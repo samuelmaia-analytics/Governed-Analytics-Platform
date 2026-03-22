@@ -6,8 +6,8 @@ Relatório de validação da tabela `fact_orders_enriched`.
 
 - Total de registros avaliados: **112,650**
 - Total de colunas avaliadas no dataset: **48**
-- Total de checks executados: **20**
-- Checks aprovados: **19**
+- Total de checks executados: **25**
+- Checks aprovados: **24**
 - Checks reprovados: **1**
 
 ## Resultado dos Checks
@@ -33,6 +33,11 @@ Relatório de validação da tabela `fact_orders_enriched`.
 | `category_missing_pct` | **PASS** | 1.42 | 5.0 | medium |
 | `undelivered_orders_pct` | **PASS** | 2.18 | 5.0 | medium |
 | `delay_null_consistency` | **PASS** | 0.0 | 0.0 | high |
+| `dimension_join_missing_pct__customer_unique_id` | **PASS** | 0.0 | 1.0 | medium |
+| `dimension_join_missing_pct__customer_state` | **PASS** | 0.0 | 1.0 | medium |
+| `dimension_join_missing_pct__seller_state` | **PASS** | 0.0 | 1.0 | medium |
+| `dimension_join_missing_pct__payment_type_mode` | **PASS** | 0.0 | 1.0 | medium |
+| `payment_reconciliation_gap_over_1_real_pct` | **PASS** | 0.25 | 5.0 | medium |
 | `record_volume_above_100k` | **PASS** | 112650.0 | 100001.0 | high |
 
 ## Observações
@@ -56,4 +61,6 @@ Relatório de validação da tabela `fact_orders_enriched`.
 - Percentual de ausência de categoria dentro do limite aceitável.
 - Percentual de pedidos sem entrega final dentro do limite aceitável.
 - Consistência entre ausência de entrega e ausência de `estimated_delay_days`.
+- Cobertura mínima dos principais atributos enriquecidos da camada dimensional.
+- Reconciliação financeira entre valor do pedido na grain analítica e total pago por pedido.
 - Volume total acima de 100.000 registros.

@@ -56,6 +56,8 @@ GRANULARITY_COLUMNS = ["order_id", "order_item_id", "product_id", "seller_id"]
 MAX_REVIEW_SCORE_MISSING_PCT = 35.0
 MAX_CATEGORY_MISSING_PCT = 5.0
 MAX_UNDELIVERED_PCT = 5.0
+MAX_DIMENSION_JOIN_MISSING_PCT = 1.0
+MAX_PAYMENT_GAP_OVER_1_REAL_PCT = 5.0
 MIN_RECORDS = 100_001
 
 
@@ -299,6 +301,47 @@ def check_record_volume(df: pd.DataFrame) -> QualityCheckResult:
     )
 
 
+def check_dimension_join_coverage(df: pd.DataFrame) -> list[QualityCheckResult]:
+    results: list[QualityCheckResult] = []
+    for column in ["customer_unique_id", "customer_state", "seller_state", "payment_type_mode"]:
+        missing_pct = round(float(df[column].isna().mean() * 100), 2)
+        results.append(
+            build_result(
+                f"dimension_join_missing_pct__{column}",
+                missing_pct <= MAX_DIMENSION_JOIN_MISSING_PCT,
+                missing_pct,
+                MAX_DIMENSION_JOIN_MISSING_PCT,
+                "medium",
+                f"Percentual de ausência do atributo enriquecido `{column}` na tabela final.",
+            )
+        )
+    return results
+
+
+def check_payment_reconciliation(df: pd.DataFrame) -> QualityCheckResult:
+    order_level = (
+        df.groupby("order_id", as_index=False)
+        .agg(
+            order_items_total=("total_item_value", "sum"),
+            order_payment_total=("total_payment_value", "max"),
+        )
+        .assign(
+            order_payment_total=lambda frame: frame["order_payment_total"].fillna(0),
+            abs_gap=lambda frame: (frame["order_items_total"] - frame["order_payment_total"]).abs(),
+        )
+    )
+    gap_pct = round(float((order_level["abs_gap"] > 1.0).mean() * 100), 2)
+    passed = gap_pct <= MAX_PAYMENT_GAP_OVER_1_REAL_PCT
+    return build_result(
+        "payment_reconciliation_gap_over_1_real_pct",
+        passed,
+        gap_pct,
+        MAX_PAYMENT_GAP_OVER_1_REAL_PCT,
+        "medium",
+        "Percentual de pedidos com diferenca superior a R$ 1,00 entre `sum(total_item_value)` e `total_payment_value`.",
+    )
+
+
 def run_quality_checks(df: pd.DataFrame) -> list[QualityCheckResult]:
     results: list[QualityCheckResult] = []
     results.append(check_expected_schema(df))
@@ -310,6 +353,8 @@ def run_quality_checks(df: pd.DataFrame) -> list[QualityCheckResult]:
     results.append(check_category_missing_pct(df))
     results.append(check_undelivered_pct(df))
     results.append(check_delay_null_consistency(df))
+    results.extend(check_dimension_join_coverage(df))
+    results.append(check_payment_reconciliation(df))
     results.append(check_record_volume(df))
     return results
 
@@ -391,6 +436,8 @@ def render_quality_report(df: pd.DataFrame, results: list[QualityCheckResult]) -
             "- Percentual de ausência de categoria dentro do limite aceitável.",
             "- Percentual de pedidos sem entrega final dentro do limite aceitável.",
             "- Consistência entre ausência de entrega e ausência de `estimated_delay_days`.",
+            "- Cobertura mínima dos principais atributos enriquecidos da camada dimensional.",
+            "- Reconciliação financeira entre valor do pedido na grain analítica e total pago por pedido.",
             "- Volume total acima de 100.000 registros.",
             "",
         ]

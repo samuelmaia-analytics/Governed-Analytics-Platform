@@ -5,6 +5,9 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.env
+.env.*
+!.env.example
 
 # Keep raw data delivered with the case
 !data/raw/
@@ -20,6 +23,14 @@ data/staging/*
 
 data/curated/*
 !data/curated/.gitkeep
+!data/curated/catalog/
+!data/curated/catalog/*.json
+!data/curated/catalog/*.csv
+
+data/published/*
+!data/published/.gitkeep
+!data/published/dashboard/
+!data/published/dashboard/.gitkeep
 
 # Optional local-only data
 data/external/*

@@ -11,6 +11,7 @@ if __package__ is None or __package__ == "":
 
 from src.config import DATA_DIR
 from src.ingest import configure_logging
+from src.publish_dashboard import pseudonymize
 from src.utils import ensure_directory
 
 
@@ -59,8 +60,10 @@ def build_dim_date(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_dim_product(df: pd.DataFrame) -> pd.DataFrame:
+    dim = df.copy()
+    dim["product_key"] = dim["product_id"].map(lambda value: pseudonymize(value, "product_id"))
     columns = [
-        "product_id",
+        "product_key",
         "product_category_name",
         "product_category_name_english",
         "category_label",
@@ -72,28 +75,22 @@ def build_dim_product(df: pd.DataFrame) -> pd.DataFrame:
         "product_height_cm",
         "product_width_cm",
     ]
-    return df[columns].drop_duplicates(subset=["product_id"]).sort_values("product_id").reset_index(drop=True)
+    return dim[columns].drop_duplicates(subset=["product_key"]).sort_values("product_key").reset_index(drop=True)
 
 
 def build_dim_customer(df: pd.DataFrame) -> pd.DataFrame:
-    columns = [
-        "customer_id",
-        "customer_unique_id",
-        "customer_zip_code_prefix",
-        "customer_city",
-        "customer_state",
-    ]
-    return df[columns].drop_duplicates(subset=["customer_id"]).sort_values("customer_id").reset_index(drop=True)
+    dim = df.copy()
+    dim["customer_key"] = dim["customer_id"].map(lambda value: pseudonymize(value, "customer_id"))
+    dim["customer_master_key"] = dim["customer_unique_id"].map(lambda value: pseudonymize(value, "customer_unique_id"))
+    columns = ["customer_key", "customer_master_key", "customer_state"]
+    return dim[columns].drop_duplicates(subset=["customer_key"]).sort_values("customer_key").reset_index(drop=True)
 
 
 def build_dim_seller(df: pd.DataFrame) -> pd.DataFrame:
-    columns = [
-        "seller_id",
-        "seller_zip_code_prefix",
-        "seller_city",
-        "seller_state",
-    ]
-    return df[columns].drop_duplicates(subset=["seller_id"]).sort_values("seller_id").reset_index(drop=True)
+    dim = df.copy()
+    dim["seller_key"] = dim["seller_id"].map(lambda value: pseudonymize(value, "seller_id"))
+    columns = ["seller_key", "seller_state"]
+    return dim[columns].drop_duplicates(subset=["seller_key"]).sort_values("seller_key").reset_index(drop=True)
 
 
 def build_dim_payment(df: pd.DataFrame) -> pd.DataFrame:
@@ -125,29 +122,33 @@ def build_dim_order_status(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_fact_sales(df: pd.DataFrame) -> pd.DataFrame:
     fact = df.copy()
+    fact["order_key"] = fact["order_id"].map(lambda value: pseudonymize(value, "order_id"))
+    fact["customer_key"] = fact["customer_id"].map(lambda value: pseudonymize(value, "customer_id"))
+    fact["product_key"] = fact["product_id"].map(lambda value: pseudonymize(value, "product_id"))
+    fact["seller_key"] = fact["seller_id"].map(lambda value: pseudonymize(value, "seller_id"))
     fact["date_key"] = fact["order_date"].dt.strftime("%Y%m%d")
     fact.loc[fact["order_date"].isna(), "date_key"] = pd.NA
     fact["date_key"] = fact["date_key"].astype("Int64")
     fact["order_item_key"] = (
-        fact["order_id"].astype(str)
+        fact["order_key"].astype(str)
         + "_"
         + fact["order_item_id"].astype(str)
         + "_"
-        + fact["product_id"].astype(str)
+        + fact["product_key"].astype(str)
         + "_"
-        + fact["seller_id"].astype(str)
+        + fact["seller_key"].astype(str)
     )
     fact["review_available"] = fact["review_score_mean"].notna().astype(int)
     fact["delivered_flag"] = fact["order_delivered_customer_date"].notna().astype(int)
 
     columns = [
         "order_item_key",
-        "order_id",
+        "order_key",
         "order_item_id",
         "date_key",
-        "customer_id",
-        "product_id",
-        "seller_id",
+        "customer_key",
+        "product_key",
+        "seller_key",
         "payment_type_mode",
         "order_status",
         "order_purchase_timestamp",

@@ -6,6 +6,8 @@ Este projeto foi desenvolvido para transformar o dataset Olist em uma base anal�
 
 O resultado central do trabalho é a tabela `fact_orders_enriched`, desenhada para consolidar informações de pedidos, itens, clientes, produtos, sellers, pagamentos e reviews em uma camada única de análise.
 
+Para consumo executivo, o projeto também passou a publicar a camada `fact_orders_dashboard`, derivada da fato interna com minimização de campos e pseudonimização de chaves para o Streamlit.
+
 ## Objetivo do Projeto
 
 O objetivo do projeto é construir uma solução de dados ponta a ponta que permita:
@@ -68,6 +70,8 @@ Principais características:
 - volume final: `112.650` registros
 - formato de persistência: `csv` e `parquet`
 - uso principal: base de consulta SQL, documentação do case e consumo por dashboard
+- ativo central da coleção materializada em `data/curated/catalog/dadosfera_collection.json`
+- camada publicada derivada: `data/published/dashboard/fact_orders_dashboard.parquet`, usada exclusivamente no dashboard
 
 Principais grupos de atributos:
 
@@ -77,6 +81,11 @@ Principais grupos de atributos:
 - reviews agregadas
 - atributos de categoria e localidade
 - colunas derivadas para calendário e performance logística
+
+Observação de governança:
+
+- a tabela acima permanece como camada analítica interna
+- a exposição no dashboard ocorre a partir de uma camada publicada e minimizada, com remoção de cidade, CEP e IDs desnecessários
 
 Colunas derivadas de maior relevância:
 
@@ -198,15 +207,17 @@ Do ponto de vista de negócio, isso sugere algumas leituras prioritárias:
 
 Do ponto de vista técnico, a camada analítica também preserva transparência sobre a qualidade da fonte: pedidos sem entrega permanecem com métricas logísticas nulas quando apropriado, e pequenas anomalias residuais de origem são tratadas como alerta documentado, não como dado artificialmente corrigido.
 
+Além disso, a entrega passou a incluir uma coleção materializada do projeto, com manifesto JSON e inventário tabular dos ativos, o que reforça a aderência ao item de catalogação/publicação do case.
+
 ## Próximos Passos
 
 Como evolução natural do trabalho, os próximos passos recomendados são:
 
-- construir dashboards interativos no Streamlit sobre a `fact_orders_enriched`
 - desenvolver marts adicionais por cliente, seller e categoria
 - incluir métricas de cohort, recorrência, ticket por pedido e lifetime value
 - aprofundar as validações de qualidade com regras relacionais entre entidades
-- adicionar visualizações gráficas complementares além das tabelas em PNG
+- integrar o manifesto da coleção a uma API real de catálogo ou publicação
+- ampliar a suíte de testes para contratos de schema, regressão analítica e componentes do dashboard
 - automatizar a execução do pipeline de ponta a ponta
 
 ## Como Esta Entrega Atende ao Case
@@ -216,9 +227,11 @@ Esta entrega atende ao case porque demonstra, de forma integrada, as capacidades
 - organização profissional do repositório
 - tratamento estruturado dos dados brutos
 - modelagem analítica com critério de granularidade
+- materialização da coleção/catalogação dos ativos do case
 - validação da qualidade da base final
 - consultas SQL orientadas a perguntas de negócio
 - documentação clara e rastreável dos resultados
+- testes automatizados mínimos para regras críticas do pipeline
 - preparo da base para consumo visual e executivo
 
 Em resumo, o projeto mostra a capacidade de sair de dados transacionais brutos e chegar a uma camada analítica robusta, com rastreabilidade técnica e leitura executiva, respondendo ao case de maneira completa e coerente.

@@ -6,6 +6,8 @@ Este bônus foi preparado para ampliar a entrega do case com uma camada de consu
 
 A proposta é disponibilizar um modelo simples de fato e dimensões auxiliares, facilitando a montagem de um dashboard mais corporativo, com exploração ad hoc, relacionamento visual entre tabelas e distribuição futura em ambiente de BI.
 
+Os exports foram mantidos analiticamente úteis, mas com pseudonimização das chaves e remoção de localização fina desnecessária, para refletir uma abordagem mais madura de privacidade por design.
+
 ## Arquivos Gerados
 
 Os arquivos para Power BI ficam em:
@@ -25,9 +27,9 @@ Os arquivos para Power BI ficam em:
 3. Importe todos os arquivos de `data/processed/bi_exports/`.
 4. No modelo, configure os relacionamentos:
    - `fact_sales_power_bi[date_key]` -> `dim_date[date_key]`
-   - `fact_sales_power_bi[product_id]` -> `dim_product[product_id]`
-   - `fact_sales_power_bi[customer_id]` -> `dim_customer[customer_id]`
-   - `fact_sales_power_bi[seller_id]` -> `dim_seller[seller_id]`
+   - `fact_sales_power_bi[product_key]` -> `dim_product[product_key]`
+   - `fact_sales_power_bi[customer_key]` -> `dim_customer[customer_key]`
+   - `fact_sales_power_bi[seller_key]` -> `dim_seller[seller_key]`
    - `fact_sales_power_bi[payment_type_mode]` -> `dim_payment[payment_type_mode]`
    - `fact_sales_power_bi[order_status]` -> `dim_order_status[order_status]`
 5. Marque `dim_date` como tabela de datas, usando `order_date`.

@@ -85,6 +85,8 @@ Dadosfera
 
 Na prática, a proposta não exige descartar o que já foi construído. O pipeline atual pode continuar como motor de transformação, enquanto a Dadosfera atua como camada de publicação, compartilhamento e escalabilidade. Em um estágio mais maduro, parte relevante da arquitetura local pode ser simplificada ou absorvida pela plataforma.
 
+Nesta prova de conceito, essa visão já foi parcialmente materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Ainda não há integração direta com endpoint externo da plataforma, mas o case agora explicita quais ativos seriam publicados e com quais metadados.
+
 ## 3. Por que a Abordagem Baseada na Dadosfera é Mais Viável e/ou Mais Barata
 
 Do ponto de vista técnico, a principal vantagem da Dadosfera está em reduzir o custo de complexidade operacional.

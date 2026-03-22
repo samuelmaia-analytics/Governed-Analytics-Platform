@@ -42,8 +42,11 @@ Os ativos processed representam as saídas geradas pelo pipeline analítico do p
 | `all_duplicate_profile.csv` | `data/staging/profiling/all_duplicate_profile.csv` | Duplicidade por tabela raw. | 1 linha por tabela |
 | `fact_orders_enriched.parquet` | `data/curated/analytics/fact_orders_enriched.parquet` | Tabela analítica principal do projeto. | 1 linha por item de pedido |
 | `fact_orders_enriched.csv` | `data/curated/analytics/fact_orders_enriched.csv` | Versão CSV da tabela analítica principal. | 1 linha por item de pedido |
+| `fact_orders_dashboard.parquet` | `data/published/dashboard/fact_orders_dashboard.parquet` | Camada publicada para o dashboard, com pseudonimização e minimização. | 1 linha por item de pedido |
 | `fact_orders_enriched_quality_checks.csv` | `data/curated/quality/fact_orders_enriched_quality_checks.csv` | Resultado estruturado dos checks de qualidade da tabela final. | 1 linha por check |
 | `query_results/*.csv` | `data/curated/query_results/` | Resultados das queries analíticas executadas em DuckDB. | Variável por consulta |
+| `dadosfera_collection.json` | `data/curated/catalog/dadosfera_collection.json` | Manifesto versionável da coleção do case com metadados de publicação e ativos catalogáveis. | 1 documento por coleção |
+| `collection_assets_inventory.csv` | `data/curated/catalog/collection_assets_inventory.csv` | Inventário tabular dos ativos do projeto usados para catalogação/publicação. | 1 linha por ativo |
 | `bi_exports/*.csv` | `data/processed/bi_exports/` | Exportações auxiliares para consumo em Power BI. | Variável por dataset |
 
 ## 3. Tabela Analítica Final
@@ -77,6 +80,15 @@ Tabela analítica consolidada para análise de pedidos, itens, receita, logísti
 - `delivery_time_days` mede o tempo entre compra e entrega
 - `estimated_delay_days` mede a diferença entre entrega real e entrega estimada
 - `is_delayed` indica entrega posterior à data estimada
+
+## 3.1 Classificação de Sensibilidade
+
+| Classe | Descrição | Exemplos no projeto |
+| --- | --- | --- |
+| `Analítico público` | Pode ser exposto em dashboard, markdown e prints sem granularidade sensível adicional. | métricas agregadas por categoria, tempo, UF, pagamento |
+| `Analítico interno` | Necessário para engenharia, SQL e qualidade, mas não para exposição direta em app executivo. | `fact_orders_enriched` |
+| `Quase-identificador` | Não identifica diretamente, mas pode aumentar risco por combinação. | `customer_city`, `seller_city`, `customer_zip_code_prefix`, `seller_zip_code_prefix`, timestamps detalhados |
+| `Identificador pseudonimizado` | Chave mantida apenas para contagem, deduplicação e drill-down controlado. | `order_id` e `customer_unique_id` na camada publicada |
 
 ## 4. Dicionário de Colunas da `fact_orders_enriched`
 
@@ -131,7 +143,25 @@ Tabela analítica consolidada para análise de pedidos, itens, receita, logísti
 | `latest_review_creation_date` | `datetime` | Data mais recente de criação de review do pedido. | Agregado por `order_id`. | Nulo quando não há review. |
 | `latest_review_answer_timestamp` | `datetime` | Data mais recente de resposta ao review. | Agregado por `order_id`. | Nulo quando não há review ou resposta. |
 
-## 5. Observações Gerais de Qualidade
+## 5. Camada Publicada para Dashboard
+
+### `fact_orders_dashboard`
+
+**Caminho**
+
+- `data/published/dashboard/fact_orders_dashboard.parquet`
+
+**Objetivo**
+
+Camada publicada para o Streamlit, derivada de `fact_orders_enriched`, com minimização de dados e pseudonimização de chaves usadas apenas para contagem e drill-down controlado.
+
+**Principais decisões**
+
+- `order_id` e `customer_unique_id` permanecem apenas em formato pseudonimizado.
+- `customer_id`, `product_id`, `seller_id`, cidade e prefixo de CEP não são publicados no dashboard.
+- A camada mantém apenas colunas necessárias para responder às perguntas do case.
+
+## 6. Observações Gerais de Qualidade
 
 - A base final possui mais de `100.000` registros e atende ao volume mínimo esperado do case.
 - A granularidade escolhida não apresentou duplicidade na validação de qualidade.
@@ -139,7 +169,7 @@ Tabela analítica consolidada para análise de pedidos, itens, receita, logísti
 - Existe uma pequena parcela de pedidos sem data final de entrega, o que gera nulos esperados em métricas logísticas derivadas.
 - Existe uma anomalia residual da fonte em poucos registros nos quais a entrega aparece antes da aprovação; esse ponto foi mantido como alerta de qualidade, sem mascarar a informação original.
 
-## 6. Uso Recomendado
+## 7. Uso Recomendado
 
 Esta base é adequada para:
 
@@ -150,3 +180,5 @@ Esta base é adequada para:
 - consultas SQL em DuckDB
 
 Para análises no nível de pedido, recomenda-se cuidado ao usar colunas agregadas por `order_id`, pois a base final preserva granularidade por item e replica alguns atributos de pedido em todas as linhas correspondentes.
+
+Para consumo em dashboard e material executivo, recomenda-se usar preferencialmente `fact_orders_dashboard`, e não a camada interna `fact_orders_enriched`.

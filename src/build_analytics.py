@@ -183,6 +183,42 @@ def remove_obvious_inconsistencies(fact_table: pd.DataFrame) -> pd.DataFrame:
     return cleaned
 
 
+def build_join_health_summary(fact_table: pd.DataFrame) -> dict[str, float]:
+    metrics = {}
+    for column in [
+        "customer_unique_id",
+        "customer_state",
+        "seller_state",
+        "payment_type_mode",
+        "product_category_name",
+        "product_category_name_english",
+    ]:
+        if column in fact_table.columns:
+            metrics[column] = round(float(fact_table[column].isna().mean() * 100), 2)
+    return metrics
+
+
+def build_payment_reconciliation_summary(fact_table: pd.DataFrame) -> dict[str, float]:
+    order_reconciliation = (
+        fact_table.groupby("order_id", as_index=False)
+        .agg(
+            order_items_total=("total_item_value", "sum"),
+            order_payment_total=("total_payment_value", "max"),
+        )
+        .assign(
+            order_payment_total=lambda df_: df_["order_payment_total"].fillna(0),
+            abs_gap=lambda df_: (df_["order_items_total"] - df_["order_payment_total"]).abs(),
+        )
+    )
+    order_reconciliation["gap_gt_1_real"] = order_reconciliation["abs_gap"] > 1.0
+    return {
+        "orders_reconciled": int(len(order_reconciliation)),
+        "avg_abs_gap": round(float(order_reconciliation["abs_gap"].mean()), 4),
+        "max_abs_gap": round(float(order_reconciliation["abs_gap"].max()), 4),
+        "orders_gap_gt_1_real_pct": round(float(order_reconciliation["gap_gt_1_real"].mean() * 100), 2),
+    }
+
+
 def select_output_columns(fact_table: pd.DataFrame) -> pd.DataFrame:
     preferred_order = [
         "order_id",
@@ -285,6 +321,8 @@ def save_outputs(fact_table: pd.DataFrame) -> tuple[Path, Path]:
 
 
 def render_report(fact_table: pd.DataFrame) -> str:
+    join_health = build_join_health_summary(fact_table)
+    reconciliation = build_payment_reconciliation_summary(fact_table)
     lines = [
         "# fact_orders_enriched",
         "",
@@ -306,19 +344,38 @@ def render_report(fact_table: pd.DataFrame) -> str:
         "- `is_delayed` sinaliza pedidos entregues após a data estimada.",
         "- Registros com chaves essenciais ausentes, valores monetários negativos ou entrega anterior à compra são removidos.",
         "",
-        "## Decisão de Granularidade",
+        "## Cobertura de Enriquecimento",
         "",
-        "- A granularidade escolhida é `order_id + order_item_id + product_id + seller_id`.",
-        "- Essa decisão preserva a análise por item vendido, seller e produto, sem perder contexto de pedido, cliente, pagamento e review.",
-        "",
-        "## Principais Limitações",
-        "",
-        "- `payments` e `reviews` são resumidos ao nível do pedido, portanto distribuições internas por item não existem na fonte final.",
-        "- Algumas colunas de data do dataset original possuem ausências; nesses casos, as métricas derivadas podem ficar nulas ou simplificadas.",
-        "- A regra de inconsistência é propositalmente conservadora e remove apenas anomalias óbvias.",
-        "- O campo `order_approved_at` pode permanecer nulo ou texto convertido para `NaT` quando a origem estiver incompleta.",
-        "",
+        "| Atributo | Percentual ausente |",
+        "| --- | ---: |",
     ]
+    for column, missing_pct in join_health.items():
+        lines.append(f"| `{column}` | {missing_pct:.2f}% |")
+
+    lines.extend(
+        [
+            "",
+            "## Reconciliação Financeira em Nível de Pedido",
+            "",
+            f"- Pedidos reconciliados: **{reconciliation['orders_reconciled']:,}**",
+            f"- Gap absoluto médio entre `sum(total_item_value)` e `total_payment_value`: **{reconciliation['avg_abs_gap']:.4f}**",
+            f"- Gap absoluto máximo observado: **{reconciliation['max_abs_gap']:.4f}**",
+            f"- Percentual de pedidos com gap acima de R$ 1,00: **{reconciliation['orders_gap_gt_1_real_pct']:.2f}%**",
+            "",
+            "## Decisão de Granularidade",
+            "",
+            "- A granularidade escolhida é `order_id + order_item_id + product_id + seller_id`.",
+            "- Essa decisão preserva a análise por item vendido, seller e produto, sem perder contexto de pedido, cliente, pagamento e review.",
+            "",
+            "## Principais Limitações",
+            "",
+            "- `payments` e `reviews` são resumidos ao nível do pedido, portanto distribuições internas por item não existem na fonte final.",
+            "- Algumas colunas de data do dataset original possuem ausências; nesses casos, as métricas derivadas podem ficar nulas ou simplificadas.",
+            "- A regra de inconsistência é propositalmente conservadora e remove apenas anomalias óbvias.",
+            "- O campo `order_approved_at` pode permanecer nulo ou texto convertido para `NaT` quando a origem estiver incompleta.",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
