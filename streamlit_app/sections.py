@@ -1,0 +1,309 @@
+from __future__ import annotations
+
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+
+from streamlit_app.analytics import build_executive_insights, build_filter_context_summary, build_regional_insights, build_smart_summary, build_state_table
+from streamlit_app.charts import (
+    chart_category_share_donut,
+    chart_category_value_vs_satisfaction,
+    chart_delay_by_category,
+    chart_delay_by_period,
+    chart_delivery_boxplot,
+    chart_delivery_vs_review,
+    chart_orders_area,
+    chart_revenue_line,
+    chart_seasonality_heatmap,
+    chart_state_delay_rate,
+    chart_state_delivery_time,
+    chart_state_revenue,
+    chart_top_categories_orders,
+    chart_top_categories_revenue,
+)
+from streamlit_app.data import FilterState
+from streamlit_app.formatting import format_currency, format_number, format_pct, to_csv_bytes
+from streamlit_app.theme import COLORS
+
+
+def metric_card(label: str, value: str, delta: str, help_text: str) -> None:
+    st.metric(label=label, value=value, delta=delta, help=help_text)
+
+
+def render_header(filters: FilterState) -> None:
+    period_text = f"{filters.start_date:%d/%m/%Y} a {filters.end_date:%d/%m/%Y}"
+    st.markdown(
+        f"""
+        <div class="hero-shell">
+            <div class="hero-top">
+                <div>
+                    <span class="hero-badge">samuelmaia_DDF_032026</span>
+                    <h1 class="hero-title">Executive Commerce Analytics</h1>
+                    <p class="hero-subtitle">
+                        Painel executivo para leitura rápida de receita, categorias, operação e experiência do cliente,
+                        transformando o dataset Olist em uma camada analítica pronta para decisão.
+                    </p>
+                </div>
+                <div class="hero-badge">Dataset Olist | Brazilian E-Commerce Public Dataset</div>
+            </div>
+            <div class="hero-dataset">
+                <div class="hero-stat">
+                    <strong>Objetivo analítico</strong>
+                    Entender onde o negócio cresce, onde perde eficiência e onde estão as prioridades operacionais.
+                </div>
+                <div class="hero-stat">
+                    <strong>Leitura atual</strong>
+                    Recorte ativo de {period_text}, com filtros globais refletidos em indicadores, visuais e insights.
+                </div>
+                <div class="hero-stat">
+                    <strong>Base do dashboard</strong>
+                    Camada publicada em parquet, derivada de <code>fact_orders_enriched</code> e minimizada para consumo executivo.
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_section_header(eyebrow: str, title: str, copy: str) -> None:
+    st.markdown("<div class='section-shell'>", unsafe_allow_html=True)
+    st.markdown(f"<div class='section-eyebrow'>{eyebrow}</div>", unsafe_allow_html=True)
+    st.markdown(f"<h2 class='section-title'>{title}</h2>", unsafe_allow_html=True)
+    st.markdown(f"<p class='section-copy'>{copy}</p>", unsafe_allow_html=True)
+
+
+def close_section() -> None:
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_kpi_row(metrics: list[dict[str, str]]) -> None:
+    st.markdown(
+        """
+        <div class="kpi-shell">
+            <div class="section-eyebrow">KPI Layer</div>
+            <h2 class="section-title">Indicadores principais do recorte</h2>
+            <p class="section-copy">
+                Os KPIs abaixo resumem escala comercial, monetização, satisfação e eficiência operacional,
+                com comparação contra o período imediatamente anterior quando houver base.
+            </p>
+        """,
+        unsafe_allow_html=True,
+    )
+    row1 = st.columns(4, gap="medium")
+    row2 = st.columns(4, gap="medium")
+    for idx, metric in enumerate(metrics[:4]):
+        with row1[idx]:
+            metric_card(metric["label"], metric["value"], metric["delta"], metric["help"])
+    for idx, metric in enumerate(metrics[4:8]):
+        with row2[idx]:
+            metric_card(metric["label"], metric["value"], metric["delta"], metric["help"])
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_context_bar(df: pd.DataFrame, filters: FilterState) -> None:
+    items = build_filter_context_summary(df, filters)
+    items_html = "".join(f"<div class='hero-stat'><strong>{label}</strong>{value}</div>" for label, value in items)
+    st.markdown(
+        f"""
+        <div class="section-shell" style="padding:0.9rem 1rem 0.95rem 1rem;">
+            <div class="section-eyebrow">Contexto do Recorte</div>
+            <p class="section-copy" style="margin-bottom:0.35rem;">
+                Resumo executivo dos filtros ativos para facilitar leitura rápida da sessão atual do dashboard.
+            </p>
+            <div class="hero-dataset" style="margin-top:0.35rem;">
+                {items_html}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_smart_summary(df: pd.DataFrame) -> None:
+    insights = build_smart_summary(df)
+    chip_html = "".join(f"<div class='copilot-chip'><strong>{chip['label']}</strong><span>{chip['value']}</span></div>" for chip in insights["chips"])
+    rec_html = "".join(f"<li>{item}</li>" for item in insights["recommendations"])
+    st.markdown(
+        f"""
+        <div class="copilot-shell">
+            <div class="section-eyebrow">Insights Inteligentes</div>
+            <h2 class="section-title" style="margin-top:0.15rem;">Copiloto analítico do recorte filtrado</h2>
+            <p class="section-copy" style="margin-bottom:0.2rem;">{insights["summary"]}</p>
+            <div class="copilot-grid">{chip_html}</div>
+            <div class="divider-label">Recomendações automáticas</div>
+            <ul style="margin:0.3rem 0 0.1rem 1.1rem; color:{COLORS["muted"]}; line-height:1.65;">
+                {rec_html}
+            </ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_regional_kpi(label: str, value: str, note: str) -> None:
+    st.markdown(
+        f"""
+        <div class="regional-kpi">
+            <strong>{label}</strong>
+            <span>{value}</span>
+            <div class="footer-note" style="margin-top:0.2rem;">{note}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def style_regional_table(df: pd.DataFrame) -> pd.io.formats.style.Styler:
+    return (
+        df.copy().style.format(
+            {
+                "receita": lambda x: format_currency(float(x)),
+                "pedidos": lambda x: format_number(float(x)),
+                "ticket_medio": lambda x: format_currency(float(x)) if pd.notna(x) else "N/A",
+                "frete_medio": lambda x: format_currency(float(x)) if pd.notna(x) else "N/A",
+                "prazo_medio": lambda x: f"{x:.1f} dias" if pd.notna(x) else "N/A",
+                "atraso_pct": lambda x: format_pct(float(x)) if pd.notna(x) else "N/A",
+                "review_medio": lambda x: f"{x:.2f}" if pd.notna(x) else "N/A",
+            }
+        )
+        .background_gradient(subset=["receita"], cmap="Blues")
+        .background_gradient(subset=["atraso_pct"], cmap="Reds")
+        .background_gradient(subset=["review_medio"], cmap="BuGn")
+    )
+
+
+def render_chart(fig: go.Figure, insight: str) -> None:
+    st.plotly_chart(fig, use_container_width=True)
+    st.caption(insight)
+
+
+def render_temporal_section(df: pd.DataFrame) -> None:
+    render_section_header("Análise Temporal", "Tendência, sazonalidade e ritmo operacional", "Esta seção mostra quando o negócio acelera, onde a sazonalidade aparece e em quais janelas a operação parece mais pressionada.")
+    col1, col2 = st.columns(2, gap="large")
+    with col1:
+        render_chart(chart_revenue_line(df), "A curva de receita destaca aceleração, desaceleração e momentos em que o crescimento merece leitura conjunta com capacidade operacional.")
+    with col2:
+        render_chart(chart_orders_area(df), "O volume de pedidos ajuda a diferenciar crescimento de receita por demanda versus crescimento por ticket.")
+    col3, col4 = st.columns(2, gap="large")
+    with col3:
+        render_chart(chart_seasonality_heatmap(df), "O heatmap localiza concentração de receita por combinação de mês e dia da semana, sinalizando sazonalidades acionáveis.")
+    with col4:
+        render_chart(chart_delay_by_period(df), "O atraso por período expõe janelas em que a expansão comercial pode ter tensionado a execução logística.")
+    close_section()
+
+
+def render_category_section(df: pd.DataFrame) -> None:
+    render_section_header("Análise por Categoria", "Quais categorias sustentam resultado, risco e oportunidade", "A leitura por categoria conecta faturamento, volume, participação e satisfação para separar o que gera escala do que exige correção de rota.")
+    top_row_left, top_row_right = st.columns(2, gap="large")
+    with top_row_left:
+        render_chart(chart_top_categories_revenue(df), "O ranking por receita revela os grupos com maior peso comercial e maior sensibilidade para preço, estoque e sortimento.")
+    with top_row_right:
+        render_chart(chart_top_categories_orders(df), "O ranking por pedidos mostra quais categorias sustentam volume transacional e ajudam a separar escala de monetização.")
+    bottom_row_left, bottom_row_right = st.columns(2, gap="large")
+    with bottom_row_left:
+        render_chart(chart_category_share_donut(df), "A participação por categoria mostra o grau de concentração da receita e a dependência do negócio em poucos clusters.")
+    with bottom_row_right:
+        render_chart(chart_category_value_vs_satisfaction(df), "A dispersão cruza preço médio, escala e satisfação para destacar categorias com alto volume e percepção inferior à média.")
+    close_section()
+
+
+def render_geography_section(df: pd.DataFrame, geography_mode: str) -> None:
+    geography_label = "cliente" if geography_mode == "Cliente" else "seller"
+    render_section_header("Performance Regional e Gargalos Operacionais", f"Quais UFs geram mais valor e onde o desempenho perde eficiência ({geography_label})", "A leitura regional mostra quais estados concentram receita, onde o prazo se alonga e onde custo logístico e satisfação entram em tensão.")
+    regional_df = build_state_table(df).query("pedidos >= 80").copy()
+    if regional_df.empty:
+        st.info("O recorte atual não possui massa suficiente para uma análise regional comparável por UF.")
+        close_section()
+        return
+
+    best_revenue = regional_df.sort_values("receita", ascending=False).iloc[0]
+    worst_delay = regional_df.sort_values("atraso_pct", ascending=False).iloc[0]
+
+    top_kpi_left, top_kpi_right = st.columns(2, gap="large")
+    with top_kpi_left:
+        render_regional_kpi(
+            "Melhor UF em receita",
+            f"{best_revenue['uf']} • {format_currency(float(best_revenue['receita']))}",
+            f"{format_number(float(best_revenue['pedidos']))} pedidos e ticket médio de {format_currency(float(best_revenue['ticket_medio']))}.",
+        )
+    with top_kpi_right:
+        render_regional_kpi(
+            "Pior UF em taxa de atraso",
+            f"{worst_delay['uf']} • {format_pct(float(worst_delay['atraso_pct']))}",
+            f"Prazo médio de {worst_delay['prazo_medio']:.1f} dias e review médio de {worst_delay['review_medio']:.2f}.",
+        )
+
+    col1, col2 = st.columns(2, gap="large")
+    with col1:
+        render_chart(chart_state_revenue(df), "O ranking por UF mostra onde a operação concentra maior valor comercial e onde a priorização regional tende a gerar mais retorno.")
+    with col2:
+        render_chart(chart_state_delivery_time(df), "O prazo médio por UF torna explícito onde o serviço logístico está mais pressionado, mesmo em estados comercialmente relevantes.")
+
+    col3, col4 = st.columns((1.15, 0.85), gap="large")
+    with col3:
+        table_df = regional_df[["uf", "receita", "pedidos", "ticket_medio", "frete_medio", "prazo_medio", "atraso_pct", "review_medio"]].sort_values("receita", ascending=False)
+        st.dataframe(style_regional_table(table_df), use_container_width=True, height=420)
+        st.caption("Tabela analítica por UF com foco em escala comercial, custo logístico e percepção de experiência.")
+    with col4:
+        render_chart(chart_state_delay_rate(df), "A taxa de atraso por UF ajuda a localizar gargalos operacionais persistentes e orientar revisão de SLA regional.")
+        regional_insights_html = "".join(f"<li>{item}</li>" for item in build_regional_insights(df))
+        st.markdown(
+            f"""
+            <div class="regional-kpi" style="margin-top:0.8rem;">
+                <strong>Insights regionais</strong>
+                <div class="footer-note" style="margin-top:0.35rem;">
+                    <ul style="margin:0 0 0 1rem; padding:0; line-height:1.65;">
+                        {regional_insights_html}
+                    </ul>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    close_section()
+
+
+def render_operations_section(df: pd.DataFrame) -> None:
+    render_section_header("Operação e Logística", "Onde estão os gargalos que afetam SLA, satisfação e eficiência", "A leitura operacional conecta prazo, atraso e percepção do cliente para direcionar ações de SLA, transporte e jornada.")
+    col1, col2 = st.columns(2, gap="large")
+    with col1:
+        render_chart(chart_delivery_boxplot(df), "A distribuição de prazo mostra dispersão operacional e ajuda a separar rotinas estáveis de exceções severas.")
+    with col2:
+        render_chart(chart_delay_by_category(df), "Categorias com maior taxa de atraso são candidatas naturais para revisão de SLA, sellers e estratégia de fulfilment.")
+    render_chart(chart_delivery_vs_review(df), "O relacionamento entre prazo médio e nota média indica em quais clusters a experiência do cliente é mais sensível à lentidão logística.")
+    close_section()
+
+
+def render_executive_insights(df: pd.DataFrame) -> None:
+    render_section_header("Insights Executivos", "Síntese final para decisão de negócio", "Esta camada final resume o recorte em sinais de ação, destacando o que merece atenção imediata de negócio e operação.")
+    cards_html = "".join(f"<div class='insight-card'><h4>{card['title']}</h4><p>{card['text']}</p></div>" for card in build_executive_insights(df))
+    st.markdown(f"<div class='insight-grid'>{cards_html}</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<p class='footer-note'>Leitura recomendada: primeiro validar tendência e concentração de receita, depois localizar gargalos regionais e, por fim, priorizar ações logísticas com maior impacto em valor e experiência.</p>",
+        unsafe_allow_html=True,
+    )
+    close_section()
+
+
+def render_support_tables(df: pd.DataFrame) -> None:
+    render_section_header("Apoio Analítico", "Tabelas para exploração detalhada e exportação", "As tabelas abaixo complementam a leitura executiva com recortes prontos para inspeção, documentação e exportação local.")
+    category_table = (
+        df.groupby("category_label", as_index=False)
+        .agg(receita=("total_item_value", "sum"), pedidos=("order_id", "nunique"), preco_medio=("price", "mean"), review_medio=("review_score_mean", "mean"), atraso_pct=("is_delayed", "mean"))
+        .sort_values("receita", ascending=False)
+        .head(20)
+    )
+    category_table["atraso_pct"] = category_table["atraso_pct"] * 100
+    state_table = build_state_table(df)
+    order_table = (
+        df[["order_id", "order_status", "selected_state", "category_label", "payment_type_mode", "order_purchase_timestamp", "total_item_value", "delivery_time_days", "estimated_delay_days", "review_score_mean"]]
+        .sort_values("order_purchase_timestamp", ascending=False)
+        .head(250)
+    )
+    tabs = st.tabs(["Categorias", "Estados", "Pedidos"])
+    for tab, table_name, table_df in [(tabs[0], "categorias", category_table), (tabs[1], "estados", state_table), (tabs[2], "pedidos", order_table)]:
+        with tab:
+            st.dataframe(table_df, use_container_width=True, height=380)
+            st.download_button(label=f"Exportar tabela de {table_name}", data=to_csv_bytes(table_df), file_name=f"{table_name}_dashboard.csv", mime="text/csv", use_container_width=True)
+    close_section()
