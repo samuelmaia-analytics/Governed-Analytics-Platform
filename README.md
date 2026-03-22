@@ -27,8 +27,11 @@ data/
     profiling/
   curated/
     analytics/
+    catalog/
     quality/
     query_results/
+  published/
+    dashboard/
   external/
   screenshots/
     query_results/
@@ -51,8 +54,10 @@ Pastas principais:
 - `data/standardized/olist/`: tabelas padronizadas para consumo interno do pipeline
 - `data/staging/profiling/`: saídas da análise exploratória inicial
 - `data/curated/analytics/`: tabela analítica final
+- `data/curated/catalog/`: manifesto de coleção e inventário catalogável dos ativos
 - `data/curated/quality/`: resultados dos testes de qualidade
 - `data/curated/query_results/`: resultados das queries SQL em CSV
+- `data/published/dashboard/`: camada publicada e minimizada para consumo do Streamlit
 - `data/screenshots/query_results/`: imagens PNG das tabelas geradas para o markdown
 - `data/processed/bi_exports/`: exportações auxiliares para Power BI
 - `sql/analytics/`: consultas do case em DuckDB
@@ -75,14 +80,42 @@ O pipeline foi organizado em etapas modulares:
 4. `src/quality.py`
    Valida schema, nulos críticos, duplicidade, coerência temporal e volume mínimo da tabela final.
 
-5. `src/run_analytics_queries.py`
+5. `src/publish_dashboard.py`
+   Gera a camada publicada do dashboard com minimização de dados, remoção de localização fina e pseudonimização de chaves.
+
+6. `src/data_classification.py`
+   Materializa a classificação formal dos principais campos com impacto de privacidade, risco e publicação.
+
+7. `src/schema_contracts.py`
+   Valida contratos simples de schema para as camadas `standardized`, `curated` e `published`.
+
+8. `src/catalog.py`
+   Materializa a coleção do case em JSON e CSV, com inventário de ativos e payload pronto para catalogação/publicação.
+
+9. `src/run_analytics_queries.py`
    Executa as queries SQL em DuckDB sobre a tabela analítica e exporta os resultados em CSV.
 
-6. `src/export_query_result_images.py`
+10. `src/export_query_result_images.py`
    Converte os resultados tabulares das queries em imagens PNG legíveis para uso no markdown do case.
 
-7. `src/export_power_bi.py`
+11. `src/export_power_bi.py`
    Gera uma fato simplificada e dimensões auxiliares para consumo externo em Power BI.
+
+## Coleção Local vs Integração Futura
+
+Para evitar ambiguidade na leitura do case, a distinção é a seguinte:
+
+- **Implementado hoje**
+  - uma coleção local materializada em `data/curated/catalog/dadosfera_collection.json`
+  - um inventário catalogável dos ativos em `data/curated/catalog/collection_assets_inventory.csv`
+  - documentação da coleção em `docs/collection_catalog.md`
+
+- **Não implementado ainda**
+  - autenticação em plataforma externa
+  - publicação real em endpoint/API da Dadosfera
+  - sincronização automática da coleção com um catálogo gerenciado
+
+Em outras palavras, o projeto já entrega a estrutura e o payload da coleção em nível de prova de conceito local, mas não afirma integração nativa concluída com a plataforma.
 
 ## Tabela Analítica Principal
 
@@ -134,7 +167,8 @@ Para manter o repositório aderente a um formato de entrega de case técnico, fo
 
 - os arquivos raw do case em `data/raw/landing/olist/` permanecem versionados
 - os screenshots usados na documentação permanecem versionados em `data/screenshots/query_results/`
-- as camadas `standardized`, `staging` e `curated` são tratadas como artefatos gerados pelo pipeline e, por isso, não precisam ser versionadas
+- o catálogo do case em `data/curated/catalog/` permanece versionado por representar a coleção materializada
+- as camadas `standardized`, `staging`, `published` e o restante de `curated` são tratadas como artefatos gerados pelo pipeline e, por isso, não precisam ser versionadas
 
 Essa decisão preserva reprodutibilidade e leitura do case sem poluir o repositório com saídas que podem ser recriadas localmente.
 
@@ -181,7 +215,58 @@ Saídas:
 - `docs/data_quality_report.md`
 - `data/curated/quality/fact_orders_enriched_quality_checks.csv`
 
-### 5. Executar queries SQL do case
+### 5. Publicar a camada segura do dashboard
+
+```bash
+python src/publish_dashboard.py
+```
+
+Saídas:
+- `data/published/dashboard/fact_orders_dashboard.parquet`
+- `data/published/dashboard/fact_orders_dashboard.csv`
+- `docs/privacy_governance.md`
+
+### 6. Materializar a classificação de dados
+
+```bash
+python src/data_classification.py
+```
+
+Saídas:
+- `data/curated/catalog/data_classification_inventory.csv`
+- `docs/data_classification.md`
+
+### 7. Validar os contratos simples de schema
+
+```bash
+python src/schema_contracts.py
+```
+
+Saídas:
+- `data/curated/quality/schema_contract_results.csv`
+- `docs/schema_contract_report.md`
+
+### 8. Materializar a coleção do case
+
+```bash
+python src/catalog.py
+```
+
+Saídas:
+- `data/curated/catalog/dadosfera_collection.json`
+- `data/curated/catalog/collection_assets_inventory.csv`
+- `docs/collection_catalog.md`
+
+### 9. Executar testes automatizados mínimos
+
+```bash
+python -m pytest tests
+```
+
+Saída:
+- suíte unitária cobrindo derivação, limpeza, qualidade e manifesto da coleção
+
+### 10. Executar queries SQL do case
 
 Se estiver usando a virtualenv local:
 
@@ -193,7 +278,7 @@ Saídas:
 - `data/curated/query_results/*.csv`
 - `data/curated/query_results/query_execution_manifest.csv`
 
-### 6. Gerar imagens dos resultados das queries
+### 11. Gerar imagens dos resultados das queries
 
 ```bash
 .\.venv\Scripts\python.exe src/export_query_result_images.py
@@ -202,7 +287,7 @@ Saídas:
 Saídas:
 - `data/screenshots/query_results/*.png`
 
-### 7. Gerar exportações para Power BI
+### 12. Gerar exportações para Power BI
 
 ```bash
 python src/export_power_bi.py
@@ -211,10 +296,32 @@ python src/export_power_bi.py
 Saída:
 - `data/processed/bi_exports/`
 
-### 8. Rodar o dashboard Streamlit
+### 13. Rodar o dashboard Streamlit
 
 ```bash
 streamlit run streamlit_app/app.py
+```
+
+O app consome exclusivamente:
+
+- `data/published/dashboard/fact_orders_dashboard.parquet`
+
+### 14. Rodar o pipeline completo em sequência
+
+```bash
+python src/run_case_pipeline.py
+```
+
+Para listar as etapas disponíveis:
+
+```bash
+python src/run_case_pipeline.py --list-steps
+```
+
+Para executar apenas etapas específicas:
+
+```bash
+python src/run_case_pipeline.py --steps build publish classify contracts quality catalog
 ```
 
 ## Consultas SQL do Case
@@ -239,8 +346,28 @@ Arquivos principais em `docs/`:
 - `fact_orders_enriched.md`: documentação da tabela analítica
 - `data_quality_report.md`: relatório de qualidade da base final
 - `architecture.md`: visão geral da arquitetura
+- `collection_catalog.md`: materialização da coleção/catálogo do case
 - `data_dictionary.md`: dicionário de dados
+- `data_classification.md`: classificação formal dos principais campos com impacto de privacidade e publicação
+- `privacy_governance.md`: decisões de minimização, publicação segura e privacidade por design
+- `governance_policy.md`: política de governança, retenção e accountability
+- `schema_contract_report.md`: validação dos contratos simples de schema das camadas principais
 - `bi_bonus.md`: orientação para o bônus em Power BI
+
+## Privacidade, Governança e Publicação
+
+O projeto separa explicitamente:
+
+- `data/curated/analytics/`: camada analítica interna, usada para engenharia, SQL, qualidade e rastreabilidade
+- `data/published/dashboard/`: camada publicada, minimizada e pseudonimizada para o Streamlit
+
+Medidas implementadas:
+
+- pseudonimização de `order_id` e `customer_unique_id` na camada publicada
+- remoção de `customer_id`, `seller_id`, `product_id`, cidade e prefixos de CEP do produto analítico publicado
+- preservação da camada interna para reprodutibilidade técnica e auditoria
+
+Isso mantém o valor analítico do case sem expor granularidade desnecessária no dashboard.
 
 ## Principais Entregas
 
@@ -252,7 +379,9 @@ Este repositório entrega:
 - consultas SQL executáveis em DuckDB
 - resultados exportados em CSV e PNG para documentação
 - material de case escrito em tom técnico e executivo
+- coleção do case materializada em manifesto JSON e inventário tabular
 - exportações auxiliares para BI externo
+- testes automatizados mínimos para regras críticas do pipeline
 
 ## Próximos Passos
 
@@ -260,10 +389,10 @@ Evoluções naturais do projeto:
 
 - ampliar o dashboard Streamlit com novas análises e exportações
 - criar marts específicos por cliente, seller e categoria
-- incluir testes automatizados para o pipeline
 - automatizar a execução completa com um orquestrador simples
-- expandir a camada de visualização além das tabelas estáticas
+- ampliar a suíte de testes para cenários relacionais, regressão analítica e UI
+- integrar o manifesto da coleção a uma API real de catálogo/plataforma
 
 ## Status Atual
 
-O projeto já possui pipeline local funcional, base analítica consolidada, validação de qualidade, queries SQL executadas, imagens geradas para a documentação do case e exportações auxiliares para Power BI.
+O projeto já possui pipeline local funcional, base analítica interna consolidada, camada publicada segura para dashboard, coleção materializada, validação de qualidade com checks de integridade e reconciliação, queries SQL executadas, imagens geradas para a documentação do case, dashboard Streamlit modularizado e exportações auxiliares para Power BI.

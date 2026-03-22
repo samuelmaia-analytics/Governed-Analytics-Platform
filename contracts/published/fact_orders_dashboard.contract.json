@@ -1,0 +1,33 @@
+{
+  "dataset_name": "fact_orders_dashboard",
+  "layer": "published",
+  "path": "data/published/dashboard/fact_orders_dashboard.parquet",
+  "description": "Contrato simples da camada publicada e minimizada consumida pelo dashboard Streamlit.",
+  "min_rows": 100001,
+  "primary_key": ["order_id", "order_item_id"],
+  "allow_unexpected_columns": false,
+  "columns": {
+    "order_id": "string",
+    "order_item_id": "integer",
+    "customer_unique_id": "string",
+    "order_status": "string",
+    "order_purchase_timestamp": "datetime",
+    "order_delivered_customer_date": "datetime",
+    "order_estimated_delivery_date": "datetime",
+    "order_date": "date_like",
+    "order_year": "integer",
+    "order_month": "integer",
+    "delivery_time_days": "float",
+    "estimated_delay_days": "float",
+    "is_delayed": "boolean",
+    "price": "float",
+    "freight_value": "float",
+    "total_item_value": "float",
+    "payment_type_mode": "string",
+    "review_score_mean": "float",
+    "product_category_name": "string",
+    "product_category_name_english": "string",
+    "customer_state": "string",
+    "seller_state": "string"
+  }
+}

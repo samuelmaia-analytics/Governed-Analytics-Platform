@@ -9,3 +9,4 @@ pyarrow
 openpyxl
 python-dotenv
 jinja2
+pytest

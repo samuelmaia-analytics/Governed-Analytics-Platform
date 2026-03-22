@@ -1,0 +1,18 @@
+{
+  "dataset_name": "olist_order_items_dataset",
+  "layer": "standardized",
+  "path": "data/standardized/olist/olist_order_items_dataset.parquet",
+  "description": "Contrato simples da tabela padronizada de itens de pedido.",
+  "min_rows": 100000,
+  "primary_key": ["order_id", "order_item_id", "product_id", "seller_id"],
+  "allow_unexpected_columns": false,
+  "columns": {
+    "order_id": "string",
+    "order_item_id": "integer",
+    "product_id": "string",
+    "seller_id": "string",
+    "shipping_limit_date": "datetime",
+    "price": "float",
+    "freight_value": "float"
+  }
+}

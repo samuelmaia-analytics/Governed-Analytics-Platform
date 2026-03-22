@@ -17,8 +17,11 @@ data/
     profiling/
   curated/
     analytics/
+    catalog/
     quality/
     query_results/
+  published/
+    dashboard/
   external/
   screenshots/
 ```
@@ -74,19 +77,37 @@ Armazenar artefatos intermediários, perfis exploratórios e saídas de apoio ao
 
 **Objetivo**
 
-Disponibilizar os datasets finais e confiáveis para consumo analítico, consultas SQL, validação de qualidade e dashboard.
+Disponibilizar os datasets finais e confiáveis para consumo analítico interno, consultas SQL e validação de qualidade.
 
 **Caminhos**
 
 - `data/curated/analytics/`
+- `data/curated/catalog/`
 - `data/curated/quality/`
 - `data/curated/query_results/`
 
 **Uso no projeto**
 
 - `fact_orders_enriched`
+- manifesto da coleção do case e inventário de ativos catalogáveis
 - resultados dos checks de qualidade
 - resultados das queries SQL executadas em DuckDB
+
+### 5. Published / Dashboard
+
+**Objetivo**
+
+Separar a camada de exposição do produto analítico da camada analítica interna, aplicando minimização e pseudonimização antes do consumo pelo dashboard.
+
+**Caminho**
+
+- `data/published/dashboard/`
+
+**Uso no projeto**
+
+- `fact_orders_dashboard.parquet`
+- fonte exclusiva do Streamlit
+- redução de identificadores, cidades e prefixos de CEP na camada publicada
 
 ## Fluxo do Pipeline
 
@@ -103,14 +124,26 @@ Disponibilizar os datasets finais e confiáveis para consumo analítico, consult
 4. `src/quality.py`
    Valida a tabela analítica final e salva os resultados em `curated/quality`.
 
-5. `src/run_analytics_queries.py`
+5. `src/publish_dashboard.py`
+   Deriva a camada `published/dashboard` a partir de `fact_orders_enriched`, aplicando pseudonimização e minimização para exposição analítica.
+
+6. `src/data_classification.py`
+   Materializa o inventário de classificação de dados, com foco em sensibilidade, risco e ação de publicação.
+
+7. `src/schema_contracts.py`
+   Valida contratos simples de schema sobre as camadas `standardized`, `curated` e `published`, reforçando consistência estrutural.
+
+8. `src/catalog.py`
+   Materializa a coleção do case em arquivos versionáveis, com manifesto JSON e inventário tabular dos ativos publicados e intermediários.
+
+9. `src/run_analytics_queries.py`
    Executa SQL sobre a camada `curated/analytics` e salva os resultados em `curated/query_results`.
 
-6. `src/export_query_result_images.py`
+10. `src/export_query_result_images.py`
    Converte os resultados tabulares das queries em PNG para documentação.
 
-7. `streamlit_app/app.py`
-   Consome `curated/analytics/fact_orders_enriched.parquet` como fonte principal do dashboard.
+11. `streamlit_app/app.py`
+   Consome `published/dashboard/fact_orders_dashboard.parquet` como fonte principal do dashboard.
 
 ## Racional da Arquitetura
 
@@ -119,6 +152,7 @@ Esse desenho foi adotado para manter o projeto simples, mas com separação sufi
 - dado de origem
 - dado tecnicamente padronizado
 - artefato intermediário de engenharia
-- ativo final para análise e apresentação
+- ativo final interno para análise
+- ativo publicado para apresentação controlada
 
-Na prática, isso melhora a rastreabilidade, facilita a manutenção do pipeline e aproxima o projeto de um padrão real de engenharia de dados, sem introduzir complexidade desnecessária.
+Na prática, isso melhora a rastreabilidade, facilita a manutenção do pipeline, reforça governança por camada e adiciona privacidade por design sem enfraquecer o valor analítico do case.
