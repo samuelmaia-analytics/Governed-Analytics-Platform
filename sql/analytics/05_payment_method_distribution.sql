@@ -1,0 +1,10 @@
+SELECT
+    COALESCE(payment_type_mode, 'unknown') AS payment_type,
+    COUNT(*) AS total_items,
+    COUNT(DISTINCT order_id) AS total_orders,
+    ROUND(SUM(total_item_value), 2) AS total_revenue,
+    ROUND(AVG(total_item_value), 2) AS avg_item_revenue,
+    ROUND(AVG(CASE WHEN is_delayed THEN 1 ELSE 0 END) * 100, 2) AS delayed_orders_pct
+FROM fact_orders_enriched
+GROUP BY 1
+ORDER BY total_revenue DESC, total_orders DESC;

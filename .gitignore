@@ -1,0 +1,30 @@
+.idea/
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+
+# Keep raw data delivered with the case
+!data/raw/
+!data/raw/landing/
+!data/raw/landing/olist/
+
+# Ignore generated Data Lake layers
+data/standardized/*
+!data/standardized/.gitkeep
+
+data/staging/*
+!data/staging/.gitkeep
+
+data/curated/*
+!data/curated/.gitkeep
+
+# Optional local-only data
+data/external/*
+!data/external/.gitkeep
+
+# Keep screenshots used in the case documentation
+!data/screenshots/
+!data/screenshots/query_results/

@@ -1,0 +1,11 @@
+pandas
+numpy
+streamlit
+plotly
+matplotlib
+seaborn
+duckdb
+pyarrow
+openpyxl
+python-dotenv
+jinja2

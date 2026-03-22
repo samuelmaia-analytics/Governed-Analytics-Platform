@@ -1,0 +1,8 @@
+order_status,status_group
+approved,In Fulfillment
+canceled,Exception
+delivered,Closed
+invoiced,In Fulfillment
+processing,In Fulfillment
+shipped,In Fulfillment
+unavailable,Exception

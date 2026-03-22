@@ -1,0 +1,6 @@
+payment_type_mode,payment_group
+boleto,Boleto
+credit_card,Card
+debit_card,Card
+unknown,Other
+voucher,Voucher
