@@ -37,7 +37,7 @@ def render_header(filters: FilterState) -> None:
         <div class="hero-shell">
             <div class="hero-top">
                 <div>
-                    <span class="hero-badge">samuelmaia_DDF_032026</span>
+                    <span class="hero-badge">SAMUEL_MAIA_DDF_TECH_032026</span>
                     <h1 class="hero-title">Executive Commerce Analytics</h1>
                     <p class="hero-subtitle">
                         Painel executivo para leitura rápida de receita, categorias, operação e experiência do cliente,
