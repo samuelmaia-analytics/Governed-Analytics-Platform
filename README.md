@@ -42,6 +42,7 @@ data/
 
 Se você quiser seguir a mesma ordem do case, use:
 
+0. [docs/00_planejamento.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\00_planejamento.md)
 1. [docs/01_contexto.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\01_contexto.md)
 2. [docs/02_carga_e_modelagem.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\02_carga_e_modelagem.md)
 3. [docs/03_catalogacao.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\03_catalogacao.md)

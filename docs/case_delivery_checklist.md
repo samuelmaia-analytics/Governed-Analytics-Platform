@@ -12,6 +12,7 @@
 
 ## Pronto localmente no projeto
 
+- [x] artefato de planejamento do projeto
 - [x] base raw com volume suficiente
 - [x] camada analítica final com mais de 100k registros
 - [x] análise descritiva inicial
