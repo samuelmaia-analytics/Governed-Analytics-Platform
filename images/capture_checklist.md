@@ -14,6 +14,7 @@
 - `images/dadosfera/02_asset_preview.png`
 - `images/dadosfera/03_schema.png`
 - `images/dadosfera/04_catalog.png`
+- `images/dadosfera/05_usage_or_query.png` (opcional)
 
 ## Presentation
 
@@ -26,3 +27,4 @@
 
 - manter aqui apenas evidencias finais de submissao
 - nao misturar com os PNGs gerados automaticamente em `data/screenshots/query_results/`
+- usar preferencialmente a camada `data/published/dashboard/fact_orders_dashboard.parquet` como ativo principal da prova na Dadosfera

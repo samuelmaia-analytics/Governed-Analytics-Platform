@@ -42,6 +42,7 @@
 - [ ] validar preview/esquema do ativo publicado
 - [ ] catalogar ou registrar o ativo na plataforma
 - [ ] gerar evidências reais da plataforma
+- [ ] salvar capturas em `images/dadosfera/`
 
 ## Evidências visuais finais
 

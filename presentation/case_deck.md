@@ -101,6 +101,11 @@
 - Recomendação para fala:
   - dizer explicitamente que o repositorio ja entrega o payload e o inventario
   - nao vender como integracao real concluida enquanto os prints da plataforma nao existirem
+- Quando os prints forem capturados, inserir:
+  - `images/dadosfera/01_asset_list.png`
+  - `images/dadosfera/02_asset_preview.png`
+  - `images/dadosfera/04_catalog.png`
+- Referencia operacional: [docs/dadosfera_capture_runbook.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\dadosfera_capture_runbook.md)
 
 ## Slide 10 - Testes e Robustez
 
