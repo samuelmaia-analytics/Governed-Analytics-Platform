@@ -42,6 +42,8 @@
 - [ ] publicar dataset real na plataforma
 - [ ] validar preview/esquema do ativo publicado
 - [ ] catalogar ou registrar o ativo na plataforma
+- [ ] criar pipeline real na plataforma
+- [ ] catalogar o pipeline na plataforma
 - [ ] gerar evidências reais da plataforma
 - [ ] salvar capturas em `images/dadosfera/`
 
