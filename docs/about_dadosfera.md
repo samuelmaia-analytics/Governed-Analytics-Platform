@@ -1,5 +1,29 @@
 # Sobre a Dadosfera
 
+## Status Atual do Case
+
+Este projeto já possui uma solução local funcional para o dataset Olist, com pipeline em Python, organização em camadas, modelagem analítica, validação de qualidade, SQL e dashboard Streamlit.
+
+Para evitar ambiguidade na leitura do case, o status real até o momento é:
+
+- **feito localmente no projeto**
+  - ingestão dos CSVs do Olist
+  - promoção para `standardized`
+  - profiling em `staging`
+  - construção da `fact_orders_enriched`
+  - publicação segura da `fact_orders_dashboard`
+  - queries SQL, screenshots tabulares, catálogo local e dashboard Streamlit
+- **feito no Git local**
+  - repositório inicializado e remoto GitHub configurado
+  - versionamento da estrutura, documentação e código
+- **ainda não comprovado neste repositório como execução real na Dadosfera**
+  - upload/publicação do dataset na plataforma
+  - catálogo/coleção materializados na interface da plataforma
+  - screenshots da plataforma
+  - evidência de query, app ou ativo acessível dentro da Dadosfera
+
+Em outras palavras, a solução técnica do case já está pronta localmente, mas a parte de operacionalização na Dadosfera ainda depende de execução manual na plataforma e captura de evidências finais.
+
 ## Contexto
 
 Este case foi desenvolvido a partir do dataset Olist, com um pipeline local em Python para ingestão, profiling, modelagem analítica, validação de qualidade, consultas SQL e consumo em dashboard Streamlit.
@@ -85,7 +109,7 @@ Dadosfera
 
 Na prática, a proposta não exige descartar o que já foi construído. O pipeline atual pode continuar como motor de transformação, enquanto a Dadosfera atua como camada de publicação, compartilhamento e escalabilidade. Em um estágio mais maduro, parte relevante da arquitetura local pode ser simplificada ou absorvida pela plataforma.
 
-Nesta prova de conceito, essa visão já foi parcialmente materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Ainda não há integração direta com endpoint externo da plataforma, mas o case agora explicita quais ativos seriam publicados e com quais metadados.
+Nesta prova de conceito, essa visão já foi parcialmente materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Ainda não há integração direta com endpoint externo da plataforma, e portanto este repositório não comprova publicação real na Dadosfera neste momento.
 
 ## 3. Por que a Abordagem Baseada na Dadosfera é Mais Viável e/ou Mais Barata
 
@@ -158,4 +182,10 @@ Com uma camada de dados mais organizada e publicável, o time consegue responder
 
 Para este case, a solução local já demonstra capacidade de engenharia, modelagem e visualização. A Dadosfera entra como proposta de evolução da arquitetura, tornando a operação analítica mais simples de sustentar, mais fácil de compartilhar e mais preparada para crescer.
 
-Em uma leitura de prova de conceito, a conclusão é direta: a combinação entre pipeline analítico, camada de consumo e plataforma de publicação de dados aumenta a velocidade de análise e aproxima ainda mais os dados da decisão de negócio no e-commerce.
+No estado atual do repositório, a conclusão correta é:
+
+- a engenharia local está implementada
+- a estrutura para publicação/catálogo está preparada
+- a execução real na plataforma ainda precisa ser feita e evidenciada
+
+Em uma leitura honesta de prova de conceito, a combinação entre pipeline analítico, camada de consumo e plataforma de publicação de dados continua sendo o caminho certo para aumentar a velocidade de análise e aproximar ainda mais os dados da decisão de negócio no e-commerce.

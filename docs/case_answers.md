@@ -8,6 +8,22 @@ O resultado central do trabalho é a tabela `fact_orders_enriched`, desenhada pa
 
 Para consumo executivo, o projeto também passou a publicar a camada `fact_orders_dashboard`, derivada da fato interna com minimização de campos e pseudonimização de chaves para o Streamlit.
 
+## Status de Entrega por Ambiente
+
+Para evitar exagero na narrativa do case, o estado real da entrega foi separado da seguinte forma:
+
+| Ambiente | Status | Evidencia |
+| --- | --- | --- |
+| Projeto local no PyCharm | feito | pipeline, docs, SQL, dashboard, testes e artefatos gerados no repositorio |
+| GitHub | parcial | remoto configurado, mas o fechamento final depende de commit e push da ultima versao |
+| Dadosfera | documentado, mas nao executado | existe manifesto local da colecao, sem prova neste repositorio de upload/catalogacao real na plataforma |
+
+Leitura correta:
+
+- a solucao tecnica principal esta pronta localmente
+- a parte de versionamento remoto precisa ser fechada antes da entrega
+- a operacionalizacao real na Dadosfera ainda depende de execucao manual e captura de evidencias
+
 ## Objetivo do Projeto
 
 O objetivo do projeto é construir uma solução de dados ponta a ponta que permita:
@@ -209,6 +225,12 @@ Do ponto de vista técnico, a camada analítica também preserva transparência 
 
 Além disso, a entrega passou a incluir uma coleção materializada do projeto, com manifesto JSON e inventário tabular dos ativos, o que reforça a aderência ao item de catalogação/publicação do case.
 
+Observação importante de honestidade técnica:
+
+- o manifesto e o inventário da coleção existem localmente no repositório
+- isso demonstra preparo para catalogação/publicação
+- isso não deve ser descrito como publicação real já concluída na plataforma Dadosfera sem evidência externa
+
 ## Próximos Passos
 
 Como evolução natural do trabalho, os próximos passos recomendados são:
@@ -235,3 +257,9 @@ Esta entrega atende ao case porque demonstra, de forma integrada, as capacidades
 - preparo da base para consumo visual e executivo
 
 Em resumo, o projeto mostra a capacidade de sair de dados transacionais brutos e chegar a uma camada analítica robusta, com rastreabilidade técnica e leitura executiva, respondendo ao case de maneira completa e coerente.
+
+No entanto, o fechamento completo da entrega ainda depende de:
+
+- capturas finais do dashboard Streamlit
+- execução real e evidenciada na Dadosfera
+- consolidação final do repositório no GitHub

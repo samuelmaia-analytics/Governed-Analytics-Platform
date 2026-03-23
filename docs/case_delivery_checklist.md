@@ -10,7 +10,7 @@
 - [x] `streamlit_app/`
 - [x] `powerbi/`
 
-## Entregáveis já presentes no projeto
+## Pronto localmente no projeto
 
 - [x] base raw com volume suficiente
 - [x] camada analítica final com mais de 100k registros
@@ -20,13 +20,45 @@
 - [x] catálogo local e inventário de ativos
 - [x] queries SQL salvas
 - [x] prints dos resultados SQL
-- [x] dashboard Streamlit
+- [x] dashboard Streamlit implementado
 - [x] export para Power BI
+- [x] testes automatizados mínimos
+- [x] camada publicada para consumo seguro do dashboard
 
-## Itens que ainda dependem de captura externa
+## GitHub
+
+- [x] repositório git inicializado
+- [x] remoto GitHub configurado
+- [ ] revisar `git status`
+- [ ] remover artefatos temporários antes do commit final
+- [ ] commitar a versão final da entrega
+- [ ] fazer push da versão final
+- [ ] validar README e docs no GitHub web
+- [ ] registrar o link final do GitHub
+
+## Dadosfera
+
+- [ ] publicar dataset real na plataforma
+- [ ] validar preview/esquema do ativo publicado
+- [ ] catalogar ou registrar o ativo na plataforma
+- [ ] gerar evidências reais da plataforma
+
+## Evidências visuais finais
 
 - [ ] prints da Dadosfera
 - [ ] prints do dashboard final em execução
-- [ ] deck final preenchido
+- [ ] organizar imagens finais em `images/`
+
+## Apresentação final
+
+- [x] estrutura da pasta `presentation/`
+- [x] deck base em markdown
+- [x] roteiro de fala inicial
+- [ ] deck final preenchido com imagens
 - [ ] vídeo de apresentação, se exigido
-- [ ] link final do GitHub
+
+## Leitura correta do status
+
+- o projeto local está pronto para demonstração técnica
+- o GitHub ainda precisa de fechamento final
+- a parte da Dadosfera está documentada, mas ainda não comprovada neste repositório como execução real
