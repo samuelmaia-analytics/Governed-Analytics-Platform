@@ -46,7 +46,7 @@
 ## Evidências visuais finais
 
 - [ ] prints da Dadosfera
-- [ ] prints do dashboard final em execução
+- [x] prints do dashboard final em execução
 - [ ] organizar imagens finais em `images/`
 
 ## Apresentação final

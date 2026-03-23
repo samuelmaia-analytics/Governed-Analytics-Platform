@@ -23,6 +23,9 @@
   - `data/curated/catalog/`
   - `data/published/dashboard/`
 - Referência visual: [docs/architecture.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\architecture.md)
+- Sugestão de fala:
+  - começar explicando que o projeto separa dado bruto, dado padronizado, dado analítico interno e dado publicado
+  - enfatizar que o dashboard consome apenas a camada publicada
 
 ## Slide 4 - Pipeline
 
@@ -40,6 +43,8 @@
 - Volume final: `112.650` linhas
 - Colunas: `48`
 - Uso: SQL, qualidade, documentação e derivação da camada publicada
+- Mensagem principal:
+  - a modelagem foi feita para preservar detalhe operacional e ainda permitir leitura executiva
 
 ## Slide 6 - Governança e Publicação
 
@@ -59,6 +64,8 @@
   - concentração comercial em poucas categorias e estados
   - aceleração temporal com pressão operacional em meses de pico
   - alta dependência de `credit_card`
+- Sugestão visual:
+  - colocar um mosaico com 2 ou 3 screenshots de `data/screenshots/query_results/`
 
 ## Slide 8 - Dashboard
 
@@ -71,7 +78,17 @@
   - geografia
   - operação
   - insights executivos
-- Inserir aqui screenshots finais do Streamlit
+- Screenshots finais já disponíveis:
+  - [images/dashboard/01_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\01_overview.png)
+  - [images/dashboard/02_kpis.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\02_kpis.png)
+  - [images/dashboard/03_temporal.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\03_temporal.png)
+  - [images/dashboard/04_categories.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\04_categories.png)
+  - [images/dashboard/05_geography.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\05_geography.png)
+- Sugestão de uso no slide:
+  - imagem principal: `01_overview.png`
+  - imagens de apoio: `03_temporal.png`, `04_categories.png` e `05_geography.png`
+- Mensagem principal:
+  - o dashboard nao e apenas visual; ele consome uma camada publicada e minimizada, coerente com a governanca do projeto
 
 ## Slide 9 - Catálogo e Dadosfera
 
@@ -81,6 +98,9 @@
 - Status honesto:
   - estrutura de publicação e metadados está pronta localmente
   - a materialização real na plataforma Dadosfera ainda depende de execução manual e captura de evidência
+- Recomendação para fala:
+  - dizer explicitamente que o repositorio ja entrega o payload e o inventario
+  - nao vender como integracao real concluida enquanto os prints da plataforma nao existirem
 
 ## Slide 10 - Testes e Robustez
 
@@ -100,11 +120,12 @@
 - Status honesto:
   - base pronta para Power BI
   - dashboard Power BI ainda precisa ser materializado, se o bônus for usado
+- Referencia operacional: [powerbi/delivery_plan.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\delivery_plan.md)
 
 ## Slide 12 - Próximos Passos
 
 - publicar dataset e catálogo real na Dadosfera
 - capturar evidências finais da plataforma
-- gerar screenshots finais do Streamlit
+- integrar os screenshots finais do Streamlit ao deck final
 - opcional: materializar o bônus em Power BI
 - fechar commit final e push no GitHub
