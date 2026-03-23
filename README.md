@@ -51,6 +51,7 @@ Se você quiser seguir a mesma ordem do case, use:
 6. [docs/06_arquitetura_proposta.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\06_arquitetura_proposta.md)
 7. [docs/07_bonus_genai_dataapps.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\07_bonus_genai_dataapps.md)
 8. [docs/08_pipelines.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\08_pipelines.md)
+9. [docs/09_genai_llm_processar.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\09_genai_llm_processar.md)
 
 ## Objetivo
 

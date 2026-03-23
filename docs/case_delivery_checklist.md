@@ -47,6 +47,13 @@
 - [ ] gerar evidências reais da plataforma
 - [ ] salvar capturas em `images/dadosfera/`
 
+## GenAI e LLM
+
+- [ ] escolher dataset desestruturado para o item
+- [ ] gerar features com IA
+- [ ] documentar prompts utilizados
+- [ ] materializar tabela final de features
+
 ## Evidências visuais finais
 
 - [ ] prints da Dadosfera
