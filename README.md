@@ -16,7 +16,19 @@ O objetivo do projeto é transformar dados transacionais brutos em uma camada an
 
 ## Estrutura do Projeto
 
+Estrutura organizada para aderir ao formato de entrega do case:
+
 ```text
+README.md
+docs/
+images/
+presentation/
+powerbi/
+streamlit_app/
+sql/
+src/
+tests/
+
 data/
   raw/
     landing/
@@ -39,17 +51,13 @@ data/
     bi_exports/
 
 notebooks/
-sql/
-  exploratory/
-  analytics/
-src/
-streamlit_app/
-docs/
-tests/
 ```
 
 Pastas principais:
 
+- `images/`: evidências visuais finais do case, como prints da plataforma, dashboard e apresentação
+- `presentation/`: material da defesa final do case
+- `powerbi/`: espaço para o bônus de BI externo, com `.pbix`, screenshots e notas
 - `data/raw/landing/olist/`: arquivos CSV originais do dataset
 - `data/standardized/olist/`: tabelas padronizadas para consumo interno do pipeline
 - `data/staging/profiling/`: saídas da análise exploratória inicial
@@ -63,6 +71,13 @@ Pastas principais:
 - `sql/analytics/`: consultas do case em DuckDB
 - `src/`: scripts Python do pipeline
 - `docs/`: documentação técnica e executiva
+
+Arquivos-guia para a entrega:
+
+- `docs/case_delivery_checklist.md`
+- `images/README.md`
+- `presentation/README.md`
+- `powerbi/README.md`
 
 ## Arquitetura do Pipeline
 
@@ -340,6 +355,7 @@ Essas queries respondem perguntas sobre receita, evolução temporal, distribui�
 
 Arquivos principais em `docs/`:
 
+- `case_delivery_checklist.md`: checklist da estrutura e dos entregáveis do case
 - `case_answers.md`: narrativa principal do case
 - `raw_data_inventory.md`: inventário dos dados brutos
 - `eda_summary.md`: resumo exploratório inicial
