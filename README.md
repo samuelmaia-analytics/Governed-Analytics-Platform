@@ -2,9 +2,53 @@
 
 ## Visão Geral
 
-Este repositório contém uma solução local de engenharia e análise de dados construída sobre o dataset Olist. O projeto foi estruturado para cobrir o fluxo completo do case: ingestão, profiling, modelagem analítica, validação de qualidade, consultas SQL e preparação de insumos para documentação, dashboard e bônus de BI.
+Este repositório contém a entrega do case técnico estruturada para leitura rápida, navegação numerada e execução local. O projeto cobre ingestão, profiling, modelagem analítica, qualidade, SQL, dashboard, catálogo local e material de apresentação.
 
-A entrega principal é a tabela `fact_orders_enriched`, que consolida informações de pedidos, itens, produtos, clientes, sellers, pagamentos e reviews em uma base analítica única, pronta para exploração em SQL, markdown e Streamlit.
+A entrega principal é a tabela `fact_orders_enriched`, consolidada em:
+
+- `data/curated/analytics/fact_orders_enriched.parquet`
+
+Para consumo executivo, o dashboard usa exclusivamente:
+
+- `data/published/dashboard/fact_orders_dashboard.parquet`
+
+## Estrutura Principal do Case
+
+Esta é a estrutura de entrada recomendada para leitura do case:
+
+```text
+README.md
+docs/
+  01_contexto.md
+  02_carga_e_modelagem.md
+  03_catalogacao.md
+  04_analises_sql.md
+  05_dashboard.md
+  06_arquitetura_proposta.md
+  07_bonus_genai_dataapps.md
+  imagens/
+sql/
+  01_exploracao_inicial.sql
+  02_limpeza.sql
+  03_kpis.sql
+  04_series_temporais.sql
+  05_categorias.sql
+data/
+  README.md
+.gitignore
+```
+
+## Como Ler o Projeto
+
+Se você quiser seguir a mesma ordem do case, use:
+
+1. [docs/01_contexto.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\01_contexto.md)
+2. [docs/02_carga_e_modelagem.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\02_carga_e_modelagem.md)
+3. [docs/03_catalogacao.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\03_catalogacao.md)
+4. [docs/04_analises_sql.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\04_analises_sql.md)
+5. [docs/05_dashboard.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\05_dashboard.md)
+6. [docs/06_arquitetura_proposta.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\06_arquitetura_proposta.md)
+7. [docs/07_bonus_genai_dataapps.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\07_bonus_genai_dataapps.md)
 
 ## Objetivo
 
@@ -14,70 +58,16 @@ O objetivo do projeto é transformar dados transacionais brutos em uma camada an
 - sustentar análises de receita, tempo, geografia e experiência do cliente
 - servir como base para dashboard, documentação executiva e exportação para BI
 
-## Estrutura do Projeto
+## Navegação Complementar
 
-Estrutura organizada para aderir ao formato de entrega do case:
+Além da estrutura principal acima, o projeto também mantém:
 
-```text
-README.md
-docs/
-images/
-presentation/
-powerbi/
-streamlit_app/
-sql/
-src/
-tests/
-
-data/
-  raw/
-    landing/
-      olist/
-  standardized/
-    olist/
-  staging/
-    profiling/
-  curated/
-    analytics/
-    catalog/
-    quality/
-    query_results/
-  published/
-    dashboard/
-  external/
-  screenshots/
-    query_results/
-  processed/
-    bi_exports/
-
-notebooks/
-```
-
-Pastas principais:
-
-- `images/`: evidências visuais finais do case, como prints da plataforma, dashboard e apresentação
-- `presentation/`: material da defesa final do case
-- `powerbi/`: espaço para o bônus de BI externo, com `.pbix`, screenshots e notas
-- `data/raw/landing/olist/`: arquivos CSV originais do dataset
-- `data/standardized/olist/`: tabelas padronizadas para consumo interno do pipeline
-- `data/staging/profiling/`: saídas da análise exploratória inicial
-- `data/curated/analytics/`: tabela analítica final
-- `data/curated/catalog/`: manifesto de coleção e inventário catalogável dos ativos
-- `data/curated/quality/`: resultados dos testes de qualidade
-- `data/curated/query_results/`: resultados das queries SQL em CSV
-- `data/published/dashboard/`: camada publicada e minimizada para consumo do Streamlit
-- `data/screenshots/query_results/`: imagens PNG das tabelas geradas para o markdown
-- `data/processed/bi_exports/`: exportações auxiliares para Power BI
-- `sql/analytics/`: consultas do case em DuckDB
-- `src/`: scripts Python do pipeline
-- `docs/`: documentação técnica e executiva
-
-Arquivos-guia para a entrega:
-
-- `docs/case_delivery_checklist.md`
-- `images/README.md`
-- `presentation/README.md`
-- `powerbi/README.md`
+- `src/`: scripts do pipeline
+- `streamlit_app/`: aplicação Streamlit
+- `tests/`: suíte de testes
+- `presentation/`: deck e roteiro
+- `powerbi/`: plano do bônus
+- `images/`: evidências finais
 
 ## Arquitetura do Pipeline
 
