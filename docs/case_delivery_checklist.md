@@ -66,6 +66,8 @@
 - [x] deck base em markdown
 - [x] roteiro de fala inicial
 - [ ] deck final preenchido com imagens
+- [ ] links finais da Dadosfera inseridos na apresentação
+- [ ] link do vídeo inserido
 - [ ] vídeo de apresentação, se exigido
 
 ## Leitura correta do status
