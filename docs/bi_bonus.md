@@ -22,10 +22,12 @@ Os arquivos para Power BI ficam em:
 
 Todos os arquivos sao exportados com:
 
-- delimitador explicito `,`
-- encoding `utf-8`
+- delimitador explicito `;`
+- encoding `utf-8-sig`
 - `header=True`
 - `index=False`
+
+Esse padrao foi adotado para reduzir problemas de leitura em Power BI com configuracao regional em portugues do Brasil.
 
 ## Grain da Fato
 
@@ -63,14 +65,29 @@ As dimensoes `payment` e `order_status` passaram a usar chaves explicitas, evita
 1. Abra o Power BI Desktop.
 2. Selecione `Obter Dados` > `Texto/CSV`.
 3. Importe todos os arquivos de `data/processed/bi_exports/`.
-4. No modelo, configure os relacionamentos:
+4. Se o Power BI ja tiver tabelas antigas importadas, remova as tabelas anteriores e reimporte os arquivos atualizados.
+5. No modelo, configure os relacionamentos:
    - `fact_sales_power_bi[date_key]` -> `dim_date[date_key]`
    - `fact_sales_power_bi[product_key]` -> `dim_product[product_key]`
    - `fact_sales_power_bi[customer_key]` -> `dim_customer[customer_key]`
    - `fact_sales_power_bi[seller_key]` -> `dim_seller[seller_key]`
    - `fact_sales_power_bi[payment_key]` -> `dim_payment[payment_key]`
    - `fact_sales_power_bi[order_status_key]` -> `dim_order_status[order_status_key]`
-5. Marque `dim_date` como tabela de datas, usando `order_date`.
+6. Marque `dim_date` como tabela de datas, usando `order_date`.
+
+## Observacao sobre `Column1`, `Column2`
+
+Se alguma tabela aparecer com nomes genericos como `Column1`, `Column2` ou `Column3`, isso normalmente indica uma destas situacoes:
+
+- importacao antiga mantida no modelo antes da regeneracao dos CSVs
+- etapa de Power Query sem promocao correta do cabecalho
+- leitura com configuracao de delimitador errada
+
+Com os arquivos atuais, o comportamento esperado e:
+
+- cabecalho real na primeira linha
+- delimitador `;`
+- colunas visiveis ja no preview do Power BI
 
 ## Estrutura das Tabelas
 

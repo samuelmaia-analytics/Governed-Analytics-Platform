@@ -19,8 +19,8 @@ from src.utils import ensure_directory
 LOGGER = logging.getLogger(__name__)
 FACT_SOURCE_PATH = DATA_DIR / "curated" / "analytics" / "fact_orders_enriched.parquet"
 BI_EXPORT_DIR = DATA_DIR / "processed" / "bi_exports"
-CSV_SEPARATOR = ","
-CSV_ENCODING = "utf-8"
+CSV_SEPARATOR = ";"
+CSV_ENCODING = "utf-8-sig"
 
 REQUIRED_SOURCE_COLUMNS = {
     "order_id",

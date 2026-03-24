@@ -1,8 +1,8 @@
-order_status_key,order_status,status_group,status_description
-1,approved,In Fulfillment,Approved
-2,canceled,Exception,Canceled
-3,delivered,Closed,Delivered
-4,invoiced,In Fulfillment,Invoiced
-5,processing,In Fulfillment,Processing
-6,shipped,In Fulfillment,Shipped
-7,unavailable,Exception,Unavailable
+﻿order_status_key;order_status;status_group;status_description
+1;approved;In Fulfillment;Approved
+2;canceled;Exception;Canceled
+3;delivered;Closed;Delivered
+4;invoiced;In Fulfillment;Invoiced
+5;processing;In Fulfillment;Processing
+6;shipped;In Fulfillment;Shipped
+7;unavailable;Exception;Unavailable
