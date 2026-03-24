@@ -1,6 +1,6 @@
-payment_type_mode,payment_group
-boleto,Boleto
-credit_card,Card
-debit_card,Card
-unknown,Other
-voucher,Voucher
+payment_key,payment_type,payment_group,payment_description
+1,boleto,Boleto,Boleto
+2,credit_card,Card,Credit Card
+3,debit_card,Card,Debit Card
+4,unknown,Other,Unknown
+5,voucher,Voucher,Voucher

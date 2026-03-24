@@ -15,10 +15,48 @@ Os arquivos para Power BI ficam em:
 - `data/processed/bi_exports/fact_sales_power_bi.csv`
 - `data/processed/bi_exports/dim_date.csv`
 - `data/processed/bi_exports/dim_product.csv`
-- `data/processed/bi_exports/dim_customer.csv`
-- `data/processed/bi_exports/dim_seller.csv`
 - `data/processed/bi_exports/dim_payment.csv`
 - `data/processed/bi_exports/dim_order_status.csv`
+- `data/processed/bi_exports/dim_customer.csv`
+- `data/processed/bi_exports/dim_seller.csv`
+
+Todos os arquivos sao exportados com:
+
+- delimitador explicito `,`
+- encoding `utf-8`
+- `header=True`
+- `index=False`
+
+## Grain da Fato
+
+A fato exportada em `fact_sales_power_bi.csv` possui:
+
+- granularidade de `1 linha por item de pedido`
+- chave primaria: `order_item_key`
+
+## Chaves e Relacionamentos
+
+### Dimensoes
+
+- `dim_date[date_key]`
+- `dim_product[product_key]`
+- `dim_payment[payment_key]`
+- `dim_order_status[order_status_key]`
+- `dim_customer[customer_key]`
+- `dim_seller[seller_key]`
+
+### Foreign keys na fato
+
+- `fact_sales_power_bi[date_key]`
+- `fact_sales_power_bi[product_key]`
+- `fact_sales_power_bi[payment_key]`
+- `fact_sales_power_bi[order_status_key]`
+- `fact_sales_power_bi[customer_key]`
+- `fact_sales_power_bi[seller_key]`
+
+### Observacao importante
+
+As dimensoes `payment` e `order_status` passaram a usar chaves explicitas, evitando relacionamento por texto bruto e deixando o modelo estrela mais estavel para BI.
 
 ## Como Importar no Power BI
 
@@ -30,9 +68,69 @@ Os arquivos para Power BI ficam em:
    - `fact_sales_power_bi[product_key]` -> `dim_product[product_key]`
    - `fact_sales_power_bi[customer_key]` -> `dim_customer[customer_key]`
    - `fact_sales_power_bi[seller_key]` -> `dim_seller[seller_key]`
-   - `fact_sales_power_bi[payment_type_mode]` -> `dim_payment[payment_type_mode]`
-   - `fact_sales_power_bi[order_status]` -> `dim_order_status[order_status]`
+   - `fact_sales_power_bi[payment_key]` -> `dim_payment[payment_key]`
+   - `fact_sales_power_bi[order_status_key]` -> `dim_order_status[order_status_key]`
 5. Marque `dim_date` como tabela de datas, usando `order_date`.
+
+## Estrutura das Tabelas
+
+### `dim_date`
+
+Colunas:
+
+- `date_key`
+- `order_date`
+- `year`
+- `quarter`
+- `month`
+- `month_name`
+- `year_month`
+- `week_of_year`
+- `day`
+- `weekday_name`
+
+### `dim_product`
+
+Colunas principais:
+
+- `product_key`
+- categoria em portugues
+- categoria em ingles
+- `category_label`
+- atributos fisicos do produto
+
+### `dim_payment`
+
+Colunas principais:
+
+- `payment_key`
+- `payment_type`
+- `payment_group`
+- `payment_description`
+
+### `dim_order_status`
+
+Colunas principais:
+
+- `order_status_key`
+- `order_status`
+- `status_group`
+- `status_description`
+
+### `dim_customer`
+
+Colunas principais:
+
+- `customer_key`
+- `customer_master_key`
+- `customer_state`
+
+### `dim_seller`
+
+Colunas principais:
+
+- `seller_key`
+- `seller_state`
 
 ## Quais Visuais Montar
 
