@@ -1,17 +1,28 @@
 # Power BI
 
-Esta pasta existe para alinhar o repositório ao formato pedido no case quando houver bônus de BI externo.
+Esta pasta concentra os artefatos finais do bônus de BI externo, alinhados ao formato de entrega do case.
 
-Conteúdo recomendado:
+Conteúdo principal:
 
-- arquivo `.pbix`, se for produzido
+- arquivo `.pbix` do dashboard
+- documentação executiva da entrega
+- evidência da query principal
+- checklist final de conferência
 - screenshots do dashboard em Power BI
-- medidas/DAX relevantes, se houver
 
 Base já preparada no projeto:
 
 - exports tabulares em `data/processed/bi_exports/`
 - documentação em `docs/bi_bonus.md`
+
+Artefatos finais recomendados nesta pasta:
+
+- `README_powerbi.md`
+- `evidencia_query.md`
+- `checklist_entrega.md`
+- `INSIGHTS_EXECUTIVOS.md`
+- arquivo `.pbix`
+- prints finais do dashboard
 
 Arquivos esperados para importação:
 

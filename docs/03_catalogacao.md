@@ -10,6 +10,8 @@ Este documento resume a parte de catalogacao e governanca do case.
   - `data/curated/catalog/collection_assets_inventory.csv`
 - inventario de classificacao:
   - `data/curated/catalog/data_classification_inventory.csv`
+- ativo publicado recomendado para plataforma:
+  - `data/published/dashboard/fact_orders_dashboard.csv`
 
 ## Objetivo
 
@@ -30,3 +32,15 @@ Demonstrar:
 
 - catalogacao local: feita
 - publicacao real em plataforma: depende de execucao externa e evidencia visual
+
+## Ativo recomendado para upload na Dadosfera
+
+Para execucao manual na plataforma, o ativo mais adequado do projeto e:
+
+- `data/published/dashboard/fact_orders_dashboard.csv`
+
+Motivo:
+
+- ja representa a camada publicada do case
+- evita expor a base analitica interna completa
+- esta alinhado ao dashboard e aos principais indicadores executivos

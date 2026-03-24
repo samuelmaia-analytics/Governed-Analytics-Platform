@@ -8,6 +8,17 @@ Este documento resume o dashboard final do case.
 - fonte exclusiva:
   - `data/published/dashboard/fact_orders_dashboard.parquet`
 
+## Ativo publicado equivalente
+
+Para upload manual em plataforma e demonstracao de publicacao, o arquivo equivalente e:
+
+- `data/published/dashboard/fact_orders_dashboard.csv`
+
+Regra pratica de uso:
+
+- `parquet`: execucao local do Streamlit
+- `csv`: upload na Dadosfera
+
 ## Objetivo
 
 Transformar a camada analitica publicada em leitura executiva de:

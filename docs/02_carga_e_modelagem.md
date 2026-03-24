@@ -33,6 +33,29 @@ Volume confirmado:
 
 - `112.650` registros
 
+## Camada publicada para consumo
+
+O projeto separa explicitamente a camada analitica interna da camada publicada para consumo.
+
+### Camada analitica interna
+
+- ativo: `fact_orders_enriched`
+- local: `data/curated/analytics/`
+- uso: SQL, qualidade, governanca e rastreabilidade
+
+### Camada publicada
+
+- ativo: `fact_orders_dashboard`
+- local: `data/published/dashboard/`
+- formatos:
+  - `fact_orders_dashboard.parquet`
+  - `fact_orders_dashboard.csv`
+
+Uso recomendado:
+
+- `parquet`: dashboard Streamlit local
+- `csv`: upload manual na Dadosfera e evidencia do ativo publicado
+
 ## Referencias detalhadas
 
 - tabela analitica: [docs/fact_orders_enriched.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\fact_orders_enriched.md)

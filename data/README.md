@@ -15,6 +15,19 @@ Este diretorio concentra os dados do projeto organizados em camadas.
 - `processed/bi_exports/`: exports para Power BI
 - `screenshots/query_results/`: imagens tabulares das queries
 
+## Arquivo mais importante para publicacao manual
+
+Se for necessario subir o ativo principal do case em plataforma externa, utilizar:
+
+- `published/dashboard/fact_orders_dashboard.csv`
+
+Resumo de uso:
+
+- `curated/analytics/fact_orders_enriched.*`: camada interna principal
+- `published/dashboard/fact_orders_dashboard.parquet`: consumo do Streamlit
+- `published/dashboard/fact_orders_dashboard.csv`: upload na Dadosfera
+- `processed/bi_exports/*`: consumo no Power BI
+
 ## Leitura recomendada
 
 - arquitetura: [docs/architecture.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\architecture.md)

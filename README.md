@@ -12,6 +12,38 @@ Para consumo executivo, o dashboard usa exclusivamente:
 
 - `data/published/dashboard/fact_orders_dashboard.parquet`
 
+Para publicacao externa e upload manual em plataforma, o ativo recomendado e:
+
+- `data/published/dashboard/fact_orders_dashboard.csv`
+
+## Diferenca entre os principais ativos
+
+### `fact_orders_enriched`
+
+E a camada analitica interna principal do projeto.
+
+- uso: engenharia, SQL, qualidade, auditoria e rastreabilidade
+- local: `data/curated/analytics/`
+- granularidade: `1 linha por item de pedido`
+
+### `fact_orders_dashboard`
+
+E a camada publicada do case, derivada da base analitica interna e preparada para consumo analitico.
+
+- uso: dashboard, publicacao controlada e demonstracao em plataforma
+- local: `data/published/dashboard/`
+- formatos disponiveis:
+  - `fact_orders_dashboard.parquet`: consumo local pelo Streamlit
+  - `fact_orders_dashboard.csv`: upload manual na Dadosfera e compartilhamento tabular
+
+### `fact_sales_power_bi`
+
+E a fato simplificada do modelo estrela criado exclusivamente para BI externo.
+
+- uso: Power BI
+- local: `data/processed/bi_exports/`
+- relacionamento com dimensoes auxiliares
+
 ## Estrutura Principal do Case
 
 Esta é a estrutura de entrada recomendada para leitura do case:
@@ -235,6 +267,11 @@ Saídas:
 - `data/published/dashboard/fact_orders_dashboard.csv`
 - `docs/privacy_governance.md`
 
+Uso recomendado dos arquivos gerados:
+
+- `fact_orders_dashboard.parquet`: app Streamlit local
+- `fact_orders_dashboard.csv`: upload na Dadosfera e prova do ativo publicado
+
 ### 6. Materializar a classificação de dados
 
 ```bash
@@ -314,6 +351,10 @@ streamlit run streamlit_app/app.py
 O app consome exclusivamente:
 
 - `data/published/dashboard/fact_orders_dashboard.parquet`
+
+Se a intencao for subir um ativo na Dadosfera, usar:
+
+- `data/published/dashboard/fact_orders_dashboard.csv`
 
 ### 14. Rodar o pipeline completo em sequência
 
