@@ -33,7 +33,7 @@ Este case foi desenvolvido a partir do dataset Olist, com um pipeline local em P
 
 Na prova de conceito atual, essa arquitetura atende bem ao objetivo de demonstrar capacidade técnica ponta a ponta. Ainda assim, quando o problema é observado em um contexto mais próximo de produção, surgem limitações típicas de uma operação local: dependência de execução manual, baixa padronização de publicação de dados, maior esforço de governança e dificuldade de escalar o compartilhamento entre times.
 
-É nesse ponto que a Dadosfera passa a ser relevante como evolução natural da solução.
+É nesse ponto que a Dadosfera passa a ser relevante: não como substituição artificial do que já funciona, mas como camada de publicação, descoberta e compartilhamento que reduz atrito operacional.
 
 ## 1. Principal Problema a Ser Resolvido
 
@@ -140,7 +140,7 @@ Do ponto de vista econômico, ela pode ser mais barata por pelo menos quatro raz
 - acelera a disponibilização de datasets confiáveis para análise
 - evita crescimento desnecessário de infraestrutura local e scripts auxiliares
 
-Ou seja, o ganho não está apenas em infraestrutura, mas no custo total de operação analítica. Quanto menor o atrito para disponibilizar dados confiáveis, mais barata tende a ser a jornada completa entre dado e decisão.
+Ou seja, o ganho não está apenas em infraestrutura, mas no custo total da operação analítica. Quanto menor o atrito para disponibilizar dados confiáveis, menor tende a ser o custo de coordenação, publicação e reuso.
 
 ## 4. Oportunidades e Ganhos Futuros
 
@@ -192,4 +192,4 @@ No estado atual do repositório, a conclusão correta é:
 - a publicação do ativo principal na plataforma já foi evidenciada
 - a execução de pipeline nativo na plataforma ainda precisa ser feita e evidenciada
 
-Em uma leitura honesta de prova de conceito, a combinação entre pipeline analítico, camada de consumo e plataforma de publicação de dados continua sendo o caminho certo para aumentar a velocidade de análise e aproximar ainda mais os dados da decisão de negócio no e-commerce.
+Em uma leitura honesta de prova de conceito, a combinação entre pipeline analítico, camada publicada e plataforma de distribuição continua sendo o caminho mais defensável para aumentar velocidade de análise, governança e compartilhamento em contexto de e-commerce.

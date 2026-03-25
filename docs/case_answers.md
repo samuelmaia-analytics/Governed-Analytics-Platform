@@ -2,11 +2,21 @@
 
 ## Resumo Executivo
 
-Este projeto foi desenvolvido para transformar o dataset Olist em uma base analítica estruturada, confiável e pronta para responder perguntas de negócio com clareza. A entrega contempla ingestão, profiling, modelagem analítica, validação de qualidade, consultas SQL e geração de insumos visuais para documentação e dashboard.
+O projeto transforma o dataset Olist em uma base analítica estruturada, confiável e pronta para responder perguntas de negócio com clareza. A entrega cobre ingestão, profiling, modelagem analítica, qualidade, documentação, SQL, dashboard e publicação controlada do ativo principal.
 
-O resultado central do trabalho é a tabela `fact_orders_enriched`, desenhada para consolidar informações de pedidos, itens, clientes, produtos, sellers, pagamentos e reviews em uma camada única de análise.
+O núcleo técnico da solução é a tabela `fact_orders_enriched`, construída com granularidade de item de pedido e volume final de `112.650` registros. A partir dela, o projeto deriva a camada `fact_orders_dashboard`, minimizada e pseudonimizada para consumo executivo.
 
-Para consumo executivo, o projeto também passou a publicar a camada `fact_orders_dashboard`, derivada da fato interna com minimização de campos e pseudonimização de chaves para o Streamlit.
+O objetivo não foi apenas montar gráficos, mas demonstrar domínio de ciclo de vida dos dados: da origem bruta até um ativo analítico consumível, documentado, catalogável e defensável em contexto de negócio.
+
+## Tese de Valor da Entrega
+
+Esta entrega é forte porque combina:
+
+- modelagem com critério de granularidade
+- volume relevante e aderente ao case
+- preocupação explícita com qualidade e governança
+- separação clara entre camada interna e camada publicada
+- evidência real de consumo por dashboard, plataforma e BI externo
 
 ## Status de Entrega por Ambiente
 
@@ -24,6 +34,23 @@ Leitura correta:
 - a parte de versionamento remoto ja foi consolidada no GitHub
 - a operacionalizacao do ativo principal na Dadosfera ja foi evidenciada
 - a parte ainda pendente na plataforma e o pipeline nativo
+
+## O que Esta Comprovado
+
+- ingestao e organizacao em zonas de dados
+- modelagem da `fact_orders_enriched` com mais de 100 mil registros
+- camada publicada para consumo analitico
+- SQLs versionadas e resultados exportados
+- dashboard Streamlit com evidencias visuais
+- publicacao do ativo principal na Dadosfera com screenshots do catalogo e do volume
+- trilha complementar de Power BI com evidencia da query principal
+
+## O que Nao Esta Sendo Vendido Como Pronto
+
+- integracao por API com a Dadosfera
+- pipeline nativo executado na plataforma
+- item de GenAI com LLM externa de forma completa
+- video final da apresentacao, quando aplicavel
 
 ## Objetivo do Projeto
 
@@ -258,7 +285,7 @@ Esta entrega atende ao case porque demonstra, de forma integrada, as capacidades
 - testes automatizados mínimos para regras críticas do pipeline
 - preparo da base para consumo visual e executivo
 
-Em resumo, o projeto mostra a capacidade de sair de dados transacionais brutos e chegar a uma camada analítica robusta, com rastreabilidade técnica e leitura executiva, respondendo ao case de maneira completa e coerente.
+Em resumo, o projeto mostra capacidade de sair de dados transacionais brutos e chegar a uma camada analítica robusta, com rastreabilidade técnica, leitura executiva e documentação orientada à avaliação.
 
 No entanto, o fechamento completo da entrega ainda depende de:
 

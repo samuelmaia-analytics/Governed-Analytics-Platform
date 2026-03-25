@@ -2,7 +2,14 @@
 
 ## Visão Geral
 
-Este repositório contém a entrega do case técnico estruturada para leitura rápida, navegação numerada e execução local. O projeto cobre ingestão, profiling, modelagem analítica, qualidade, SQL, dashboard, catálogo local e material de apresentação.
+Este repositório consolida a entrega do case técnico com foco em ciclo de vida de dados, analytics engineering, governança, consumo analítico e clareza de documentação. A solução parte do dataset Olist e o transforma em uma camada analítica confiável, auditável e reutilizável, pronta para consulta SQL, dashboard, catalogação e exploração em BI.
+
+Em termos de avaliação, o projeto busca demonstrar quatro capacidades centrais:
+
+- construção de pipeline analítico em camadas
+- modelagem com granularidade defensável e volume acima de 100 mil registros
+- preocupação real com qualidade, privacidade e rastreabilidade
+- capacidade de transformar dado em ativo consumível por dashboard, catálogo e BI
 
 A entrega principal é a tabela `fact_orders_enriched`, consolidada em:
 
@@ -16,12 +23,37 @@ Para publicacao externa e upload manual em plataforma, o ativo recomendado e:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
-Status atual da entrega:
+## Resumo Executivo da Entrega
+
+Status atual:
 
 - GitHub publicado e atualizado
 - ativo publicado na Dadosfera com evidencias visuais em `images/dadosfera/`
 - dashboard Streamlit operacional com fallback para `csv` no deploy
 - trilha complementar de Power BI com evidencias de query e dashboard
+
+Leitura rápida para avaliador:
+
+- ativo analítico principal: `fact_orders_enriched`
+- camada publicada para consumo: `fact_orders_dashboard`
+- volume final da base analítica: `112.650` linhas
+- SQLs versionadas e evidenciadas
+- dashboard Streamlit implementado
+- ativo principal publicado na Dadosfera com evidência visual
+- documentação de apoio cobrindo arquitetura, catálogo, qualidade, privacidade e apresentação
+
+## Mapa de Evidências
+
+Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais importantes:
+
+1. visão geral e posicionamento da entrega: [README.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\README.md)
+2. narrativa principal do case: [docs/case_answers.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\case_answers.md)
+3. carga, modelagem e volume da base: [docs/02_carga_e_modelagem.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\02_carga_e_modelagem.md)
+4. catálogo e publicação do ativo: [docs/03_catalogacao.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\03_catalogacao.md)
+5. perguntas analíticas e SQLs: [docs/04_analises_sql.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\04_analises_sql.md)
+6. dashboard e screenshots finais: [docs/05_dashboard.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\05_dashboard.md)
+7. evidência Power BI e query principal: [powerbi/evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
+8. preparação da apresentação final: [docs/10_apresentacao_final.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\10_apresentacao_final.md)
 
 ## Diferenca entre os principais ativos
 
@@ -163,7 +195,7 @@ Para evitar ambiguidade na leitura do case, a distinção é a seguinte:
   - publicação real em endpoint/API da Dadosfera
   - sincronização automática da coleção com um catálogo gerenciado
 
-Em outras palavras, o projeto já entrega a estrutura e o payload da coleção em nível de prova de conceito local, mas não afirma integração nativa concluída com a plataforma.
+Em outras palavras, o projeto já entrega a estrutura e o payload da coleção em nível de prova de conceito local. O que está comprovado na plataforma hoje é a publicação do ativo principal e sua documentação visual. O que não está sendo afirmado é integração por API ou pipeline nativo já concluídos.
 
 Hoje, o repositório também já inclui evidências visuais da publicação do ativo na interface da Dadosfera:
 
@@ -427,7 +459,7 @@ Arquivos principais em `docs/`:
 - `schema_contract_report.md`: validação dos contratos simples de schema das camadas principais
 - `bi_bonus.md`: orientação para o bônus em Power BI
 - `03_catalogacao.md`: evidências da publicação do ativo na Dadosfera
-- `10_apresentacao_final.md`: estado real da apresentação e links pendentes
+- `10_apresentacao_final.md`: estado real da apresentação, artefatos e pendências finais
 
 ## Privacidade, Governança e Publicação
 
@@ -458,9 +490,15 @@ Este repositório entrega:
 - exportações auxiliares para BI externo
 - testes automatizados mínimos para regras críticas do pipeline
 
-## Próximos Passos
+## Limites e Próximos Passos
 
-Evoluções naturais do projeto:
+Para manter honestidade técnica, estes pontos seguem como evolução e não como entrega concluída:
+
+- pipeline nativo na Dadosfera
+- integração por API para catalogação/publicação
+- vídeo final da apresentação, se exigido pelo processo
+
+Evoluções naturais da solução:
 
 - ampliar o dashboard Streamlit com novas análises e exportações
 - criar marts específicos por cliente, seller e categoria

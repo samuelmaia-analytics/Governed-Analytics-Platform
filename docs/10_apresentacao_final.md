@@ -4,7 +4,7 @@ Este documento organiza a entrega final de apresentacao do case, incluindo video
 
 ## Objetivo
 
-Consolidar a demonstracao de valor do case como prova de conceito de que a Dadosfera pode ser o caminho mais rapido entre dados e valor.
+Consolidar a apresentação final do case em uma narrativa curta, executiva e tecnicamente honesta, mostrando problema, solução, evidências e limites reais da entrega.
 
 ## O que a apresentacao precisa cobrir
 
@@ -46,6 +46,15 @@ Segundo o edital, a apresentacao deve:
 - inserir links reais da Dadosfera
 - gravar o video final
 - publicar o video como `Unlisted` no YouTube
+
+## Mensagem Central para a Defesa
+
+Se a apresentação precisar ser curta, a mensagem principal deve ser:
+
+- o projeto entrega um ativo analítico confiável e documentado
+- o dashboard consome uma camada publicada e governada
+- o ativo principal já foi operacionalizado na Dadosfera
+- o que permanece como evolução é pipeline nativo e integração mais profunda com a plataforma
 
 ## Campos para preencher
 
