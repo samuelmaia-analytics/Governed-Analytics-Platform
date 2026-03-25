@@ -42,6 +42,34 @@ Leitura rápida para avaliador:
 - ativo principal publicado na Dadosfera com evidência visual
 - documentação de apoio cobrindo arquitetura, catálogo, qualidade, privacidade e apresentação
 
+## Evidências Finais da Submissão
+
+### Dadosfera
+
+- Importação do dataset publicado: [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
+- Catalogação / documentação do ativo: [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
+- Evidência do ativo no catálogo: [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
+- Evidência de volume acima de 100 mil registros: [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
+
+### SQL e Evidências Analíticas
+
+- Query principal: [sql/query_principal.sql](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\sql\query_principal.sql)
+- Evidência consolidada da query: [powerbi/evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
+- Print da SQL principal: [powerbi/query_principal_sql.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\query_principal_sql.png)
+- Print do resultado principal: [powerbi/query_principal_resultado.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\query_principal_resultado.png)
+
+### Dashboard e Visualizações
+
+- Overview: [images/dashboard/01_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\01_overview.png)
+- Análise temporal: [images/dashboard/03_temporal.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\03_temporal.png)
+- Categorias: [images/dashboard/04_categories.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\04_categories.png)
+- Evidências complementares em Power BI: [powerbi/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi)
+
+### Apresentação
+
+- Roteiro de apresentação: [presentation/talk_track.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\presentation\talk_track.md)
+- Material complementar da apresentação: [docs/10_apresentacao_final.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\10_apresentacao_final.md)
+
 ## Mapa de Evidências
 
 Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais importantes:
@@ -55,7 +83,7 @@ Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais i
 7. evidência Power BI e query principal: [powerbi/evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
 8. preparação da apresentação final: [docs/10_apresentacao_final.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\10_apresentacao_final.md)
 
-## Diferenca entre os principais ativos
+## Diferença entre os Principais Ativos
 
 ### `fact_orders_enriched`
 
@@ -77,11 +105,11 @@ Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais i
 
 ### `fact_sales_power_bi`
 
-E a fato simplificada do modelo estrela criado exclusivamente para BI externo.
+É a fato simplificada do modelo estrela criado exclusivamente para BI externo.
 
 - uso: Power BI
 - local: `data/processed/bi_exports/`
-- relacionamento com dimensoes auxiliares
+- relacionamento com dimensões auxiliares
 
 ## Estrutura Principal do Case
 
