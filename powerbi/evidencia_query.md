@@ -33,7 +33,7 @@ Em vez de uma única consulta monolítica, o arquivo foi organizado em blocos in
 
 Arquivo de referência:
 
-- [query_principal.sql](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\sql\query_principal.sql)
+- [query_principal.sql](../sql/query_principal.sql)
 
 ```sql
 -- Referência completa em sql/query_principal.sql
@@ -54,6 +54,16 @@ Os blocos da `query_principal.sql` foram executados sobre a tabela analítica `f
 ## Evidência principal do resultado
 
 ![Resultado da query principal](./query_principal_resultado.png)
+
+## Evidências visuais complementares
+
+### Evolução da Receita no Tempo
+
+![Evolução da receita no tempo](./query_principal_02_evolucao_receita_tempo.png)
+
+### Top 10 Categorias por Receita
+
+![Top 10 categorias por receita](./query_principal_03_top10_categorias_receita.png)
 
 - Bloco 1. KPIs Executivos
   CSV: [query_principal_01_kpis_executivos.csv](./query_principal_01_kpis_executivos.csv)
