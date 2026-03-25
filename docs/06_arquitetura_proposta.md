@@ -16,8 +16,8 @@ fontes -> plataforma / catalogação -> ativos publicados -> consumo por app, SQ
 
 ## Referencias principais
 
-- arquitetura atual: [docs/architecture.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\architecture.md)
-- contexto de plataforma: [docs/about_dadosfera.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\about_dadosfera.md)
+- arquitetura atual: `docs/architecture.md`
+- contexto de plataforma: `docs/about_dadosfera.md`
 
 ## Status honesto
 

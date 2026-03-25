@@ -36,7 +36,12 @@ Aqui eu explicaria que o Olist é uma base muito boa para esse tipo de desafio p
 - Essa separação ajuda a manter rastreabilidade, qualidade e clareza de uso por camada.
 - Para o dashboard, eu não uso a camada interna completa; eu publico uma camada segura, específica para consumo analítico.
 
-[INSERIR PRINT REAL AQUI: arquitetura em camadas do projeto ou árvore de pastas com as zonas raw, standardized, staging, curated e published]
+```text
+raw/landing -> standardized -> staging -> curated -> published -> dashboard
+```
+
+Referência de apoio:
+- `docs/architecture.md`
 
 **Notas do apresentador:**
 Aqui eu falaria de forma bem objetiva: eu preservei uma camada analítica interna para engenharia e auditoria, e criei uma camada publicada para consumo no app. Isso reforça governança e deixa a solução mais madura, porque separa o dado de trabalho do dado de exposição.
