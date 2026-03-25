@@ -76,7 +76,7 @@ Pendências locais atuais fora da submissão principal:
 - [x] deck base em markdown
 - [x] roteiro de fala inicial
 - [x] deck final preenchido com imagens
-- [ ] links finais da Dadosfera inseridos na apresentação
+- [x] links finais da Dadosfera inseridos na apresentação
 - [ ] link do vídeo inserido
 - [ ] vídeo de apresentação, se exigido
 
@@ -87,9 +87,10 @@ Pendências locais atuais fora da submissão principal:
 - a parte da Dadosfera já está comprovada para o ativo principal
 - pipeline nativo na plataforma permanece pendente
 - item de GenAI com LLM externa já foi validado localmente
-- vídeo final e links finais da apresentação permanecem pendentes
+- vídeo final da apresentação permanece pendente
 - o `README.md` principal já foi ajustado com links relativos compatíveis com GitHub web
 - a evidência SQL principal em `powerbi/evidencia_query.md` já está fortalecida com imagens e links válidos
 - o item de GenAI agora possui amostra desestruturada, script, prompt e tabela final materializada com `openai_api`
 - a evidência visual atual de GenAI está em `images/genai/01_product_text_features_openai.png`
 - o deck final já possui imagens reais de dashboard, SQL, Dadosfera e GenAI
+- a apresentação final já registra o link principal do ativo na Dadosfera/Metabase

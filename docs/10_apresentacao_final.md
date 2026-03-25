@@ -45,7 +45,6 @@ Segundo o edital, a apresentacao deve:
 
 ## O que ainda falta para fechar a apresentacao
 
-- inserir links reais da Dadosfera, se a plataforma disponibilizar URL navegável
 - gravar o video final
 - publicar o video como `Unlisted` no YouTube
 
@@ -70,11 +69,14 @@ Se a apresentação precisar ser curta, a mensagem principal deve ser:
 
 ### Link do ativo principal na Dadosfera
 
-- `não encontrei evidência suficiente de URL pública navegável`
+- `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- identificador técnico do ativo: `TB__3TTJXS__SAMUELMAIA_032026_FACT_ORDERS_DASHBOARD`
+- coleção / schema associado: `PUBLIC.SAMUELMAIA-03_2026`
 
 ### Link do dashboard ou colecao na Dadosfera
 
-- `não encontrei evidência suficiente de URL pública navegável`
+- `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- observação: não encontrei evidência suficiente de URL separada para coleção navegável além do modelo acima
 
 ### Link do pipeline na Dadosfera
 
@@ -105,4 +107,4 @@ O maior risco é apresentar uma solução local como se toda a operacionalizaç�
 - prints reais da plataforma: prontos
 - deck com imagens do dashboard, Dadosfera, SQL e GenAI: pronto
 - video final: pendente
-- links finais da plataforma: não encontrei evidência suficiente de URLs públicas navegáveis
+- link principal do ativo na Dadosfera/Metabase: registrado
