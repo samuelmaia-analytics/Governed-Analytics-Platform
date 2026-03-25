@@ -26,6 +26,9 @@ data/curated/*
 !data/curated/catalog/
 !data/curated/catalog/*.json
 !data/curated/catalog/*.csv
+!data/curated/genai/
+!data/curated/genai/*.csv
+!data/curated/genai/*.jsonl
 
 data/published/*
 !data/published/.gitkeep
@@ -37,6 +40,8 @@ data/published/dashboard/*
 # Optional local-only data
 data/external/*
 !data/external/.gitkeep
+!data/external/genai/
+!data/external/genai/*.csv
 
 # Keep screenshots used in the case documentation
 !data/screenshots/

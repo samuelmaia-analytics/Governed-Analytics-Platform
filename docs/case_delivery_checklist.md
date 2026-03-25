@@ -57,10 +57,10 @@ Pendências locais atuais fora da submissão principal:
 
 ## GenAI e LLM
 
-- [ ] escolher dataset desestruturado para o item
+- [x] escolher dataset desestruturado para o item
 - [ ] gerar features com IA
-- [ ] documentar prompts utilizados
-- [ ] materializar tabela final de features
+- [x] documentar prompts utilizados
+- [x] materializar tabela final de features
 
 ## Evidências visuais finais
 
@@ -88,3 +88,4 @@ Pendências locais atuais fora da submissão principal:
 - vídeo final e links finais da apresentação permanecem pendentes
 - o `README.md` principal já foi ajustado com links relativos compatíveis com GitHub web
 - a evidência SQL principal em `powerbi/evidencia_query.md` já está fortalecida com imagens e links válidos
+- o item de GenAI agora possui amostra desestruturada, script, prompt e tabela final materializada em modo de referência

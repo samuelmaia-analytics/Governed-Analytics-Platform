@@ -17,13 +17,20 @@ Hoje o projeto já possui:
 - camada analítica estruturada do Olist
 - dashboard com insights executivos
 - documentacao do bonus de GenAI em:
-  - [docs/genai_bonus.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\genai_bonus.md)
+  - `docs/genai_bonus.md`
+- script de extração de features:
+  - `src/genai_feature_extraction.py`
+- dataset desestruturado de exemplo:
+  - `data/external/genai/product_text_samples.csv`
+- tabela final de features:
+  - `data/curated/genai/product_text_features.csv`
 
 ## Status honesto atual
 
 - insights heurísticos no dashboard: feitos
-- uso de LLM externa para extração de features: não implementado neste repositório
-- dataset desestruturado dedicado para este item: não materializado neste repositório
+- uso de LLM externa para extração de features: preparado via script, depende de chave/API
+- dataset desestruturado dedicado para este item: materializado em amostra versionada
+- tabela final de features: materializada em modo de referência
 
 ## O que o edital pede
 
@@ -68,43 +75,56 @@ Uma tabela ou arquivo com colunas como:
 - markdown com prompts usados
 - exemplos de entrada e saida
 
-## Campos para preencher apos a implementacao
+## Campos preenchidos para a entrega atual
 
 ### Dataset desestruturado escolhido
 
-- `PREENCHER`
+- `data/external/genai/product_text_samples.csv`
 
 ### Colunas de entrada
 
-- `PREENCHER`
+- `source_id`
+- `title`
+- `product_description`
 
 ### Modelo utilizado
 
-- `PREENCHER`
+- `gpt-4.1-mini` no modo API
+- `reference_output` no modo reprodutível versionado
 
 ### Prompt principal
 
-- `PREENCHER`
+- prompt de extração para JSON estrito com schema fixo de features de produto
+- implementado em `src/genai_feature_extraction.py`
 
 ### Estrutura de saida
 
-- `PREENCHER`
+- `category`
+- `material`
+- `compatibility`
+- `quality_signals`
+- `functional_features`
+- `security_features`
+- `aesthetic_signals`
+- `target_use_cases`
+- `summary`
 
 ### Arquivo final das features
 
-- `PREENCHER`
+- `data/curated/genai/product_text_features.csv`
+- `data/curated/genai/product_text_features.jsonl`
 
 ### Link do notebook ou script
 
-- `PREENCHER`
+- `src/genai_feature_extraction.py`
 
 ## Evidencias recomendadas
 
 Salvar em `docs/` ou `images/presentation/`:
 
-- exemplo de entrada textual
-- exemplo de JSON de saida
-- print do notebook ou da execução
+- exemplo de entrada textual: `data/external/genai/product_text_samples.csv`
+- exemplo de JSON de saída: `data/curated/genai/product_text_features.jsonl`
+- tabela final: `data/curated/genai/product_text_features.csv`
 
 ## Risco principal deste item
 
@@ -116,4 +136,5 @@ O maior risco e vender heuristica como se fosse LLM real. A documentacao final d
 ## Status atual
 
 - base documental do item: pronta
-- implementacao real do item: pendente
+- implementacao minima do item: pronta
+- chamada real à LLM: depende de credencial/API externa

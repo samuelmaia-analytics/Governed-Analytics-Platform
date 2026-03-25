@@ -1,96 +1,97 @@
 # Bônus de GenAI
 
-## Objetivo do Bônus
+## Objetivo do bônus
 
-Este bônus adiciona ao dashboard uma camada de experiência inspirada em copilotos analíticos, chamada `Insights Inteligentes`. A ideia é transformar o painel em um Data App mais próximo da tomada de decisão, e não apenas em uma coleção de gráficos.
+Este bônus agora possui duas frentes complementares no repositório:
 
-Em vez de exigir que a pessoa usuária interprete manualmente cada visual, a seção sintetiza o recorte filtrado e entrega uma leitura executiva automática com foco em negócio.
+- um copiloto analítico heurístico no dashboard, chamado `Insights Inteligentes`
+- uma prova de conceito de extração de features em texto desestruturado usando prompt estruturado para LLM
 
-## Problema de Negócio Atendido
+Com isso, o projeto cobre tanto a ideia de Data App orientado à decisão quanto o item específico do edital sobre transformar texto bruto em atributos estruturados.
 
-Em contextos reais, um dos principais desafios de analytics não é apenas gerar dados ou gráficos, mas reduzir o tempo entre:
+## Caso de uso implementado
 
-- observar um recorte
-- entender o que ele significa
-- decidir qual ação faz mais sentido
+Foi adicionada uma amostra desestruturada de produto com:
 
-Mesmo quando o dashboard é bem construído, a leitura ainda depende de repertório analítico. Isso cria fricção para lideranças, stakeholders de negócio e perfis menos técnicos.
+- `title`
+- `product_description`
 
-O bônus de GenAI ataca exatamente esse problema: aproximar os dados da decisão por meio de uma camada textual orientada a síntese, destaque de padrões e sugestão de próximos passos.
+Arquivos:
 
-## Como o Data App Aproxima Dados e Decisão
+- entrada: `data/external/genai/product_text_samples.csv`
+- saída tabular: `data/curated/genai/product_text_features.csv`
+- saída completa: `data/curated/genai/product_text_features.jsonl`
+- script: `src/genai_feature_extraction.py`
 
-A seção `Insights Inteligentes` atua como um copiloto analítico heurístico sobre o recorte filtrado do dashboard. Ela:
+## Features geradas
 
-- lê o contexto dos filtros ativos
-- identifica a categoria líder em receita
-- interpreta a tendência temporal mais recente
-- destaca a UF com maior peso comercial
-- aponta o principal alerta logístico do recorte
-- gera recomendações automáticas de negócio com base em regras heurísticas
+O processo foi desenhado para extrair:
 
-Na prática, isso aproxima dados e decisão porque:
+- categoria inferida
+- material
+- compatibilidade
+- sinais de qualidade
+- funcionalidades
+- sinais de segurança
+- sinais estéticos
+- casos de uso
+- resumo executivo do item
 
-- reduz o esforço de interpretação inicial
-- ajuda a transformar observação em narrativa executiva
-- orienta o olhar do usuário para o que é mais importante naquele recorte
-- deixa o dashboard mais próximo de uma ferramenta de apoio gerencial
+## Como rodar
 
-## O que Foi Implementado no Projeto
+Modo reprodutível versionado no repositório:
 
-No estado atual, o copiloto não depende de uma LLM externa. A geração dos insights acontece localmente, com regras determinísticas baseadas na `fact_orders_enriched`.
+```bash
+python src/genai_feature_extraction.py --mode reference
+```
 
-Isso traz algumas vantagens:
+Modo com LLM real via OpenAI API:
 
-- funcionamento simples e reprodutível
-- zero dependência de API externa
-- custo operacional nulo
-- comportamento previsível para apresentação do case
+```bash
+set OPENAI_API_KEY=sua_chave
+python src/genai_feature_extraction.py --mode openai --model gpt-4.1-mini
+```
 
-Ao mesmo tempo, a experiência já simula o papel de um assistente analítico, mostrando como o dashboard pode evoluir de visualização para interpretação assistida.
+## Leitura honesta do status
 
-## Como uma LLM Poderia Ser Conectada Futuramente
+O que está implementado e comprovado:
 
-Em uma evolução futura, essa camada poderia ser conectada a uma LLM para suportar perguntas em linguagem natural, como:
+- dataset desestruturado de exemplo
+- schema de saída das features
+- prompt estruturado para extração
+- script executável para materializar as features
+- tabela final já salva em `data/curated/genai/`
 
-- "Quais categorias mais cresceram no período filtrado?"
-- "Por que o atraso está alto neste recorte?"
-- "Quais estados combinam alta receita e baixa satisfação?"
-- "Resuma este painel para uma diretoria comercial."
+O que depende de credencial externa:
 
-Uma arquitetura simples para essa evolução seria:
+- chamada real a uma LLM via API
 
-1. capturar o contexto do filtro ativo no Streamlit
-2. gerar um conjunto estruturado de métricas do recorte
-3. montar um prompt com contexto de negócio, definição das métricas e regras de interpretação
-4. enviar esse prompt para uma LLM
-5. devolver a resposta no painel com linguagem executiva
+No ambiente atual do repositório, a saída versionada foi materializada no modo `reference`, para manter reprodutibilidade e não simular uma chamada externa que não foi executada aqui.
 
-## Caminhos Possíveis de Evolução
+## Prompt principal
 
-Com uma LLM integrada, o Data App poderia incluir:
+O script usa um prompt com instrução de JSON estrito e schema fixo para reduzir ambiguidade e facilitar auditoria da resposta.
 
-- perguntas e respostas em linguagem natural sobre o recorte filtrado
-- geração automática de sumários executivos por área
-- explicação textual de anomalias e mudanças de tendência
-- sugestão de hipóteses investigativas
-- comparação entre períodos e segmentos com narrativa automática
+Campos esperados:
 
-Também seria possível adicionar salvaguardas, como:
+- `category`
+- `material`
+- `compatibility`
+- `quality_signals`
+- `functional_features`
+- `security_features`
+- `aesthetic_signals`
+- `target_use_cases`
+- `summary`
 
-- grounding em métricas calculadas localmente
-- limitação de resposta a fatos presentes no dataset
-- trilha de auditoria do prompt e da resposta
-- avisos quando a resposta envolver inferência e não observação direta
+## Como defender na apresentação
 
-## Valor Adicional para o Case
+Fala simples e honesta:
 
-Este bônus aumenta o valor da entrega por mostrar que o projeto não termina na modelagem e na visualização tradicional. Ele demonstra uma visão de produto analítico, em que dados, interface e suporte à decisão caminham juntos.
+- o item de GenAI foi tratado como extração estruturada de features a partir de texto desestruturado de produto
+- o repositório já entrega entrada, prompt, schema e tabela final materializada
+- a execução totalmente online depende apenas de chave de API, mas a lógica e a estrutura do caso já estão demonstradas
 
-Isso reforça três pontos relevantes no contexto de um case técnico:
+## Valor adicional para o case
 
-- maturidade na transformação de dados em experiência de uso
-- preocupação com adoção por públicos não técnicos
-- visão prática de como analytics pode evoluir para GenAI com governança
-
-Em resumo, o bônus posiciona o dashboard como um embrião de assistente analítico, aproximando a solução de um cenário real de Data App com linguagem natural e apoio à decisão.
+Este bônus mostra que a solução não se limita a tabelas prontas. Ela também consegue transformar texto bruto em atributos analíticos utilizáveis, o que aproxima o projeto de cenários reais de enrichment de catálogo, product intelligence e preparação de dados para busca semântica ou recomendação.
