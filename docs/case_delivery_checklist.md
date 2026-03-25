@@ -43,6 +43,7 @@ Link final do repositório:
 
 Pendências locais atuais fora da submissão principal:
 
+- `data/curated/genai/product_text_features.csv`
 - `powerbi/dashboard_overview.pbix`
 
 ## Dadosfera
@@ -66,6 +67,7 @@ Pendências locais atuais fora da submissão principal:
 
 - [x] prints da Dadosfera
 - [x] prints do dashboard final em execução
+- [x] print do item GenAI salvo em `images/genai/`
 - [x] organizar imagens finais em `images/`
 
 ## Apresentação final
@@ -89,3 +91,4 @@ Pendências locais atuais fora da submissão principal:
 - o `README.md` principal já foi ajustado com links relativos compatíveis com GitHub web
 - a evidência SQL principal em `powerbi/evidencia_query.md` já está fortalecida com imagens e links válidos
 - o item de GenAI agora possui amostra desestruturada, script, prompt e tabela final materializada com `openai_api`
+- a evidência visual atual de GenAI está em `images/genai/01_product_text_features_openai.png`
