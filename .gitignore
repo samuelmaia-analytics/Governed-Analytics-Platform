@@ -32,6 +32,7 @@ data/published/*
 !data/published/dashboard/
 data/published/dashboard/*
 !data/published/dashboard/.gitkeep
+!data/published/dashboard/fact_orders_dashboard.csv
 
 # Optional local-only data
 data/external/*

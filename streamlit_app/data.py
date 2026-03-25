@@ -9,7 +9,8 @@ from src.config import PUBLISHED_DASHBOARD_DIR
 from streamlit_app.theme import MONTH_NAME_MAP, WEEKDAY_MAP
 
 
-FACT_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
+FACT_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
+FACT_CSV_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.csv"
 
 
 @dataclass(frozen=True)
@@ -27,10 +28,15 @@ class FilterState:
 
 @st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
-    if not FACT_PATH.exists():
-        raise FileNotFoundError(f"Arquivo não encontrado: {FACT_PATH}")
+    if FACT_PARQUET_PATH.exists():
+        df = pd.read_parquet(FACT_PARQUET_PATH)
+    elif FACT_CSV_PATH.exists():
+        df = pd.read_csv(FACT_CSV_PATH)
+    else:
+        raise FileNotFoundError(
+            f"Arquivo não encontrado: {FACT_PARQUET_PATH} nem {FACT_CSV_PATH}"
+        )
 
-    df = pd.read_parquet(FACT_PATH)
     datetime_columns = [
         "order_purchase_timestamp",
         "order_approved_at",
