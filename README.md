@@ -35,8 +35,6 @@ Para publicação externa e upload manual em plataforma, o ativo recomendado é:
 
 ## Resumo Executivo da Entrega
 
-[Voltar ao Sumário](#sumário)
-
 Status atual:
 
 - GitHub publicado e atualizado
