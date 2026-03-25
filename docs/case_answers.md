@@ -15,14 +15,15 @@ Para evitar exagero na narrativa do case, o estado real da entrega foi separado 
 | Ambiente | Status | Evidencia |
 | --- | --- | --- |
 | Projeto local no PyCharm | feito | pipeline, docs, SQL, dashboard, testes e artefatos gerados no repositorio |
-| GitHub | parcial | remoto configurado, mas o fechamento final depende de commit e push da ultima versao |
-| Dadosfera | documentado, mas nao executado | existe manifesto local da colecao, sem prova neste repositorio de upload/catalogacao real na plataforma |
+| GitHub | feito | repositorio publicado e atualizado com documentacao, evidencias e artefatos finais |
+| Dadosfera | parcial, com evidencia real do ativo publicado | prints de importacao, catalogo, colecao e volume em `images/dadosfera/`, sem pipeline nativo comprovado |
 
 Leitura correta:
 
 - a solucao tecnica principal esta pronta localmente
-- a parte de versionamento remoto precisa ser fechada antes da entrega
-- a operacionalizacao real na Dadosfera ainda depende de execucao manual e captura de evidencias
+- a parte de versionamento remoto ja foi consolidada no GitHub
+- a operacionalizacao do ativo principal na Dadosfera ja foi evidenciada
+- a parte ainda pendente na plataforma e o pipeline nativo
 
 ## Objetivo do Projeto
 
@@ -229,7 +230,8 @@ Observação importante de honestidade técnica:
 
 - o manifesto e o inventário da coleção existem localmente no repositório
 - isso demonstra preparo para catalogação/publicação
-- isso não deve ser descrito como publicação real já concluída na plataforma Dadosfera sem evidência externa
+- o ativo principal também foi publicado na Dadosfera com evidências visuais em `images/dadosfera/`
+- isso não deve ser descrito como pipeline nativo ou integração por API já concluídos na plataforma
 
 ## Próximos Passos
 
@@ -260,6 +262,6 @@ Em resumo, o projeto mostra a capacidade de sair de dados transacionais brutos e
 
 No entanto, o fechamento completo da entrega ainda depende de:
 
-- capturas finais do dashboard Streamlit
-- execução real e evidenciada na Dadosfera
-- consolidação final do repositório no GitHub
+- gravação do vídeo final, se exigido
+- preenchimento dos links finais na apresentação
+- eventual implementação de pipeline nativo na Dadosfera, se quiser expandir além do essencial

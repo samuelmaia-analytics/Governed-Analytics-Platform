@@ -97,14 +97,16 @@
   - [data/curated/catalog/collection_assets_inventory.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\curated\catalog\collection_assets_inventory.csv)
 - Status honesto:
   - estrutura de publicação e metadados está pronta localmente
-  - a materialização real na plataforma Dadosfera ainda depende de execução manual e captura de evidência
+  - o ativo principal já foi publicado e evidenciado na plataforma Dadosfera
+  - o que permanece pendente é pipeline nativo na plataforma
 - Recomendação para fala:
-  - dizer explicitamente que o repositorio ja entrega o payload e o inventario
-  - nao vender como integracao real concluida enquanto os prints da plataforma nao existirem
-- Quando os prints forem capturados, inserir:
-  - `images/dadosfera/01_asset_list.png`
-  - `images/dadosfera/02_asset_preview.png`
-  - `images/dadosfera/04_catalog.png`
+  - dizer explicitamente que o repositorio ja entrega o payload, o inventario e a prova visual do ativo publicado
+  - nao vender como integracao por API ou pipeline real concluido
+- Prints já disponíveis:
+  - [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
+  - [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
+  - [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
+  - [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
 - Referencia operacional: [docs/dadosfera_capture_runbook.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\dadosfera_capture_runbook.md)
 
 ## Slide 10 - Testes e Robustez
@@ -124,13 +126,12 @@
 - Exports preparados em [data/processed/bi_exports/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports)
 - Status honesto:
   - base pronta para Power BI
-  - dashboard Power BI ainda precisa ser materializado, se o bônus for usado
+  - documentação, evidência de query e screenshots já foram materializadas na pasta `powerbi/`
 - Referencia operacional: [powerbi/delivery_plan.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\delivery_plan.md)
 
 ## Slide 12 - Próximos Passos
 
-- publicar dataset e catálogo real na Dadosfera
-- capturar evidências finais da plataforma
-- integrar os screenshots finais do Streamlit ao deck final
-- opcional: materializar o bônus em Power BI
-- fechar commit final e push no GitHub
+- preencher os links finais da apresentação
+- gravar o vídeo final
+- integrar os screenshots finais do Streamlit e da Dadosfera ao deck final
+- opcional: criar pipeline nativo na Dadosfera

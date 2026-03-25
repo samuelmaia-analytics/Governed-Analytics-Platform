@@ -16,13 +16,16 @@ Para evitar ambiguidade na leitura do case, o status real até o momento é:
 - **feito no Git local**
   - repositório inicializado e remoto GitHub configurado
   - versionamento da estrutura, documentação e código
-- **ainda não comprovado neste repositório como execução real na Dadosfera**
+- **já comprovado neste repositório na interface da Dadosfera**
   - upload/publicação do dataset na plataforma
   - catálogo/coleção materializados na interface da plataforma
-  - screenshots da plataforma
-  - evidência de query, app ou ativo acessível dentro da Dadosfera
+  - screenshots da plataforma em `images/dadosfera/`
+- **ainda não comprovado neste repositório como execução real na Dadosfera**
+  - pipeline real executado na plataforma
+  - catálogo do pipeline na interface
+  - query, notebook ou app materializado nativamente dentro da plataforma
 
-Em outras palavras, a solução técnica do case já está pronta localmente, mas a parte de operacionalização na Dadosfera ainda depende de execução manual na plataforma e captura de evidências finais.
+Em outras palavras, a solução técnica do case já está pronta localmente e o ativo principal já foi publicado com evidência visual na Dadosfera. O que ainda permanece pendente é a parte de pipeline nativo e operacionalização mais ampla dentro da plataforma.
 
 ## Contexto
 
@@ -109,7 +112,7 @@ Dadosfera
 
 Na prática, a proposta não exige descartar o que já foi construído. O pipeline atual pode continuar como motor de transformação, enquanto a Dadosfera atua como camada de publicação, compartilhamento e escalabilidade. Em um estágio mais maduro, parte relevante da arquitetura local pode ser simplificada ou absorvida pela plataforma.
 
-Nesta prova de conceito, essa visão já foi parcialmente materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Ainda não há integração direta com endpoint externo da plataforma, e portanto este repositório não comprova publicação real na Dadosfera neste momento.
+Nesta prova de conceito, essa visão já foi parcialmente materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Além disso, o repositório agora inclui evidências visuais da publicação do ativo principal na interface da Dadosfera em `images/dadosfera/`. Ainda não há integração direta com endpoint externo da plataforma nem evidência de pipeline nativo executado.
 
 ## 3. Por que a Abordagem Baseada na Dadosfera é Mais Viável e/ou Mais Barata
 
@@ -186,6 +189,7 @@ No estado atual do repositório, a conclusão correta é:
 
 - a engenharia local está implementada
 - a estrutura para publicação/catálogo está preparada
-- a execução real na plataforma ainda precisa ser feita e evidenciada
+- a publicação do ativo principal na plataforma já foi evidenciada
+- a execução de pipeline nativo na plataforma ainda precisa ser feita e evidenciada
 
 Em uma leitura honesta de prova de conceito, a combinação entre pipeline analítico, camada de consumo e plataforma de publicação de dados continua sendo o caminho certo para aumentar a velocidade de análise e aproximar ainda mais os dados da decisão de negócio no e-commerce.

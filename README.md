@@ -16,6 +16,13 @@ Para publicacao externa e upload manual em plataforma, o ativo recomendado e:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
+Status atual da entrega:
+
+- GitHub publicado e atualizado
+- ativo publicado na Dadosfera com evidencias visuais em `images/dadosfera/`
+- dashboard Streamlit operacional com fallback para `csv` no deploy
+- trilha complementar de Power BI com evidencias de query e dashboard
+
 ## Diferenca entre os principais ativos
 
 ### `fact_orders_enriched`
@@ -157,6 +164,13 @@ Para evitar ambiguidade na leitura do case, a distinção é a seguinte:
   - sincronização automática da coleção com um catálogo gerenciado
 
 Em outras palavras, o projeto já entrega a estrutura e o payload da coleção em nível de prova de conceito local, mas não afirma integração nativa concluída com a plataforma.
+
+Hoje, o repositório também já inclui evidências visuais da publicação do ativo na interface da Dadosfera:
+
+- [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
+- [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
+- [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
+- [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
 
 ## Tabela Analítica Principal
 
@@ -352,6 +366,10 @@ O app consome exclusivamente:
 
 - `data/published/dashboard/fact_orders_dashboard.parquet`
 
+No deploy remoto do Streamlit, o carregamento tambem aceita:
+
+- `data/published/dashboard/fact_orders_dashboard.csv`
+
 Se a intencao for subir um ativo na Dadosfera, usar:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
@@ -408,6 +426,8 @@ Arquivos principais em `docs/`:
 - `governance_policy.md`: política de governança, retenção e accountability
 - `schema_contract_report.md`: validação dos contratos simples de schema das camadas principais
 - `bi_bonus.md`: orientação para o bônus em Power BI
+- `03_catalogacao.md`: evidências da publicação do ativo na Dadosfera
+- `10_apresentacao_final.md`: estado real da apresentação e links pendentes
 
 ## Privacidade, Governança e Publicação
 
@@ -450,4 +470,4 @@ Evoluções naturais do projeto:
 
 ## Status Atual
 
-O projeto já possui pipeline local funcional, base analítica interna consolidada, camada publicada segura para dashboard, coleção materializada, validação de qualidade com checks de integridade e reconciliação, queries SQL executadas, imagens geradas para a documentação do case, dashboard Streamlit modularizado e exportações auxiliares para Power BI.
+O projeto já possui pipeline local funcional, base analítica interna consolidada, camada publicada segura para dashboard, coleção materializada, validação de qualidade com checks de integridade e reconciliação, queries SQL executadas, imagens geradas para a documentação do case, dashboard Streamlit modularizado, evidências reais da publicação do ativo na Dadosfera e exportações auxiliares para Power BI.

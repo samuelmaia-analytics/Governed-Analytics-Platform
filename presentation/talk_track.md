@@ -30,8 +30,8 @@ Para consumo executivo, eu publiquei uma camada reduzida e pseudonimizada e cons
 
 ## Dadosfera
 
-O projeto já possui um manifesto local de catálogo e inventário de ativos. A parte que ainda precisa ser materializada de forma real é a publicação e evidência desses ativos dentro da plataforma Dadosfera.
+O projeto já possui um manifesto local de catálogo e inventário de ativos. Além disso, o ativo principal foi publicado na Dadosfera com evidências visuais de importação, catálogo, coleção e volume acima de 100 mil linhas. O que ainda permanece pendente é a criação de um pipeline nativo na plataforma.
 
 ## Fechamento
 
-Hoje o projeto já está forte como entrega local de analytics engineering e data product. O próximo passo é fechar a operacionalização final: evidências visuais, plataforma e entrega consolidada no GitHub.
+Hoje o projeto já está forte como entrega de analytics engineering e data product, com GitHub consolidado e evidências reais do ativo principal na Dadosfera. O próximo passo é fechar a apresentação final e, se houver tempo, expandir a operacionalização para pipeline nativo na plataforma.

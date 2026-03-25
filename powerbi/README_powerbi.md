@@ -101,4 +101,4 @@ Marcadores recomendados:
 Status atual:
 
 - `dashboard_overview.png`: disponível
-- `dashboard_drilldown.png`: pendente de validação visual
+- `dashboard_drilldown.png`: disponível

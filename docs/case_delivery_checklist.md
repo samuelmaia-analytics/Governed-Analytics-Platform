@@ -30,22 +30,22 @@
 
 - [x] repositório git inicializado
 - [x] remoto GitHub configurado
-- [ ] revisar `git status`
+- [x] revisar `git status`
 - [ ] remover artefatos temporários antes do commit final
-- [ ] commitar a versão final da entrega
-- [ ] fazer push da versão final
+- [x] commitar a versão final da entrega
+- [x] fazer push da versão final
 - [ ] validar README e docs no GitHub web
 - [ ] registrar o link final do GitHub
 
 ## Dadosfera
 
-- [ ] publicar dataset real na plataforma
-- [ ] validar preview/esquema do ativo publicado
-- [ ] catalogar ou registrar o ativo na plataforma
+- [x] publicar dataset real na plataforma
+- [x] validar preview/esquema do ativo publicado
+- [x] catalogar ou registrar o ativo na plataforma
 - [ ] criar pipeline real na plataforma
 - [ ] catalogar o pipeline na plataforma
-- [ ] gerar evidências reais da plataforma
-- [ ] salvar capturas em `images/dadosfera/`
+- [x] gerar evidências reais da plataforma
+- [x] salvar capturas em `images/dadosfera/`
 
 ## GenAI e LLM
 
@@ -56,9 +56,9 @@
 
 ## Evidências visuais finais
 
-- [ ] prints da Dadosfera
+- [x] prints da Dadosfera
 - [x] prints do dashboard final em execução
-- [ ] organizar imagens finais em `images/`
+- [x] organizar imagens finais em `images/`
 
 ## Apresentação final
 
@@ -73,5 +73,6 @@
 ## Leitura correta do status
 
 - o projeto local está pronto para demonstração técnica
-- o GitHub ainda precisa de fechamento final
-- a parte da Dadosfera está documentada, mas ainda não comprovada neste repositório como execução real
+- o GitHub já está consolidado com as evidências principais
+- a parte da Dadosfera já está comprovada para o ativo principal
+- pipeline nativo na plataforma permanece pendente

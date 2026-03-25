@@ -2,7 +2,7 @@
 
 ## Observação
 
-Os pontos abaixo foram preparados para apoiar a apresentação final do case. Eles devem ser tratados como leituras executivas prontas para uso, mas seguem `pendentes de validação visual final` no dashboard antes da submissão definitiva.
+Os pontos abaixo foram preparados para apoiar a apresentação final do case. Eles devem ser tratados como leituras executivas prontas para uso e já contam com evidências visuais e SQLs materializadas na pasta `powerbi/`.
 
 ## Insights
 
