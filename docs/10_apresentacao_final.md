@@ -35,11 +35,15 @@ Segundo o edital, a apresentacao deve:
   - [presentation/talk_track.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\presentation\talk_track.md)
 - screenshots do Streamlit:
   - [images/dashboard/01_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\01_overview.png)
+- screenshots da Dadosfera:
+  - [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
+  - [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
+  - [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
+  - [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
 
 ## O que ainda falta para fechar a apresentacao
 
 - inserir links reais da Dadosfera
-- inserir prints reais da plataforma
 - gravar o video final
 - publicar o video como `Unlisted` no YouTube
 
@@ -87,5 +91,6 @@ O maior risco e apresentar uma solucao local como se toda a operacionalizacao ja
 ## Status atual
 
 - deck e roteiro: prontos
+- prints reais da plataforma: prontos
 - video final: pendente
 - links finais da plataforma: pendentes

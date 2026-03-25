@@ -17,3 +17,10 @@ Uso recomendado:
 
 - manter aqui apenas evidências finais de submissão
 - preservar em `data/screenshots/query_results/` as imagens geradas pelo pipeline
+
+Evidências atuais já disponíveis em `images/dadosfera/`:
+
+- `01_importacao_dataset.png`: comprova upload/importação do ativo publicado
+- `02_catalogo_metadados.png`: comprova preenchimento de documentação e metadados
+- `03_colecao_case.png`: comprova o ativo dentro da coleção/catálogo do case
+- `04_volume_100k.png`: comprova volume de `112650` linhas no ativo publicado
