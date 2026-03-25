@@ -47,17 +47,35 @@ Arquivo de referência:
 -- 7. Detalhamento por Categoria
 ```
 
-## Onde inserir o print do resultado
+## Resultados e prints gerados
 
-Inserir abaixo o print da execução da query principal ou da consulta mais relevante utilizada para construir o dashboard.
+Os blocos da `query_principal.sql` foram executados sobre a tabela analítica `fact_orders_enriched`, com exportação do resultado tabular em CSV e geração de print em PNG para evidência.
 
-Marcador para inserção manual:
+## Evidência principal do resultado
 
-`[INSERIR PRINT DO RESULTADO DA QUERY PRINCIPAL AQUI]`
+![Resultado da query principal](./query_principal_resultado.png)
 
-Sugestão de nome do arquivo:
-
-- `powerbi/query_principal_resultado.png`
+- Bloco 1. KPIs Executivos
+  CSV: [query_principal_01_kpis_executivos.csv](./query_principal_01_kpis_executivos.csv)
+  PNG: [query_principal_01_kpis_executivos.png](./query_principal_01_kpis_executivos.png)
+- Bloco 2. Evolução da Receita no Tempo
+  CSV: [query_principal_02_evolucao_receita_tempo.csv](./query_principal_02_evolucao_receita_tempo.csv)
+  PNG: [query_principal_02_evolucao_receita_tempo.png](./query_principal_02_evolucao_receita_tempo.png)
+- Bloco 3. Top 10 Categorias por Receita
+  CSV: [query_principal_03_top10_categorias_receita.csv](./query_principal_03_top10_categorias_receita.csv)
+  PNG: [query_principal_03_top10_categorias_receita.png](./query_principal_03_top10_categorias_receita.png)
+- Bloco 4. Distribuição dos Pedidos por Status
+  CSV: [query_principal_04_distribuicao_pedidos_status.csv](./query_principal_04_distribuicao_pedidos_status.csv)
+  PNG: [query_principal_04_distribuicao_pedidos_status.png](./query_principal_04_distribuicao_pedidos_status.png)
+- Bloco 5. Estados com Maior Percentual de Atraso
+  CSV: [query_principal_05_estados_maior_percentual_atraso.csv](./query_principal_05_estados_maior_percentual_atraso.csv)
+  PNG: [query_principal_05_estados_maior_percentual_atraso.png](./query_principal_05_estados_maior_percentual_atraso.png)
+- Bloco 6. Top 10 Categorias por Frete Médio
+  CSV: [query_principal_06_top10_categorias_frete_medio.csv](./query_principal_06_top10_categorias_frete_medio.csv)
+  PNG: [query_principal_06_top10_categorias_frete_medio.png](./query_principal_06_top10_categorias_frete_medio.png)
+- Bloco 7. Detalhamento por Categoria
+  CSV: [query_principal_07_detalhamento_categoria.csv](./query_principal_07_detalhamento_categoria.csv)
+  PNG: [query_principal_07_detalhamento_categoria.png](./query_principal_07_detalhamento_categoria.png)
 
 ## Breve leitura analítica dos resultados
 
@@ -72,7 +90,4 @@ Leitura executiva sugerida:
 ## Status
 
 Documento pronto.
-
-Ponto pendente de validação:
-
-- inserção do print final do resultado SQL
+Os resultados e prints dos 7 blocos já foram gerados e vinculados neste documento.

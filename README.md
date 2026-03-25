@@ -386,6 +386,10 @@ As principais perguntas analíticas foram organizadas em `sql/analytics/`:
 
 Essas queries respondem perguntas sobre receita, evolução temporal, distribuição geográfica, atraso logístico e meios de pagamento.
 
+Para a trilha de Power BI, a evidência consolidada da query principal está em:
+
+- [powerbi/evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
+
 ## Documentação Disponível
 
 Arquivos principais em `docs/`:

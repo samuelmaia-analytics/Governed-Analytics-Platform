@@ -88,6 +88,8 @@ Artefatos já encontrados no projeto:
 
 - arquivo Power BI atual: [dashboard_overview.pbix](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\dashboard_overview.pbix)
 - print executivo atual: [dashboard_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\dashboard_overview.png)
+- evidência SQL principal: [evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
+- print do resultado SQL: [query_principal_resultado.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\query_principal_resultado.png)
 
 ## Onde inserir imagem ou print final do dashboard
 

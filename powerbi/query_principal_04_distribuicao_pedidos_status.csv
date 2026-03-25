@@ -1,0 +1,8 @@
+order_status,total_pedidos,receita_total,ticket_medio_item
+delivered,96478,15419773.75,139.93
+shipped,1106,177129.34,149.48
+canceled,461,105885.72,195.36
+processing,301,69394.11,194.38
+invoiced,312,68988.75,192.17
+unavailable,6,2140.49,305.78
+approved,2,241.08,80.36

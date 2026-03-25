@@ -33,3 +33,8 @@ Arquivos esperados para importação:
 - `dim_seller.csv`
 - `dim_payment.csv`
 - `dim_order_status.csv`
+
+Referências diretas:
+
+- evidência da query principal: [evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
+- documentação do dashboard: [README_powerbi.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\README_powerbi.md)
