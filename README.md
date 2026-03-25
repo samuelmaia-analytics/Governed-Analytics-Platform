@@ -23,6 +23,16 @@ Para publicação externa e upload manual em plataforma, o ativo recomendado é:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
+## Sumário
+
+- [Resumo Executivo da Entrega](#resumo-executivo-da-entrega)
+- [Evidências Finais da Submissão](#evidências-finais-da-submissão)
+- [Mapa de Evidências](#mapa-de-evidências)
+- [Como Ler o Projeto](#como-ler-o-projeto)
+- [Como Executar](#como-executar)
+- [Documentação Disponível](#documentação-disponível)
+- [Limites e Próximos Passos](#limites-e-próximos-passos)
+
 ## Resumo Executivo da Entrega
 
 Status atual:
