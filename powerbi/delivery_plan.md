@@ -1,8 +1,8 @@
-# Plano de Materializacao do Bonus em Power BI
+# Plano de Materialização do Bônus em Power BI
 
 ## Status Atual
 
-O projeto ja possui os datasets necessarios para montar o bonus em Power BI:
+O projeto já possui os datasets necessários para montar o bônus em Power BI:
 
 - `data/processed/bi_exports/fact_sales_power_bi.csv`
 - `data/processed/bi_exports/dim_date.csv`
@@ -12,12 +12,12 @@ O projeto ja possui os datasets necessarios para montar o bonus em Power BI:
 - `data/processed/bi_exports/dim_payment.csv`
 - `data/processed/bi_exports/dim_order_status.csv`
 
-Isso significa que a camada de dados para o bonus esta pronta localmente.
+Isso significa que a camada de dados para o bônus está pronta localmente.
 
 ## O que ainda falta
 
 - criar o arquivo `.pbix`
-- montar ao menos uma pagina executiva
+- montar ao menos uma página executiva
 - salvar screenshots do dashboard do Power BI
 - adicionar esses arquivos nesta pasta
 
@@ -28,12 +28,12 @@ Isso significa que a camada de dados para o bonus esta pronta localmente.
 - `dashboard_drilldown.png`
 - `measures.md`
 
-## Pagina minima recomendada
+## Página mínima recomendada
 
 - cards de KPI:
   - receita total
   - pedidos
-  - ticket medio
+  - ticket médio
   - percentual de atraso
   - review medio
 - linha:
@@ -45,9 +45,9 @@ Isso significa que a camada de dados para o bonus esta pronta localmente.
 - donut:
   - mix por pagamento
 
-## Status correto para a apresentacao
+## Status correto para a apresentação
 
-Se o `.pbix` ainda nao for criado, o bonus deve ser descrito como:
+Se o `.pbix` ainda não for criado, o bônus deve ser descrito como:
 
 - `base preparada para Power BI`
-- `bonus documentado, mas ainda nao materializado visualmente`
+- `bônus documentado, mas ainda não materializado visualmente`

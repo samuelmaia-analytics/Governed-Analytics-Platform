@@ -1,8 +1,8 @@
 # 02 Carga e Modelagem
 
-Este documento resume como os dados entram no projeto e como a camada analitica final foi construida.
+Este documento resume como os dados entram no projeto e como a camada analítica final foi construída.
 
-## Carga e organizacao em camadas
+## Carga e organização em camadas
 
 Camadas implementadas:
 
@@ -35,13 +35,13 @@ Volume confirmado:
 
 ## Camada publicada para consumo
 
-O projeto separa explicitamente a camada analitica interna da camada publicada para consumo.
+O projeto separa explicitamente a camada analítica interna da camada publicada para consumo.
 
-### Camada analitica interna
+### Camada analítica interna
 
 - ativo: `fact_orders_enriched`
 - local: `data/curated/analytics/`
-- uso: SQL, qualidade, governanca e rastreabilidade
+- uso: SQL, qualidade, governança e rastreabilidade
 
 ### Camada publicada
 
@@ -54,7 +54,7 @@ O projeto separa explicitamente a camada analitica interna da camada publicada p
 Uso recomendado:
 
 - `parquet`: dashboard Streamlit local
-- `csv`: upload manual na Dadosfera e evidencia do ativo publicado
+- `csv`: upload manual na Dadosfera e evidência do ativo publicado
 
 ## Referencias detalhadas
 

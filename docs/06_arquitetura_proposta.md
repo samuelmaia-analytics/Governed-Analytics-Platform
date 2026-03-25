@@ -1,6 +1,6 @@
 # 06 Arquitetura Proposta
 
-Este documento resume a arquitetura implementada e a evolucao proposta com uso de plataforma.
+Este documento resume a arquitetura implementada e a evolução proposta com uso de plataforma.
 
 ## Arquitetura implementada
 
@@ -8,10 +8,10 @@ Este documento resume a arquitetura implementada e a evolucao proposta com uso d
 raw -> standardized -> staging -> curated -> published -> dashboard
 ```
 
-## Arquitetura proposta para evolucao
+## Arquitetura proposta para evolução
 
 ```text
-fontes -> plataforma / catalogacao -> ativos publicados -> consumo por app, SQL e BI
+fontes -> plataforma / catalogação -> ativos publicados -> consumo por app, SQL e BI
 ```
 
 ## Referencias principais
@@ -22,4 +22,4 @@ fontes -> plataforma / catalogacao -> ativos publicados -> consumo por app, SQL 
 ## Status honesto
 
 - arquitetura local: implementada
-- evolucao real na plataforma: depende de execucao e evidencia externa
+- evolução real na plataforma: depende de execução e evidência externa

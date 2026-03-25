@@ -1,14 +1,14 @@
 # 08 Pipelines
 
-Este documento organiza a parte de pipelines do case, separando o que ja foi implementado localmente do que ainda precisa ser materializado na Dadosfera.
+Este documento organiza a parte de pipelines do case, separando o que já foi implementado localmente do que ainda precisa ser materializado na Dadosfera.
 
 ## Objetivo
 
 Demonstrar a capacidade de transformar, validar e publicar dados de forma reproduzivel por meio de pipeline.
 
-## Pipeline ja implementado localmente
+## Pipeline já implementado localmente
 
-O projeto ja possui um pipeline ponta a ponta em Python, orquestrado por:
+O projeto já possui um pipeline ponta a ponta em Python, orquestrado por:
 
 - `src/run_case_pipeline.py`
 
@@ -34,7 +34,7 @@ Etapas disponiveis:
 - `fact_orders_dashboard`
 - relatorios de qualidade
 - contratos de schema
-- colecao local
+- coleção local
 - resultados SQL
 - screenshots das queries
 - exports para Power BI
@@ -52,7 +52,7 @@ Para fechar o item 8 conforme o case da Dadosfera, ainda falta:
 - criar um pipeline real dentro da plataforma
 - executar esse pipeline na plataforma
 - catalogar esse pipeline
-- gerar evidencias visuais da execucao
+- gerar evidências visuais da execução
 
 ## Sugestao de pipeline na Dadosfera
 
@@ -60,8 +60,8 @@ Pipeline minimo sugerido:
 
 1. entrada do dataset publicado
 2. etapa de tratamento ou modelagem
-3. etapa de validacao
-4. etapa de publicacao do ativo final
+3. etapa de validação
+4. etapa de publicação do ativo final
 
 Sugestao de narrativa:
 
@@ -76,7 +76,7 @@ Salvar em `images/dadosfera/`:
 - `08_pipeline_run.png`
 - `09_pipeline_catalog.png`
 
-## Campos para preencher apos a execucao na plataforma
+## Campos para preencher após a execução na plataforma
 
 ### Nome do pipeline na Dadosfera
 
@@ -106,4 +106,4 @@ Salvar em `images/dadosfera/`:
 
 - pipeline local em Python: feito
 - pipeline real na Dadosfera: pendente
-- catalogacao do pipeline na plataforma: pendente
+- catalogação do pipeline na plataforma: pendente

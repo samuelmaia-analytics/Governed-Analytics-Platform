@@ -2,7 +2,7 @@
 
 Este documento centraliza os bonus do case.
 
-## Bonus ja preparados no projeto
+## Bônus já preparados no projeto
 
 - modulo de insights no dashboard
 - documentacao do bonus GenAI
@@ -17,6 +17,6 @@ Este documento centraliza os bonus do case.
 ## Status honesto
 
 - heuristica de insights no app: feita
-- LLM externa integrada: nao
+- LLM externa integrada: não
 - dados para Power BI: feitos
-- dashboard Power BI materializado: depende de execucao manual
+- dashboard Power BI materializado: depende de execução manual

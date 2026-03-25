@@ -1,14 +1,14 @@
 # 03 Catalogacao
 
-Este documento resume a parte de catalogacao e governanca do case.
+Este documento resume a parte de catalogação e governança do case.
 
-## O que ja existe no projeto
+## O que já existe no projeto
 
-- manifesto local da colecao:
+- manifesto local da coleção:
   - `data/curated/catalog/dadosfera_collection.json`
 - inventario de ativos:
   - `data/curated/catalog/collection_assets_inventory.csv`
-- inventario de classificacao:
+- inventário de classificação:
   - `data/curated/catalog/data_classification_inventory.csv`
 - ativo publicado recomendado para plataforma:
   - `data/published/dashboard/fact_orders_dashboard.csv`
@@ -17,15 +17,15 @@ Este documento resume a parte de catalogacao e governanca do case.
 
 Demonstrar:
 
-- organizacao dos ativos
-- preparo para publicacao
-- governanca minima sobre dados e documentacao
+- organização dos ativos
+- preparo para publicação
+- governança mínima sobre dados e documentação
 
 ## Referencias principais
 
-- colecao local: [docs/collection_catalog.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\collection_catalog.md)
-- classificacao de dados: [docs/data_classification.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\data_classification.md)
-- politica de governanca: [docs/governance_policy.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\governance_policy.md)
+- coleção local: [docs/collection_catalog.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\collection_catalog.md)
+- classificação de dados: [docs/data_classification.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\data_classification.md)
+- política de governança: [docs/governance_policy.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\governance_policy.md)
 - contexto de plataforma: [docs/about_dadosfera.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\about_dadosfera.md)
 
 ## Evidencias visuais da plataforma
@@ -37,17 +37,17 @@ Demonstrar:
 
 ## Status honesto
 
-- catalogacao local: feita
-- publicacao real em plataforma: feita com evidencia visual de importacao, catalogo e volume do ativo publicado
+- catalogação local: feita
+- publicação real em plataforma: feita com evidência visual de importação, catálogo e volume do ativo publicado
 
 ## Ativo recomendado para upload na Dadosfera
 
-Para execucao manual na plataforma, o ativo mais adequado do projeto e:
+Para execução manual na plataforma, o ativo mais adequado do projeto é:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
 Motivo:
 
-- ja representa a camada publicada do case
-- evita expor a base analitica interna completa
-- esta alinhado ao dashboard e aos principais indicadores executivos
+- já representa a camada publicada do case
+- evita expor a base analítica interna completa
+- está alinhado ao dashboard e aos principais indicadores executivos

@@ -10,24 +10,24 @@ Este documento resume o dashboard final do case.
 
 ## Ativo publicado equivalente
 
-Para upload manual em plataforma e demonstracao de publicacao, o arquivo equivalente e:
+Para upload manual em plataforma e demonstração de publicação, o arquivo equivalente é:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
 Regra pratica de uso:
 
-- `parquet`: execucao local do Streamlit
+- `parquet`: execução local do Streamlit
 - `csv`: upload na Dadosfera
 
 ## Objetivo
 
-Transformar a camada analitica publicada em leitura executiva de:
+Transformar a camada analítica publicada em leitura executiva de:
 
 - KPIs
 - tendencia temporal
 - categorias
 - geografia
-- operacao
+- operação
 - insights
 
 ## Evidencias

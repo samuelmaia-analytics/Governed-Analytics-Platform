@@ -1,6 +1,6 @@
 # 09 GenAI e LLMs - Processar
 
-Este documento organiza o item de GenAI do case, separando o que ja existe no projeto do que ainda precisa ser implementado para aderir totalmente ao edital.
+Este documento organiza o item de GenAI do case, separando o que já existe no projeto do que ainda precisa ser implementado para aderir totalmente ao edital.
 
 ## Objetivo do Item
 
@@ -10,11 +10,11 @@ Demonstrar a capacidade de:
 - usar IA para gerar features
 - transformar texto bruto em estrutura util para analise
 
-## O que ja existe no projeto
+## O que já existe no projeto
 
-Hoje o projeto ja possui:
+Hoje o projeto já possui:
 
-- camada analitica estruturada do Olist
+- camada analítica estruturada do Olist
 - dashboard com insights executivos
 - documentacao do bonus de GenAI em:
   - [docs/genai_bonus.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\genai_bonus.md)
@@ -22,8 +22,8 @@ Hoje o projeto ja possui:
 ## Status honesto atual
 
 - insights heurísticos no dashboard: feitos
-- uso de LLM externa para extracao de features: nao implementado neste repositorio
-- dataset desestruturado dedicado para este item: nao materializado neste repositorio
+- uso de LLM externa para extração de features: não implementado neste repositório
+- dataset desestruturado dedicado para este item: não materializado neste repositório
 
 ## O que o edital pede
 
@@ -34,7 +34,7 @@ Para fechar este item, ainda falta:
 - documentar prompts e saidas
 - mostrar a estrutura final gerada
 
-## Estrutura sugerida para execucao
+## Estrutura sugerida para execução
 
 ### Entrada recomendada
 
@@ -104,7 +104,7 @@ Salvar em `docs/` ou `images/presentation/`:
 
 - exemplo de entrada textual
 - exemplo de JSON de saida
-- print do notebook ou da execucao
+- print do notebook ou da execução
 
 ## Risco principal deste item
 
