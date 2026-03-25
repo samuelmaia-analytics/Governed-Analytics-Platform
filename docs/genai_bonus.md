@@ -60,13 +60,17 @@ O que está implementado e comprovado:
 - schema de saída das features
 - prompt estruturado para extração
 - script executável para materializar as features
-- tabela final já salva em `data/curated/genai/`
+- tabela final salva em `data/curated/genai/`
+- execução real validada localmente via OpenAI API
 
-O que depende de credencial externa:
+Status atual da saída materializada:
 
-- chamada real a uma LLM via API
+- `extraction_mode`: `openai_api`
+- `model_name`: `gpt-4.1-mini`
 
-No ambiente atual do repositório, a saída versionada foi materializada no modo `reference`, para manter reprodutibilidade e não simular uma chamada externa que não foi executada aqui.
+Observação importante:
+
+- a execução real depende de credencial externa, por isso a reexecução por terceiros requer uma nova chave de API
 
 ## Prompt principal
 
@@ -90,7 +94,7 @@ Fala simples e honesta:
 
 - o item de GenAI foi tratado como extração estruturada de features a partir de texto desestruturado de produto
 - o repositório já entrega entrada, prompt, schema e tabela final materializada
-- a execução totalmente online depende apenas de chave de API, mas a lógica e a estrutura do caso já estão demonstradas
+- a execução real foi validada localmente com `gpt-4.1-mini`, e o artefato final registra `openai_api` como modo de extração
 
 ## Valor adicional para o case
 

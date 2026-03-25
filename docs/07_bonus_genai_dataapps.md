@@ -23,7 +23,7 @@ Este documento centraliza os bonus do case.
 ## Status honesto
 
 - heuristica de insights no app: feita
-- extração de features com schema GenAI: feita em modo de referência
-- LLM externa integrada e executada por API: depende de credencial
+- extração de features com schema GenAI: feita
+- LLM externa integrada e executada por API: validada localmente
 - dados para Power BI: feitos
 - dashboard Power BI materializado: depende de execução manual

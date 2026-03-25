@@ -28,18 +28,15 @@ Hoje o projeto já possui:
 ## Status honesto atual
 
 - insights heurísticos no dashboard: feitos
-- uso de LLM externa para extração de features: preparado via script, depende de chave/API
+- uso de LLM externa para extração de features: executado e validado localmente via API
 - dataset desestruturado dedicado para este item: materializado em amostra versionada
-- tabela final de features: materializada em modo de referência
+- tabela final de features: materializada com saída real da API
 
 ## O que o edital pede
 
 Para fechar este item, ainda falta:
 
-- escolher ou criar um dataset desestruturado
-- executar extracao de features com IA
-- documentar prompts e saidas
-- mostrar a estrutura final gerada
+- não encontrei evidência suficiente de print da execução para documentação visual
 
 ## Estrutura sugerida para execução
 
@@ -137,4 +134,5 @@ O maior risco e vender heuristica como se fosse LLM real. A documentacao final d
 
 - base documental do item: pronta
 - implementacao minima do item: pronta
-- chamada real à LLM: depende de credencial/API externa
+- chamada real à LLM: validada localmente com `gpt-4.1-mini`
+- saída final atual: `data/curated/genai/product_text_features.csv` com `extraction_mode=openai_api`

@@ -58,7 +58,7 @@ Pendências locais atuais fora da submissão principal:
 ## GenAI e LLM
 
 - [x] escolher dataset desestruturado para o item
-- [ ] gerar features com IA
+- [x] gerar features com IA
 - [x] documentar prompts utilizados
 - [x] materializar tabela final de features
 
@@ -84,8 +84,8 @@ Pendências locais atuais fora da submissão principal:
 - o GitHub já está consolidado com as evidências principais
 - a parte da Dadosfera já está comprovada para o ativo principal
 - pipeline nativo na plataforma permanece pendente
-- item de GenAI com LLM externa permanece pendente
+- item de GenAI com LLM externa já foi validado localmente
 - vídeo final e links finais da apresentação permanecem pendentes
 - o `README.md` principal já foi ajustado com links relativos compatíveis com GitHub web
 - a evidência SQL principal em `powerbi/evidencia_query.md` já está fortalecida com imagens e links válidos
-- o item de GenAI agora possui amostra desestruturada, script, prompt e tabela final materializada em modo de referência
+- o item de GenAI agora possui amostra desestruturada, script, prompt e tabela final materializada com `openai_api`
