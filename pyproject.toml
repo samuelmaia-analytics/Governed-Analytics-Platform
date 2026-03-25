@@ -11,7 +11,8 @@ requires-python = ">=3.11"
 dependencies = [
     "pandas",
     "numpy",
-    "streamlit",
+    "streamlit==1.55.0",
+    "altair==6.0.0",
     "plotly",
     "matplotlib",
     "seaborn",
