@@ -30,20 +30,22 @@ Segundo o edital, a apresentacao deve:
 ## Artefatos de apresentacao ja existentes
 
 - deck base:
-  - [presentation/case_deck.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\presentation\case_deck.md)
+  - `presentation/case_deck.md`
 - roteiro:
-  - [presentation/talk_track.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\presentation\talk_track.md)
+  - `presentation/talk_track.md`
 - screenshots do Streamlit:
-  - [images/dashboard/01_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\01_overview.png)
+  - `images/dashboard/01_overview.png`
 - screenshots da Dadosfera:
-  - [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
-  - [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
-  - [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
-  - [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
+  - `images/dadosfera/01_importacao_dataset.png`
+  - `images/dadosfera/02_catalogo_metadados.png`
+  - `images/dadosfera/03_colecao_case.png`
+  - `images/dadosfera/04_volume_100k.png`
+- screenshot do GenAI:
+  - `images/genai/01_product_text_features_openai.png`
 
 ## O que ainda falta para fechar a apresentacao
 
-- inserir links reais da Dadosfera
+- inserir links reais da Dadosfera, se a plataforma disponibilizar URL navegável
 - gravar o video final
 - publicar o video como `Unlisted` no YouTube
 
@@ -60,23 +62,23 @@ Se a apresentação precisar ser curta, a mensagem principal deve ser:
 
 ### Link do video no YouTube
 
-- `PREENCHER`
+- `pendente, caso exigido pelo processo`
 
 ### Link principal do repositorio GitHub
 
-- `PREENCHER`
+- `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
 
 ### Link do ativo principal na Dadosfera
 
-- `PREENCHER`
+- `não encontrei evidência suficiente de URL pública navegável`
 
 ### Link do dashboard ou colecao na Dadosfera
 
-- `PREENCHER`
+- `não encontrei evidência suficiente de URL pública navegável`
 
 ### Link do pipeline na Dadosfera
 
-- `PREENCHER`
+- `não aplicável nesta entrega`
 
 ## Checklist da gravacao
 
@@ -101,5 +103,6 @@ O maior risco é apresentar uma solução local como se toda a operacionalizaç�
 
 - deck e roteiro: prontos
 - prints reais da plataforma: prontos
+- deck com imagens do dashboard, Dadosfera, SQL e GenAI: pronto
 - video final: pendente
-- links finais da plataforma: pendentes
+- links finais da plataforma: não encontrei evidência suficiente de URLs públicas navegáveis

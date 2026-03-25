@@ -75,7 +75,7 @@ Pendências locais atuais fora da submissão principal:
 - [x] estrutura da pasta `presentation/`
 - [x] deck base em markdown
 - [x] roteiro de fala inicial
-- [ ] deck final preenchido com imagens
+- [x] deck final preenchido com imagens
 - [ ] links finais da Dadosfera inseridos na apresentação
 - [ ] link do vídeo inserido
 - [ ] vídeo de apresentação, se exigido
@@ -92,3 +92,4 @@ Pendências locais atuais fora da submissão principal:
 - a evidência SQL principal em `powerbi/evidencia_query.md` já está fortalecida com imagens e links válidos
 - o item de GenAI agora possui amostra desestruturada, script, prompt e tabela final materializada com `openai_api`
 - a evidência visual atual de GenAI está em `images/genai/01_product_text_features_openai.png`
+- o deck final já possui imagens reais de dashboard, SQL, Dadosfera e GenAI

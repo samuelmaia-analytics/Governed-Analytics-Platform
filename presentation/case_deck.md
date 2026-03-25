@@ -22,7 +22,7 @@
   - `data/curated/quality/`
   - `data/curated/catalog/`
   - `data/published/dashboard/`
-- Referência visual: [docs/architecture.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\architecture.md)
+- Referência visual: `docs/architecture.md`
 - Sugestão de fala:
   - começar explicando que o projeto separa dado bruto, dado padronizado, dado analítico interno e dado publicado
   - enfatizar que o dashboard consome apenas a camada publicada
@@ -67,9 +67,11 @@
 - Sugestão visual:
   - colocar um mosaico com 2 ou 3 screenshots de `data/screenshots/query_results/`
 
+![Resultado principal da query](../powerbi/query_principal_resultado.png)
+
 ## Slide 8 - Dashboard
 
-- App em [streamlit_app/app.py](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\streamlit_app\app.py)
+- App em `streamlit_app/app.py`
 - Fonte exclusiva: `data/published/dashboard/fact_orders_dashboard.parquet`
 - Blocos principais:
   - KPIs
@@ -79,16 +81,20 @@
   - operação
   - insights executivos
 - Screenshots finais já disponíveis:
-  - [images/dashboard/01_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\01_overview.png)
-  - [images/dashboard/02_kpis.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\02_kpis.png)
-  - [images/dashboard/03_temporal.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\03_temporal.png)
-  - [images/dashboard/04_categories.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\04_categories.png)
-  - [images/dashboard/05_geography.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\05_geography.png)
+  - `images/dashboard/01_overview.png`
+  - `images/dashboard/02_kpis.png`
+  - `images/dashboard/03_temporal.png`
+  - `images/dashboard/04_categories.png`
+  - `images/dashboard/05_geography.png`
 - Sugestão de uso no slide:
   - imagem principal: `01_overview.png`
   - imagens de apoio: `03_temporal.png`, `04_categories.png` e `05_geography.png`
 - Mensagem principal:
   - o dashboard não é apenas visual; ele consome uma camada publicada e minimizada, coerente com a governança do projeto
+
+![Dashboard overview](../images/dashboard/01_overview.png)
+![Dashboard temporal](../images/dashboard/03_temporal.png)
+![Dashboard categorias](../images/dashboard/04_categories.png)
 
 ## Slide 9 - Catálogo e Dadosfera
 
@@ -103,11 +109,15 @@
   - dizer explicitamente que o repositorio ja entrega o payload, o inventario e a prova visual do ativo publicado
   - não vender como integração por API ou pipeline real concluído
 - Prints já disponíveis:
-  - [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
-  - [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
-  - [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
-  - [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
-- Referencia operacional: [docs/dadosfera_capture_runbook.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\dadosfera_capture_runbook.md)
+  - `images/dadosfera/01_importacao_dataset.png`
+  - `images/dadosfera/02_catalogo_metadados.png`
+  - `images/dadosfera/03_colecao_case.png`
+  - `images/dadosfera/04_volume_100k.png`
+- Referencia operacional: `docs/dadosfera_capture_runbook.md`
+
+![Importação na Dadosfera](../images/dadosfera/01_importacao_dataset.png)
+![Catálogo na Dadosfera](../images/dadosfera/02_catalogo_metadados.png)
+![Volume 100k+ na Dadosfera](../images/dadosfera/04_volume_100k.png)
 
 ## Slide 10 - Testes e Robustez
 
@@ -127,9 +137,23 @@
 - Status honesto:
   - base pronta para Power BI
   - documentação, evidência de query e screenshots já foram materializadas na pasta `powerbi/`
-- Referencia operacional: [powerbi/delivery_plan.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\delivery_plan.md)
+- Referencia operacional: `powerbi/delivery_plan.md`
 
-## Slide 12 - Próximos Passos
+## Slide 12 - GenAI
+
+- caso de uso implementado:
+  - extração de features estruturadas a partir de texto desestruturado de produto
+- artefatos:
+  - `data/external/genai/product_text_samples.csv`
+  - `data/curated/genai/product_text_features.csv`
+  - `src/genai_feature_extraction.py`
+- status honesto:
+  - execução real validada localmente com `gpt-4.1-mini`
+  - saída final registra `openai_api` em `extraction_mode`
+
+![Evidência final de GenAI](../images/genai/01_product_text_features_openai.png)
+
+## Slide 13 - Próximos Passos
 
 - preencher os links finais da apresentação
 - gravar o vídeo final
