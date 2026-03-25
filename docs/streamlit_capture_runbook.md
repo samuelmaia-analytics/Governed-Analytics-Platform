@@ -2,9 +2,9 @@
 
 Este documento define exatamente quais capturas finais devem ser feitas no dashboard para fechar a entrega do case.
 
-## Pre-condicoes
+## Pre-condições
 
-- a virtualenv deve estar ativa ou acessivel em `.venv`
+- a virtualenv deve estar ativa ou acessível em `.venv`
 - a camada publicada deve existir em `data/published/dashboard/fact_orders_dashboard.parquet`
 - o app deve ser iniciado a partir da raiz do projeto
 
@@ -14,18 +14,18 @@ Este documento define exatamente quais capturas finais devem ser feitas no dashb
 .\.venv\Scripts\python.exe -m streamlit run streamlit_app\app.py
 ```
 
-## Validacao inicial
+## Validação inicial
 
 Antes de tirar qualquer print, confirme:
 
 - o app abre sem erro
 - os KPIs aparecem
-- os filtros laterais estao visiveis
+- os filtros laterais estão visíveis
 - o dashboard responde a troca de filtros
 
 ## Sequencia exata de capturas
 
-### 1. Visao geral do dashboard
+### 1. Visão geral do dashboard
 
 **Objetivo**
 
@@ -39,8 +39,8 @@ Mostrar a tela principal completa, com identidade visual, filtros e KPIs.
 - deixar `Todos os status`
 - deixar `Todos os meios`
 - manter `Dimensão geográfica = Cliente`
-- manter o modo normal, nao o modo apresentacao
-- deixar a navegacao em `Visão completa`
+- manter o modo normal, não o modo apresentação
+- deixar a navegação em `Visão completa`
 
 **Salvar como**
 
@@ -48,10 +48,10 @@ Mostrar a tela principal completa, com identidade visual, filtros e KPIs.
 
 **Tem que aparecer no print**
 
-- cabecalho do dashboard
+- cabeçalho do dashboard
 - barra lateral com filtros
 - primeira faixa de KPIs
-- inicio da area analitica principal
+- início da área analítica principal
 
 ### 2. KPIs executivos
 
@@ -71,19 +71,19 @@ Destacar os indicadores principais do case.
 **Tem que aparecer no print**
 
 - cards de KPI
-- variacao ou comparativo, se visivel
-- parte minima do contexto acima
+- variação ou comparativo, se visivel
+- parte mínima do contexto acima
 
-### 3. Analise temporal
+### 3. Análise temporal
 
 **Objetivo**
 
-Mostrar a evolucao do negocio ao longo do tempo.
+Mostrar a evolução do negócio ao longo do tempo.
 
 **Como configurar**
 
 - manter os filtros globais abertos
-- na navegacao, selecionar `Tempo`
+- na navegação, selecionar `Tempo`
 
 **Salvar como**
 
@@ -91,20 +91,20 @@ Mostrar a evolucao do negocio ao longo do tempo.
 
 **Tem que aparecer no print**
 
-- grafico temporal principal
-- algum subtitulo ou contexto da secao
+- gráfico temporal principal
+- algum subtítulo ou contexto da seção
 - preferencialmente a legenda, se existir
 
-### 4. Analise por categorias
+### 4. Análise por categorias
 
 **Objetivo**
 
-Mostrar concentracao de receita por categoria.
+Mostrar concentração de receita por categoria.
 
 **Como configurar**
 
-- na navegacao, selecionar `Categorias`
-- se quiser destacar um recorte, use uma categoria especifica com alto volume, mas prefira a visao completa
+- na navegação, selecionar `Categorias`
+- se quiser destacar um recorte, use uma categoria específica com alto volume, mas prefira a visão completa
 
 **Salvar como**
 
@@ -112,21 +112,21 @@ Mostrar concentracao de receita por categoria.
 
 **Tem que aparecer no print**
 
-- grafico principal da secao
-- nomes de categorias legiveis
+- gráfico principal da seção
+- nomes de categorias legíveis
 - valores ou ranking, se visivel
 
-### 5. Analise geografica
+### 5. Analise geográfica
 
 **Objetivo**
 
-Mostrar distribuicao regional da operacao.
+Mostrar distribuição regional da operação.
 
 **Como configurar**
 
-- na navegacao, selecionar `Regional`
+- na navegação, selecionar `Regional`
 - manter `Dimensão geográfica = Cliente`
-- se o visual ficar melhor, repetir uma segunda versao com `Seller` para uso opcional na apresentacao
+- se o visual ficar melhor, repetir uma segunda versão com `Seller` para uso opcional na apresentação
 
 **Salvar como**
 
@@ -134,9 +134,9 @@ Mostrar distribuicao regional da operacao.
 
 **Tem que aparecer no print**
 
-- grafico ou mapa principal da secao
-- estados visiveis
-- indicacao clara de que a visao e geografica
+- gráfico ou mapa principal da seção
+- estados visíveis
+- indicação clara de que a visao e geográfica
 
 ## Captura opcional extra
 
@@ -144,7 +144,7 @@ Se houver tempo, gere mais uma captura para enriquecer o deck:
 
 - `images/dashboard/06_filtered_view.png`
 
-Configuracao sugerida:
+Configuração sugerida:
 
 - intervalo em 2018
 - `Categoria específica`
@@ -154,16 +154,19 @@ Configuracao sugerida:
 
 Objetivo:
 
-Mostrar que o app suporta exploracao orientada por filtro.
+Mostrar que o app suporta exploração orientada por filtro.
 
-## Checklist final apos as capturas
+## Checklist final após as capturas
 
 - os 5 arquivos existem em `images/dashboard/`
-- todos os textos principais estao legiveis
-- nenhum print mostra erro ou area em branco
-- o browser nao esta com zoom estranho
-- a interface da maquina nao expoe itens desnecessarios
+- todos os textos principais estão legíveis
+- nenhum print mostra erro ou área em branco
+- o browser não está com zoom estranho
+- a interface da máquina não expõe itens desnecessários
 
-## Observacao importante
+## Observação importante
 
-Essas capturas devem ser feitas manualmente na interface. Este repositório agora ja esta preparado para receber os arquivos nos caminhos corretos.
+Essas capturas devem ser feitas manualmente na interface. Este repositório agora já está preparado para receber os arquivos nos caminhos corretos.
+
+
+

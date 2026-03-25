@@ -25,5 +25,7 @@ Este documento aponta para os artefatos SQL principais do case.
 
 ## Referencias detalhadas
 
-- narrativa analitica: [docs/case_answers.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\case_answers.md)
+- narrativa analítica: [docs/case_answers.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\case_answers.md)
 - screenshots tabulares: [docs/imagens/README.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\imagens\README.md)
+
+

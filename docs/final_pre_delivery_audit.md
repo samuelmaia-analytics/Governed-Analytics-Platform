@@ -7,31 +7,31 @@ Data da auditoria: `2026-03-22`
 ## 1. Resumo Executivo Final
 
 - Nota geral atual: `8.5/10`
-- Classificacao atual: `avancado`
-- Atende o minimo do case: `sim`
-- Esta competitivo: `sim`
+- Classificação atual: `avançado`
+- Atende o mínimo do case: `sim`
+- Está competitivo: `sim`
 - Se destacaria: `sim, com ressalvas`
-- Maior risco atual: vender a solucao como mais pronta para producao do que ela realmente esta
-- Maior oportunidade de ganho rapido: alinhar todos os documentos finais com a camada `published/dashboard` e persistir metadata de execucao do runner
-- Veredito de reviewer tecnico: `aprovaria`
+- Maior risco atual: vender a solução como mais pronta para produção do que ela realmente está
+- Maior oportunidade de ganho rápido: alinhar todos os documentos finais com a camada `published/dashboard` e persistir metadata de execução do runner
+- Veredito de reviewer técnico: `aprovaria`
 
-## 2. Sintese de Aderencia
+## 2. Síntese de Aderência
 
-| Item | Status | Observacao |
+| Item | Status | Observação |
 | --- | --- | --- |
-| Carregamento e analise descritiva | feito | scripts e docs presentes |
+| Carregamento e análise descritiva | feito | scripts e docs presentes |
 | Volume acima de 100k | feito | `fact_orders_enriched` com 112.650 registros |
-| Catalogacao de ativos | feito | manifesto, inventario e colecao local materializados |
+| Catalogação de ativos | feito | manifesto, inventário e coleção local materializados |
 | Data Lake por zonas | feito | raw / standardized / staging / curated / published |
-| Colecao no padrao solicitado | parcial | implementada localmente, sem API externa |
+| Coleção no padrão solicitado | parcial | implementada localmente, sem API externa |
 | Dashboard de categorias | feito | presente no Streamlit |
 | Dashboard temporal | feito | presente no Streamlit |
 | SQL salvo | feito | queries em `sql/analytics` |
 | Print da query em markdown | feito | screenshots referenciados em `docs/case_answers.md` |
-| 5 visualizacoes e 5 tipos | feito | linha, area, heatmap, barras, donut, scatter, boxplot |
-| GitHub | feito | remoto configurado e repositorio publicado |
+| 5 visualizações e 5 tipos | feito | linha, área, heatmap, barras, donut, scatter, boxplot |
+| GitHub | feito | remoto configurado e repositório publicado |
 | Sobre Dadosfera | feito | documento dedicado |
-| Bonus GenAI + Data Apps | feito | heuristico, sem LLM real |
+| Bônus GenAI + Data Apps | feito | heurístico, sem LLM real |
 
 ## 3. Pontos Fortes Reais
 
@@ -48,7 +48,7 @@ Data da auditoria: `2026-03-22`
 - sem RBAC ou controle de acesso real
 - sem integração real da coleção com plataforma externa
 - sem metadata persistida de execução por etapa
-- parte do bonus GenAI ainda é heurística e não IA real
+- parte do bônus GenAI ainda é heurística e não IA real
 
 ## 5. Governança e Privacidade
 
@@ -60,21 +60,21 @@ Data da auditoria: `2026-03-22`
 
 ## 6. Estado de Entrevista
 
-O projeto esta defensavel em entrevista se o discurso for preciso:
+O projeto está defensável em entrevista se o discurso for preciso:
 
 - forte para analytics engineering, data product e dashboard
-- bom para governanca e privacidade por design em contexto de case
-- parcial para plataforma de dados corporativa pronta para producao
+- bom para governança e privacidade por design em contexto de case
+- parcial para plataforma de dados corporativa pronta para produção
 
-## 7. Pendencias Finais Prioritarias
+## 7. Pendências Finais Prioritárias
 
 1. alinhar todos os documentos finais com a camada `published/dashboard`
-2. gerar classificacao por coluna em formato operacional
-3. expandir metadata operacional do runner, porque os contratos de schema ja foram implementados
-4. registrar metadata de execucao do pipeline
+2. gerar classificação por coluna em formato operacional
+3. expandir metadata operacional do runner, porque os contratos de schema já foram implementados
+4. registrar metadata de execução do pipeline
 5. evitar qualquer oversell de Dadosfera, LGPD ou GenAI
 
-## 8. Validacoes Executadas
+## 8. Validações Executadas
 
 - `python src/publish_dashboard.py`
 - `python src/data_classification.py`
@@ -82,9 +82,12 @@ O projeto esta defensavel em entrevista se o discurso for preciso:
 - `python src/catalog.py`
 - `python src/export_power_bi.py`
 - `python -m pytest tests` -> `13 passed`
-- `python -m py_compile` nos modulos alterados
+- `python -m py_compile` nos módulos alterados
 
 ## 9. Veredito Final
 
-Hoje, o projeto ja parece uma entrega madura de case tecnico, com boa chance de avancar em processo seletivo.  
-Nao parece outlier de engenharia de plataforma, mas ja transmite senioridade real em analytics engineering, produto de dados, documentacao, contratos de qualidade estrutural e preocupacao com governanca.
+Hoje, o projeto já parece uma entrega madura de case técnico, com boa chance de avançar em processo seletivo.  
+Não parece outlier de engenharia de plataforma, mas já transmite senioridade real em analytics engineering, produto de dados, documentação, contratos de qualidade estrutural e preocupação com governança.
+
+
+

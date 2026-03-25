@@ -23,3 +23,5 @@ fontes -> plataforma / catalogação -> ativos publicados -> consumo por app, SQ
 
 - arquitetura local: implementada
 - evolução real na plataforma: depende de execução e evidência externa
+
+

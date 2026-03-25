@@ -57,3 +57,6 @@ Este documento registra as decisões de privacidade por design e governança apl
 
 - o dataset Olist é público e anonimizado, mas o projeto adota privacidade por design para refletir prática corporativa.
 - esta camada não substitui controles organizacionais de acesso, mas reduz exposição desnecessária no produto analítico publicado.
+
+
+

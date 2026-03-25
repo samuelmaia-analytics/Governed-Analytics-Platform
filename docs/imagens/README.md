@@ -1,6 +1,6 @@
 # Imagens do Case
 
-Este diretorio organiza as referencias visuais principais do case.
+Este diretório organiza as referencias visuais principais do case.
 
 ## Fontes de imagem do projeto
 
@@ -10,11 +10,13 @@ Este diretorio organiza as referencias visuais principais do case.
   - `images/dashboard/`
 - screenshots finais da Dadosfera:
   - `images/dadosfera/`
-- imagens de apoio da apresentacao:
+- imagens de apoio da apresentação:
   - `images/presentation/`
 
 ## Uso recomendado
 
-- usar `data/screenshots/query_results/` como evidencia tecnica das queries
+- usar `data/screenshots/query_results/` como evidencia técnica das queries
 - usar `images/dashboard/` no slide de dashboard
-- usar `images/dadosfera/` no slide de catalogacao/plataforma
+- usar `images/dadosfera/` no slide de catalogação/plataforma
+
+

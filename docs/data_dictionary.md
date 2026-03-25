@@ -182,3 +182,5 @@ Esta base é adequada para:
 Para análises no nível de pedido, recomenda-se cuidado ao usar colunas agregadas por `order_id`, pois a base final preserva granularidade por item e replica alguns atributos de pedido em todas as linhas correspondentes.
 
 Para consumo em dashboard e material executivo, recomenda-se usar preferencialmente `fact_orders_dashboard`, e não a camada interna `fact_orders_enriched`.
+
+

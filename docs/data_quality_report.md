@@ -64,3 +64,5 @@ Relatório de validação da tabela `fact_orders_enriched`.
 - Cobertura mínima dos principais atributos enriquecidos da camada dimensional.
 - Reconciliação financeira entre valor do pedido na grain analítica e total pago por pedido.
 - Volume total acima de 100.000 registros.
+
+

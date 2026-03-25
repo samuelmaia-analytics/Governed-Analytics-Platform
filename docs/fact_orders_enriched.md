@@ -47,3 +47,5 @@ Tabela analítica principal derivada do dataset Olist com granularidade por item
 - Algumas colunas de data do dataset original possuem ausências; nesses casos, as métricas derivadas podem ficar nulas ou simplificadas.
 - A regra de inconsistência é propositalmente conservadora e remove apenas anomalias óbvias.
 - O campo `order_approved_at` pode permanecer nulo ou texto convertido para `NaT` quando a origem estiver incompleta.
+
+

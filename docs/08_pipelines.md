@@ -28,7 +28,7 @@ Etapas disponiveis:
 
 ## Artefatos gerados pelo pipeline local
 
-- inventario bruto
+- inventário bruto
 - profiling exploratorio
 - `fact_orders_enriched`
 - `fact_orders_dashboard`
@@ -56,7 +56,7 @@ Para fechar o item 8 conforme o case da Dadosfera, ainda falta:
 
 ## Sugestao de pipeline na Dadosfera
 
-Pipeline minimo sugerido:
+Pipeline mínimo sugerido:
 
 1. entrada do dataset publicado
 2. etapa de tratamento ou modelagem
@@ -94,7 +94,7 @@ Salvar em `images/dadosfera/`:
 
 - `PREENCHER`
 
-### Ativos de saida
+### Ativos de saída
 
 - `PREENCHER`
 
@@ -107,3 +107,5 @@ Salvar em `images/dadosfera/`:
 - pipeline local em Python: feito
 - pipeline real na Dadosfera: pendente
 - catalogação do pipeline na plataforma: pendente
+
+

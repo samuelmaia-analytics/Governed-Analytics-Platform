@@ -1,6 +1,6 @@
 # Relatorio de Contratos de Schema
 
-Este documento registra a validacao dos contratos simples de schema das camadas principais do projeto.
+Este documento registra a validação dos contratos simples de schema das camadas principais do projeto.
 
 ## Resumo
 
@@ -66,7 +66,7 @@ Este documento registra a validacao dos contratos simples de schema das camadas 
 | `fact_orders_enriched` | `type__seller_state` | **PASS** | Esperado=string | atual=object |
 | `fact_orders_enriched` | `type__latest_review_creation_date` | **PASS** | Esperado=datetime | atual=datetime64[ns] |
 | `fact_orders_enriched` | `type__latest_review_answer_timestamp` | **PASS** | Esperado=datetime | atual=datetime64[ns] |
-| `fact_orders_enriched` | `min_rows` | **PASS** | Linhas observadas=112650 | minimo=100001 |
+| `fact_orders_enriched` | `min_rows` | **PASS** | Linhas observadas=112650 | mínimo=100001 |
 | `fact_orders_enriched` | `primary_key_duplicates` | **PASS** | Chave=['order_id', 'order_item_id', 'product_id', 'seller_id'] | duplicados=0 |
 | `fact_orders_dashboard` | `missing_columns` | **PASS** | Ausentes: nenhuma |
 | `fact_orders_dashboard` | `unexpected_columns` | **PASS** | Inesperadas: nenhuma |
@@ -92,7 +92,7 @@ Este documento registra a validacao dos contratos simples de schema das camadas 
 | `fact_orders_dashboard` | `type__product_category_name_english` | **PASS** | Esperado=string | atual=object |
 | `fact_orders_dashboard` | `type__customer_state` | **PASS** | Esperado=string | atual=object |
 | `fact_orders_dashboard` | `type__seller_state` | **PASS** | Esperado=string | atual=object |
-| `fact_orders_dashboard` | `min_rows` | **PASS** | Linhas observadas=112650 | minimo=100001 |
+| `fact_orders_dashboard` | `min_rows` | **PASS** | Linhas observadas=112650 | mínimo=100001 |
 | `fact_orders_dashboard` | `primary_key_duplicates` | **PASS** | Chave=['order_id', 'order_item_id'] | duplicados=0 |
 | `olist_customers_dataset` | `missing_columns` | **PASS** | Ausentes: nenhuma |
 | `olist_customers_dataset` | `unexpected_columns` | **PASS** | Inesperadas: nenhuma |
@@ -101,7 +101,7 @@ Este documento registra a validacao dos contratos simples de schema das camadas 
 | `olist_customers_dataset` | `type__customer_zip_code_prefix` | **PASS** | Esperado=integer | atual=int64 |
 | `olist_customers_dataset` | `type__customer_city` | **PASS** | Esperado=string | atual=object |
 | `olist_customers_dataset` | `type__customer_state` | **PASS** | Esperado=string | atual=object |
-| `olist_customers_dataset` | `min_rows` | **PASS** | Linhas observadas=99441 | minimo=90000 |
+| `olist_customers_dataset` | `min_rows` | **PASS** | Linhas observadas=99441 | mínimo=90000 |
 | `olist_customers_dataset` | `primary_key_duplicates` | **PASS** | Chave=['customer_id'] | duplicados=0 |
 | `olist_order_items_dataset` | `missing_columns` | **PASS** | Ausentes: nenhuma |
 | `olist_order_items_dataset` | `unexpected_columns` | **PASS** | Inesperadas: nenhuma |
@@ -112,7 +112,7 @@ Este documento registra a validacao dos contratos simples de schema das camadas 
 | `olist_order_items_dataset` | `type__shipping_limit_date` | **PASS** | Esperado=datetime | atual=datetime64[ns] |
 | `olist_order_items_dataset` | `type__price` | **PASS** | Esperado=float | atual=float64 |
 | `olist_order_items_dataset` | `type__freight_value` | **PASS** | Esperado=float | atual=float64 |
-| `olist_order_items_dataset` | `min_rows` | **PASS** | Linhas observadas=112650 | minimo=100000 |
+| `olist_order_items_dataset` | `min_rows` | **PASS** | Linhas observadas=112650 | mínimo=100000 |
 | `olist_order_items_dataset` | `primary_key_duplicates` | **PASS** | Chave=['order_id', 'order_item_id', 'product_id', 'seller_id'] | duplicados=0 |
 | `olist_orders_dataset` | `missing_columns` | **PASS** | Ausentes: nenhuma |
 | `olist_orders_dataset` | `unexpected_columns` | **PASS** | Inesperadas: nenhuma |
@@ -124,5 +124,6 @@ Este documento registra a validacao dos contratos simples de schema das camadas 
 | `olist_orders_dataset` | `type__order_delivered_carrier_date` | **PASS** | Esperado=datetime | atual=datetime64[ns] |
 | `olist_orders_dataset` | `type__order_delivered_customer_date` | **PASS** | Esperado=datetime | atual=datetime64[ns] |
 | `olist_orders_dataset` | `type__order_estimated_delivery_date` | **PASS** | Esperado=datetime | atual=datetime64[ns] |
-| `olist_orders_dataset` | `min_rows` | **PASS** | Linhas observadas=99441 | minimo=90000 |
+| `olist_orders_dataset` | `min_rows` | **PASS** | Linhas observadas=99441 | mínimo=90000 |
 | `olist_orders_dataset` | `primary_key_duplicates` | **PASS** | Chave=['order_id'] | duplicados=0 |
+

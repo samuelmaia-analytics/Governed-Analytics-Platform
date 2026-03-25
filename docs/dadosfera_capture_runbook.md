@@ -1,12 +1,12 @@
 # Runbook de Captura da Dadosfera
 
-Este documento define exatamente quais evidencias devem ser capturadas na plataforma Dadosfera para fechar a entrega do case com prova visual real.
+Este documento define exatamente quais evidências devem ser capturadas na plataforma Dadosfera para fechar a entrega do case com prova visual real.
 
 ## Objetivo
 
-Demonstrar de forma clara que o projeto nao ficou apenas no ambiente local e que ao menos um ativo analitico foi operacionalizado na plataforma.
+Demonstrar de forma clara que o projeto não ficou apenas no ambiente local e que ao menos um ativo analítico foi operacionalizado na plataforma.
 
-## Ativo recomendado para publicacao
+## Ativo recomendado para publicação
 
 Use preferencialmente:
 
@@ -14,17 +14,17 @@ Use preferencialmente:
 
 Motivo:
 
-- essa e a camada publicada do projeto
-- ela ja foi minimizada para consumo analitico
-- ela e coerente com a narrativa de governanca do case
+- essa é a camada publicada do projeto
+- ela já foi minimizada para consumo analítico
+- ela é coerente com a narrativa de governança do case
 
 ## Antes de entrar na plataforma
 
-Tenha em maos:
+Tenha em mãos:
 
 - nome do projeto: `SAMUEL_MAIA_DDF_TECH_032026`
 - caminho do ativo principal: `data/published/dashboard/fact_orders_dashboard.parquet`
-- descricao curta do ativo:
+- descrição curta do ativo:
   - `Camada publicada e minimizada para dashboard executivo do case Olist`
 
 ## Sequencia exata de capturas
@@ -41,7 +41,7 @@ Mostrar que o ativo existe na plataforma.
 
 **O que precisa aparecer**
 
-- nome do workspace ou area do projeto
+- nome do workspace ou área do projeto
 - nome do ativo publicado
 - tela de listagem ou home de datasets
 
@@ -49,7 +49,7 @@ Mostrar que o ativo existe na plataforma.
 
 **Objetivo**
 
-Mostrar que o arquivo foi reconhecido e esta acessivel.
+Mostrar que o arquivo foi reconhecido e está acessível.
 
 **Salvar como**
 
@@ -59,13 +59,13 @@ Mostrar que o arquivo foi reconhecido e esta acessivel.
 
 - nome do ativo
 - colunas ou linhas de preview
-- indicacao visual de que os dados foram carregados
+- indicação visual de que os dados foram carregados
 
 ### 3. Esquema ou metadados do ativo
 
 **Objetivo**
 
-Mostrar estrutura tecnica do dataset.
+Mostrar estrutura técnica do dataset.
 
 **Salvar como**
 
@@ -76,11 +76,11 @@ Mostrar estrutura tecnica do dataset.
 - lista de colunas, schema, ou painel de metadados
 - se existir, tipo de dado ou descricao do ativo
 
-### 4. Catalogo, colecao ou tela equivalente
+### 4. Catálogo, coleção ou tela equivalente
 
 **Objetivo**
 
-Mostrar a parte de descoberta, organizacao ou publicacao do ativo.
+Mostrar a parte de descoberta, organização ou publicação do ativo.
 
 **Salvar como**
 
@@ -88,7 +88,7 @@ Mostrar a parte de descoberta, organizacao ou publicacao do ativo.
 
 **O que precisa aparecer**
 
-- area de catalogo, colecao, classificacao ou organizacao
+- área de catálogo, coleção, classificação ou organização
 - o ativo publicado dentro desse contexto
 
 ### 5. Captura opcional extra
@@ -101,26 +101,26 @@ Enriquecer a defesa se a plataforma oferecer query, notebook, app ou detalhes de
 
 `images/dadosfera/05_usage_or_query.png`
 
-**Exemplos validos**
+**Exemplos válidos**
 
 - preview expandido
 - query executada
 - notebook aberto
 - detalhe do ativo com tags, descricao ou dominio
 
-## O que nao fazer
+## O que não fazer
 
-- nao publicar a `fact_orders_enriched` como evidência principal se a ideia for defender governanca
-- nao tirar print cortado sem nome do ativo
-- nao usar print generico que nao mostre claramente a Dadosfera
+- não publicar a `fact_orders_enriched` como evidência principal se a ideia for defender governança
+- não tirar print cortado sem nome do ativo
+- não usar print generico que não mostre claramente a Dadosfera
 
-## Checklist apos a captura
+## Checklist após a captura
 
 - os arquivos existem em `images/dadosfera/`
-- o nome do ativo esta visivel
-- a interface da plataforma esta reconhecivel
+- o nome do ativo está visível
+- a interface da plataforma está reconhecível
 - ao menos uma captura mostra os dados
-- ao menos uma captura mostra esquema ou catalogacao
+- ao menos uma captura mostra esquema ou catalogação
 
 ## Como usar no deck
 
@@ -130,8 +130,11 @@ Inserir principalmente:
 - `02_asset_preview.png`
 - `04_catalog.png`
 
-Essas tres imagens juntas contam a historia minima:
+Essas três imagens juntas contam a história mínima:
 
 - o ativo foi publicado
 - os dados existem e podem ser lidos
-- o ativo esta organizado/publicado na plataforma
+- o ativo está organizado/publicado na plataforma
+
+
+

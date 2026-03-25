@@ -193,3 +193,5 @@ No estado atual do repositório, a conclusão correta é:
 - a execução de pipeline nativo na plataforma ainda precisa ser feita e evidenciada
 
 Em uma leitura honesta de prova de conceito, a combinação entre pipeline analítico, camada publicada e plataforma de distribuição continua sendo o caminho mais defensável para aumentar velocidade de análise, governança e compartilhamento em contexto de e-commerce.
+
+

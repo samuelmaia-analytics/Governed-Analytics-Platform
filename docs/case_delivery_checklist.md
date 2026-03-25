@@ -94,3 +94,5 @@ Pendências locais atuais fora da submissão principal:
 - a evidência visual atual de GenAI está em `images/genai/01_product_text_features_openai.png`
 - o deck final já possui imagens reais de dashboard, SQL, Dadosfera e GenAI
 - a apresentação final já registra o link principal do ativo na Dadosfera/Metabase
+
+

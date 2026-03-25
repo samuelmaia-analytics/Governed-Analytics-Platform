@@ -99,3 +99,5 @@ Fala simples e honesta:
 ## Valor adicional para o case
 
 Este bônus mostra que a solução não se limita a tabelas prontas. Ela também consegue transformar texto bruto em atributos analíticos utilizáveis, o que aproxima o projeto de cenários reais de enrichment de catálogo, product intelligence e preparação de dados para busca semântica ou recomendação.
+
+

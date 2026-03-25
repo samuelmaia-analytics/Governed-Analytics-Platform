@@ -6,28 +6,28 @@ Este documento organiza a entrega final de apresentação do case, incluindo ví
 
 Consolidar a apresentação final do case em uma narrativa curta, executiva e tecnicamente honesta, mostrando problema, solução, evidências e limites reais da entrega.
 
-## O que a apresentacao precisa cobrir
+## O que a apresentação precisa cobrir
 
-Segundo o edital, a apresentacao deve:
+Segundo o edital, a apresentação deve:
 
 - passar por todos os ativos criados
-- mostrar a viabilidade da solucao
+- mostrar a viabilidade da solução
 - demonstrar problema, arquitetura, valor e ganhos futuros
 
-## Estrutura recomendada da apresentacao
+## Estrutura recomendada da apresentação
 
 1. contexto do cliente e do problema
 2. base de dados escolhida
 3. arquitetura implementada
 4. modelagem e qualidade
-5. catalogacao e publicacao
-6. analises SQL
+5. catalogação e publicação
+6. análises SQL
 7. dashboard e Data App
 8. pipeline
 9. GenAI, se implementado
 10. proposta de valor da Dadosfera
 
-## Artefatos de apresentacao ja existentes
+## Artefatos de apresentação já existentes
 
 - deck base:
   - `presentation/case_deck.md`
@@ -43,10 +43,10 @@ Segundo o edital, a apresentacao deve:
 - screenshot do GenAI:
   - `images/genai/01_product_text_features_openai.png`
 
-## O que ainda falta para fechar a apresentacao
+## O que ainda falta para fechar a apresentação
 
-- gravar o video final
-- publicar o video como `Unlisted` no YouTube
+- gravar o vídeo final
+- publicar o vídeo como `Unlisted` no YouTube
 
 ## Mensagem Central para a Defesa
 
@@ -59,11 +59,11 @@ Se a apresentação precisar ser curta, a mensagem principal deve ser:
 
 ## Campos para preencher
 
-### Link do video no YouTube
+### Link do vídeo no YouTube
 
 - `pendente, caso exigido pelo processo`
 
-### Link principal do repositorio GitHub
+### Link principal do repositório GitHub
 
 - `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
 
@@ -73,7 +73,7 @@ Se a apresentação precisar ser curta, a mensagem principal deve ser:
 - identificador técnico do ativo: `TB__3TTJXS__SAMUELMAIA_032026_FACT_ORDERS_DASHBOARD`
 - coleção / schema associado: `PUBLIC.SAMUELMAIA-03_2026`
 
-### Link do dashboard ou colecao na Dadosfera
+### Link do dashboard ou coleção na Dadosfera
 
 - `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 - observação: não encontrei evidência suficiente de URL separada para coleção navegável além do modelo acima
@@ -82,16 +82,16 @@ Se a apresentação precisar ser curta, a mensagem principal deve ser:
 
 - `não aplicável nesta entrega`
 
-## Checklist da gravacao
+## Checklist da gravação
 
 - se apresentar rapidamente
 - explicar o problema do cliente
 - mostrar a base escolhida
 - mostrar a tabela final
-- mostrar a qualidade e a governanca
+- mostrar a qualidade e a governança
 - mostrar SQL e dashboard
 - mostrar o papel da Dadosfera
-- encerrar com valor de negocio e proximos passos
+- encerrar com valor de negócio e próximos passos
 
 ## Risco principal
 
@@ -99,12 +99,15 @@ O maior risco é apresentar uma solução local como se toda a operacionalizaç�
 
 - o que foi implementado localmente
 - o que foi publicado de verdade na Dadosfera
-- o que ainda esta como proxima etapa
+- o que ainda está como próxima etapa
 
 ## Status atual
 
 - deck e roteiro: prontos
 - prints reais da plataforma: prontos
 - deck com imagens do dashboard, Dadosfera, SQL e GenAI: pronto
-- video final: pendente
+- vídeo final: pendente
 - link principal do ativo na Dadosfera/Metabase: registrado
+
+
+

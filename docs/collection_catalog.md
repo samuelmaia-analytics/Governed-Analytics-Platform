@@ -72,5 +72,7 @@ Este documento materializa a coleção do case em formato versionável, pronta p
 
 ## Observação
 
-- esta implementação representa uma coleção operacional em nível de projeto, adequada para prova de conceito local.
+- está implementação representa uma coleção operacional em nível de projeto, adequada para prova de conceito local.
 - uma integração nativa com uma plataforma externa exigiria autenticação, endpoint e contrato específicos, que não foram fornecidos no enunciado.
+
+

@@ -198,3 +198,5 @@ Resumo exploratório inicial dos CSVs em `data/raw/landing/olist/`, com tabelas 
 - `data/staging/profiling/all_nulls_profile.csv`
 - `data/staging/profiling/all_possible_keys.csv`
 - `data/staging/profiling/all_duplicate_profile.csv`
+
+

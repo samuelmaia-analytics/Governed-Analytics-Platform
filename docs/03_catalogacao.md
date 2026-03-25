@@ -6,7 +6,7 @@ Este documento resume a parte de catalogação e governança do case.
 
 - manifesto local da coleção:
   - `data/curated/catalog/dadosfera_collection.json`
-- inventario de ativos:
+- inventário de ativos:
   - `data/curated/catalog/collection_assets_inventory.csv`
 - inventário de classificação:
   - `data/curated/catalog/data_classification_inventory.csv`
@@ -30,9 +30,9 @@ Demonstrar:
 
 ## Evidencias visuais da plataforma
 
-- importacao do ativo publicado: [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
-- documentacao e metadados do ativo: [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
-- ativo publicado dentro da colecao do case: [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
+- importação do ativo publicado: [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
+- documentação e metadados do ativo: [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
+- ativo publicado dentro da coleção do case: [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
 - prova de volume acima de 100k registros: [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
 
 ## Status honesto
@@ -51,3 +51,5 @@ Motivo:
 - já representa a camada publicada do case
 - evita expor a base analítica interna completa
 - está alinhado ao dashboard e aos principais indicadores executivos
+
+

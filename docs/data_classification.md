@@ -28,3 +28,4 @@ Este documento materializa a classificação dos principais campos com impacto d
 | `fact_orders_dashboard` | `seller_state` | `published_dashboard` | `analitico_agregado` | `low` | `keep` | `True` |
 | `fact_orders_dashboard` | `total_item_value` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
 | `fact_orders_dashboard` | `delivery_time_days` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
+

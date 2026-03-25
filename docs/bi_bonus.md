@@ -20,25 +20,25 @@ Os arquivos para Power BI ficam em:
 - `data/processed/bi_exports/dim_customer.csv`
 - `data/processed/bi_exports/dim_seller.csv`
 
-Todos os arquivos sao exportados com:
+Todos os arquivos são exportados com:
 
-- delimitador explicito `;`
+- delimitador explícito `;`
 - encoding `utf-8-sig`
 - `header=True`
 - `index=False`
 
-Esse padrao foi adotado para reduzir problemas de leitura em Power BI com configuracao regional em portugues do Brasil.
+Esse padrão foi adotado para reduzir problemas de leitura em Power BI com configuração regional em português do Brasil.
 
 ## Grain da Fato
 
 A fato exportada em `fact_sales_power_bi.csv` possui:
 
 - granularidade de `1 linha por item de pedido`
-- chave primaria: `order_item_key`
+- chave primária: `order_item_key`
 
 ## Chaves e Relacionamentos
 
-### Dimensoes
+### Dimensões
 
 - `dim_date[date_key]`
 - `dim_product[product_key]`
@@ -56,16 +56,16 @@ A fato exportada em `fact_sales_power_bi.csv` possui:
 - `fact_sales_power_bi[customer_key]`
 - `fact_sales_power_bi[seller_key]`
 
-### Observacao importante
+### Observação importante
 
-As dimensoes `payment` e `order_status` passaram a usar chaves explicitas, evitando relacionamento por texto bruto e deixando o modelo estrela mais estavel para BI.
+As dimensões `payment` e `order_status` passaram a usar chaves explícitas, evitando relacionamento por texto bruto e deixando o modelo estrela mais estável para BI.
 
 ## Como Importar no Power BI
 
 1. Abra o Power BI Desktop.
 2. Selecione `Obter Dados` > `Texto/CSV`.
 3. Importe todos os arquivos de `data/processed/bi_exports/`.
-4. Se o Power BI ja tiver tabelas antigas importadas, remova as tabelas anteriores e reimporte os arquivos atualizados.
+4. Se o Power BI já tiver tabelas antigas importadas, remova as tabelas anteriores e reimporte os arquivos atualizados.
 5. No modelo, configure os relacionamentos:
    - `fact_sales_power_bi[date_key]` -> `dim_date[date_key]`
    - `fact_sales_power_bi[product_key]` -> `dim_product[product_key]`
@@ -77,17 +77,17 @@ As dimensoes `payment` e `order_status` passaram a usar chaves explicitas, evita
 
 ## Observacao sobre `Column1`, `Column2`
 
-Se alguma tabela aparecer com nomes genericos como `Column1`, `Column2` ou `Column3`, isso normalmente indica uma destas situacoes:
+Se alguma tabela aparecer com nomes genéricos como `Column1`, `Column2` ou `Column3`, isso normalmente indica uma destas situações:
 
-- importacao antiga mantida no modelo antes da regeneracao dos CSVs
-- etapa de Power Query sem promocao correta do cabecalho
-- leitura com configuracao de delimitador errada
+- importação antiga mantida no modelo antes da regeneração dos CSVs
+- etapa de Power Query sem promoção correta do cabeçalho
+- leitura com configuração de delimitador errada
 
-Com os arquivos atuais, o comportamento esperado e:
+Com os arquivos atuais, o comportamento esperado é:
 
-- cabecalho real na primeira linha
+- cabeçalho real na primeira linha
 - delimitador `;`
-- colunas visiveis ja no preview do Power BI
+- colunas visíveis já no preview do Power BI
 
 ## Estrutura das Tabelas
 
@@ -111,10 +111,10 @@ Colunas:
 Colunas principais:
 
 - `product_key`
-- categoria em portugues
-- categoria em ingles
+- categoria em português
+- categoria em inglês
 - `category_label`
-- atributos fisicos do produto
+- atributos físicos do produto
 
 ### `dim_payment`
 
@@ -203,3 +203,6 @@ Este bônus aumenta o valor do projeto por quatro motivos principais:
 - reforça a maturidade do projeto ao separar camada factual e dimensões auxiliares
 
 Na prática, isso mostra que a solução não termina no código ou no dashboard customizado: ela também pode ser consumida em um fluxo analítico mais corporativo, com potencial de uso em ambiente executivo.
+
+
+

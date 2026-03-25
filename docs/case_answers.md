@@ -24,9 +24,9 @@ Para evitar exagero na narrativa do case, o estado real da entrega foi separado 
 
 | Ambiente | Status | Evidencia |
 | --- | --- | --- |
-| Projeto local no PyCharm | feito | pipeline, docs, SQL, dashboard, testes e artefatos gerados no repositorio |
-| GitHub | feito | repositorio publicado e atualizado com documentacao, evidencias e artefatos finais |
-| Dadosfera | parcial, com evidencia real do ativo publicado | prints de importacao, catalogo, colecao e volume em `images/dadosfera/`, sem pipeline nativo comprovado |
+| Projeto local no PyCharm | feito | pipeline, docs, SQL, dashboard, testes e artefatos gerados no repositório |
+| GitHub | feito | repositório publicado e atualizado com documentação, evidências e artefatos finais |
+| Dadosfera | parcial, com evidencia real do ativo publicado | prints de importação, catálogo, coleção e volume em `images/dadosfera/`, sem pipeline nativo comprovado |
 
 Leitura correta:
 
@@ -35,17 +35,17 @@ Leitura correta:
 - a operacionalização do ativo principal na Dadosfera já foi evidenciada
 - a parte ainda pendente na plataforma e o pipeline nativo
 
-## O que Esta Comprovado
+## O que Está Comprovado
 
-- ingestao e organizacao em zonas de dados
+- ingestão e organização em zonas de dados
 - modelagem da `fact_orders_enriched` com mais de 100 mil registros
-- camada publicada para consumo analitico
+- camada publicada para consumo analítico
 - SQLs versionadas e resultados exportados
 - dashboard Streamlit com evidências visuais
-- publicacao do ativo principal na Dadosfera com screenshots do catalogo e do volume
+- publicação do ativo principal na Dadosfera com screenshots do catálogo e do volume
 - trilha complementar de Power BI com evidência da query principal
 
-## O que Nao Esta Sendo Vendido Como Pronto
+## O que Não Está Sendo Vendido Como Pronto
 
 - integração por API com a Dadosfera
 - pipeline nativo executado na plataforma
@@ -292,3 +292,6 @@ No entanto, o fechamento completo da entrega ainda depende de:
 - gravação do vídeo final, se exigido
 - preenchimento dos links finais na apresentação
 - eventual implementação de pipeline nativo na Dadosfera, se quiser expandir além do essencial
+
+
+

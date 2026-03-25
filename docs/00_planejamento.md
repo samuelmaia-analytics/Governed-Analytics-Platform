@@ -38,12 +38,12 @@ Garantir que a entrega do case seja executada de forma organizada, cobrindo:
 - [x] definir o dominio do case
 - [x] selecionar uma base com mais de 100 mil registros
 - [x] definir narrativa de e-commerce e plataforma de dados
-- [x] estruturar o repositorio base
+- [x] estruturar o repositório base
 
 ### Fase 2 - Ingestão e Organização
 
 - [x] carregar os arquivos raw
-- [x] validar a integridade minima dos arquivos
+- [x] validar a integridade mínima dos arquivos
 - [x] organizar os dados em camadas
 - [ ] publicar a base na Dadosfera
 
@@ -64,7 +64,7 @@ Garantir que a entrega do case seja executada de forma organizada, cobrindo:
 ### Fase 5 - Catalogação
 
 - [x] gerar manifesto local da coleção
-- [x] gerar inventario de ativos
+- [x] gerar inventário de ativos
 - [x] documentar classificação de dados
 - [ ] catalogar os ativos de verdade na Dadosfera
 
@@ -135,11 +135,11 @@ Os pontos mais sensíveis do case são:
 
 | Frente | Esforco estimado |
 | --- | --- |
-| engenharia local e modelagem | concluido |
+| engenharia local e modelagem | concluído |
 | documentação técnica | concluído em grande parte |
-| Streamlit | concluido |
+| Streamlit | concluído |
 | Dadosfera real | pendente |
-| Power BI bonus | opcional e pendente |
+| Power BI bônus | opcional e pendente |
 | apresentação e vídeo | parcial |
 
 ## Alocação de Recursos
@@ -155,7 +155,9 @@ Como este case foi executado individualmente, a alocacao de recursos pode ser vi
 
 1. subir ativo real na Dadosfera
 2. catalogar o ativo e tirar prints
-3. criar query, visualizacao e pipeline na plataforma
+3. criar query, visualização e pipeline na plataforma
 4. atualizar docs com links reais
-5. gravar o video
+5. gravar o vídeo
 6. revisar checklist final e submeter
+
+

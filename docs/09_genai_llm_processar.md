@@ -8,7 +8,7 @@ Demonstrar a capacidade de:
 
 - trabalhar com dado desestruturado
 - usar IA para gerar features
-- transformar texto bruto em estrutura util para analise
+- transformar texto bruto em estrutura útil para análise
 
 ## O que já existe no projeto
 
@@ -16,7 +16,7 @@ Hoje o projeto já possui:
 
 - camada analítica estruturada do Olist
 - dashboard com insights executivos
-- documentacao do bonus de GenAI em:
+- documentação do bônus de GenAI em:
   - `docs/genai_bonus.md`
 - script de extração de features:
   - `src/genai_feature_extraction.py`
@@ -50,12 +50,12 @@ Uma tabela ou arquivo com colunas como:
 ### Processo esperado
 
 1. selecionar amostra ou dataset desestruturado
-2. definir schema de saida das features
+2. definir schema de saída das features
 3. enviar texto ao modelo
 4. receber a resposta estruturada
 5. consolidar as features em tabela final
 
-### Exemplo de features possiveis
+### Exemplo de features possíveis
 
 - categoria inferida
 - material
@@ -65,12 +65,12 @@ Uma tabela ou arquivo com colunas como:
 - palavras-chave
 - embeddings ou grupos semanticos
 
-## Sugestao de entregaveis
+## Sugestão de entregáveis
 
-- notebook ou script de geracao
-- tabela com features extraidas
+- notebook ou script de geração
+- tabela com features extraídas
 - markdown com prompts usados
-- exemplos de entrada e saida
+- exemplos de entrada e saída
 
 ## Campos preenchidos para a entrega atual
 
@@ -94,7 +94,7 @@ Uma tabela ou arquivo com colunas como:
 - prompt de extração para JSON estrito com schema fixo de features de produto
 - implementado em `src/genai_feature_extraction.py`
 
-### Estrutura de saida
+### Estrutura de saída
 
 - `category`
 - `material`
@@ -115,7 +115,7 @@ Uma tabela ou arquivo com colunas como:
 
 - `src/genai_feature_extraction.py`
 
-## Evidencias recomendadas
+## Evidências recomendadas
 
 Salvar em `docs/` ou `images/presentation/`:
 
@@ -125,14 +125,17 @@ Salvar em `docs/` ou `images/presentation/`:
 
 ## Risco principal deste item
 
-O maior risco e vender heuristica como se fosse LLM real. A documentacao final deve deixar isso explicito:
+O maior risco é vender heurística como se fosse LLM real. A documentação final deve deixar isso explícito:
 
-- se foi heuristico, dizer heuristico
+- se foi heurístico, dizer heurístico
 - se foi LLM, dizer qual modelo foi usado
 
 ## Status atual
 
 - base documental do item: pronta
-- implementacao minima do item: pronta
+- implementação mínima do item: pronta
 - chamada real à LLM: validada localmente com `gpt-4.1-mini`
 - saída final atual: `data/curated/genai/product_text_features.csv` com `extraction_mode=openai_api`
+
+
+

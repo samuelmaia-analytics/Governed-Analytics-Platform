@@ -156,3 +156,5 @@ Esse desenho foi adotado para manter o projeto simples, mas com separação sufi
 - ativo publicado para apresentação controlada
 
 Na prática, isso melhora a rastreabilidade, facilita a manutenção do pipeline, reforça governança por camada e adiciona privacidade por design sem enfraquecer o valor analítico do case.
+
+
