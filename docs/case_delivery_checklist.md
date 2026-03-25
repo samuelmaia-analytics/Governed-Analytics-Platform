@@ -35,7 +35,11 @@
 - [x] commitar a versão final da entrega
 - [x] fazer push da versão final
 - [ ] validar README e docs no GitHub web
-- [ ] registrar o link final do GitHub
+- [x] registrar o link final do GitHub
+
+Link final do repositório:
+
+- `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
 
 ## Dadosfera
 
@@ -76,3 +80,5 @@
 - o GitHub já está consolidado com as evidências principais
 - a parte da Dadosfera já está comprovada para o ativo principal
 - pipeline nativo na plataforma permanece pendente
+- item de GenAI com LLM externa permanece pendente
+- vídeo final e links finais da apresentação permanecem pendentes

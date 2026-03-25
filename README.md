@@ -46,42 +46,42 @@ Leitura rápida para avaliador:
 
 ### Dadosfera
 
-- Importação do dataset publicado: [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
-- Catalogação / documentação do ativo: [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
-- Evidência do ativo no catálogo: [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
-- Evidência de volume acima de 100 mil registros: [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
+- Importação do dataset publicado: [images/dadosfera/01_importacao_dataset.png](images/dadosfera/01_importacao_dataset.png)
+- Catalogação / documentação do ativo: [images/dadosfera/02_catalogo_metadados.png](images/dadosfera/02_catalogo_metadados.png)
+- Evidência do ativo no catálogo: [images/dadosfera/03_colecao_case.png](images/dadosfera/03_colecao_case.png)
+- Evidência de volume acima de 100 mil registros: [images/dadosfera/04_volume_100k.png](images/dadosfera/04_volume_100k.png)
 
 ### SQL e Evidências Analíticas
 
-- Query principal: [sql/query_principal.sql](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\sql\query_principal.sql)
-- Evidência consolidada da query: [powerbi/evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
-- Print da SQL principal: [powerbi/query_principal_sql.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\query_principal_sql.png)
-- Print do resultado principal: [powerbi/query_principal_resultado.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\query_principal_resultado.png)
+- Query principal: [sql/query_principal.sql](sql/query_principal.sql)
+- Evidência consolidada da query: [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
+- Print da SQL principal: [powerbi/query_principal_sql.png](powerbi/query_principal_sql.png)
+- Print do resultado principal: [powerbi/query_principal_resultado.png](powerbi/query_principal_resultado.png)
 
 ### Dashboard e Visualizações
 
-- Overview: [images/dashboard/01_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\01_overview.png)
-- Análise temporal: [images/dashboard/03_temporal.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\03_temporal.png)
-- Categorias: [images/dashboard/04_categories.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dashboard\04_categories.png)
-- Evidências complementares em Power BI: [powerbi/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi)
+- Overview: [images/dashboard/01_overview.png](images/dashboard/01_overview.png)
+- Análise temporal: [images/dashboard/03_temporal.png](images/dashboard/03_temporal.png)
+- Categorias: [images/dashboard/04_categories.png](images/dashboard/04_categories.png)
+- Evidências complementares em Power BI: [powerbi/](powerbi)
 
 ### Apresentação
 
-- Roteiro de apresentação: [presentation/talk_track.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\presentation\talk_track.md)
-- Material complementar da apresentação: [docs/10_apresentacao_final.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\10_apresentacao_final.md)
+- Roteiro de apresentação: [presentation/talk_track.md](presentation/talk_track.md)
+- Material complementar da apresentação: [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
 ## Mapa de Evidências
 
 Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais importantes:
 
-1. visão geral e posicionamento da entrega: [README.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\README.md)
-2. narrativa principal do case: [docs/case_answers.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\case_answers.md)
-3. carga, modelagem e volume da base: [docs/02_carga_e_modelagem.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\02_carga_e_modelagem.md)
-4. catálogo e publicação do ativo: [docs/03_catalogacao.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\03_catalogacao.md)
-5. perguntas analíticas e SQLs: [docs/04_analises_sql.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\04_analises_sql.md)
-6. dashboard e screenshots finais: [docs/05_dashboard.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\05_dashboard.md)
-7. evidência Power BI e query principal: [powerbi/evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
-8. preparação da apresentação final: [docs/10_apresentacao_final.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\10_apresentacao_final.md)
+1. visão geral e posicionamento da entrega: [README.md](README.md)
+2. narrativa principal do case: [docs/case_answers.md](docs/case_answers.md)
+3. carga, modelagem e volume da base: [docs/02_carga_e_modelagem.md](docs/02_carga_e_modelagem.md)
+4. catálogo e publicação do ativo: [docs/03_catalogacao.md](docs/03_catalogacao.md)
+5. perguntas analíticas e SQLs: [docs/04_analises_sql.md](docs/04_analises_sql.md)
+6. dashboard e screenshots finais: [docs/05_dashboard.md](docs/05_dashboard.md)
+7. evidência Power BI e query principal: [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
+8. preparação da apresentação final: [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
 ## Diferença entre os Principais Ativos
 
@@ -141,17 +141,17 @@ data/
 
 Se você quiser seguir a mesma ordem do case, use:
 
-0. [docs/00_planejamento.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\00_planejamento.md)
-1. [docs/01_contexto.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\01_contexto.md)
-2. [docs/02_carga_e_modelagem.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\02_carga_e_modelagem.md)
-3. [docs/03_catalogacao.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\03_catalogacao.md)
-4. [docs/04_analises_sql.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\04_analises_sql.md)
-5. [docs/05_dashboard.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\05_dashboard.md)
-6. [docs/06_arquitetura_proposta.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\06_arquitetura_proposta.md)
-7. [docs/07_bonus_genai_dataapps.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\07_bonus_genai_dataapps.md)
-8. [docs/08_pipelines.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\08_pipelines.md)
-9. [docs/09_genai_llm_processar.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\09_genai_llm_processar.md)
-10. [docs/10_apresentacao_final.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\10_apresentacao_final.md)
+0. [docs/00_planejamento.md](docs/00_planejamento.md)
+1. [docs/01_contexto.md](docs/01_contexto.md)
+2. [docs/02_carga_e_modelagem.md](docs/02_carga_e_modelagem.md)
+3. [docs/03_catalogacao.md](docs/03_catalogacao.md)
+4. [docs/04_analises_sql.md](docs/04_analises_sql.md)
+5. [docs/05_dashboard.md](docs/05_dashboard.md)
+6. [docs/06_arquitetura_proposta.md](docs/06_arquitetura_proposta.md)
+7. [docs/07_bonus_genai_dataapps.md](docs/07_bonus_genai_dataapps.md)
+8. [docs/08_pipelines.md](docs/08_pipelines.md)
+9. [docs/09_genai_llm_processar.md](docs/09_genai_llm_processar.md)
+10. [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
 ## Objetivo
 
@@ -227,10 +227,10 @@ Em outras palavras, o projeto já entrega a estrutura e o payload da coleção e
 
 Hoje, o repositório também já inclui evidências visuais da publicação do ativo na interface da Dadosfera:
 
-- [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
-- [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
-- [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
-- [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
+- [images/dadosfera/01_importacao_dataset.png](images/dadosfera/01_importacao_dataset.png)
+- [images/dadosfera/02_catalogo_metadados.png](images/dadosfera/02_catalogo_metadados.png)
+- [images/dadosfera/03_colecao_case.png](images/dadosfera/03_colecao_case.png)
+- [images/dadosfera/04_volume_100k.png](images/dadosfera/04_volume_100k.png)
 
 ## Tabela Analítica Principal
 
@@ -466,7 +466,7 @@ Essas queries respondem perguntas sobre receita, evolução temporal, distribui�
 
 Para a trilha de Power BI, a evidência consolidada da query principal está em:
 
-- [powerbi/evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
+- [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
 
 ## Documentação Disponível
 
