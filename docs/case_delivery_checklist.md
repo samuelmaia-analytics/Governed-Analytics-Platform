@@ -31,10 +31,10 @@
 - [x] repositório git inicializado
 - [x] remoto GitHub configurado
 - [x] revisar `git status`
-- [ ] remover artefatos temporários antes do commit final
+- [x] remover artefatos temporários antes do commit final
 - [x] commitar a versão final da entrega
 - [x] fazer push da versão final
-- [ ] validar README e docs no GitHub web
+- [x] validar README e docs no GitHub web
 - [x] registrar o link final do GitHub
 
 Link final do repositório:
@@ -44,7 +44,6 @@ Link final do repositório:
 Pendências locais atuais fora da submissão principal:
 
 - `powerbi/dashboard_overview.pbix`
-- `docs/imagens/powerbi/`
 
 ## Dadosfera
 
