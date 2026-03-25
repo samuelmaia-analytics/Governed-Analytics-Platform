@@ -35,6 +35,8 @@ Para publicação externa e upload manual em plataforma, o ativo recomendado é:
 
 ## Resumo Executivo da Entrega
 
+[Voltar ao Sumário](#sumário)
+
 Status atual:
 
 - GitHub publicado e atualizado
@@ -53,6 +55,8 @@ Leitura rápida para avaliador:
 - documentação de apoio cobrindo arquitetura, catálogo, qualidade, privacidade e apresentação
 
 ## Evidências Finais da Submissão
+
+[Voltar ao Sumário](#sumário)
 
 ### Dadosfera
 
@@ -81,6 +85,8 @@ Leitura rápida para avaliador:
 - Material complementar da apresentação: [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
 ## Mapa de Evidências
+
+[Voltar ao Sumário](#sumário)
 
 Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais importantes:
 
@@ -148,6 +154,8 @@ data/
 ```
 
 ## Como Ler o Projeto
+
+[Voltar ao Sumário](#sumário)
 
 Se você quiser seguir a mesma ordem do case, use:
 
@@ -298,6 +306,8 @@ Para manter o repositório aderente a um formato de entrega de case técnico, fo
 Essa decisão preserva reprodutibilidade e leitura do case sem poluir o repositório com saídas que podem ser recriadas localmente.
 
 ## Como Executar
+
+[Voltar ao Sumário](#sumário)
 
 ### 1. Gerar o inventário dos dados brutos
 
@@ -480,6 +490,8 @@ Para a trilha de Power BI, a evidência consolidada da query principal está em:
 
 ## Documentação Disponível
 
+[Voltar ao Sumário](#sumário)
+
 Arquivos principais em `docs/`:
 
 - `case_delivery_checklist.md`: checklist da estrutura e dos entregáveis do case
@@ -529,6 +541,8 @@ Este repositório entrega:
 - testes automatizados mínimos para regras críticas do pipeline
 
 ## Limites e Próximos Passos
+
+[Voltar ao Sumário](#sumário)
 
 Para manter honestidade técnica, estes pontos seguem como evolução e não como entrega concluída:
 
