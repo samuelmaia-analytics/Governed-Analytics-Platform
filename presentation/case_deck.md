@@ -38,7 +38,7 @@
 
 ## Slide 5 - Tabela Analítica Principal
 
-- Ativo central: [data/curated/analytics/fact_orders_enriched.parquet](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\curated\analytics\fact_orders_enriched.parquet)
+- Ativo central: [data/curated/analytics/fact_orders_enriched.parquet](../data/curated/analytics/fact_orders_enriched.parquet)
 - Granularidade: `1 linha por item de pedido`
 - Volume final: `112.650` linhas
 - Colunas: `48`
@@ -49,17 +49,17 @@
 ## Slide 6 - Governança e Publicação
 
 - Camada interna: `fact_orders_enriched`
-- Camada publicada: [data/published/dashboard/fact_orders_dashboard.parquet](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\published\dashboard\fact_orders_dashboard.parquet)
+- Camada publicada: [data/published/dashboard/fact_orders_dashboard.parquet](../data/published/dashboard/fact_orders_dashboard.parquet)
 - Medidas aplicadas:
   - pseudonimização de `order_id` e `customer_unique_id`
   - remoção de identificadores e quase-identificadores desnecessários
-- Referência: [docs/privacy_governance.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\privacy_governance.md)
+- Referência: [docs/privacy_governance.md](../docs/privacy_governance.md)
 
 ## Slide 7 - SQL e Insights
 
-- Queries salvas em [sql/analytics/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\sql\analytics)
-- Resultados exportados em [data/curated/query_results/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\curated\query_results)
-- Evidências tabulares em [data/screenshots/query_results/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\screenshots\query_results)
+- Queries salvas em [sql/analytics/](../sql/analytics/)
+- Resultados exportados em [data/curated/query_results/](../data/curated/query_results/)
+- Evidências tabulares em [data/screenshots/query_results/](../data/screenshots/query_results/)
 - Principais leituras:
   - concentração comercial em poucas categorias e estados
   - aceleração temporal com pressão operacional em meses de pico
@@ -99,8 +99,8 @@
 ## Slide 9 - Catálogo e Dadosfera
 
 - Existe catálogo local em:
-  - [data/curated/catalog/dadosfera_collection.json](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\curated\catalog\dadosfera_collection.json)
-  - [data/curated/catalog/collection_assets_inventory.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\curated\catalog\collection_assets_inventory.csv)
+  - [data/curated/catalog/dadosfera_collection.json](../data/curated/catalog/dadosfera_collection.json)
+  - [data/curated/catalog/collection_assets_inventory.csv](../data/curated/catalog/collection_assets_inventory.csv)
 - Status honesto:
   - estrutura de publicação e metadados está pronta localmente
   - o ativo principal já foi publicado e evidenciado na plataforma Dadosfera
@@ -121,7 +121,7 @@
 
 ## Slide 10 - Testes e Robustez
 
-- Suíte em [tests/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\tests)
+- Suíte em [tests/](../tests/)
 - Validações cobrindo:
   - build analítico
   - catálogo
@@ -133,7 +133,7 @@
 
 ## Slide 11 - Bônus de BI
 
-- Exports preparados em [data/processed/bi_exports/](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports)
+- Exports preparados em [data/processed/bi_exports/](../data/processed/bi_exports/)
 - Status honesto:
   - base pronta para Power BI
   - documentação, evidência de query e screenshots já foram materializadas na pasta `powerbi/`

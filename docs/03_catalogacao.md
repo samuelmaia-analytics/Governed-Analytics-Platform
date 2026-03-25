@@ -23,17 +23,17 @@ Demonstrar:
 
 ## Referencias principais
 
-- coleção local: [docs/collection_catalog.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\collection_catalog.md)
-- classificação de dados: [docs/data_classification.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\data_classification.md)
-- política de governança: [docs/governance_policy.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\governance_policy.md)
-- contexto de plataforma: [docs/about_dadosfera.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\about_dadosfera.md)
+- coleção local: [docs/collection_catalog.md](./collection_catalog.md)
+- classificação de dados: [docs/data_classification.md](./data_classification.md)
+- política de governança: [docs/governance_policy.md](./governance_policy.md)
+- contexto de plataforma: [docs/about_dadosfera.md](./about_dadosfera.md)
 
 ## Evidencias visuais da plataforma
 
-- importação do ativo publicado: [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
-- documentação e metadados do ativo: [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
-- ativo publicado dentro da coleção do case: [images/dadosfera/03_colecao_case.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\03_colecao_case.png)
-- prova de volume acima de 100k registros: [images/dadosfera/04_volume_100k.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\04_volume_100k.png)
+- importação do ativo publicado: [images/dadosfera/01_importacao_dataset.png](../images/dadosfera/01_importacao_dataset.png)
+- documentação e metadados do ativo: [images/dadosfera/02_catalogo_metadados.png](../images/dadosfera/02_catalogo_metadados.png)
+- ativo publicado dentro da coleção do case: [images/dadosfera/03_colecao_case.png](../images/dadosfera/03_colecao_case.png)
+- prova de volume acima de 100k registros: [images/dadosfera/04_volume_100k.png](../images/dadosfera/04_volume_100k.png)
 
 ## Status honesto
 

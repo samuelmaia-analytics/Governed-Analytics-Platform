@@ -76,20 +76,20 @@ O dashboard foi estruturado para responder rapidamente:
 
 Arquivos-base do modelo:
 
-- [fact_sales_power_bi.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports\fact_sales_power_bi.csv)
-- [dim_date.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports\dim_date.csv)
-- [dim_product.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports\dim_product.csv)
-- [dim_payment.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports\dim_payment.csv)
-- [dim_order_status.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports\dim_order_status.csv)
-- [dim_customer.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports\dim_customer.csv)
-- [dim_seller.csv](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\data\processed\bi_exports\dim_seller.csv)
+- [fact_sales_power_bi.csv](../data/processed/bi_exports/fact_sales_power_bi.csv)
+- [dim_date.csv](../data/processed/bi_exports/dim_date.csv)
+- [dim_product.csv](../data/processed/bi_exports/dim_product.csv)
+- [dim_payment.csv](../data/processed/bi_exports/dim_payment.csv)
+- [dim_order_status.csv](../data/processed/bi_exports/dim_order_status.csv)
+- [dim_customer.csv](../data/processed/bi_exports/dim_customer.csv)
+- [dim_seller.csv](../data/processed/bi_exports/dim_seller.csv)
 
 Artefatos já encontrados no projeto:
 
-- arquivo Power BI atual: [dashboard_overview.pbix](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\dashboard_overview.pbix)
-- print executivo atual: [dashboard_overview.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\dashboard_overview.png)
-- evidência SQL principal: [evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
-- print do resultado SQL: [query_principal_resultado.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\query_principal_resultado.png)
+- arquivo Power BI atual: [dashboard_overview.pbix](./dashboard_overview.pbix)
+- print executivo atual: [dashboard_overview.png](./dashboard_overview.png)
+- evidência SQL principal: [evidencia_query.md](./evidencia_query.md)
+- print do resultado SQL: [query_principal_resultado.png](./query_principal_resultado.png)
 
 ## Onde inserir imagem ou print final do dashboard
 

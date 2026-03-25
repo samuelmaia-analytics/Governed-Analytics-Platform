@@ -36,5 +36,5 @@ Arquivos esperados para importação:
 
 Referências diretas:
 
-- evidência da query principal: [evidencia_query.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\evidencia_query.md)
-- documentação do dashboard: [README_powerbi.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\powerbi\README_powerbi.md)
+- evidência da query principal: [evidencia_query.md](./evidencia_query.md)
+- documentação do dashboard: [README_powerbi.md](./README_powerbi.md)

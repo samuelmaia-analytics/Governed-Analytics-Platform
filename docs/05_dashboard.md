@@ -41,7 +41,7 @@ Transformar a camada analítica publicada em leitura executiva de:
 
 ## Referencias detalhadas
 
-- runbook de captura: [docs/streamlit_capture_runbook.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\streamlit_capture_runbook.md)
-- deck: [presentation/case_deck.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\presentation\case_deck.md)
+- runbook de captura: [docs/streamlit_capture_runbook.md](./streamlit_capture_runbook.md)
+- deck: [presentation/case_deck.md](../presentation/case_deck.md)
 
 

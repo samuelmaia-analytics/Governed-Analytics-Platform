@@ -58,8 +58,8 @@ Uso recomendado:
 
 ## Referencias detalhadas
 
-- tabela analítica: [docs/fact_orders_enriched.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\fact_orders_enriched.md)
-- dicionario de dados: [docs/data_dictionary.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\data_dictionary.md)
-- qualidade: [docs/data_quality_report.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\data_quality_report.md)
+- tabela analítica: [docs/fact_orders_enriched.md](./fact_orders_enriched.md)
+- dicionario de dados: [docs/data_dictionary.md](./data_dictionary.md)
+- qualidade: [docs/data_quality_report.md](./data_quality_report.md)
 
 

@@ -38,9 +38,9 @@ Essa tabela foi desenhada para consolidar o contexto analítico do case com gran
 
 ## Leitura recomendada
 
-- contexto geral do case: [README.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\README.md)
-- narrativa principal: [docs/case_answers.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\case_answers.md)
-- inventário da fonte: [docs/raw_data_inventory.md](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\docs\raw_data_inventory.md)
+- contexto geral do case: [README.md](../README.md)
+- narrativa principal: [docs/case_answers.md](./case_answers.md)
+- inventário da fonte: [docs/raw_data_inventory.md](./raw_data_inventory.md)
 
 
 
