@@ -9,7 +9,7 @@
 ![Importação do dataset na Dadosfera](../images/dadosfera/01_importacao_dataset.png)
 
 **Notas do apresentador:**
-Aqui eu começaria dizendo que a proposta do case não foi só montar um dashboard. A ideia foi demonstrar uma jornada completa: ingestão, organização, modelagem, publicação e consumo. Eu tratei o projeto como um mini produto de dados, com preocupação tanto técnica quanto de negócio.
+Eu começaria dizendo que a proposta não foi só montar um dashboard. A ideia foi mostrar uma jornada completa: ingestão, organização, modelagem, publicação e consumo. Eu tratei o case como um mini produto de dados, com preocupação técnica, mas também com clareza para negócio.
 
 **Tempo estimado:** 35 segundos
 
@@ -24,7 +24,7 @@ Aqui eu começaria dizendo que a proposta do case não foi só montar um dashboa
 ![Evidência de volume acima de 100 mil registros](../images/dadosfera/04_volume_100k.png)
 
 **Notas do apresentador:**
-Neste ponto, eu explicaria que o Olist é uma base muito boa para esse tipo de case porque obriga a fazer join entre domínios diferentes, lidar com volume e pensar em modelagem. O problema de negócio que eu procurei atacar foi dar visibilidade sobre receita, operação e experiência de compra em uma estrutura que fosse rastreável e reutilizável.
+Aqui eu explicaria que o Olist é uma base muito boa para esse tipo de desafio porque obriga a integrar domínios diferentes, lidar com volume e pensar em modelagem de verdade. O problema de negócio que eu quis resolver foi dar visibilidade sobre receita, operação e experiência de compra em uma estrutura rastreável e reutilizável.
 
 **Tempo estimado:** 35 segundos
 
@@ -39,7 +39,7 @@ Neste ponto, eu explicaria que o Olist é uma base muito boa para esse tipo de c
 [INSERIR PRINT REAL AQUI: arquitetura em camadas do projeto ou árvore de pastas com as zonas raw, standardized, staging, curated e published]
 
 **Notas do apresentador:**
-Aqui vale falar de forma bem objetiva: eu preservei uma camada analítica interna para engenharia e auditoria, e criei uma camada publicada para consumo no app. Isso reforça governança e também deixa a solução mais madura, porque separa o dado de trabalho do dado de exposição.
+Aqui eu falaria de forma bem objetiva: eu preservei uma camada analítica interna para engenharia e auditoria, e criei uma camada publicada para consumo no app. Isso reforça governança e deixa a solução mais madura, porque separa o dado de trabalho do dado de exposição.
 
 **Tempo estimado:** 40 segundos
 
@@ -55,7 +55,7 @@ Aqui vale falar de forma bem objetiva: eu preservei uma camada analítica intern
 ![Ativo publicado na coleção do case](../images/dadosfera/03_colecao_case.png)
 
 **Notas do apresentador:**
-Esse é um ponto importante da defesa. Eu não tratei a publicação como um detalhe. O ativo foi organizado e documentado para ser encontrado, entendido e reutilizado. Ao mesmo tempo, eu tomo cuidado para não vender como pronto algo que ainda é evolução, como pipeline nativo na plataforma.
+Esse é um ponto importante da defesa. Eu não tratei a publicação como detalhe. O ativo foi organizado e documentado para ser encontrado, entendido e reutilizado. Ao mesmo tempo, eu tomo cuidado para não vender como pronto algo que ainda é evolução, como pipeline nativo na plataforma.
 
 **Tempo estimado:** 40 segundos
 
@@ -70,7 +70,7 @@ Esse é um ponto importante da defesa. Eu não tratei a publicação como um det
 ![Resultado principal da query SQL](../powerbi/query_principal_resultado.png)
 
 **Notas do apresentador:**
-Eu apresentaria esse slide como a ponte entre engenharia e decisão. A query principal mostra que a base final já responde perguntas reais do negócio: receita, pedidos, ticket, atraso, categoria e recorte operacional. Isso reforça que a modelagem foi construída para uso, não só para estrutura.
+Eu apresentaria esse slide como a ponte entre engenharia e decisão. A query principal mostra que a base final já responde perguntas reais do negócio: receita, pedidos, ticket, atraso, categoria e recorte operacional. Isso reforça que a modelagem foi construída para uso, e não só para estrutura.
 
 **Tempo estimado:** 35 segundos
 
