@@ -34,4 +34,10 @@ O projeto já possui um manifesto local de catálogo e inventário de ativos. Al
 
 ## Fechamento
 
-Hoje o projeto já está forte como entrega de analytics engineering e data product, com GitHub consolidado e evidências reais do ativo principal na Dadosfera. O próximo passo é fechar a apresentação final e, se houver tempo, expandir a operacionalização para pipeline nativo na plataforma.
+Este projeto foi estruturado como um mini produto de dados, com separação por camadas, documentação, publicação de dataset, consultas SQL analíticas e visualização executiva.
+
+Na Dadosfera, foi realizada a importação do ativo publicado, a documentação do dataset no catálogo e o registro das evidências da carga e do volume de dados.
+
+Como resultado, a solução permite responder perguntas de negócio sobre receita, pedidos, ticket médio, categorias, atraso logístico, distribuição por status e recortes geográficos, apoiando tomada de decisão de forma mais clara e escalável.
+
+Como próximos passos, a evolução natural da solução é ampliar o uso como Data App, fortalecer automações de catalogação e expandir a camada de leitura executiva assistida.
