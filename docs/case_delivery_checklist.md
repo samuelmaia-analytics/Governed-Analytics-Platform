@@ -41,6 +41,11 @@ Link final do repositório:
 
 - `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
 
+Pendências locais atuais fora da submissão principal:
+
+- `powerbi/dashboard_overview.pbix`
+- `docs/imagens/powerbi/`
+
 ## Dadosfera
 
 - [x] publicar dataset real na plataforma
@@ -82,3 +87,5 @@ Link final do repositório:
 - pipeline nativo na plataforma permanece pendente
 - item de GenAI com LLM externa permanece pendente
 - vídeo final e links finais da apresentação permanecem pendentes
+- o `README.md` principal já foi ajustado com links relativos compatíveis com GitHub web
+- a evidência SQL principal em `powerbi/evidencia_query.md` já está fortalecida com imagens e links válidos
