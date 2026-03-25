@@ -1,6 +1,6 @@
 # 10 Apresentacao Final
 
-Este documento organiza a entrega final de apresentacao do case, incluindo video, deck e links dos ativos.
+Este documento organiza a entrega final de apresentação do case, incluindo vídeo, deck e links dos ativos.
 
 ## Objetivo
 
@@ -91,7 +91,7 @@ Se a apresentação precisar ser curta, a mensagem principal deve ser:
 
 ## Risco principal
 
-O maior risco e apresentar uma solucao local como se toda a operacionalizacao ja estivesse concluida na plataforma. A apresentacao final deve ser precisa sobre:
+O maior risco é apresentar uma solução local como se toda a operacionalização já estivesse concluída na plataforma. A apresentação final deve ser precisa sobre:
 
 - o que foi implementado localmente
 - o que foi publicado de verdade na Dadosfera

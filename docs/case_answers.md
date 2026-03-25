@@ -30,9 +30,9 @@ Para evitar exagero na narrativa do case, o estado real da entrega foi separado 
 
 Leitura correta:
 
-- a solucao tecnica principal esta pronta localmente
-- a parte de versionamento remoto ja foi consolidada no GitHub
-- a operacionalizacao do ativo principal na Dadosfera ja foi evidenciada
+- a solução técnica principal está pronta localmente
+- a parte de versionamento remoto já foi consolidada no GitHub
+- a operacionalização do ativo principal na Dadosfera já foi evidenciada
 - a parte ainda pendente na plataforma e o pipeline nativo
 
 ## O que Esta Comprovado
@@ -41,16 +41,16 @@ Leitura correta:
 - modelagem da `fact_orders_enriched` com mais de 100 mil registros
 - camada publicada para consumo analitico
 - SQLs versionadas e resultados exportados
-- dashboard Streamlit com evidencias visuais
+- dashboard Streamlit com evidências visuais
 - publicacao do ativo principal na Dadosfera com screenshots do catalogo e do volume
-- trilha complementar de Power BI com evidencia da query principal
+- trilha complementar de Power BI com evidência da query principal
 
 ## O que Nao Esta Sendo Vendido Como Pronto
 
-- integracao por API com a Dadosfera
+- integração por API com a Dadosfera
 - pipeline nativo executado na plataforma
 - item de GenAI com LLM externa de forma completa
-- video final da apresentacao, quando aplicavel
+- vídeo final da apresentação, quando aplicável
 
 ## Objetivo do Projeto
 

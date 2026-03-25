@@ -19,7 +19,7 @@ Para consumo executivo, o dashboard usa exclusivamente:
 
 - `data/published/dashboard/fact_orders_dashboard.parquet`
 
-Para publicacao externa e upload manual em plataforma, o ativo recomendado e:
+Para publicação externa e upload manual em plataforma, o ativo recomendado é:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
@@ -28,9 +28,9 @@ Para publicacao externa e upload manual em plataforma, o ativo recomendado e:
 Status atual:
 
 - GitHub publicado e atualizado
-- ativo publicado na Dadosfera com evidencias visuais em `images/dadosfera/`
+- ativo publicado na Dadosfera com evidências visuais em `images/dadosfera/`
 - dashboard Streamlit operacional com fallback para `csv` no deploy
-- trilha complementar de Power BI com evidencias de query e dashboard
+- trilha complementar de Power BI com evidências de query e dashboard
 
 Leitura rápida para avaliador:
 
@@ -59,7 +59,7 @@ Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais i
 
 ### `fact_orders_enriched`
 
-E a camada analitica interna principal do projeto.
+É a camada analítica interna principal do projeto.
 
 - uso: engenharia, SQL, qualidade, auditoria e rastreabilidade
 - local: `data/curated/analytics/`
@@ -67,9 +67,9 @@ E a camada analitica interna principal do projeto.
 
 ### `fact_orders_dashboard`
 
-E a camada publicada do case, derivada da base analitica interna e preparada para consumo analitico.
+É a camada publicada do case, derivada da base analítica interna e preparada para consumo analítico.
 
-- uso: dashboard, publicacao controlada e demonstracao em plataforma
+- uso: dashboard, publicação controlada e demonstração em plataforma
 - local: `data/published/dashboard/`
 - formatos disponiveis:
   - `fact_orders_dashboard.parquet`: consumo local pelo Streamlit
@@ -398,11 +398,11 @@ O app consome exclusivamente:
 
 - `data/published/dashboard/fact_orders_dashboard.parquet`
 
-No deploy remoto do Streamlit, o carregamento tambem aceita:
+No deploy remoto do Streamlit, o carregamento também aceita:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
-Se a intencao for subir um ativo na Dadosfera, usar:
+Se a intenção for subir um ativo na Dadosfera, usar:
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 

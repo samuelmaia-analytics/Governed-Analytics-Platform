@@ -88,7 +88,7 @@
   - imagem principal: `01_overview.png`
   - imagens de apoio: `03_temporal.png`, `04_categories.png` e `05_geography.png`
 - Mensagem principal:
-  - o dashboard nao e apenas visual; ele consome uma camada publicada e minimizada, coerente com a governanca do projeto
+  - o dashboard não é apenas visual; ele consome uma camada publicada e minimizada, coerente com a governança do projeto
 
 ## Slide 9 - Catálogo e Dadosfera
 
@@ -101,7 +101,7 @@
   - o que permanece pendente é pipeline nativo na plataforma
 - Recomendação para fala:
   - dizer explicitamente que o repositorio ja entrega o payload, o inventario e a prova visual do ativo publicado
-  - nao vender como integracao por API ou pipeline real concluido
+  - não vender como integração por API ou pipeline real concluído
 - Prints já disponíveis:
   - [images/dadosfera/01_importacao_dataset.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\01_importacao_dataset.png)
   - [images/dadosfera/02_catalogo_metadados.png](C:\Users\samue\PycharmProjects\SAMUEL_MAIA_DDF_TECH_032026\images\dadosfera\02_catalogo_metadados.png)
