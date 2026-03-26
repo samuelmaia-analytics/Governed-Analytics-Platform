@@ -69,6 +69,6 @@ No contexto deste case, os papéis estão acumulados pelo autor do projeto, mas 
 ## Limitações
 
 - este projeto não implementa autenticação, RBAC ou catálogo externo real
-- os controles aqui documentados representam uma prova de conceito local de governança por design
+- os controles aqui documentados representam uma implementação local de governança por design adequada ao escopo do case
 
 

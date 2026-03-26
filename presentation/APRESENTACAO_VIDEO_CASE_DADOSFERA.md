@@ -52,7 +52,7 @@ Aqui eu explicaria que a arquitetura foi pensada para separar bem o que é dado 
 
 - A coleção publicada na Dadosfera centraliza os ativos do case em um único ponto de navegação.
 - Nela ficam organizados perguntas, visualizações, dashboard final e ativo analítico principal.
-- O que está comprovado publicamente hoje é a coleção `Samuel Maia - 03_2026` e o ativo `Fact Orders Dashboardss`.
+- O que está comprovado publicamente hoje é a coleção `Samuel Maia - 03_2026` e o modelo principal publicado em `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`.
 
 ![Coleção publicada com os ativos do case](../images/dadosfera/dadosfera_colecao_ativos_publicados.png)
 
@@ -102,6 +102,6 @@ Aqui eu mostraria o consumo executivo do case. O ponto principal é que o dashbo
 ![Evidência do item de GenAI](../images/genai/01_product_text_features_openai.png)
 
 **Notas do apresentador:**
-Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. E eu também destacaria que existe uma frente de GenAI no projeto, usada como prova de conceito para enriquecer a leitura analítica com dados textuais. O próximo passo natural é aprofundar essa camada junto da operação dentro da plataforma.
+Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. E eu também destacaria que existe uma frente de GenAI no projeto, usada como extensão controlada para enriquecer a leitura analítica com dados textuais. O próximo passo natural é aprofundar essa camada junto da operação dentro da plataforma.
 
 **Tempo estimado:** 40 segundos

@@ -43,6 +43,12 @@ Relacionamentos esperados:
 - `fact_sales_power_bi[customer_key]` -> `dim_customer[customer_key]`
 - `fact_sales_power_bi[seller_key]` -> `dim_seller[seller_key]`
 
+Observações de importação:
+
+- separador CSV: `;`
+- encoding: `utf-8-sig`
+- fato e dimensões são derivados da camada interna `fact_orders_enriched`
+
 ## Principais KPIs
 
 - Receita Total
@@ -76,10 +82,11 @@ O dashboard foi estruturado para responder rapidamente:
 ## Instruções de uso
 
 1. Abrir o arquivo `.pbix` atual do projeto.
-2. Validar os relacionamentos do modelo estrela.
-3. Conferir se os cards principais estão coerentes.
-4. Aplicar filtros por ano, categoria, status, pagamento e estado.
-5. Validar se os visuais respondem corretamente ao cruzamento dos filtros.
+2. Importar ou atualizar os CSVs usando separador `;`.
+3. Validar os relacionamentos do modelo estrela.
+4. Conferir se os cards principais estão coerentes.
+5. Aplicar filtros por ano, categoria, status, pagamento e estado.
+6. Validar se os visuais respondem corretamente ao cruzamento dos filtros.
 
 Arquivos-base do modelo:
 

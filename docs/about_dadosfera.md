@@ -33,18 +33,22 @@ Para evitar ambiguidade na leitura do case, o status real até o momento é:
   - upload/publicação do dataset na plataforma
   - catálogo/coleção materializados na interface da plataforma
   - screenshots da plataforma em `images/dadosfera/`
+- **já implementado via integração programática**
+  - sincronização de ativos públicos no catálogo via API do Maestro
+  - manifesto versionado em `contracts/catalog/dadosfera_catalog_assets.json`
+  - cliente de sync em `src/dadosfera_catalog_sync.py`
 - **ainda não comprovado neste repositório como execução real na Dadosfera**
   - pipeline real executado na plataforma
   - catálogo do pipeline na interface
   - query, notebook ou app materializado nativamente dentro da plataforma
 
-Em outras palavras, a solução técnica do case já está pronta localmente e o ativo principal já foi publicado com evidência visual na Dadosfera. O ponto ainda pendente é a operacionalização nativa dentro da plataforma.
+Em outras palavras, a solução técnica do case já está pronta localmente, o ativo principal já foi publicado com evidência visual na Dadosfera e o repositório já possui integração via API para sincronizar ativos públicos de catálogo. O ponto ainda pendente é a operacionalização nativa dentro da plataforma.
 
 ## Contexto
 
 Este case foi desenvolvido a partir do dataset Olist, com um pipeline local em Python para ingestão, profiling, modelagem analítica, validação de qualidade, consultas SQL e consumo em dashboard Streamlit.
 
-Na prova de conceito atual, essa arquitetura atende bem ao objetivo de demonstrar capacidade técnica ponta a ponta. Ainda assim, quando o problema é observado em um contexto mais próximo de produção, surgem limitações típicas de uma operação local: dependência de execução manual, baixa padronização de publicação de dados, maior esforço de governança e dificuldade de escalar o compartilhamento entre times.
+Na configuração atual, essa arquitetura atende bem ao objetivo de demonstrar capacidade técnica ponta a ponta. Ainda assim, quando o problema é observado em um contexto mais próximo de produção, surgem limitações típicas de uma operação local: dependência de execução manual, baixa padronização de publicação de dados, maior esforço de governança e dificuldade de escalar o compartilhamento entre times.
 
 É nesse ponto que a Dadosfera passa a ser relevante: não como substituição artificial do que já funciona, mas como camada de publicação, descoberta e compartilhamento capaz de reduzir atrito operacional.
 
@@ -125,7 +129,7 @@ Dadosfera
 
 Na prática, a proposta não exige descartar o que já foi construído. O pipeline atual pode continuar como motor de transformação, enquanto a Dadosfera atua como camada de publicação, compartilhamento e escalabilidade. Em um estágio mais maduro, parte relevante da arquitetura local pode ser simplificada ou absorvida pela plataforma.
 
-Nesta prova de conceito, essa visão já foi parcialmente materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Além disso, o repositório agora inclui evidências visuais da publicação do ativo principal na interface da Dadosfera em `images/dadosfera/`. Ainda não há integração direta com endpoint externo da plataforma nem evidência de pipeline nativo executado.
+Nesta entrega, essa visão já foi materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Além disso, o repositório inclui evidências visuais da publicação do ativo principal na interface da Dadosfera em `images/dadosfera/` e um fluxo complementar de sincronização por API em `src/dadosfera_catalog_sync.py`. Ainda não há evidência de pipeline nativo executado.
 
 ## 3. Por que a Abordagem Baseada na Dadosfera é Mais Viável e/ou Mais Barata
 
@@ -202,9 +206,10 @@ No estado atual do repositório, a conclusão correta é:
 
 - a engenharia local está implementada
 - a estrutura para publicação/catálogo está preparada
+- a integração por API para sincronização de catálogo está implementada
 - a publicação do ativo principal na plataforma já foi evidenciada
 - a execução de pipeline nativo na plataforma ainda precisa ser feita e evidenciada
 
-Em uma leitura honesta de prova de conceito, a combinação entre pipeline analítico, camada publicada e plataforma de distribuição continua sendo o caminho mais defensável para aumentar velocidade de análise, governança e compartilhamento em contexto de e-commerce.
+Em uma leitura tecnicamente rigorosa, a combinação entre pipeline analítico, camada publicada e plataforma de distribuição continua sendo o caminho mais defensável para aumentar velocidade de análise, governança e compartilhamento em contexto de e-commerce.
 
 

@@ -77,11 +77,11 @@ Para a visão da coleção já publicada na Dadosfera/Metabase, com links confir
 - `fact_orders_enriched` é o ativo analítico interno principal da coleção.
 - `fact_orders_dashboard` é a camada publicada e minimizada usada pelo Streamlit.
 - os resultados de qualidade, queries SQL e documentação derivada compõem a camada de evidência técnica do case.
-- o manifesto JSON pode ser usado como payload base para publicação ou integração futura com uma API de catálogo.
+- o manifesto JSON pode ser usado como payload base para publicação ou extensão do sync já implementado com a API de catálogo.
 
 ## Observação
 
-- está implementação representa uma coleção operacional em nível de projeto, adequada para prova de conceito local.
+- esta implementação representa uma coleção operacional em nível de projeto, adequada para operação catalogável no contexto do case.
 - uma integração nativa com uma plataforma externa exigiria autenticação, endpoint e contrato específicos, que não foram fornecidos no enunciado.
 
 

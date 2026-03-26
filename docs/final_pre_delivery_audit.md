@@ -30,7 +30,7 @@ Data da auditoria: `2026-03-22`
 | Volume acima de 100k | feito | `fact_orders_enriched` com 112.650 registros |
 | Catalogação de ativos | feito | manifesto, inventário e coleção local materializados |
 | Data Lake por zonas | feito | raw / standardized / staging / curated / published |
-| Coleção no padrão solicitado | parcial | implementada localmente, sem API externa |
+| Coleção no padrão solicitado | feito | implementada localmente e complementada com sync por API externa |
 | Dashboard de categorias | feito | presente no Streamlit |
 | Dashboard temporal | feito | presente no Streamlit |
 | SQL salvo | feito | queries em `sql/analytics` |
@@ -53,7 +53,7 @@ Data da auditoria: `2026-03-22`
 ## 4. Lacunas Relevantes
 
 - sem RBAC ou controle de acesso real
-- sem integração real da coleção com plataforma externa
+- sync da coleção com plataforma externa implementado via API, ainda sem pipeline nativo na plataforma
 - sem metadata persistida de execução por etapa
 - parte do bônus GenAI ainda é heurística e não IA real
 

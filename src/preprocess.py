@@ -16,7 +16,7 @@ from pandas.api.types import (
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from src.config import DOCS_DIR, LANDING_DIR, PROFILING_DIR, STANDARDIZED_DIR
+from src.config import DOCS_DIR, PROFILING_DIR, STANDARDIZED_DIR
 from src.ingest import configure_logging, load_csv, validate_expected_files
 
 

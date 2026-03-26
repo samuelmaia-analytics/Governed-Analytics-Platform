@@ -1,47 +1,41 @@
 # Roteiro de Apresentação
 
-## Acesso Rápido
+## Mensagem central
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+Este case não foi desenhado como exercício de visualização. Ele foi estruturado como um produto analítico: uma base transacional fragmentada foi convertida em um ativo confiável, governado e consumível por múltiplos canais, com evidência real de publicação.
 
 ## Abertura
 
-Eu apresentaria este case como uma jornada completa de dados. A ideia não foi apenas montar um dashboard, mas mostrar como sair de dados transacionais brutos e chegar a um ativo analítico confiável, documentado e pronto para consumo.
+“Esta entrega foi organizada para responder a uma pergunta simples: como transformar um conjunto relacional bruto de e-commerce em um ativo analítico que suporte decisão de negócio sem perder rastreabilidade técnica. A resposta foi construir uma camada factual defensável, separar a exposição executiva da base interna e provar consumo real em dashboard, catálogo e BI.”
 
 ## Problema
 
-O Olist é um dataset muito rico, mas ele não chega pronto para leitura executiva. Os dados estão fragmentados em várias tabelas, então o desafio foi organizar essa base de um jeito que sustentasse análise de negócio com qualidade, rastreabilidade e clareza.
+“O dataset Olist é rico, mas nasce fragmentado. Pedidos, itens, produtos, clientes, sellers, pagamentos e reviews não chegam prontos para leitura executiva. O problema real não era fazer joins; era criar uma camada estável o suficiente para responder perguntas de negócio com consistência e governança.”
 
-## O que eu construí
+## Decisão arquitetural
 
-Eu implementei um pipeline em camadas, saindo de `raw` para `standardized`, depois `staging`, `curated` e, por fim, uma camada `published` voltada para consumo. Essa estrutura ajudou a separar bem o dado bruto, o dado tratado, a base analítica interna e o ativo publicado.
+“A principal decisão foi preservar granularidade por item de pedido em `fact_orders_enriched`. Isso deu flexibilidade para SQL, qualidade, documentação e exportações sem distorcer análise. A segunda decisão foi separar essa base da camada publicada `fact_orders_dashboard`, para que o consumo executivo não dependesse da camada interna completa.”
 
-## Ativo principal
+## Modelagem e qualidade
 
-O principal resultado é a `fact_orders_enriched`, com `112.650` linhas e granularidade de item de pedido. Essa tabela concentra pedidos, produtos, clientes, sellers, pagamentos e reviews em uma estrutura que já responde às perguntas mais importantes do case.
+“A modelagem foi tratada como estrutura de produto, não como tabela final isolada. Além da fato principal, o projeto inclui checks de qualidade, contratos simples de schema, classificação de dados e documentação de privacidade. Isso importa porque a base não fica apenas utilizável; ela fica defensável.”
 
-## Qualidade e governança
+## Consumo analítico
 
-Além da modelagem, eu adicionei checks de qualidade, contratos simples de schema, documentação de privacidade e uma separação clara entre camada interna e camada publicada. Isso foi importante para mostrar que a solução não é só visualmente funcional, mas tecnicamente defensável.
-
-## SQL e insights
-
-Com essa base, eu respondi perguntas de negócio sobre receita por categoria, evolução temporal, receita por estado, atraso logístico e meios de pagamento. Esse ponto é importante porque mostra que a modelagem realmente chegou em consumo analítico reproduzível.
+“Com essa base, o projeto responde perguntas concretas sobre concentração de receita, evolução temporal, geografia, atraso logístico e meios de pagamento. O importante aqui é que as respostas não estão escondidas em visualização. Elas existem em SQL versionada, resultados exportados e evidências reproduzíveis.”
 
 ## Dashboard
 
-Para consumo executivo, eu publiquei uma camada reduzida e pseudonimizada e construí um dashboard Streamlit com KPIs, análise temporal, categorias, geografia e insights. A proposta foi dar uma leitura rápida do negócio, mantendo consistência com a base publicada. O link do app é `https://samuelmaia-032026.streamlit.app/`.
+“O Streamlit é a camada executiva da solução. Ele consome exclusivamente a camada publicada e traduz a base em KPIs, tendência, categorias, geografia e insights. O ponto forte não é o visual em si; é a coerência entre modelagem, governança e produto.”
 
 ## Dadosfera
 
-Além do repositório, o ativo principal foi publicado na Dadosfera com evidências visuais de importação, catálogo, coleção e volume acima de 100 mil linhas. O ponto que eu deixaria claro na apresentação é que isso já comprova a publicação do ativo, mas ainda não representa pipeline nativo executado dentro da plataforma.
+“Além do ambiente local, o ativo principal foi publicado na Dadosfera/Metabase e está documentado com evidências visuais de importação, catálogo, coleção e volume. O repositório também inclui sincronização complementar de catálogo via API do Maestro. O que não se afirma é pipeline nativo rodando dentro da plataforma, porque isso não está comprovado.”
 
 ## Fechamento
 
-Eu encerraria dizendo que este projeto foi estruturado como um mini produto de dados. Ele combina pipeline, modelagem, qualidade, publicação, SQL e visualização executiva em uma entrega única.
+“A leitura correta desta entrega é: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe e o único limite estrutural remanescente é a ausência de pipeline nativo dentro da plataforma. Para um case técnico, isso mostra capacidade real de construir ativo, governar exposição e fechar a jornada entre engenharia e consumo.”
 
-Na prática, o case mostra capacidade de transformar dado bruto em ativo analítico utilizável. E, na minha leitura, a principal prova de valor da Dadosfera aqui é justamente acelerar a passagem entre engenharia, publicação e consumo, com mais governança e menos atrito operacional.
+## Encerramento sugerido
 
-Como próximos passos, a evolução natural da solução é ampliar o uso como Data App, fortalecer automações de publicação e aprofundar a camada de leitura executiva assistida.
+“Se eu resumir em uma frase: esta entrega mostra menos um dashboard e mais um ativo analítico operacionalizado com critério.”

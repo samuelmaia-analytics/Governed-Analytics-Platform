@@ -1,0 +1,38 @@
+[
+  {
+    "display_name": "Samuel Maia | Olist Executive Commerce Analytics",
+    "description": "Aplicacao Streamlit publicada com KPIs, analise temporal, categorias, geografia e insights executivos do case Olist.",
+    "data_asset_type": "dashboard",
+    "external_url": "https://samuelmaia-032026.streamlit.app/",
+    "location": "streamlit_cloud",
+    "tags": ["streamlit", "dashboard", "olist", "analytics", "case-tecnico"],
+    "share_type": "public"
+  },
+  {
+    "display_name": "Samuel Maia | Video Case Olist",
+    "description": "Video de apresentacao final do case tecnico com demonstracao dos ativos, arquitetura, dashboard, Dadosfera e bonus de GenAI.",
+    "data_asset_type": "link",
+    "external_url": "https://youtu.be/SqJ0UF1Em9k",
+    "location": "youtube",
+    "tags": ["video", "apresentacao", "olist", "case-tecnico"],
+    "share_type": "public"
+  },
+  {
+    "display_name": "Samuel Maia | Repositorio Olist Analytics Case",
+    "description": "Repositorio GitHub com pipeline, dados publicados, SQL, documentacao, testes, workflows e materiais da entrega.",
+    "data_asset_type": "documentation",
+    "external_url": "https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026",
+    "location": "github",
+    "tags": ["github", "documentacao", "pipeline", "olist", "case-tecnico"],
+    "share_type": "public"
+  },
+  {
+    "display_name": "Samuel Maia | Bônus GenAI Olist",
+    "description": "Documentacao do bonus de GenAI com extração estruturada de features de texto desestruturado usando prompt controlado e saida auditavel.",
+    "data_asset_type": "documentation",
+    "external_url": "https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026/blob/main/docs/genai_bonus.md",
+    "location": "github_docs",
+    "tags": ["genai", "llm", "documentacao", "olist", "case-tecnico"],
+    "share_type": "public"
+  }
+]

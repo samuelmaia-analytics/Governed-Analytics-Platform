@@ -7,7 +7,7 @@
 - Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 
-Este documento organiza a parte de pipelines do case, separando o que já foi implementado localmente do que ainda precisa ser materializado na Dadosfera.
+Este documento organiza a parte de pipelines do case, separando o que já foi implementado localmente, o que já foi automatizado no GitHub e o que ainda precisa ser materializado nativamente na Dadosfera.
 
 ## Objetivo
 
@@ -46,15 +46,32 @@ Etapas disponiveis:
 - screenshots das queries
 - exports para Power BI
 
+## Automação já implementada no repositório
+
+- CI de testes em `.github/workflows/ci.yml`
+- lint em `.github/workflows/lint.yml`
+- promoção automática do branch `streamlit-prod` em `.github/workflows/deploy-streamlit.yml`
+- sincronização de ativos do catálogo por API em `.github/workflows/sync-dadosfera-catalog.yml`
+
+## Leitura de maturidade
+
+O projeto já não depende apenas de execução manual. Há uma separação clara entre:
+
+- pipeline analítico local, que produz os ativos centrais
+- automação de engenharia no GitHub, que valida e promove artefatos
+- automação de catálogo, que sincroniza ativos públicos
+
+Isso eleva o padrão da entrega porque aproxima o case de um fluxo real de operação, sem alegar que toda a transformação já roda nativamente dentro da plataforma.
+
 ## Comando principal local
 
 ```powershell
 .\.venv\Scripts\python.exe src\run_case_pipeline.py
 ```
 
-## Como este item deve ficar aderente ao edital
+## O que ainda permanece fora do escopo
 
-Para fechar o item 8 conforme o case da Dadosfera, ainda falta:
+Para fechar a parte especificamente nativa da plataforma, ainda falta:
 
 - criar um pipeline real dentro da plataforma
 - executar esse pipeline na plataforma
@@ -112,6 +129,8 @@ Salvar em `images/dadosfera/`:
 ## Status atual
 
 - pipeline local em Python: feito
+- CI/CD do branch de deploy do Streamlit: feito
+- sync de catálogo via API: feito
 - pipeline real na Dadosfera: pendente
 - catalogação do pipeline na plataforma: pendente
 

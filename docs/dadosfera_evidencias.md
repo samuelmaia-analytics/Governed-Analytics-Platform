@@ -10,7 +10,7 @@ O objetivo é facilitar a avaliação técnica, centralizando:
 - links diretos confirmados
 - itens já identificados visualmente na coleção
 - evidências de dashboard, perguntas SQL e ativo analítico publicado
-- pendências de links individuais que ainda precisam ser inseridos manualmente
+- links confirmados e pendências de URL ainda não públicas
 
 ## Coleção da Dadosfera
 
@@ -42,7 +42,7 @@ O objetivo é facilitar a avaliação técnica, centralizando:
 | Nome do ativo | Tipo do ativo | Objetivo resumido | Link direto | Evidência visual |
 | --- | --- | --- | --- | --- |
 | `PUBLIC.SAMUELMAIA-03_2026` | Tabela publicada | Disponibilizar a camada tabular publicada do case para prévia, documentação e exploração na plataforma. | `LINK_A_INSERIR` | [images/dadosfera/03_colecao_case.png](../images/dadosfera/03_colecao_case.png) |
-| `Fact Orders Dashboardss` | Modelo / ativo analítico | Expor o ativo analítico principal publicado na Dadosfera para consumo e reaproveitamento no case. | [Fact Orders Dashboardss](https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard) | [images/dadosfera/dadosfera_colecao_ativos_publicados.png](../images/dadosfera/dadosfera_colecao_ativos_publicados.png) |
+| `fact-orders-dashboard` | Modelo / ativo analítico | Expor o ativo analítico principal publicado na Dadosfera para consumo e reaproveitamento no case. | [Modelo principal](https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard) | [images/dadosfera/dadosfera_colecao_ativos_publicados.png](../images/dadosfera/dadosfera_colecao_ativos_publicados.png) |
 
 ## Dashboard Final
 
@@ -73,7 +73,7 @@ O objetivo é facilitar a avaliação técnica, centralizando:
 ## Observações Técnicas
 
 - A coleção principal foi confirmada via acesso público em `26 de março de 2026`.
-- O link direto do ativo `Fact Orders Dashboardss` já constava no repositório e foi mantido por estar confirmado.
+- O link direto do ativo principal já constava no repositório e foi mantido por estar confirmado.
 - A listagem dos ativos foi validada com base nas evidências visuais versionadas em `images/dadosfera/`.
 - A API pública de itens da coleção retornou `Unauthenticated`; por isso, os links individuais não confirmados foram mantidos como `LINK_A_INSERIR`.
 - Não foram inferidos IDs, slugs ou URLs individuais sem confirmação objetiva na plataforma.
@@ -81,7 +81,7 @@ O objetivo é facilitar a avaliação técnica, centralizando:
 ## Links Rápidos
 
 - Coleção principal: [Samuel Maia - 03_2026](https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026)
-- Ativo analítico principal: [Fact Orders Dashboardss](https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard)
+- Ativo analítico principal: [Modelo principal](https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard)
 - Dashboard Streamlit do case: [samuelmaia-032026.streamlit.app](https://samuelmaia-032026.streamlit.app/)
 - Documento de catalogação: [docs/03_catalogacao.md](./03_catalogacao.md)
 - Catálogo local versionado: [docs/collection_catalog.md](./collection_catalog.md)

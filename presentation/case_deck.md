@@ -1,168 +1,184 @@
 # Case Deck
 
+## Estrutura narrativa
 
-## Acesso Rápido
+A apresentação funciona melhor se seguir a lógica:
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+1. problema
+2. decisão arquitetural
+3. ativo central
+4. prova de consumo
+5. prova de publicação
+6. limite real
 
-## Slide 1 - Capa
+## Slide 1 | Tese
 
-- Projeto: `SAMUEL_MAIA_DDF_TECH_032026`
-- Tema: Analytics Engineering e Data Product com dados do Olist
-- Objetivo: transformar dados brutos de e-commerce em camada analítica confiável, consultável e pronta para consumo executivo
+**Mensagem**
 
-## Slide 2 - Problema
+Transformar um dataset relacional bruto em um ativo analítico governado, testado e pronto para consumo executivo.
 
-- O dataset Olist possui múltiplas tabelas transacionais e exige integração entre pedidos, itens, clientes, produtos, sellers, pagamentos e reviews
-- O desafio do case é sair do dado bruto e chegar a uma base analítica que responda perguntas de negócio com rastreabilidade
-- Além da análise, a entrega precisava contemplar documentação, SQL, dashboard e visão de publicação/catalogação
+**Fala**
 
-## Slide 3 - Arquitetura
+“O objetivo deste case foi sair de dados transacionais fragmentados e chegar a um produto analítico utilizável. A entrega foi desenhada para mostrar modelagem, governança, publicação e consumo como partes da mesma solução.”
 
-- Camadas implementadas:
-  - `data/raw/landing/olist/`
-  - `data/standardized/olist/`
-  - `data/staging/profiling/`
-  - `data/curated/analytics/`
-  - `data/curated/quality/`
-  - `data/curated/catalog/`
-  - `data/published/dashboard/`
-- Referência visual: `docs/architecture.md`
-- Sugestão de fala:
-  - começar explicando que o projeto separa dado bruto, dado padronizado, dado analítico interno e dado publicado
-  - enfatizar que o dashboard consome apenas a camada publicada
+## Slide 2 | Problema
 
-## Slide 4 - Pipeline
+**Mensagem**
 
-- `src/ingest.py`: valida arquivos de origem
-- `src/preprocess.py`: padroniza e gera profiling
-- `src/build_analytics.py`: constrói a `fact_orders_enriched`
-- `src/quality.py`: executa checks de qualidade
-- `src/publish_dashboard.py`: gera camada segura para consumo
-- `src/run_case_pipeline.py`: orquestra tudo ponta a ponta
+Olist é rico em dado, mas pobre em legibilidade executiva na forma original.
 
-## Slide 5 - Tabela Analítica Principal
+**Pontos**
 
-- Ativo central: [data/curated/analytics/fact_orders_enriched.parquet](../data/curated/analytics/fact_orders_enriched.parquet)
-- Granularidade: `1 linha por item de pedido`
-- Volume final: `112.650` linhas
-- Colunas: `48`
-- Uso: SQL, qualidade, documentação e derivação da camada publicada
-- Mensagem principal:
-  - a modelagem foi feita para preservar detalhe operacional e ainda permitir leitura executiva
+- múltiplas tabelas e dependência de joins
+- dificuldade de responder perguntas de negócio diretamente na origem
+- necessidade de separar engenharia, exposição e consumo
 
-## Slide 6 - Governança e Publicação
+## Slide 3 | Arquitetura
 
-- Camada interna: `fact_orders_enriched`
-- Camada publicada: [data/published/dashboard/fact_orders_dashboard.parquet](../data/published/dashboard/fact_orders_dashboard.parquet)
-- Medidas aplicadas:
-  - pseudonimização de `order_id` e `customer_unique_id`
-  - remoção de identificadores e quase-identificadores desnecessários
-- Referência: [docs/privacy_governance.md](../docs/privacy_governance.md)
+**Mensagem**
 
-## Slide 7 - SQL e Insights
+A solução foi organizada em camadas para reduzir ambiguidade de uso e melhorar governança.
 
-- Queries salvas em [sql/analytics/](../sql/analytics/)
-- Resultados exportados em [data/curated/query_results/](../data/curated/query_results/)
-- Evidências tabulares em [data/screenshots/query_results/](../data/screenshots/query_results/)
-- Principais leituras:
-  - concentração comercial em poucas categorias e estados
-  - aceleração temporal com pressão operacional em meses de pico
-  - alta dependência de `credit_card`
-- Sugestão visual:
-  - colocar um mosaico com 2 ou 3 screenshots de `data/screenshots/query_results/`
+**Pontos**
 
-![Resultado principal da query](../powerbi/query_principal_resultado.png)
+- `raw -> standardized -> staging -> curated -> published`
+- `curated` como camada interna de engenharia
+- `published` como camada oficial de exposição
 
-## Slide 8 - Dashboard
+**Apoio**
 
-- App em `streamlit_app/app.py`
-- Link público: `https://samuelmaia-032026.streamlit.app/`
-- Fonte exclusiva: `data/published/dashboard/fact_orders_dashboard.parquet`
-- Blocos principais:
-  - KPIs
-  - tendência temporal
-  - categorias
-  - geografia
-  - operação
-  - insights executivos
-- Screenshots finais já disponíveis:
-  - `images/dashboard/01_overview.png`
-  - `images/dashboard/02_kpis.png`
-  - `images/dashboard/03_temporal.png`
-  - `images/dashboard/04_categories.png`
-  - `images/dashboard/05_geography.png`
-- Sugestão de uso no slide:
-  - imagem principal: `01_overview.png`
-  - imagens de apoio: `03_temporal.png`, `04_categories.png` e `05_geography.png`
-- Mensagem principal:
-  - o dashboard não é apenas visual; ele consome uma camada publicada e minimizada, coerente com a governança do projeto
+- referenciar `docs/architecture.md`
 
-![Dashboard overview](../images/dashboard/01_overview.png)
-![Dashboard temporal](../images/dashboard/03_temporal.png)
-![Dashboard categorias](../images/dashboard/04_categories.png)
+## Slide 4 | Ativo Central
 
-## Slide 9 - Catálogo e Dadosfera
+**Mensagem**
 
-- Existe catálogo local em:
-  - [data/curated/catalog/dadosfera_collection.json](../data/curated/catalog/dadosfera_collection.json)
-  - [data/curated/catalog/collection_assets_inventory.csv](../data/curated/catalog/collection_assets_inventory.csv)
-- Status honesto:
-  - estrutura de publicação e metadados está pronta localmente
-  - o ativo principal já foi publicado e evidenciado na plataforma Dadosfera
-  - o que permanece pendente é pipeline nativo na plataforma
-- Recomendação para fala:
-  - dizer explicitamente que o repositorio ja entrega o payload, o inventario e a prova visual do ativo publicado
-  - não vender como integração por API ou pipeline real concluído
-- Prints já disponíveis:
-  - `images/dadosfera/01_importacao_dataset.png`
-  - `images/dadosfera/02_catalogo_metadados.png`
-  - `images/dadosfera/03_colecao_case.png`
-  - `images/dadosfera/04_volume_100k.png`
-- Referencia operacional: `docs/dadosfera_capture_runbook.md`
+`fact_orders_enriched` é a espinha dorsal da solução.
 
-![Importação na Dadosfera](../images/dadosfera/01_importacao_dataset.png)
-![Catálogo na Dadosfera](../images/dadosfera/02_catalogo_metadados.png)
-![Volume 100k+ na Dadosfera](../images/dadosfera/04_volume_100k.png)
+**Pontos**
 
-## Slide 10 - Testes e Robustez
+- granularidade: `1 linha por item de pedido`
+- volume: `112.650` linhas
+- uso: SQL, qualidade, documentação, BI e derivação da publicada
 
-- Suíte em [tests/](../tests/)
-- Validações cobrindo:
-  - build analítico
-  - catálogo
-  - filtros do dashboard
-  - publicação segura
-  - qualidade
-  - runner do pipeline
-  - contratos de schema
+**Fala**
 
-## Slide 11 - Bônus de BI
+“Essa decisão de granularidade foi a mais importante do projeto, porque ela sustenta consumo analítico sem sacrificar rastreabilidade.”
 
-- Exports preparados em [data/processed/bi_exports/](../data/processed/bi_exports/)
-- Status honesto:
-  - base pronta para Power BI
-  - documentação, evidência de query e screenshots já foram materializadas na pasta `powerbi/`
-- Referencia operacional: `powerbi/delivery_plan.md`
+## Slide 5 | Governança
 
-## Slide 12 - GenAI
+**Mensagem**
 
-- caso de uso implementado:
-  - extração de features estruturadas a partir de texto desestruturado de produto
-- artefatos:
-  - `data/external/genai/product_text_samples.csv`
-  - `data/curated/genai/product_text_features.csv`
-  - `src/genai_feature_extraction.py`
-- status honesto:
-  - execução real validada localmente com `gpt-4.1-mini`
-  - saída final registra `openai_api` em `extraction_mode`
+O dashboard não consome a camada interna completa.
 
-![Evidência final de GenAI](../images/genai/01_product_text_features_openai.png)
+**Pontos**
 
-## Slide 13 - Próximos Passos
+- `fact_orders_dashboard` deriva da fato principal
+- pseudonimização de `order_id` e `customer_unique_id`
+- remoção de identificadores e quase-identificadores desnecessários
 
-- compartilhar o link final do vídeo na submissão, se o processo exigir
-- integrar os screenshots finais do Streamlit e da Dadosfera ao deck final
-- opcional: criar pipeline nativo na Dadosfera
+**Fala**
+
+“Essa separação mostra maturidade de produto: a base de engenharia continua rica, mas a camada executiva expõe apenas o necessário.”
+
+## Slide 6 | SQL e Evidência Analítica
+
+**Mensagem**
+
+A modelagem foi validada por perguntas reais de negócio.
+
+**Pontos**
+
+- top categorias por receita
+- evolução temporal
+- receita por estado
+- atraso por categoria
+- distribuição por meio de pagamento
+
+**Apoio**
+
+- `powerbi/query_principal_resultado.png`
+- mosaico com screenshots de `data/screenshots/query_results/`
+
+## Slide 7 | Dashboard
+
+**Mensagem**
+
+O Streamlit é o produto executivo da solução.
+
+**Pontos**
+
+- KPIs, tendência, categorias, geografia e insights
+- consumo exclusivo da camada publicada
+- coerência entre base, narrativa e visual
+
+**Apoio**
+
+- `images/dashboard/01_overview.png`
+- `images/dashboard/03_temporal.png`
+- `images/dashboard/04_categories.png`
+
+## Slide 8 | Dadosfera e Catálogo
+
+**Mensagem**
+
+A entrega foi além do ambiente local.
+
+**Pontos**
+
+- ativo principal publicado na plataforma
+- evidências de importação, catálogo, coleção e volume
+- manifesto local e inventário versionado
+- sync complementar de catálogo via API do Maestro
+
+**Fala**
+
+“Eu deixaria explícito que a publicação e a catalogação estão comprovadas. O que não está sendo vendido como concluído é pipeline nativo rodando dentro da plataforma.”
+
+## Slide 9 | Robustez
+
+**Mensagem**
+
+A solução foi pensada para resistir à revisão técnica.
+
+**Pontos**
+
+- testes automatizados
+- contratos simples de schema
+- checks de qualidade
+- workflows de CI, lint e promoção do branch de deploy
+
+## Slide 10 | Extensões
+
+**Mensagem**
+
+A solução já se abre para múltiplos canais de consumo.
+
+**Pontos**
+
+- Power BI com modelo auxiliar
+- GenAI com extração estruturada de features textuais
+
+## Slide 11 | Escopo Real
+
+**Mensagem**
+
+O case está pronto como produto analítico, mas não infla o que ainda não foi evidenciado.
+
+**Pontos**
+
+- feito: modelagem, governança, publicação, dashboard, catálogo, sync API, automação GitHub
+- não feito: pipeline nativo dentro da Dadosfera
+
+## Slide 12 | Fechamento
+
+**Mensagem final**
+
+“Se eu resumir a entrega em uma frase: este projeto demonstra a capacidade de transformar dado bruto em ativo analítico operacionalizado, com critério de modelagem, controle de exposição e prova real de consumo.”
+
+## Materiais de apoio
+
+- repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- app: `https://samuelmaia-032026.streamlit.app/`
+- vídeo: `https://youtu.be/SqJ0UF1Em9k`
+- modelo principal: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`

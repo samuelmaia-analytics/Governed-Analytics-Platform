@@ -11,3 +11,4 @@ openpyxl
 python-dotenv
 jinja2
 pytest
+requests

@@ -26,7 +26,7 @@ fontes -> plataforma / catalogação -> ativos publicados -> consumo por app, SQ
 - arquitetura atual: `docs/architecture.md`
 - contexto de plataforma: `docs/about_dadosfera.md`
 
-## Status honesto
+## Status atual
 
 - arquitetura local: implementada
 - evolução real na plataforma: depende de execução e evidência externa

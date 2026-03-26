@@ -1,40 +1,31 @@
 # Apresentação
 
+Esta pasta concentra os artefatos da defesa final do case.
 
-## Acesso Rápido
+## Arquivos principais
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- `case_deck.md`: estrutura sugerida de slides
+- `talk_track.md`: roteiro de fala
+- `APRESENTACAO_VIDEO_CASE_DADOSFERA.md`: versão focada no vídeo
 
-Esta pasta concentra os artefatos da defesa final do case: narrativa, estrutura do deck e apoio visual para sustentação da entrega.
+## Estrutura recomendada
 
-## Finalidade
+1. contexto e objetivo do case
+2. arquitetura e pipeline
+3. modelagem e qualidade
+4. publicação e governança
+5. dashboard e insights
+6. evidências em Dadosfera/Metabase
+7. bônus de BI e GenAI
+8. limites e próximos passos
 
-O objetivo desta pasta é organizar a defesa de forma profissional, com coerência entre argumento técnico, evidência visual e mensagem executiva.
+## Critérios de qualidade
 
-## Conteúdo esperado
+- separar claramente o que foi implementado localmente, o que foi publicado e o que ainda é evolução
+- usar links e screenshots reais do repositório
+- manter consistência entre narrativa executiva e evidência técnica
 
-- `case_deck.md` ou `case_deck.pptx`
-- `talk_track.md`
-- imagens usadas na apresentação
+## Referências
 
-## Estrutura mínima recomendada no deck
-
-1. contexto do problema
-2. dataset escolhido
-3. arquitetura em camadas
-4. pipeline e modelagem analítica
-5. catálogo e governança
-6. queries e insights
-7. dashboard
-8. defesa de valor da Dadosfera
-9. próximos passos
-
-## Critério de qualidade da apresentação
-
-Uma apresentação forte para este case deve:
-
-- separar claramente o que foi implementado, o que foi publicado e o que ainda é evolução
-- manter a defesa conectada aos artefatos reais do repositório
-- mostrar valor de negócio sem perder precisão técnica
+- preparação final: [../docs/10_apresentacao_final.md](../docs/10_apresentacao_final.md)
+- evidências publicadas: [../docs/dadosfera_evidencias.md](../docs/dadosfera_evidencias.md)

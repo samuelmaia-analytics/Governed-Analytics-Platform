@@ -52,7 +52,7 @@ Garantir que a entrega do case seja executada de forma organizada, cobrindo:
 - [x] carregar os arquivos raw
 - [x] validar a integridade mínima dos arquivos
 - [x] organizar os dados em camadas
-- [ ] publicar a base na Dadosfera
+- [x] publicar a base na Dadosfera
 
 ### Fase 3 - Exploração e Modelagem
 
@@ -73,35 +73,37 @@ Garantir que a entrega do case seja executada de forma organizada, cobrindo:
 - [x] gerar manifesto local da coleção
 - [x] gerar inventário de ativos
 - [x] documentar classificação de dados
-- [ ] catalogar os ativos de verdade na Dadosfera
+- [x] catalogar os ativos de verdade na Dadosfera
+- [x] implementar sincronização complementar por API do catálogo
 
 ### Fase 6 - Analise
 
 - [x] escrever queries SQL principais
 - [x] exportar resultados
 - [x] gerar screenshots tabulares
-- [ ] salvar queries e visualizacoes diretamente na Dadosfera
+- [x] salvar queries e visualizacoes diretamente na Dadosfera
 
 ### Fase 7 - Aplicação e Visualização
 
 - [x] publicar camada minimizada para dashboard
 - [x] construir app em Streamlit
 - [x] gerar prints finais do dashboard
-- [ ] conectar a narrativa do dashboard com ativos reais publicados na Dadosfera
+- [x] conectar a narrativa do dashboard com ativos reais publicados na Dadosfera
+- [x] automatizar a promoção do branch de deploy do Streamlit
 
 ### Fase 8 - Pipelines e IA
 
 - [x] criar pipeline local em Python
 - [ ] criar pipeline real dentro da Dadosfera
 - [ ] catalogar esse pipeline na plataforma
-- [ ] implementar item de GenAI com dados desestruturados e features geradas por IA
+- [x] implementar item de GenAI com dados desestruturados e features geradas por IA
 
 ### Fase 9 - Encerramento
 
 - [x] organizar o README e a estrutura do case
 - [x] preparar deck e talk track
-- [ ] gravar vídeo final
-- [ ] inserir links reais dos ativos na Dadosfera
+- [x] gravar vídeo final
+- [x] inserir links reais dos ativos na Dadosfera
 - [ ] validar todos os itens do edital antes da submissão
 
 ## Dependências Entre Etapas
@@ -145,9 +147,9 @@ Os pontos mais sensíveis do case são:
 | engenharia local e modelagem | concluído |
 | documentação técnica | concluído em grande parte |
 | Streamlit | concluído |
-| Dadosfera real | pendente |
+| Dadosfera real | concluído em publicação, catálogo e sync por API |
 | Power BI bônus | opcional e pendente |
-| apresentação e vídeo | parcial |
+| apresentação e vídeo | concluído |
 
 ## Alocação de Recursos
 

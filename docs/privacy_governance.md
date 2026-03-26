@@ -50,8 +50,10 @@ Este documento registra as decisões de privacidade por design e governança apl
 
 ## Resultado da Publicação Segura
 
-- Arquivo publicado: `data/published/dashboard/fact_orders_dashboard.parquet`
+- Arquivo publicado para o app: `data/published/dashboard/fact_orders_dashboard.parquet`
+- Arquivo publicado para upload manual: `data/published/dashboard/fact_orders_dashboard.csv`
 - Registros publicados: **112,650**
+- Colunas publicadas: **22**
 - Colunas publicadas: **22**
 
 ## Política de Uso
@@ -59,6 +61,7 @@ Este documento registra as decisões de privacidade por design e governança apl
 - o dashboard deve consumir exclusivamente a camada `published/dashboard`.
 - a camada `curated/analytics` permanece interna ao pipeline e não deve ser tratada como camada de exposição.
 - tabelas detalhadas do app devem exibir apenas chaves pseudonimizadas e dimensões agregadas necessárias ao case.
+- uploads manuais em plataforma devem usar preferencialmente o CSV da camada publicada.
 
 ## Limitações e Escopo
 

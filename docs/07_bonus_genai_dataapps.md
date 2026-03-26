@@ -27,7 +27,7 @@ Este documento centraliza os bônus do case.
 - bônus BI: `docs/bi_bonus.md`
 - plano operacional do Power BI: `powerbi/delivery_plan.md`
 
-## Status honesto
+## Status atual
 
 - heurística de insights no app: feita
 - extração de features com schema GenAI: feita

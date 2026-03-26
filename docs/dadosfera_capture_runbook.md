@@ -17,20 +17,21 @@ Demonstrar de forma clara que o projeto não ficou apenas no ambiente local e qu
 
 Use preferencialmente:
 
-- `data/published/dashboard/fact_orders_dashboard.parquet`
+- `data/published/dashboard/fact_orders_dashboard.csv`
 
 Motivo:
 
 - essa é a camada publicada do projeto
 - ela já foi minimizada para consumo analítico
 - ela é coerente com a narrativa de governança do case
+- facilita upload manual e inspeção tabular na plataforma
 
 ## Antes de entrar na plataforma
 
 Tenha em mãos:
 
 - nome do projeto: `SAMUEL_MAIA_DDF_TECH_032026`
-- caminho do ativo principal: `data/published/dashboard/fact_orders_dashboard.parquet`
+- caminho do ativo principal: `data/published/dashboard/fact_orders_dashboard.csv`
 - descrição curta do ativo:
   - `Camada publicada e minimizada para dashboard executivo do case Olist`
 

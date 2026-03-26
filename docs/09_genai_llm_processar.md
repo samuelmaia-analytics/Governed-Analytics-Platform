@@ -32,7 +32,7 @@ Hoje o projeto já possui:
 - tabela final de features:
   - `data/curated/genai/product_text_features.csv`
 
-## Status honesto atual
+## Status atual
 
 - insights heurísticos no dashboard: feitos
 - uso de LLM externa para extração de features: executado e validado localmente via API

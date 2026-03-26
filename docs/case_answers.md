@@ -1,304 +1,127 @@
 # Respostas do Case
 
-
-## Acesso Rápido
-
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-
 ## Resumo Executivo
 
-O projeto transforma o dataset Olist em um ativo analítico estruturado, confiável e pronto para responder perguntas de negócio com clareza. A entrega cobre ingestão, profiling, modelagem analítica, qualidade, documentação, SQL, dashboard e publicação controlada do ativo principal.
+Este projeto transforma o dataset Olist em um produto analítico utilizável, com separação clara entre camada interna de engenharia e camada publicada para consumo executivo. O núcleo técnico da entrega é `fact_orders_enriched`, uma fato com granularidade de item de pedido e `112.650` registros, construída para responder perguntas de negócio sem sacrificar rastreabilidade técnica.
 
-O núcleo técnico da solução é a tabela `fact_orders_enriched`, construída com granularidade de item de pedido e volume final de `112.650` registros. A partir dela, o projeto deriva a camada `fact_orders_dashboard`, minimizada e pseudonimizada para consumo executivo.
+A camada derivada `fact_orders_dashboard` reduz risco de exposição, preserva utilidade analítica e serve como fonte oficial do Streamlit e do ativo publicado. Isso dá ao case um desenho mais maduro do que uma entrega centrada apenas em visualização.
 
-O objetivo não foi apenas montar gráficos. A proposta foi demonstrar domínio de ciclo de vida de dados, saindo da origem bruta até um ativo analítico consumível, documentado, catalogável e defensável em contexto de negócio.
+## Tese da Entrega
 
-## Tese de Valor da Entrega
+O valor desta entrega está em combinar quatro frentes que normalmente aparecem desconectadas em cases:
 
-Esta entrega é forte porque combina, na mesma solução:
+- modelagem com granularidade defensável
+- qualidade e governança explícitas
+- consumo real por múltiplos canais
+- documentação suficiente para auditoria e defesa técnica
 
-- modelagem com critério de granularidade
-- volume relevante e aderente ao case
-- preocupação explícita com qualidade e governança
-- separação clara entre camada interna e camada publicada
-- evidência real de consumo por dashboard, plataforma e BI externo
+O projeto não depende de narrativa inflada. Ele sustenta avaliação porque conecta decisão de modelagem, produto analítico, evidência operacional e automação mínima de engenharia em um mesmo fluxo.
 
-## Status de Entrega por Ambiente
+## Estado Real da Solução
 
-Para evitar exagero na narrativa do case, o estado real da entrega foi separado explicitamente por ambiente:
-
-| Ambiente | Status | Evidencia |
+| Ambiente | Estado | Evidência |
 | --- | --- | --- |
-| Projeto local no PyCharm | feito | pipeline, docs, SQL, dashboard, testes e artefatos gerados no repositório |
-| GitHub | feito | repositório publicado e atualizado com documentação, evidências e artefatos finais |
-| Dadosfera | parcial, com evidencia real do ativo publicado | prints de importação, catálogo, coleção e volume em `images/dadosfera/`, sem pipeline nativo comprovado |
+| Repositório local | concluído | pipeline, testes, docs, SQL, dashboard e artefatos |
+| GitHub | concluído | documentação, workflows e automação versionados |
+| Dadosfera/Metabase | concluído para publicação e catálogo | ativo publicado, coleção evidenciada, links reais e sync por API |
+| Dadosfera nativa como motor de pipeline | não concluído | não há execução de pipeline nativo comprovada |
 
-Leitura recomendada:
+Leitura correta:
 
-- a solução técnica principal está pronta localmente
-- a parte de versionamento remoto já foi consolidada no GitHub
-- a operacionalização do ativo principal na Dadosfera já foi evidenciada
-- a parte ainda pendente na plataforma é o pipeline nativo
+- o produto analítico está entregue
+- a publicação externa está comprovada
+- a integração programática de catálogo está implementada
+- o que segue fora do escopo é pipeline nativo executando dentro da plataforma
 
-## O que Está Comprovado na Entrega
+## Problema de Negócio
 
-- ingestão e organização em zonas de dados
-- modelagem da `fact_orders_enriched` com mais de 100 mil registros
-- camada publicada para consumo analítico
-- SQLs versionadas e resultados exportados
-- dashboard Streamlit com evidências visuais
-- publicação do ativo principal na Dadosfera com screenshots do catálogo e do volume
-- trilha complementar de Power BI com evidência da query principal
+O dataset Olist é relacional, fragmentado e operacional. Sozinho, ele não responde bem perguntas de negócio sobre receita, atraso, categoria, pagamento, geografia e experiência do cliente. O problema real não é apenas juntar tabelas; é transformar eventos transacionais em uma camada confiável e reutilizável para análise, sem perder coerência entre dado, consumo e governança.
 
-## O que Não Está Sendo Tratado Como Entrega Concluída
+Foi por isso que a solução foi desenhada como produto analítico, não como notebook exploratório.
 
-- integração por API com a Dadosfera
-- pipeline nativo executado na plataforma
-- item de GenAI com LLM externa de forma completa
-- vídeo final da apresentação, quando aplicável
+## Decisões de Modelagem
 
-## Objetivo do Projeto
+A decisão estrutural mais importante foi usar `order_items` como base factual. Isso preserva o nível em que preço, frete, produto, seller e entrega fazem sentido analítico. `orders`, `customers`, `products` e `sellers` entram como enriquecimento dimensional, enquanto `payments` e `reviews` são agregados antes do join para evitar multiplicação artificial de linhas.
 
-O objetivo do projeto é construir uma solução de dados ponta a ponta que permita:
+Essa escolha sustenta duas qualidades que importam em avaliação senior:
 
-- organizar os dados brutos em uma estrutura de projeto profissional
-- entender a qualidade e o comportamento inicial das tabelas de origem
-- modelar uma tabela analítica principal para responder às perguntas do case
-- gerar consultas SQL reproduzíveis sobre a base final
-- documentar os resultados de forma clara para consumo técnico e executivo
+- integridade analítica: a granularidade é estável e defensável
+- flexibilidade de consumo: a mesma base atende SQL, qualidade, dashboard e export BI
 
-Em termos práticos, trata-se de converter dados transacionais dispersos em uma camada analítica que apoie diagnóstico, tomada de decisão e comunicação executiva.
+## Arquitetura de Publicação
 
-## Descrição do Dataset Olist
+O projeto separa explicitamente:
 
-O dataset Olist representa operações de e-commerce no Brasil e inclui diferentes visões do negócio:
+- `fact_orders_enriched`: camada interna para engenharia, SQL, qualidade e auditoria
+- `fact_orders_dashboard`: camada publicada para consumo executivo
 
-- pedidos
-- itens de pedido
-- produtos
-- clientes
-- vendedores
-- pagamentos
-- reviews
-- tradução de categorias
+Essa separação não é cosmética. Ela reduz acoplamento, melhora governança e impede que o dashboard dependa de atributos desnecessários ou sensíveis. Na publicada, identificadores são pseudonimizados e campos como cidade, CEP e IDs operacionais deixam de ser expostos quando não agregam valor ao caso de uso.
 
-Essa composição torna a base adequada para análises de receita, experiência do cliente, eficiência logística, sazonalidade e distribuição geográfica.
+## Perguntas de Negócio Respondidas
 
-## Justificativa da Escolha
+As consultas SQL e o dashboard respondem, de forma consistente, a cinco frentes principais:
 
-O dataset foi escolhido por ser especialmente aderente a um case técnico de dados, pelos seguintes motivos:
+- quais categorias concentram receita
+- como receita e atraso evoluem no tempo
+- onde a receita se concentra geograficamente
+- quais categorias sofrem mais pressão logística
+- como os meios de pagamento se distribuem
 
-- possui estrutura relacional realista, com necessidade de joins entre várias tabelas
-- oferece volume suficiente para demonstrar modelagem analítica em escala relevante
-- combina dimensões temporais, financeiras, operacionais e geográficas
-- permite discutir tanto qualidade e engenharia de dados quanto interpretação de negócio
+Essas respostas não dependem de lógica escondida em visual. Elas partem de uma fato documentada, queries versionadas e resultados exportados, o que melhora auditabilidade.
 
-Essa escolha viabiliza uma entrega equilibrada entre rigor técnico, volume relevante e valor analítico.
+## Leitura Executiva dos Resultados
 
-## Visão Geral da Modelagem
+Os resultados mostram uma operação com forte concentração em poucas categorias e poucos estados, crescimento relevante ao longo do tempo e dependência marcante de `credit_card` como meio de pagamento dominante. Também deixam claro que crescimento comercial e pressão operacional coexistem: meses de pico ampliam receita, mas também expõem gargalos de atraso.
 
-A modelagem foi orientada por um princípio simples: preservar a granularidade do evento comercial mais importante para análise, que é o item vendido dentro de cada pedido.
+Do ponto de vista gerencial, isso sugere três leituras prioritárias:
 
-Decisões principais de modelagem:
+- concentração de valor pede foco em categorias e geografias de maior peso
+- sazonalidade precisa ser lida junto com performance logística
+- atraso deve ser tratado como problema econômico e de experiência, não apenas operacional
 
-- `order_items` foi adotada como tabela base da camada factual
-- `orders`, `customers`, `products` e `sellers` foram incorporadas como enriquecimento dimensional
-- `payments` e `reviews` foram agregadas por `order_id` antes do join para evitar multiplicação artificial de linhas
-- colunas foram padronizadas para `snake_case`
-- atributos derivados foram criados para facilitar análise temporal e logística
+## Dadosfera, Catálogo e Automação
 
-Essa abordagem preserva o detalhe operacional do item e, ao mesmo tempo, disponibiliza contexto suficiente para análises de receita, atraso, categoria, localidade e comportamento de compra.
+O projeto já vai além de um manifesto local. Hoje ele possui:
 
-## Explicação da Tabela `fact_orders_enriched`
+- ativo principal publicado e evidenciado na Dadosfera/Metabase
+- coleção publicada com evidências versionadas
+- manifesto local da coleção e inventário de ativos
+- sincronização programática de ativos públicos via API do Maestro
+- automação de promoção do branch de deploy do Streamlit
 
-A tabela `fact_orders_enriched` é a camada analítica principal do projeto.
+Essa combinação é importante porque demonstra que a entrega não termina na geração da base. Ela cobre também a etapa em que muitos projetos falham: tornar o ativo encontrável, publicável e reutilizável.
 
-Principais características:
+## O Que Não Está Sendo Superestimado
 
-- granularidade: `1 linha por item de pedido`
-- volume final: `112.650` registros
-- formato de persistência: `csv` e `parquet`
-- uso principal: base de consulta SQL, documentação do case e consumo por dashboard
-- ativo central da coleção materializada em `data/curated/catalog/dadosfera_collection.json`
-- camada publicada derivada: `data/published/dashboard/fact_orders_dashboard.parquet`, usada exclusivamente no dashboard
+Alguns limites permanecem intencionais e precisam ser mantidos claros:
 
-Principais grupos de atributos:
+- não há pipeline nativo comprovadamente executando dentro da Dadosfera
+- a plataforma ainda não substitui o motor local de transformação
+- o bônus de GenAI existe como enriquecimento e prova de capacidade, não como eixo central da solução
 
-- identificadores de pedido, item, cliente, produto e seller
-- informações de status e datas do pedido
-- valores de item, frete e pagamento
-- reviews agregadas
-- atributos de categoria e localidade
-- colunas derivadas para calendário e performance logística
+Essa postura é parte da qualidade da entrega. Um case senior não infla maturidade operacional onde não há evidência.
 
-Leitura de governança:
+## Por Que Esta Entrega É Forte
 
-- a tabela acima permanece como camada analítica interna
-- a exposição no dashboard ocorre a partir de uma camada publicada e minimizada, com remoção de cidade, CEP e IDs desnecessários
+Esta entrega é forte porque demonstra critério. O projeto não tenta parecer uma plataforma completa; ele mostra capacidade real de estruturar dados, modelar uma fato útil, controlar exposição, publicar ativos, documentar decisões e automatizar o suficiente para sair do artesanal.
 
-Colunas derivadas de maior relevância:
+Em termos de avaliação, isso sinaliza:
 
-- `order_year`
-- `order_month`
-- `order_date`
-- `delivery_time_days`
-- `estimated_delay_days`
-- `is_delayed`
-- `total_item_value`
+- domínio de analytics engineering
+- noção de data product
+- maturidade de governança acima da média para case técnico
+- capacidade de transformar output analítico em ativo defendível
 
-Regras aplicadas na construção:
+## Próximos Passos Naturais
 
-- remoção de inconsistências óbvias, como valores monetários negativos e entregas anteriores à compra
-- preservação da granularidade por item
-- enriquecimento sem duplicação indevida de registros
-- preservação de anomalias residuais da fonte quando o ajuste arbitrário poderia comprometer a rastreabilidade analítica
+- implementar pipeline nativo na Dadosfera, se houver exigência de aprofundamento
+- expandir o sync de catálogo para mais tipos de ativos
+- incluir marts adicionais por cliente, seller e categoria
+- ampliar testes para regressão analítica e componentes de consumo
+- evoluir métricas para cohort, recorrência e valor por cliente
 
-Essa tabela foi desenhada para ser a interface principal entre os dados operacionais e as perguntas de negócio do case, sem misturar a camada interna com a camada de exposição.
+## Conclusão
 
-## Perguntas Respondidas com SQL
+O projeto atende ao case porque entrega uma solução de dados ponta a ponta com coerência entre engenharia, governança, consumo e evidência. Ele sai do dado bruto, constrói uma camada analítica defensável, publica uma versão segura para consumo executivo e prova o valor da solução em canais diferentes sem perder consistência.
 
-As consultas foram escritas em SQL compatível com DuckDB sobre a tabela `fact_orders_enriched`.
-
-### 1. Top categorias por receita
-
-Objetivo: identificar quais categorias concentram a maior parcela do faturamento.
-
-Arquivo SQL:
-- `sql/analytics/01_top_categories_by_revenue.sql`
-
-Print do resultado:
-
-![Top categorias por receita](../data/screenshots/query_results/01_top_categories_by_revenue.png)
-
-Leitura executiva:
-- `health_beauty`, `watches_gifts` e `bed_bath_table` aparecem como líderes de receita
-- algumas categorias combinam alto volume com ticket médio estável
-- categorias como `computers` mostram ticket médio muito elevado, apesar do baixo volume
-
-### 2. Evolução temporal mensal
-
-Objetivo: analisar como pedidos, receita e atraso evoluem ao longo do tempo.
-
-Arquivo SQL:
-- `sql/analytics/02_monthly_revenue_evolution.sql`
-
-Print do resultado:
-
-![Evolução temporal mensal](../data/screenshots/query_results/02_monthly_revenue_evolution.png)
-
-Leitura executiva:
-- há aceleração relevante do negócio ao longo de 2017 e 2018
-- `nov/2017` é um ponto de destaque tanto em receita quanto em pressão operacional
-- os meses de pico ajudam a identificar períodos em que crescimento e qualidade de entrega precisam ser analisados em conjunto
-
-### 3. Receita por estado
-
-Objetivo: entender como a receita se distribui geograficamente.
-
-Arquivo SQL:
-- `sql/analytics/03_revenue_by_state.sql`
-
-Print do resultado:
-
-![Receita por estado](../data/screenshots/query_results/03_revenue_by_state.png)
-
-Leitura executiva:
-- `SP` concentra a maior parte da receita e do volume transacional
-- `RJ` e `MG` aparecem logo em seguida, reforçando a concentração no Sudeste
-- estados com menor volume podem apresentar pior performance relativa de atraso, o que sugere assimetria operacional
-
-### 4. Atraso de entrega por categoria
-
-Objetivo: identificar categorias com maior incidência de atraso e potencial impacto na experiência do cliente.
-
-Arquivo SQL:
-- `sql/analytics/04_delivery_delay_by_category.sql`
-
-Print do resultado:
-
-![Atraso de entrega por categoria](../data/screenshots/query_results/04_delivery_delay_by_category.png)
-
-Leitura executiva:
-- o atraso não afeta todas as categorias da mesma forma
-- categorias pequenas podem liderar em percentual de atraso
-- categorias grandes concentram maior impacto financeiro absoluto quando atrasam
-
-### 5. Distribuição por meio de pagamento
-
-Objetivo: avaliar os meios de pagamento mais relevantes em volume e receita.
-
-Arquivo SQL:
-- `sql/analytics/05_payment_method_distribution.sql`
-
-Print do resultado:
-
-![Distribuição por meio de pagamento](../data/screenshots/query_results/05_payment_method_distribution.png)
-
-Leitura executiva:
-- `credit_card` domina amplamente a operação
-- `boleto` aparece como segunda modalidade mais relevante
-- os demais meios possuem participação menor, mas seguem importantes para segmentações específicas
-
-## Interpretação Executiva Consolidada
-
-O conjunto das análises aponta para uma operação com três características marcantes:
-
-- concentração comercial em poucas categorias e poucos estados
-- crescimento relevante ao longo do tempo, acompanhado de gargalos operacionais em determinados períodos
-- forte dependência do cartão de crédito como principal meio de pagamento
-
-Do ponto de vista de negócio, isso sugere quatro prioridades de leitura:
-
-- a operação pode ganhar eficiência atacando categorias e geografias de maior peso
-- meses de pico devem ser tratados como janelas críticas de planejamento logístico
-- atrasos precisam ser analisados não apenas por volume, mas por impacto financeiro e reputacional
-- a experiência de pagamento por cartão merece atenção central em qualquer estratégia de conversão
-
-Do ponto de vista técnico, a camada analítica preserva transparência sobre a qualidade da fonte: pedidos sem entrega permanecem com métricas logísticas nulas quando apropriado, e pequenas anomalias residuais de origem são tratadas como alerta documentado, não como dado artificialmente corrigido.
-
-Além disso, a entrega passou a incluir uma coleção materializada do projeto, com manifesto JSON e inventário tabular dos ativos, o que reforça a aderência ao item de catalogação/publicação do case.
-
-Observação importante de honestidade técnica:
-
-- o manifesto e o inventário da coleção existem localmente no repositório
-- isso demonstra preparo para catalogação/publicação
-- o ativo principal também foi publicado na Dadosfera com evidências visuais em `images/dadosfera/`
-- isso não deve ser descrito como pipeline nativo ou integração por API já concluídos na plataforma
-
-## Próximos Passos
-
-Como evolução natural do trabalho, os próximos passos recomendados são:
-
-- desenvolver marts adicionais por cliente, seller e categoria
-- incluir métricas de cohort, recorrência, ticket por pedido e lifetime value
-- aprofundar as validações de qualidade com regras relacionais entre entidades
-- integrar o manifesto da coleção a uma API real de catálogo ou publicação
-- ampliar a suíte de testes para contratos de schema, regressão analítica e componentes do dashboard
-- automatizar a execução do pipeline de ponta a ponta
-
-## Como Esta Entrega Atende ao Case
-
-Esta entrega atende ao case porque demonstra, de forma integrada, as capacidades centrais esperadas em um projeto técnico de dados:
-
-- organização profissional do repositório
-- tratamento estruturado dos dados brutos
-- modelagem analítica com critério de granularidade
-- materialização da coleção/catalogação dos ativos do case
-- validação da qualidade da base final
-- consultas SQL orientadas a perguntas de negócio
-- documentação clara e rastreável dos resultados
-- testes automatizados mínimos para regras críticas do pipeline
-- preparo da base para consumo visual e executivo
-
-Em resumo, o projeto demonstra capacidade de sair de dados transacionais brutos e chegar a uma camada analítica robusta, com rastreabilidade técnica, leitura executiva e documentação orientada à avaliação.
-
-Pontos ainda dependentes, fora do núcleo técnico já concluído:
-
-- gravação do vídeo final, se exigido
-- preenchimento dos links finais na apresentação
-- eventual implementação de pipeline nativo na Dadosfera, se quiser expandir além do essencial
-
-
-
+A síntese correta é simples: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe, e o único limite estrutural remanescente é a ausência de pipeline nativo dentro da plataforma.

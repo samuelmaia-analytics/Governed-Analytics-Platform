@@ -1,0 +1,42 @@
+name: Sync Dadosfera Catalog
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "contracts/catalog/dadosfera_catalog_assets.json"
+      - "src/dadosfera_catalog_sync.py"
+      - ".github/workflows/sync-dadosfera-catalog.yml"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      DADOSFERA_MAESTRO_BASE_URL: ${{ secrets.DADOSFERA_MAESTRO_BASE_URL }}
+      DADOSFERA_USERNAME: ${{ secrets.DADOSFERA_USERNAME }}
+      DADOSFERA_PASSWORD: ${{ secrets.DADOSFERA_PASSWORD }}
+      DADOSFERA_TOTP: ${{ secrets.DADOSFERA_TOTP }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate required secrets
+        run: |
+          test -n "$DADOSFERA_USERNAME"
+          test -n "$DADOSFERA_PASSWORD"
+
+      - name: Sync catalog assets
+        run: python src/dadosfera_catalog_sync.py

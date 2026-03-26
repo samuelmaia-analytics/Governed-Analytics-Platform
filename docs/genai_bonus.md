@@ -12,7 +12,7 @@
 Este bônus agora possui duas frentes complementares no repositório:
 
 - um copiloto analítico heurístico no dashboard, chamado `Insights Inteligentes`
-- uma prova de conceito de extração de features em texto desestruturado usando prompt estruturado para LLM
+- uma implementação controlada de extração de features em texto desestruturado usando prompt estruturado para LLM
 
 Com isso, o projeto cobre tanto a ideia de Data App orientado à decisão quanto o item específico do edital sobre transformar texto bruto em atributos estruturados.
 

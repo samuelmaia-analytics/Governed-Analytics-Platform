@@ -1,45 +1,43 @@
 # Evidências Visuais do Case
 
+Esta pasta centraliza as imagens finais usadas para demonstrar a entrega.
 
-## Acesso Rápido
+## Estrutura
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- `images/dadosfera/`: publicação, catálogo, coleção e dashboard na plataforma
+- `images/dashboard/`: capturas do Streamlit
+- `images/genai/`: evidências do bônus de GenAI
 
-Esta pasta centraliza as imagens da entrega final do case.
+## Regras de uso
 
-Referência principal para as evidências da plataforma:
+- mantenha aqui apenas evidências finais de submissão
+- preserve em `data/screenshots/query_results/` os PNGs gerados automaticamente pelo pipeline
+- use os runbooks para padronizar nomes e cobertura das capturas
 
-- [docs/dadosfera_evidencias.md](../docs/dadosfera_evidencias.md)
+## Evidências principais em `images/dadosfera/`
 
-Estrutura sugerida:
+- `01_importacao_dataset.png`: importação do ativo publicado
+- `02_catalogo_metadados.png`: documentação e metadados
+- `03_colecao_case.png`: ativo dentro da coleção do case
+- `04_volume_100k.png`: prova de volume acima de `100k`
+- `dadosfera_colecao_ativos_publicados.png`: coleção publicada com os ativos do case
+- `dadosfera_dashboard_final.png`: dashboard final no Metabase
+- `dadosfera_query_02_receita_mensal.png`
+- `dadosfera_query_03_status_pedidos.png`
+- `dadosfera_query_04_receita_ano_mes.png`
+- `dadosfera_query_05_receita_por_estado.png`
+- `dadosfera_query_06_ticket_medio_mensal.png`
+- `dadosfera_query_08_pedidos_atrasados.png`
 
-- `images/dadosfera/`
-  - prints da conexão, carga, contagem de registros e catálogo na plataforma
-- `images/dashboard/`
-  - prints do Streamlit
-- `images/sql/`
-  - prints de resultados tabulares das queries, se precisar duplicar o que hoje está em `data/screenshots/query_results/`
-- `images/presentation/`
-  - imagens usadas no deck final
+## Evidências principais em `images/dashboard/`
 
-Uso recomendado:
+- `01_overview.png`
+- `02_kpis.png`
+- `03_temporal.png`
+- `04_categories.png`
+- `05_geography.png`
 
-- manter aqui apenas evidências finais de submissão
-- preservar em `data/screenshots/query_results/` as imagens geradas pelo pipeline
+## Referências
 
-Evidências atuais já disponíveis em `images/dadosfera/`:
-
-- `01_importacao_dataset.png`: comprova upload/importação do ativo publicado
-- `02_catalogo_metadados.png`: comprova preenchimento de documentação e metadados
-- `03_colecao_case.png`: comprova o ativo dentro da coleção/catálogo do case
-- `04_volume_100k.png`: comprova volume de `112650` linhas no ativo publicado
-- `dadosfera_colecao_ativos_publicados.png`: comprova a coleção publicada com perguntas, dashboard e ativo analítico
-- `dadosfera_dashboard_final.png`: comprova o dashboard executivo publicado no Metabase
-- `dadosfera_query_02_receita_mensal.png`: comprova a visualização temporal de receita mensal
-- `dadosfera_query_03_status_pedidos.png`: comprova a visualização de status dos pedidos
-- `dadosfera_query_04_receita_ano_mes.png`: comprova a visualização de receita por ano e mês
-- `dadosfera_query_05_receita_por_estado.png`: comprova a visualização geográfica de receita
-- `dadosfera_query_06_ticket_medio_mensal.png`: comprova a visualização de ticket médio mensal
-- `dadosfera_query_08_pedidos_atrasados.png`: comprova a visualização de pedidos atrasados
+- publicação na plataforma: [../docs/dadosfera_evidencias.md](../docs/dadosfera_evidencias.md)
+- checklist de captura: [capture_checklist.md](capture_checklist.md)

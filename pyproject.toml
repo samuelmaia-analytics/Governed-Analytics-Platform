@@ -22,4 +22,5 @@ dependencies = [
     "python-dotenv",
     "jinja2",
     "pytest",
+    "requests",
 ]

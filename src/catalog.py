@@ -111,7 +111,6 @@ def build_asset(
 
 
 def collect_assets() -> list[CatalogAsset]:
-    root_dir = Path(__file__).resolve().parent.parent
     assets: list[CatalogAsset] = []
 
     for path in sorted((LANDING_DIR / "olist").glob("*.csv")):

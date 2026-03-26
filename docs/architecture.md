@@ -19,6 +19,29 @@ Este projeto foi estruturado como uma arquitetura simples de Data Lake em camada
 
 A intenção foi manter o case simples o suficiente para ser reproduzível, mas maduro o bastante para demonstrar rastreabilidade, governança e clareza de uso por camada.
 
+## Diagrama de arquitetura
+
+```mermaid
+flowchart LR
+    A[Raw Landing] --> B[Standardized]
+    B --> C[Staging Profiling]
+    C --> D[Curated Analytics]
+    D --> E[Quality]
+    D --> F[Catalog]
+    D --> G[Published Dashboard]
+    D --> H[SQL]
+    D --> I[Power BI Exports]
+    G --> J[Streamlit]
+    G --> K[Dadosfera / Metabase]
+```
+
+Leitura arquitetural:
+
+- `curated/analytics` é o núcleo técnico do projeto
+- `published/dashboard` existe para desacoplar engenharia de consumo
+- qualidade, catálogo e SQL orbitam o mesmo ativo central
+- publicação e consumo acontecem sobre a camada publicada, não sobre a base interna
+
 ## Estrutura principal das camadas
 
 ```text
@@ -149,16 +172,26 @@ Separar a camada de exposição do produto analítico da camada analítica inter
 
 ## Fluxo do pipeline
 
-```text
-raw/landing
-  -> standardized
-  -> staging/profiling
-  -> curated/analytics
-  -> curated/quality
-  -> curated/catalog
-  -> published/dashboard
-  -> dashboard / SQL / BI / publicação na plataforma
+```mermaid
+flowchart TD
+    A[ingest.py] --> B[preprocess.py]
+    B --> C[build_analytics.py]
+    C --> D[quality.py]
+    C --> E[publish_dashboard.py]
+    C --> F[catalog.py]
+    C --> G[run_analytics_queries.py]
+    G --> H[export_query_result_images.py]
+    C --> I[export_power_bi.py]
+    E --> J[Streamlit]
+    E --> K[Dadosfera Publish]
+    F --> L[Catalog Sync API]
 ```
+
+Leitura operacional:
+
+- o runner local coordena a transformação principal
+- a publicação é um passo explícito, não efeito colateral da modelagem
+- o catálogo existe em duas camadas: manifesto local e sync por API
 
 ## Etapas técnicas da solução
 
@@ -207,6 +240,7 @@ raw/landing
 - o dashboard não consome a camada interna completa
 - a publicação na Dadosfera foi feita sobre o ativo publicado, e não sobre a base analítica completa
 - catálogo, qualidade, SQL e dashboard foram tratados como partes da mesma jornada de dados
+- automação de catálogo e automação de deploy foram tratadas como extensões naturais da engenharia, não como tarefa manual de pós-entrega
 
 ## O que está implementado versus o que é evolução
 
@@ -221,9 +255,9 @@ raw/landing
 **Evolução futura**
 
 - pipeline nativo recorrente na plataforma
-- integração por API com catálogo/publicação
+- integração por API com catálogo/publicação, já implementada no repositório via `src/dadosfera_catalog_sync.py`
 - maior absorção da arquitetura local pela Dadosfera
 
 ## Resumo executivo
 
-Na prática, essa arquitetura permitiu organizar o case de forma defensável: o dado entra bruto, passa por padronização e validação, vira ativo analítico interno e só depois é publicado em uma camada segura para consumo. Esse desenho melhora rastreabilidade, reduz ambiguidade de uso e deixa mais clara a passagem entre dado, ativo e valor.
+Na prática, essa arquitetura permitiu organizar o case de forma defensável: o dado entra bruto, passa por padronização e validação, vira ativo analítico interno e só depois é publicado em uma camada segura para consumo. Isso melhora rastreabilidade, reduz ambiguidade de uso e mostra uma distinção madura entre construção do ativo e exposição do ativo.
