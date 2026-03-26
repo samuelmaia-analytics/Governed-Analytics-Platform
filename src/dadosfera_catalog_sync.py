@@ -53,27 +53,23 @@ class DadosferaMaestroClient:
         self.session.headers.update({"Content-Type": "application/json"})
 
     def sign_in(self) -> None:
-        payload: dict[str, str] = {"username": self.username, "password": self.password}
-        if self.totp:
-            payload["totp"] = self.totp
+        last_body: dict[str, Any] = {}
+        last_headers: Any | None = None
 
-        response = self.session.post(f"{self.base_url}/auth/sign-in", json=payload, timeout=60)
-        response.raise_for_status()
-        body = response.json()
-        access_token = extract_access_token(body, response.headers)
-        if access_token:
-            self.session.headers.update(
-                {
-                    "access-token": access_token,
-                    "Authorization": f"Bearer {access_token}",
-                }
-            )
-            return
+        for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
+            response = self.session.post(f"{self.base_url}/auth/sign-in", json=payload, timeout=60)
+            response.raise_for_status()
+            body = response.json()
+            last_body = body
+            last_headers = response.headers
 
-        if self.session.cookies:
-            return
+            if apply_auth_from_response(self.session, body, response.headers):
+                return
 
-        raise_runtime_for_auth_response(body, response.headers)
+            if try_refresh_access_token(self.session, self.base_url):
+                return
+
+        raise_runtime_for_auth_response(last_body, last_headers)
 
     def list_data_assets(self, *, size: int = 1000) -> list[dict[str, Any]]:
         page = 1
@@ -159,6 +155,48 @@ def extract_asset_id(response_body: dict[str, Any]) -> int | None:
         if isinstance(nested, dict) and isinstance(nested.get("id"), int):
             return nested["id"]
     return None
+
+
+def build_sign_in_payloads(*, username: str, password: str, totp: str | None) -> list[dict[str, str]]:
+    payloads: list[dict[str, str]] = [
+        {"username": username, "password": password},
+        {"email": username, "password": password},
+    ]
+
+    if not totp:
+        return payloads
+
+    enriched_payloads: list[dict[str, str]] = []
+    for payload in payloads:
+        for field in ("totp", "code", "mfaCode", "mfa_code", "token"):
+            candidate = dict(payload)
+            candidate[field] = totp
+            enriched_payloads.append(candidate)
+
+    return enriched_payloads + payloads
+
+
+def apply_auth_from_response(session: requests.Session, response_body: dict[str, Any], response_headers: Any | None) -> bool:
+    access_token = extract_access_token(response_body, response_headers)
+    if access_token:
+        session.headers.update(
+            {
+                "access-token": access_token,
+                "Authorization": f"Bearer {access_token}",
+            }
+        )
+        return True
+
+    return bool(session.cookies)
+
+
+def try_refresh_access_token(session: requests.Session, base_url: str) -> bool:
+    response = session.post(f"{base_url}/auth/refresh-access-token", timeout=60)
+    if response.status_code >= 400:
+        return False
+
+    body = response.json()
+    return apply_auth_from_response(session, body, response.headers)
 
 
 def extract_access_token(response_body: dict[str, Any], response_headers: Any | None = None) -> str | None:

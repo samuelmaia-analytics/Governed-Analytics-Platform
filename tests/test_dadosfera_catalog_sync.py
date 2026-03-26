@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 
 from src.dadosfera_catalog_sync import (
+    apply_auth_from_response,
+    build_sign_in_payloads,
     CatalogAssetSpec,
     build_create_payload,
     build_update_payload,
@@ -11,6 +13,7 @@ from src.dadosfera_catalog_sync import (
     find_existing_asset,
     load_manifest,
     raise_runtime_for_auth_response,
+    try_refresh_access_token,
     sync_assets,
 )
 
@@ -174,6 +177,50 @@ def test_extract_access_token_supports_access_token_header() -> None:
 
 def test_extract_access_token_returns_none_when_missing() -> None:
     assert extract_access_token({"message": "unauthorized"}) is None
+
+
+def test_build_sign_in_payloads_supports_username_email_and_mfa_variants() -> None:
+    payloads = build_sign_in_payloads(username="[email protected]", password="secret", totp="123456")
+
+    assert {"username": "[email protected]", "password": "secret", "totp": "123456"} in payloads
+    assert {"email": "[email protected]", "password": "secret", "mfaCode": "123456"} in payloads
+
+
+def test_apply_auth_from_response_sets_bearer_headers() -> None:
+    import requests
+
+    session = requests.Session()
+
+    authenticated = apply_auth_from_response(session, {"accessToken": "abc123"}, {})
+
+    assert authenticated is True
+    assert session.headers["access-token"] == "abc123"
+    assert session.headers["Authorization"] == "Bearer abc123"
+
+
+def test_try_refresh_access_token_uses_refresh_endpoint() -> None:
+    import requests
+
+    class DummyResponse:
+        status_code = 200
+        headers = {}
+
+        @staticmethod
+        def json() -> dict[str, str]:
+            return {"accessToken": "abc123"}
+
+    class DummySession(requests.Session):
+        def post(self, url: str, timeout: int = 60):  # type: ignore[override]
+            assert url == "https://maestro.dadosfera.ai/auth/refresh-access-token"
+            assert timeout == 60
+            return DummyResponse()
+
+    session = DummySession()
+
+    refreshed = try_refresh_access_token(session, "https://maestro.dadosfera.ai")
+
+    assert refreshed is True
+    assert session.headers["Authorization"] == "Bearer abc123"
 
 
 def test_raise_runtime_for_auth_response_includes_diagnostic_keys() -> None:
