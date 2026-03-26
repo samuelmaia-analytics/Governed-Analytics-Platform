@@ -110,6 +110,8 @@ python src/dadosfera_catalog_sync.py --dry-run
 - upload manual na plataforma deve usar `fact_orders_dashboard.csv`
 - ativos públicos complementares podem ser sincronizados por API do Maestro
 
+Observação operacional: a sincronização em GitHub Actions exige credencial não interativa. Se a conta da Dadosfera usar MFA/TOTP, o workflow entra em modo seguro e não tenta o login automatizado.
+
 Referências:
 
 - [docs/privacy_governance.md](docs/privacy_governance.md)

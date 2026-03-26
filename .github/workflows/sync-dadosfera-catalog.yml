@@ -39,5 +39,12 @@ jobs:
           test -n "$DADOSFERA_USERNAME"
           test -n "$DADOSFERA_PASSWORD"
 
+      - name: Skip unsupported MFA flow
+        if: ${{ env.DADOSFERA_TOTP != '' }}
+        run: |
+          echo "DADOSFERA_TOTP detectado. Este workflow nao executa autenticacao interativa com MFA em GitHub Actions."
+          echo "Use conta tecnica sem MFA ou credencial oficial de API da Dadosfera para automacao nao interativa."
+
       - name: Sync catalog assets
+        if: ${{ env.DADOSFERA_TOTP == '' }}
         run: python src/dadosfera_catalog_sync.py

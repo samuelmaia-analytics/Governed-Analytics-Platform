@@ -15,7 +15,15 @@ Defina no ambiente local ou nos secrets do GitHub:
 - `DADOSFERA_MAESTRO_BASE_URL`
 - `DADOSFERA_USERNAME`
 - `DADOSFERA_PASSWORD`
-- `DADOSFERA_TOTP` opcional
+- `DADOSFERA_TOTP` apenas para execucao manual e interativa
+
+## Restricao operacional importante
+
+O workflow do GitHub Actions foi endurecido para nao tentar autenticacao interativa com MFA.
+
+- se `DADOSFERA_TOTP` estiver definido nos secrets, o job encerra com aviso e sem erro
+- para automacao nao interativa, o caminho recomendado e conta tecnica sem MFA ou credencial oficial de API
+- para uso manual local, `DADOSFERA_TOTP` continua suportado pelo script
 
 ## Como rodar localmente
 
@@ -41,4 +49,4 @@ python src/dadosfera_catalog_sync.py
 
 ## Observacao operacional
 
-O workflow de sincronizacao pode ser disparado manualmente ou automaticamente quando o manifesto de ativos mudar.
+O workflow de sincronizacao pode ser disparado manualmente ou automaticamente quando o manifesto de ativos mudar, desde que a credencial usada seja compativel com automacao nao interativa.
