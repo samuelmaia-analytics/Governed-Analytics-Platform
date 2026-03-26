@@ -10,6 +10,7 @@ from src.dadosfera_catalog_sync import (
     extract_access_token,
     find_existing_asset,
     load_manifest,
+    raise_runtime_for_auth_response,
     sync_assets,
 )
 
@@ -163,10 +164,23 @@ def test_extract_access_token_supports_flat_response() -> None:
     assert extract_access_token({"accessToken": "abc123"}) == "abc123"
 
 
-def test_extract_access_token_raises_with_diagnostic_keys() -> None:
+def test_extract_access_token_supports_authorization_header() -> None:
+    assert extract_access_token({}, {"Authorization": "Bearer abc123"}) == "abc123"
+
+
+def test_extract_access_token_supports_access_token_header() -> None:
+    assert extract_access_token({}, {"access-token": "abc123"}) == "abc123"
+
+
+def test_extract_access_token_returns_none_when_missing() -> None:
+    assert extract_access_token({"message": "unauthorized"}) is None
+
+
+def test_raise_runtime_for_auth_response_includes_diagnostic_keys() -> None:
     try:
-        extract_access_token({"message": "unauthorized"})
+        raise_runtime_for_auth_response({"message": "unauthorized"}, {"Content-Type": "application/json"})
     except RuntimeError as exc:
         assert "Chaves recebidas: message" in str(exc)
+        assert "Headers recebidos: content-type" in str(exc)
     else:
         raise AssertionError("Expected RuntimeError when access token is missing")

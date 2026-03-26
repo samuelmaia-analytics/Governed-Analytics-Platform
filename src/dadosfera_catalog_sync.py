@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 import sys
@@ -59,8 +60,20 @@ class DadosferaMaestroClient:
         response = self.session.post(f"{self.base_url}/auth/sign-in", json=payload, timeout=60)
         response.raise_for_status()
         body = response.json()
-        access_token = extract_access_token(body)
-        self.session.headers.update({"access-token": access_token})
+        access_token = extract_access_token(body, response.headers)
+        if access_token:
+            self.session.headers.update(
+                {
+                    "access-token": access_token,
+                    "Authorization": f"Bearer {access_token}",
+                }
+            )
+            return
+
+        if self.session.cookies:
+            return
+
+        raise_runtime_for_auth_response(body, response.headers)
 
     def list_data_assets(self, *, size: int = 1000) -> list[dict[str, Any]]:
         page = 1
@@ -148,7 +161,7 @@ def extract_asset_id(response_body: dict[str, Any]) -> int | None:
     return None
 
 
-def extract_access_token(response_body: dict[str, Any]) -> str:
+def extract_access_token(response_body: dict[str, Any], response_headers: Any | None = None) -> str | None:
     token_candidates = [
         response_body.get("accessToken"),
         response_body.get("access_token"),
@@ -174,14 +187,52 @@ def extract_access_token(response_body: dict[str, Any]) -> str:
             ]
         )
 
+    normalized_headers: dict[str, str] = {}
+    if response_headers is not None:
+        normalized_headers = {str(key).lower(): str(value) for key, value in response_headers.items()}
+        token_candidates.extend(
+            [
+                normalized_headers.get("access-token"),
+                normalized_headers.get("x-access-token"),
+            ]
+        )
+
+        authorization = normalized_headers.get("authorization")
+        if isinstance(authorization, str) and authorization.lower().startswith("bearer "):
+            token_candidates.append(authorization[7:].strip())
+
+        set_cookie = normalized_headers.get("set-cookie")
+        if isinstance(set_cookie, str):
+            for pattern in (
+                r"access[-_]?token=([^;,\s]+)",
+                r"token=([^;,\s]+)",
+                r"jwt=([^;,\s]+)",
+            ):
+                match = re.search(pattern, set_cookie, flags=re.IGNORECASE)
+                if match:
+                    token_candidates.append(match.group(1))
+
     for token in token_candidates:
         if isinstance(token, str) and token.strip():
             return token
 
+    return None
+
+
+def raise_runtime_for_auth_response(response_body: dict[str, Any], response_headers: Any | None = None) -> None:
     available_keys = ", ".join(sorted(response_body.keys())) or "<none>"
+    header_keys = "<none>"
+    if response_headers is not None:
+        header_keys = ", ".join(sorted(str(key).lower() for key in response_headers.keys())) or "<none>"
+
+    mfa_status = response_body.get("mfaStatus")
+    mfa_hint = ""
+    if mfa_status not in (None, False, "disabled", "DISABLED"):
+        mfa_hint = " A resposta indica MFA ativo; valide DADOSFERA_TOTP e o formato do payload de autenticacao."
+
     raise RuntimeError(
-        "Nao foi possivel localizar o access token na resposta de autenticacao da Dadosfera. "
-        f"Chaves recebidas: {available_keys}"
+        "Nao foi possivel localizar o access token nem cookies de sessao na resposta de autenticacao da Dadosfera. "
+        f"Chaves recebidas: {available_keys}. Headers recebidos: {header_keys}.{mfa_hint}"
     )
 
 
