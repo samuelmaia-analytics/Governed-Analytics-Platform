@@ -1,5 +1,12 @@
 # Case Deck
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Slide 1 - Capa
 
 - Projeto: `SAMUEL_MAIA_DDF_TECH_032026`
@@ -72,6 +79,7 @@
 ## Slide 8 - Dashboard
 
 - App em `streamlit_app/app.py`
+- Link público: `https://samuelmaia-032026.streamlit.app/`
 - Fonte exclusiva: `data/published/dashboard/fact_orders_dashboard.parquet`
 - Blocos principais:
   - KPIs
@@ -155,7 +163,6 @@
 
 ## Slide 13 - Próximos Passos
 
-- preencher os links finais da apresentação
-- gravar o vídeo final
+- compartilhar o link final do vídeo na submissão, se o processo exigir
 - integrar os screenshots finais do Streamlit e da Dadosfera ao deck final
 - opcional: criar pipeline nativo na Dadosfera

@@ -1,5 +1,13 @@
 # Checklist de Entrega do Case
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- Vídeo de apresentação: `https://youtu.be/SqJ0UF1Em9k`
+
 ## Estrutura do repositório
 
 - [x] `README.md`
@@ -43,8 +51,7 @@ Link final do repositório:
 
 Pendências locais atuais fora da submissão principal:
 
-- `data/curated/genai/product_text_features.csv`
-- `powerbi/dashboard_overview.pbix`
+- nenhuma pendência documental adicional identificada nesta revisão
 
 ## Dadosfera
 
@@ -77,8 +84,8 @@ Pendências locais atuais fora da submissão principal:
 - [x] roteiro de fala inicial
 - [x] deck final preenchido com imagens
 - [x] links finais da Dadosfera inseridos na apresentação
-- [ ] link do vídeo inserido
-- [ ] vídeo de apresentação, se exigido
+- [x] link do vídeo inserido
+- [x] vídeo de apresentação publicado no YouTube
 
 ## Leitura correta do status
 
@@ -87,7 +94,7 @@ Pendências locais atuais fora da submissão principal:
 - a parte da Dadosfera já está comprovada para o ativo principal
 - pipeline nativo na plataforma permanece pendente
 - item de GenAI com LLM externa já foi validado localmente
-- vídeo final da apresentação permanece pendente
+- vídeo final da apresentação já foi publicado no YouTube
 - o `README.md` principal já foi ajustado com links relativos compatíveis com GitHub web
 - a evidência SQL principal em `powerbi/evidencia_query.md` já está fortalecida com imagens e links válidos
 - o item de GenAI agora possui amostra desestruturada, script, prompt e tabela final materializada com `openai_api`

@@ -1,5 +1,12 @@
 # Política de Governança, Publicação e Retenção
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Objetivo
 
 Este documento define as regras mínimas de governança aplicadas ao projeto `samuelmaia_DDF_032026`, com foco em classificação da informação, separação por camadas, publicação controlada, retenção e accountability.

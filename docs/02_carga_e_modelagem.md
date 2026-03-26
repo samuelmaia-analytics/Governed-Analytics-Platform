@@ -1,5 +1,12 @@
 # 02 Carga e Modelagem
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 Este documento resume como os dados entram no projeto e como a camada analítica final foi construída.
 
 ## Carga e organização em camadas

@@ -1,5 +1,12 @@
 # Plano de Materialização do Bônus em Power BI
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Status Atual
 
 O projeto já possui os datasets necessários para montar o bônus em Power BI:
@@ -16,14 +23,13 @@ Isso significa que a camada de dados para o bônus está pronta localmente.
 
 ## O que ainda falta
 
-- criar o arquivo `.pbix`
-- montar ao menos uma página executiva
-- salvar screenshots do dashboard do Power BI
-- adicionar esses arquivos nesta pasta
+- revisar o arquivo `.pbix` atual, se houver ajuste final antes de versionamento
+- validar manualmente os números e filtros no Power BI Desktop
+- manter screenshots finais consistentes com a versão mais recente do dashboard
 
 ## Estrutura recomendada nesta pasta
 
-- `case_bonus.pbix`
+- `dashboard_overview.pbix`
 - `dashboard_overview.png`
 - `dashboard_drilldown.png`
 - `measures.md`
@@ -47,7 +53,7 @@ Isso significa que a camada de dados para o bônus está pronta localmente.
 
 ## Status correto para a apresentação
 
-Se o `.pbix` ainda não for criado, o bônus deve ser descrito como:
+Como o `.pbix` já existe no repositório, o bônus deve ser descrito como:
 
-- `base preparada para Power BI`
-- `bônus documentado, mas ainda não materializado visualmente`
+- `bônus de Power BI materializado com arquivo e screenshots`
+- `validação final dependente de revisão manual no Power BI Desktop`

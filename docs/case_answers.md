@@ -1,16 +1,23 @@
 # Respostas do Case
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Resumo Executivo
 
-O projeto transforma o dataset Olist em uma base analítica estruturada, confiável e pronta para responder perguntas de negócio com clareza. A entrega cobre ingestão, profiling, modelagem analítica, qualidade, documentação, SQL, dashboard e publicação controlada do ativo principal.
+O projeto transforma o dataset Olist em um ativo analítico estruturado, confiável e pronto para responder perguntas de negócio com clareza. A entrega cobre ingestão, profiling, modelagem analítica, qualidade, documentação, SQL, dashboard e publicação controlada do ativo principal.
 
 O núcleo técnico da solução é a tabela `fact_orders_enriched`, construída com granularidade de item de pedido e volume final de `112.650` registros. A partir dela, o projeto deriva a camada `fact_orders_dashboard`, minimizada e pseudonimizada para consumo executivo.
 
-O objetivo não foi apenas montar gráficos, mas demonstrar domínio de ciclo de vida dos dados: da origem bruta até um ativo analítico consumível, documentado, catalogável e defensável em contexto de negócio.
+O objetivo não foi apenas montar gráficos. A proposta foi demonstrar domínio de ciclo de vida de dados, saindo da origem bruta até um ativo analítico consumível, documentado, catalogável e defensável em contexto de negócio.
 
 ## Tese de Valor da Entrega
 
-Esta entrega é forte porque combina:
+Esta entrega é forte porque combina, na mesma solução:
 
 - modelagem com critério de granularidade
 - volume relevante e aderente ao case
@@ -20,7 +27,7 @@ Esta entrega é forte porque combina:
 
 ## Status de Entrega por Ambiente
 
-Para evitar exagero na narrativa do case, o estado real da entrega foi separado da seguinte forma:
+Para evitar exagero na narrativa do case, o estado real da entrega foi separado explicitamente por ambiente:
 
 | Ambiente | Status | Evidencia |
 | --- | --- | --- |
@@ -28,14 +35,14 @@ Para evitar exagero na narrativa do case, o estado real da entrega foi separado 
 | GitHub | feito | repositório publicado e atualizado com documentação, evidências e artefatos finais |
 | Dadosfera | parcial, com evidencia real do ativo publicado | prints de importação, catálogo, coleção e volume em `images/dadosfera/`, sem pipeline nativo comprovado |
 
-Leitura correta:
+Leitura recomendada:
 
 - a solução técnica principal está pronta localmente
 - a parte de versionamento remoto já foi consolidada no GitHub
 - a operacionalização do ativo principal na Dadosfera já foi evidenciada
-- a parte ainda pendente na plataforma e o pipeline nativo
+- a parte ainda pendente na plataforma é o pipeline nativo
 
-## O que Está Comprovado
+## O que Está Comprovado na Entrega
 
 - ingestão e organização em zonas de dados
 - modelagem da `fact_orders_enriched` com mais de 100 mil registros
@@ -45,7 +52,7 @@ Leitura correta:
 - publicação do ativo principal na Dadosfera com screenshots do catálogo e do volume
 - trilha complementar de Power BI com evidência da query principal
 
-## O que Não Está Sendo Vendido Como Pronto
+## O que Não Está Sendo Tratado Como Entrega Concluída
 
 - integração por API com a Dadosfera
 - pipeline nativo executado na plataforma
@@ -62,7 +69,7 @@ O objetivo do projeto é construir uma solução de dados ponta a ponta que perm
 - gerar consultas SQL reproduzíveis sobre a base final
 - documentar os resultados de forma clara para consumo técnico e executivo
 
-Em termos práticos, trata-se de converter dados transacionais dispersos em uma camada analítica que apoie diagnóstico, tomada de decisão e comunicação de insights.
+Em termos práticos, trata-se de converter dados transacionais dispersos em uma camada analítica que apoie diagnóstico, tomada de decisão e comunicação executiva.
 
 ## Descrição do Dataset Olist
 
@@ -88,7 +95,7 @@ O dataset foi escolhido por ser especialmente aderente a um case técnico de dad
 - combina dimensões temporais, financeiras, operacionais e geográficas
 - permite discutir tanto qualidade e engenharia de dados quanto interpretação de negócio
 
-Essa escolha viabiliza uma entrega equilibrada entre rigor técnico e valor analítico.
+Essa escolha viabiliza uma entrega equilibrada entre rigor técnico, volume relevante e valor analítico.
 
 ## Visão Geral da Modelagem
 
@@ -102,7 +109,7 @@ Decisões principais de modelagem:
 - colunas foram padronizadas para `snake_case`
 - atributos derivados foram criados para facilitar análise temporal e logística
 
-Essa abordagem permite manter o detalhe operacional do item e, ao mesmo tempo, disponibilizar contexto suficiente para análises de receita, atraso, categoria, localidade e comportamento de compra.
+Essa abordagem preserva o detalhe operacional do item e, ao mesmo tempo, disponibiliza contexto suficiente para análises de receita, atraso, categoria, localidade e comportamento de compra.
 
 ## Explicação da Tabela `fact_orders_enriched`
 
@@ -126,7 +133,7 @@ Principais grupos de atributos:
 - atributos de categoria e localidade
 - colunas derivadas para calendário e performance logística
 
-Observação de governança:
+Leitura de governança:
 
 - a tabela acima permanece como camada analítica interna
 - a exposição no dashboard ocorre a partir de uma camada publicada e minimizada, com remoção de cidade, CEP e IDs desnecessários
@@ -148,7 +155,7 @@ Regras aplicadas na construção:
 - enriquecimento sem duplicação indevida de registros
 - preservação de anomalias residuais da fonte quando o ajuste arbitrário poderia comprometer a rastreabilidade analítica
 
-Essa tabela foi desenhada para ser a interface principal entre os dados operacionais e as perguntas de negócio do case.
+Essa tabela foi desenhada para ser a interface principal entre os dados operacionais e as perguntas de negócio do case, sem misturar a camada interna com a camada de exposição.
 
 ## Perguntas Respondidas com SQL
 
@@ -242,14 +249,14 @@ O conjunto das análises aponta para uma operação com três características m
 - crescimento relevante ao longo do tempo, acompanhado de gargalos operacionais em determinados períodos
 - forte dependência do cartão de crédito como principal meio de pagamento
 
-Do ponto de vista de negócio, isso sugere algumas leituras prioritárias:
+Do ponto de vista de negócio, isso sugere quatro prioridades de leitura:
 
 - a operação pode ganhar eficiência atacando categorias e geografias de maior peso
 - meses de pico devem ser tratados como janelas críticas de planejamento logístico
 - atrasos precisam ser analisados não apenas por volume, mas por impacto financeiro e reputacional
 - a experiência de pagamento por cartão merece atenção central em qualquer estratégia de conversão
 
-Do ponto de vista técnico, a camada analítica também preserva transparência sobre a qualidade da fonte: pedidos sem entrega permanecem com métricas logísticas nulas quando apropriado, e pequenas anomalias residuais de origem são tratadas como alerta documentado, não como dado artificialmente corrigido.
+Do ponto de vista técnico, a camada analítica preserva transparência sobre a qualidade da fonte: pedidos sem entrega permanecem com métricas logísticas nulas quando apropriado, e pequenas anomalias residuais de origem são tratadas como alerta documentado, não como dado artificialmente corrigido.
 
 Além disso, a entrega passou a incluir uma coleção materializada do projeto, com manifesto JSON e inventário tabular dos ativos, o que reforça a aderência ao item de catalogação/publicação do case.
 
@@ -285,9 +292,9 @@ Esta entrega atende ao case porque demonstra, de forma integrada, as capacidades
 - testes automatizados mínimos para regras críticas do pipeline
 - preparo da base para consumo visual e executivo
 
-Em resumo, o projeto mostra capacidade de sair de dados transacionais brutos e chegar a uma camada analítica robusta, com rastreabilidade técnica, leitura executiva e documentação orientada à avaliação.
+Em resumo, o projeto demonstra capacidade de sair de dados transacionais brutos e chegar a uma camada analítica robusta, com rastreabilidade técnica, leitura executiva e documentação orientada à avaliação.
 
-No entanto, o fechamento completo da entrega ainda depende de:
+Pontos ainda dependentes, fora do núcleo técnico já concluído:
 
 - gravação do vídeo final, se exigido
 - preenchimento dos links finais na apresentação

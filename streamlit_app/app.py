@@ -51,7 +51,7 @@ def main() -> None:
         st.stop()
 
     st.sidebar.caption(f"Registros filtrados: {format_number(len(filtered_df))}")
-    render_header(filters)
+    render_header(filters, total_rows=len(df), filtered_rows=len(filtered_df))
 
     if presentation_mode:
         st.markdown(

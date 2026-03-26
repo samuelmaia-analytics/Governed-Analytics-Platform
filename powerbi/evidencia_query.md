@@ -1,5 +1,12 @@
 # Evidência da Query Principal
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Objetivo da query
 
 Este documento registra a query principal utilizada para sustentar os indicadores e recortes analíticos do dashboard Power BI do case.

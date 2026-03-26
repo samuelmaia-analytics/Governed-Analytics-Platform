@@ -1,6 +1,12 @@
-# 04 Analises SQL
+# 04 Análises SQL
 
-Este documento aponta para os artefatos SQL principais do case.
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
+Este documento aponta para os artefatos SQL principais do case e conecta a modelagem analítica às perguntas de negócio respondidas na entrega.
 
 ## Perguntas respondidas
 
@@ -23,7 +29,13 @@ Este documento aponta para os artefatos SQL principais do case.
 - `data/curated/query_results/`
 - `data/screenshots/query_results/`
 
-## Referencias detalhadas
+## Leitura recomendada
+
+- começar pela query principal em `sql/query_principal.sql`
+- usar `powerbi/evidencia_query.md` como síntese executiva dos resultados
+- consultar `data/screenshots/query_results/` quando a evidência visual tabular for necessária
+
+## Referências detalhadas
 
 - narrativa analítica: [docs/case_answers.md](./case_answers.md)
 - screenshots tabulares: [docs/imagens/README.md](./imagens/README.md)

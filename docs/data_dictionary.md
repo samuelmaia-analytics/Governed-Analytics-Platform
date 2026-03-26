@@ -1,5 +1,12 @@
 # Dicionário de Dados
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Visão Geral
 
 Este documento consolida o dicionário de dados do projeto `samuelmaia_DDF_032026`, descrevendo os principais ativos raw e processed, com foco especial na tabela analítica final `fact_orders_enriched`.

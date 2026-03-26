@@ -1,4 +1,11 @@
-# Relatorio de Contratos de Schema
+# Relatório de Contratos de Schema
+
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 
 Este documento registra a validação dos contratos simples de schema das camadas principais do projeto.
 

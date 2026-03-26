@@ -1,8 +1,21 @@
 # Sobre a Dadosfera
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Status Atual do Case
 
 Este projeto já possui uma solução local funcional para o dataset Olist, com pipeline em Python, organização em camadas, modelagem analítica, validação de qualidade, SQL e dashboard Streamlit.
+
+## Leitura Executiva
+
+Do ponto de vista do case, a Dadosfera entra menos como substituta imediata do pipeline local e mais como aceleradora da etapa em que muitos projetos começam a perder eficiência: publicação, descoberta, compartilhamento e governança de ativos analíticos.
+
+Essa é a tese central deste documento. A engenharia local já resolve transformação e modelagem; a plataforma amplia escala operacional, reduz atrito de publicação e melhora a capacidade de distribuição do ativo analítico.
 
 Para evitar ambiguidade na leitura do case, o status real até o momento é:
 
@@ -25,7 +38,7 @@ Para evitar ambiguidade na leitura do case, o status real até o momento é:
   - catálogo do pipeline na interface
   - query, notebook ou app materializado nativamente dentro da plataforma
 
-Em outras palavras, a solução técnica do case já está pronta localmente e o ativo principal já foi publicado com evidência visual na Dadosfera. O que ainda permanece pendente é a parte de pipeline nativo e operacionalização mais ampla dentro da plataforma.
+Em outras palavras, a solução técnica do case já está pronta localmente e o ativo principal já foi publicado com evidência visual na Dadosfera. O ponto ainda pendente é a operacionalização nativa dentro da plataforma.
 
 ## Contexto
 
@@ -33,7 +46,7 @@ Este case foi desenvolvido a partir do dataset Olist, com um pipeline local em P
 
 Na prova de conceito atual, essa arquitetura atende bem ao objetivo de demonstrar capacidade técnica ponta a ponta. Ainda assim, quando o problema é observado em um contexto mais próximo de produção, surgem limitações típicas de uma operação local: dependência de execução manual, baixa padronização de publicação de dados, maior esforço de governança e dificuldade de escalar o compartilhamento entre times.
 
-É nesse ponto que a Dadosfera passa a ser relevante: não como substituição artificial do que já funciona, mas como camada de publicação, descoberta e compartilhamento que reduz atrito operacional.
+É nesse ponto que a Dadosfera passa a ser relevante: não como substituição artificial do que já funciona, mas como camada de publicação, descoberta e compartilhamento capaz de reduzir atrito operacional.
 
 ## 1. Principal Problema a Ser Resolvido
 
@@ -181,7 +194,7 @@ Com uma camada de dados mais organizada e publicável, o time consegue responder
 - onde a logística compromete a experiência
 - quais regiões oferecem maior retorno potencial
 
-## Fechamento
+## Síntese Executiva
 
 Para este case, a solução local já demonstra capacidade de engenharia, modelagem e visualização. A Dadosfera entra como proposta de evolução da arquitetura, tornando a operação analítica mais simples de sustentar, mais fácil de compartilhar e mais preparada para crescer.
 

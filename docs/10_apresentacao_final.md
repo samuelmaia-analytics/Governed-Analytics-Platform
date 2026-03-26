@@ -1,6 +1,13 @@
-# 10 Apresentacao Final
+# 10 Apresentação Final
 
-Este documento organiza a entrega final de apresentação do case, incluindo vídeo, deck e links dos ativos.
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- Vídeo de apresentação: `https://youtu.be/SqJ0UF1Em9k`
+
+Este documento organiza a entrega final de apresentação do case, incluindo vídeo, deck, links dos ativos e a narrativa de defesa recomendada.
 
 ## Objetivo
 
@@ -45,8 +52,7 @@ Segundo o edital, a apresentação deve:
 
 ## O que ainda falta para fechar a apresentação
 
-- gravar o vídeo final
-- publicar o vídeo como `Unlisted` no YouTube
+- revisar se o link final do vídeo precisa ser replicado em algum formulário externo de submissão
 
 ## Mensagem Central para a Defesa
 
@@ -57,15 +63,23 @@ Se a apresentação precisar ser curta, a mensagem principal deve ser:
 - o ativo principal já foi operacionalizado na Dadosfera
 - o que permanece como evolução é pipeline nativo e integração mais profunda com a plataforma
 
+## Posição recomendada na defesa
+
+Adote uma postura objetiva e tecnicamente honesta. A apresentação fica mais forte quando diferencia com clareza o que já foi entregue, o que foi evidenciado publicamente e o que permanece como evolução natural da solução.
+
 ## Campos para preencher
 
 ### Link do vídeo no YouTube
 
-- `pendente, caso exigido pelo processo`
+- `https://youtu.be/SqJ0UF1Em9k`
 
 ### Link principal do repositório GitHub
 
 - `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+
+### Link do dashboard Streamlit
+
+- `https://samuelmaia-032026.streamlit.app/`
 
 ### Link do ativo principal na Dadosfera
 
@@ -106,7 +120,7 @@ O maior risco é apresentar uma solução local como se toda a operacionalizaç�
 - deck e roteiro: prontos
 - prints reais da plataforma: prontos
 - deck com imagens do dashboard, Dadosfera, SQL e GenAI: pronto
-- vídeo final: pendente
+- vídeo final: publicado em `https://youtu.be/SqJ0UF1Em9k`
 - link principal do ativo na Dadosfera/Metabase: registrado
 
 

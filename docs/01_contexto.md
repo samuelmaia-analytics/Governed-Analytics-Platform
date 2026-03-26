@@ -1,13 +1,19 @@
 # 01 Contexto
 
-Este documento funciona como ponto de entrada do case.
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
+Este documento funciona como ponto de entrada do case e resume o problema, o escopo e o ativo analítico principal.
 
 ## Objetivo
 
 Transformar o dataset Olist em uma solução de dados ponta a ponta, cobrindo:
 
-- ingestao
-- padronizacao
+- ingestão
+- padronização
 - modelagem analítica
 - qualidade
 - SQL
@@ -28,13 +34,13 @@ Transformar o dataset Olist em uma solução de dados ponta a ponta, cobrindo:
   - pagamentos
   - reviews
 
-## Entregavel principal
+## Entregável principal
 
-O principal ativo do projeto e:
+O principal ativo do projeto é:
 
 - `data/curated/analytics/fact_orders_enriched.parquet`
 
-Essa tabela foi desenhada para consolidar o contexto analítico do case com granularidade de item de pedido.
+Essa tabela foi desenhada para consolidar o contexto analítico do case com granularidade de item de pedido, preservando detalhe operacional sem comprometer leitura executiva.
 
 ## Leitura recomendada
 

@@ -1,5 +1,12 @@
 # Insights Executivos | Dashboard Power BI
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Observação
 
 Os pontos abaixo foram preparados para apoiar a apresentação final do case. Eles devem ser tratados como leituras executivas prontas para uso e já contam com evidências visuais e SQLs materializadas na pasta `powerbi/`.

@@ -1,5 +1,12 @@
 # 09 GenAI e LLMs - Processar
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 Este documento organiza o item de GenAI do case, separando o que já existe no projeto do que ainda precisa ser implementado para aderir totalmente ao edital.
 
 ## Objetivo do Item

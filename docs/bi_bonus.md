@@ -1,5 +1,12 @@
 # Bônus de BI
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 ## Objetivo
 
 Este bônus foi preparado para ampliar a entrega do case com uma camada de consumo externa ao Streamlit, pronta para uso no Power BI.

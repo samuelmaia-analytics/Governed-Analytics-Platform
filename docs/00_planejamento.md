@@ -1,5 +1,12 @@
 # 00 Planejamento do Projeto
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 Este documento organiza as etapas do case do início ao fim, no formato de plano de execução com dependências, riscos e pontos críticos.
 
 ## Objetivo do Planejamento

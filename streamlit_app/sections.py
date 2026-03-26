@@ -30,7 +30,7 @@ def metric_card(label: str, value: str, delta: str, help_text: str) -> None:
     st.metric(label=label, value=value, delta=delta, help=help_text)
 
 
-def render_header(filters: FilterState) -> None:
+def render_header(filters: FilterState, total_rows: int, filtered_rows: int) -> None:
     period_text = f"{filters.start_date:%d/%m/%Y} a {filters.end_date:%d/%m/%Y}"
     st.markdown(
         f"""
@@ -53,11 +53,11 @@ def render_header(filters: FilterState) -> None:
                 </div>
                 <div class="hero-stat">
                     <strong>Leitura atual</strong>
-                    Recorte ativo de {period_text}, com filtros globais refletidos em indicadores, visuais e insights.
+                    Recorte ativo de {period_text}, com {format_number(filtered_rows)} registros filtrados refletidos em indicadores, visuais e insights.
                 </div>
                 <div class="hero-stat">
                     <strong>Base do dashboard</strong>
-                    Camada publicada em parquet, derivada de <code>fact_orders_enriched</code> e minimizada para consumo executivo.
+                    Camada publicada derivada de <code>fact_orders_enriched</code>, com {format_number(total_rows)} registros disponíveis para consumo executivo.
                 </div>
             </div>
         </div>

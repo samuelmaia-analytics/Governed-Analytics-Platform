@@ -82,6 +82,10 @@ def load_data() -> pd.DataFrame:
 def build_default_filter_state(df: pd.DataFrame) -> None:
     min_date = df["order_purchase_timestamp"].min().date()
     max_date = df["order_purchase_timestamp"].max().date()
+    min_price = float(df["price"].fillna(0).min())
+    max_price = float(df["price"].fillna(0).max())
+    min_freight = float(df["freight_value"].fillna(0).min())
+    max_freight = float(df["freight_value"].fillna(0).max())
     defaults = {
         "flt_date_range": (min_date, max_date),
         "flt_category_mode": "Todas as categorias",
@@ -92,8 +96,8 @@ def build_default_filter_state(df: pd.DataFrame) -> None:
         "flt_status_value": "Todos os status",
         "flt_payment_mode": "Todos os meios",
         "flt_payment_value": "Todos os meios",
-        "flt_price_range": (float(df["price"].fillna(0).min()), float(df["price"].fillna(0).quantile(0.99))),
-        "flt_freight_range": (float(df["freight_value"].fillna(0).min()), float(df["freight_value"].fillna(0).quantile(0.99))),
+        "flt_price_range": (min_price, max_price),
+        "flt_freight_range": (min_freight, max_freight),
         "flt_geography_mode": "Cliente",
     }
     for key, value in defaults.items():
@@ -197,14 +201,14 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
     price_range = st.sidebar.slider(
         "Faixa de preço",
         min_value=float(df["price"].fillna(0).min()),
-        max_value=float(df["price"].fillna(0).quantile(0.99)),
+        max_value=float(df["price"].fillna(0).max()),
         value=st.session_state["flt_price_range"],
         key="flt_price_range",
     )
     freight_range = st.sidebar.slider(
         "Faixa de frete",
         min_value=float(df["freight_value"].fillna(0).min()),
-        max_value=float(df["freight_value"].fillna(0).quantile(0.99)),
+        max_value=float(df["freight_value"].fillna(0).max()),
         value=st.session_state["flt_freight_range"],
         key="flt_freight_range",
     )

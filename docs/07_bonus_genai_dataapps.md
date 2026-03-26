@@ -1,4 +1,11 @@
-# 07 Bonus GenAI e Data Apps
+# 07 Bônus GenAI e Data Apps
+
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 
 Este documento centraliza os bônus do case.
 

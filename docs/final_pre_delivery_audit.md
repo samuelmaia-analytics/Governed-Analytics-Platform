@@ -1,5 +1,12 @@
 # Auditoria Final Pre-Entrega
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 Projeto: `samuelmaia_DDF_032026`  
 Dataset: `Brazilian E-Commerce Public Dataset by Olist`  
 Data da auditoria: `2026-03-22`

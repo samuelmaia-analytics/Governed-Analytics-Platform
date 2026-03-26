@@ -25,7 +25,7 @@
 ![Importação do dataset na Dadosfera](../images/dadosfera/01_importacao_dataset.png)
 
 **Notas do apresentador:**
-Eu abriria dizendo que a ideia aqui não foi só construir um painel. O objetivo foi mostrar uma entrega ponta a ponta, saindo do dado bruto até um ativo analítico consumível. Então o foco do case foi combinar engenharia, governança, visualização e evidência real de publicação.
+Eu começaria dizendo que a ideia aqui não foi só construir um painel. O objetivo foi mostrar uma jornada ponta a ponta, saindo do dado bruto até um ativo analítico pronto para uso. Então o foco do case foi combinar engenharia, governança, visualização e evidência real de publicação.
 
 **Tempo estimado:** 40 segundos
 
@@ -42,7 +42,7 @@ raw/landing -> standardized -> staging -> curated -> published -> dashboard
 ```
 
 **Notas do apresentador:**
-Aqui eu explicaria que a arquitetura foi pensada para separar bem o que é dado bruto, o que é tratamento, o que é base interna e o que pode ser exposto para consumo. Isso ajuda a defender qualidade, rastreabilidade e governança. A camada publicada existe justamente para equilibrar uso executivo e controle técnico.
+Aqui eu explicaria que a arquitetura foi pensada para separar bem o que é dado bruto, o que é tratamento, o que é base interna e o que pode ser exposto para consumo. Isso ajuda a sustentar qualidade, rastreabilidade e governança. A camada publicada existe justamente para equilibrar uso executivo e controle técnico.
 
 **Tempo estimado:** 45 segundos
 
@@ -57,7 +57,7 @@ Aqui eu explicaria que a arquitetura foi pensada para separar bem o que é dado 
 ![Coleção publicada com os ativos do case](../images/dadosfera/dadosfera_colecao_ativos_publicados.png)
 
 **Notas do apresentador:**
-Esse slide serve para mostrar que a entrega não terminou no notebook ou no script local. Os ativos foram organizados em coleção, com uma estrutura mais próxima de produto analítico. Eu também manteria honestidade técnica: a coleção pública está confirmada, o ativo principal está acessível e os links individuais ainda não confirmados foram tratados como pendência documentada.
+Esse slide mostra que a entrega não terminou no notebook ou no script local. Os ativos foram organizados em coleção, com uma estrutura mais próxima de produto analítico. E eu manteria honestidade técnica: a coleção pública está confirmada, o ativo principal está acessível e os links individuais ainda não confirmados foram tratados como pendência documentada.
 
 **Tempo estimado:** 50 segundos
 
@@ -72,7 +72,7 @@ Esse slide serve para mostrar que a entrega não terminou no notebook ou no scri
 ![Visualização de pedidos atrasados no Metabase](../images/dadosfera/dadosfera_query_08_pedidos_atrasados.png)
 
 **Notas do apresentador:**
-Aqui eu faria a ponte entre engenharia e decisão. Eu diria que a modelagem importa porque ela permite responder perguntas reais de negócio com consistência. A camada analítica não foi criada só para existir como tabela; ela foi criada para sustentar leitura prática sobre receita, operação e experiência.
+Aqui eu faria a ponte entre engenharia e decisão. Eu diria que a modelagem importa porque ela permite responder perguntas reais de negócio com consistência. A camada analítica não foi criada só para existir como tabela, mas para sustentar leitura prática sobre receita, operação e experiência.
 
 **Tempo estimado:** 40 segundos
 
@@ -102,6 +102,6 @@ Aqui eu mostraria o consumo executivo do case. O ponto principal é que o dashbo
 ![Evidência do item de GenAI](../images/genai/01_product_text_features_openai.png)
 
 **Notas do apresentador:**
-Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. E eu também não deixaria de mencionar que existe uma frente de GenAI no projeto, usada como prova de conceito para enriquecer a leitura analítica com dados textuais. O próximo passo natural é aprofundar essa camada junto da operação dentro da plataforma.
+Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. E eu também destacaria que existe uma frente de GenAI no projeto, usada como prova de conceito para enriquecer a leitura analítica com dados textuais. O próximo passo natural é aprofundar essa camada junto da operação dentro da plataforma.
 
 **Tempo estimado:** 40 segundos
