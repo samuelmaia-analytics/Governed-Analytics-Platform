@@ -15,7 +15,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     env:
-      DADOSFERA_MAESTRO_BASE_URL: ${{ secrets.DADOSFERA_MAESTRO_BASE_URL }}
+      DADOSFERA_MAESTRO_BASE_URL: ${{ vars.DADOSFERA_MAESTRO_BASE_URL || 'https://maestro.dadosfera.ai' }}
       DADOSFERA_USERNAME: ${{ secrets.DADOSFERA_USERNAME }}
       DADOSFERA_PASSWORD: ${{ secrets.DADOSFERA_PASSWORD }}
       DADOSFERA_TOTP: ${{ secrets.DADOSFERA_TOTP }}

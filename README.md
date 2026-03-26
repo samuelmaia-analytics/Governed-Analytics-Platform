@@ -42,6 +42,8 @@ A proposta não foi apenas “fazer um dashboard”. O repositório foi estrutur
 - exportações auxiliares para Power BI
 - CI, lint e promoção automática do branch `streamlit-prod`
 
+O branch `streamlit-prod` já está provisionado no repositório remoto para ser usado diretamente como branch de deploy no Streamlit Cloud.
+
 ## Leitura Recomendada
 
 1. [docs/case_answers.md](docs/case_answers.md)
