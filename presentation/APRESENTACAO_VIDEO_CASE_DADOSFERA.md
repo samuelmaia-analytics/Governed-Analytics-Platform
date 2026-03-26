@@ -84,7 +84,7 @@ Aqui eu faria a ponte entre engenharia e decisão. Eu diria que a modelagem impo
 - O dashboard consolida KPIs, análise temporal, leitura geográfica e comportamento operacional.
 - Isso cria uma camada de consumo simples para o avaliador explorar depois da apresentação.
 
-![Dashboard final publicado no Metabase](../images/dadosfera/dadosfera_dashboard_final.png)
+![Visão geral do dashboard Streamlit](../images/dashboard/01_overview.png)
 
 **Notas do apresentador:**
 Aqui eu mostraria o consumo executivo do case. O ponto principal é que o dashboard não está solto: ele conversa com a mesma lógica analítica publicada e mantém coerência com o restante da solução. Então existe alinhamento entre dado, pergunta de negócio, visualização e documentação.
@@ -97,11 +97,11 @@ Aqui eu mostraria o consumo executivo do case. O ponto principal é que o dashbo
 
 - O case entrega uma jornada defensável entre dado bruto, ativo analítico e consumo executivo.
 - Já existe evidência real de publicação, documentação e governança mínima aplicada ao ativo.
-- Como evolução, a solução pode avançar para pipeline recorrente, Data Apps e operação mais nativa na Dadosfera.
+- Como evolução, a solução pode avançar para pipeline recorrente, Data Apps, uso de GenAI sobre dados e operação mais nativa na Dadosfera.
 
 ![Evidência do item de GenAI](../images/genai/01_product_text_features_openai.png)
 
 **Notas do apresentador:**
-Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. O próximo passo natural é aprofundar a operação dentro da plataforma, mas a base do produto analítico já está construída e evidenciada.
+Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. E eu também não deixaria de mencionar que existe uma frente de GenAI no projeto, usada como prova de conceito para enriquecer a leitura analítica com dados textuais. O próximo passo natural é aprofundar essa camada junto da operação dentro da plataforma.
 
 **Tempo estimado:** 40 segundos
