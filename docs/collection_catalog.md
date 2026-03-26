@@ -1,6 +1,15 @@
 # Coleção e Catálogo de Ativos
 
+
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
 Este documento materializa a coleção do case em formato versionável, pronta para publicação e catalogação.
+
+Para a visão da coleção já publicada na Dadosfera/Metabase, com links confirmados, evidências visuais e pendências de URLs individuais, consultar [docs/dadosfera_evidencias.md](./dadosfera_evidencias.md).
 
 ## Objetivo
 

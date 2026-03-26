@@ -2,7 +2,31 @@
 
 ## Visão Geral
 
-Este repositório consolida a entrega do case técnico com foco em ciclo de vida de dados, analytics engineering, governança, consumo analítico e clareza de documentação. A solução parte do dataset Olist e o transforma em uma camada analítica confiável, auditável e reutilizável, pronta para consulta SQL, dashboard, catalogação e exploração em BI.
+Este repositório consolida uma entrega de ponta a ponta em analytics engineering e data product. A solução parte do dataset Olist e o transforma em um ativo analítico confiável, auditável e reutilizável, pronto para consulta SQL, dashboard, catalogação e exploração em BI.
+
+## Links Principais
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Coleção principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- Documentação detalhada dos ativos publicados: [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
+
+## Executive Snapshot
+
+| Dimensão | Entrega |
+| --- | --- |
+| Ativo analítico principal | `fact_orders_enriched` |
+| Granularidade | `1 linha por item de pedido` |
+| Volume final | `112.650` registros |
+| Camada publicada | `fact_orders_dashboard` |
+| Consumo executivo | Streamlit + Dadosfera + Power BI |
+| Publicação Metabase | coleção, perguntas SQL, dashboard e ativo analítico evidenciados |
+| Status do produto | implementado, documentado e evidenciado |
+
+## O Que Este Repositório Demonstra
+
+Este projeto foi estruturado como um produto analítico de ponta a ponta. A entrega não se limita à construção de um dashboard; ela cobre ingestão, padronização, modelagem, validação de qualidade, publicação controlada, documentação, evidências e consumo executivo.
 
 Em termos de avaliação, o projeto busca demonstrar quatro capacidades centrais:
 
@@ -10,6 +34,10 @@ Em termos de avaliação, o projeto busca demonstrar quatro capacidades centrais
 - modelagem com granularidade defensável e volume acima de 100 mil registros
 - preocupação real com qualidade, privacidade e rastreabilidade
 - capacidade de transformar dado em ativo consumível por dashboard, catálogo e BI
+
+## Tese da Entrega
+
+A força desta entrega está na combinação entre rigor técnico e clareza de produto. A base foi modelada para sustentar análise real, a camada publicada foi separada para reforçar governança, e o consumo final foi materializado em canais diferentes sem perder coerência entre dado, narrativa e evidência.
 
 A entrega principal é a tabela `fact_orders_enriched`, consolidada em:
 
@@ -26,6 +54,7 @@ Para publicação externa e upload manual em plataforma, o ativo recomendado é:
 ## Sumário
 
 - [Resumo Executivo da Entrega](#resumo-executivo-da-entrega)
+- [Publicação na Dadosfera e Metabase](#publicação-na-dadosfera-e-metabase)
 - [Evidências Finais da Submissão](#evidências-finais-da-submissão)
 - [Mapa de Evidências](#mapa-de-evidências)
 - [Como Ler o Projeto](#como-ler-o-projeto)
@@ -34,6 +63,13 @@ Para publicação externa e upload manual em plataforma, o ativo recomendado é:
 - [Limites e Próximos Passos](#limites-e-próximos-passos)
 
 ## Resumo Executivo da Entrega
+
+Leitura executiva:
+
+- o projeto transforma uma fonte transacional relacional em um ativo analítico auditável e pronto para consumo
+- a camada interna e a camada publicada foram separadas para reforçar governança, privacidade e clareza de uso
+- o dashboard consome exclusivamente a camada publicada
+- o ativo principal foi evidenciado na Dadosfera e o dashboard foi publicado em Streamlit
 
 Status atual:
 
@@ -49,8 +85,25 @@ Leitura rápida para avaliador:
 - volume final da base analítica: `112.650` linhas
 - SQLs versionadas e evidenciadas
 - dashboard Streamlit implementado
-- ativo principal publicado na Dadosfera com evidência visual
+- coleção da Dadosfera publicada com perguntas, dashboard e ativo analítico evidenciados
 - documentação de apoio cobrindo arquitetura, catálogo, qualidade, privacidade e apresentação
+
+## Publicação na Dadosfera e Metabase
+
+[Voltar ao Sumário](#sumário)
+
+Resumo executivo do que foi publicado:
+
+- coleção principal do case: `Samuel Maia - 03_2026`
+- dashboard final publicado no Metabase: `Dashboard Executivo de Vendas`
+- perguntas e visualizações publicadas: KPIs, receita mensal, status de pedidos, receita por ano/mês, receita por estado, ticket médio mensal, status de entrega e pedidos atrasados
+- ativo analítico principal publicado: `Fact Orders Dashboardss`
+
+Links rápidos:
+
+- coleção principal: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
+- ativo analítico principal: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- documentação detalhada com evidências por item: [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
 
 ## Evidências Finais da Submissão
 
@@ -58,10 +111,15 @@ Leitura rápida para avaliador:
 
 ### Dadosfera
 
+- Coleção principal do case: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
+- Ativo analítico principal publicado: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- Mapa detalhado dos ativos publicados: [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
 - Importação do dataset publicado: [images/dadosfera/01_importacao_dataset.png](images/dadosfera/01_importacao_dataset.png)
 - Catalogação / documentação do ativo: [images/dadosfera/02_catalogo_metadados.png](images/dadosfera/02_catalogo_metadados.png)
 - Evidência do ativo no catálogo: [images/dadosfera/03_colecao_case.png](images/dadosfera/03_colecao_case.png)
 - Evidência de volume acima de 100 mil registros: [images/dadosfera/04_volume_100k.png](images/dadosfera/04_volume_100k.png)
+- Evidência da coleção com os ativos publicados: [images/dadosfera/dadosfera_colecao_ativos_publicados.png](images/dadosfera/dadosfera_colecao_ativos_publicados.png)
+- Evidência do dashboard final no Metabase: [images/dadosfera/dadosfera_dashboard_final.png](images/dadosfera/dadosfera_dashboard_final.png)
 
 ### SQL e Evidências Analíticas
 
@@ -72,6 +130,7 @@ Leitura rápida para avaliador:
 
 ### Dashboard e Visualizações
 
+- Dashboard publicado: `https://samuelmaia-032026.streamlit.app/`
 - Overview: [images/dashboard/01_overview.png](images/dashboard/01_overview.png)
 - Análise temporal: [images/dashboard/03_temporal.png](images/dashboard/03_temporal.png)
 - Categorias: [images/dashboard/04_categories.png](images/dashboard/04_categories.png)
@@ -86,7 +145,7 @@ Leitura rápida para avaliador:
 
 [Voltar ao Sumário](#sumário)
 
-Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais importantes:
+Se a leitura precisar ser feita em poucos minutos, esta é a sequência mais eficiente:
 
 1. visão geral e posicionamento da entrega: [README.md](README.md)
 2. narrativa principal do case: [docs/case_answers.md](docs/case_answers.md)
@@ -97,11 +156,9 @@ Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais i
 7. evidência Power BI e query principal: [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
 8. preparação da apresentação final: [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
-## Diferença entre os Principais Ativos
+## Arquitetura dos Ativos
 
 ### `fact_orders_enriched`
-
-É a camada analítica interna principal do projeto.
 
 - uso: engenharia, SQL, qualidade, auditoria e rastreabilidade
 - local: `data/curated/analytics/`
@@ -109,47 +166,17 @@ Se a leitura precisar ser feita em poucos minutos, estes são os arquivos mais i
 
 ### `fact_orders_dashboard`
 
-É a camada publicada do case, derivada da base analítica interna e preparada para consumo analítico.
-
 - uso: dashboard, publicação controlada e demonstração em plataforma
 - local: `data/published/dashboard/`
-- formatos disponiveis:
+- formatos disponíveis:
   - `fact_orders_dashboard.parquet`: consumo local pelo Streamlit
   - `fact_orders_dashboard.csv`: upload manual na Dadosfera e compartilhamento tabular
 
 ### `fact_sales_power_bi`
 
-É a fato simplificada do modelo estrela criado exclusivamente para BI externo.
-
 - uso: Power BI
 - local: `data/processed/bi_exports/`
 - relacionamento com dimensões auxiliares
-
-## Estrutura Principal do Case
-
-Esta é a estrutura de entrada recomendada para leitura do case:
-
-```text
-README.md
-docs/
-  01_contexto.md
-  02_carga_e_modelagem.md
-  03_catalogacao.md
-  04_analises_sql.md
-  05_dashboard.md
-  06_arquitetura_proposta.md
-  07_bonus_genai_dataapps.md
-  imagens/
-sql/
-  01_exploracao_inicial.sql
-  02_limpeza.sql
-  03_kpis.sql
-  04_series_temporais.sql
-  05_categorias.sql
-data/
-  README.md
-.gitignore
-```
 
 ## Como Ler o Projeto
 
@@ -169,23 +196,16 @@ Se você quiser seguir a mesma ordem do case, use:
 9. [docs/09_genai_llm_processar.md](docs/09_genai_llm_processar.md)
 10. [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
-## Objetivo
+## Estrutura do Repositório
 
-O objetivo do projeto é transformar dados transacionais brutos em uma camada analítica organizada, confiável e reutilizável, capaz de:
-
-- responder perguntas relevantes do case com SQL
-- sustentar análises de receita, tempo, geografia e experiência do cliente
-- servir como base para dashboard, documentação executiva e exportação para BI
-
-## Navegação Complementar
-
-Além da estrutura principal acima, o projeto também mantém:
+Pastas mais relevantes para navegação:
 
 - `src/`: scripts do pipeline
 - `streamlit_app/`: aplicação Streamlit
 - `tests/`: suíte de testes
+- `docs/`: documentação analítica, governança e apresentação
 - `presentation/`: deck e roteiro
-- `powerbi/`: plano do bônus
+- `powerbi/`: trilha complementar de BI
 - `images/`: evidências finais
 
 ## Arquitetura do Pipeline
@@ -240,35 +260,6 @@ Para evitar ambiguidade na leitura do case, a distinção é a seguinte:
   - sincronização automática da coleção com um catálogo gerenciado
 
 Em outras palavras, o projeto já entrega a estrutura e o payload da coleção em nível de prova de conceito local. O que está comprovado na plataforma hoje é a publicação do ativo principal e sua documentação visual. O que não está sendo afirmado é integração por API ou pipeline nativo já concluídos.
-
-Hoje, o repositório também já inclui evidências visuais da publicação do ativo na interface da Dadosfera:
-
-- [images/dadosfera/01_importacao_dataset.png](images/dadosfera/01_importacao_dataset.png)
-- [images/dadosfera/02_catalogo_metadados.png](images/dadosfera/02_catalogo_metadados.png)
-- [images/dadosfera/03_colecao_case.png](images/dadosfera/03_colecao_case.png)
-- [images/dadosfera/04_volume_100k.png](images/dadosfera/04_volume_100k.png)
-
-## Tabela Analítica Principal
-
-Arquivos principais:
-
-- `data/curated/analytics/fact_orders_enriched.parquet`
-- `data/curated/analytics/fact_orders_enriched.csv`
-
-Características da tabela:
-
-- granularidade: `1 linha por item de pedido`
-- volume final: `112.650` registros
-- colunas derivadas:
-  - `order_year`
-  - `order_month`
-  - `order_date`
-  - `delivery_time_days`
-  - `estimated_delay_days`
-  - `is_delayed`
-  - `total_item_value`
-
-Essa modelagem foi escolhida para equilibrar detalhamento operacional e capacidade analítica.
 
 ## Requisitos
 
@@ -440,6 +431,10 @@ Saída:
 streamlit run streamlit_app/app.py
 ```
 
+Deploy público do dashboard:
+
+- `https://samuelmaia-032026.streamlit.app/`
+
 O app consome exclusivamente:
 
 - `data/published/dashboard/fact_orders_dashboard.parquet`
@@ -500,6 +495,7 @@ Arquivos principais em `docs/`:
 - `data_quality_report.md`: relatório de qualidade da base final
 - `architecture.md`: visão geral da arquitetura
 - `collection_catalog.md`: materialização da coleção/catálogo do case
+- `dadosfera_evidencias.md`: consolidação dos links e evidências dos ativos publicados na Dadosfera/Metabase
 - `data_dictionary.md`: dicionário de dados
 - `data_classification.md`: classificação formal dos principais campos com impacto de privacidade e publicação
 - `privacy_governance.md`: decisões de minimização, publicação segura e privacidade por design
@@ -558,4 +554,4 @@ Evoluções naturais da solução:
 
 ## Status Atual
 
-O projeto já possui pipeline local funcional, base analítica interna consolidada, camada publicada segura para dashboard, coleção materializada, validação de qualidade com checks de integridade e reconciliação, queries SQL executadas, imagens geradas para a documentação do case, dashboard Streamlit modularizado, evidências reais da publicação do ativo na Dadosfera e exportações auxiliares para Power BI.
+O projeto já possui pipeline local funcional, base analítica interna consolidada, camada publicada segura para dashboard, coleção materializada, validação de qualidade, queries SQL executadas, dashboard Streamlit publicado, evidências reais da publicação do ativo na Dadosfera e exportações auxiliares para Power BI.

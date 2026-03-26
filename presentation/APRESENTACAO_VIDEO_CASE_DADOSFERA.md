@@ -1,128 +1,107 @@
-# Apresentação do Case
+# Apresentação do Video Case Dadosfera
 
-## Slide 1 — Abertura e objetivo do case
-- Este case parte do dataset Olist e foi estruturado como uma prova de conceito de ciclo de vida dos dados.
-- O foco foi sair de dados transacionais brutos e chegar a um ativo analítico confiável, documentado e pronto para consumo.
-- A entrega combina engenharia de dados, catalogação, SQL, dashboard e evidência real na Dadosfera.
-- A lógica central do projeto é simples: reduzir a distância entre dado bruto e valor de negócio.
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Coleção principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
+- Ativo analítico principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- Documentação de apoio: `docs/dadosfera_evidencias.md`
+
+## Estrutura sugerida
+
+- `6 slides`
+- `4 minutos e 20 segundos a 4 minutos e 50 segundos`
+- `1 imagem principal por slide`
+
+---
+
+## Slide 1 - Abertura e objetivo do case
+
+- Este case parte do dataset Olist e foi tratado como uma jornada completa de dados.
+- A proposta foi transformar tabelas transacionais brutas em um ativo analítico confiável, documentado e pronto para consumo.
+- A entrega reúne pipeline, modelagem, SQL, dashboard e publicação evidenciada na Dadosfera.
 
 ![Importação do dataset na Dadosfera](../images/dadosfera/01_importacao_dataset.png)
 
 **Notas do apresentador:**
-Eu começaria dizendo que a proposta não foi só montar um dashboard. A ideia foi mostrar uma jornada completa: ingestão, organização, modelagem, publicação e consumo. Eu tratei o case como um mini produto de dados, com preocupação técnica, mas também com clareza para negócio.
+Eu abriria dizendo que a ideia aqui não foi só construir um painel. O objetivo foi mostrar uma entrega ponta a ponta, saindo do dado bruto até um ativo analítico consumível. Então o foco do case foi combinar engenharia, governança, visualização e evidência real de publicação.
 
-**Tempo estimado:** 35 segundos
-
----
-
-## Slide 2 — Dataset escolhido e problema de negócio
-- Eu escolhi o Brazilian E-Commerce Public Dataset by Olist por ser um dataset relacional, com volume relevante e boa variedade de sinais de negócio.
-- Ele permite analisar receita, pedidos, categorias, experiência do cliente, atraso logístico e comportamento geográfico.
-- O principal problema aqui é transformar múltiplas tabelas transacionais em uma base analítica que responda perguntas de negócio com clareza.
-- Isso é importante porque o dado bruto, sozinho, não sustenta leitura executiva nem decisão.
-
-![Evidência de volume acima de 100 mil registros](../images/dadosfera/04_volume_100k.png)
-
-**Notas do apresentador:**
-Aqui eu explicaria que o Olist é uma base muito boa para esse tipo de desafio porque obriga a integrar domínios diferentes, lidar com volume e pensar em modelagem de verdade. O problema de negócio que eu quis resolver foi dar visibilidade sobre receita, operação e experiência de compra em uma estrutura rastreável e reutilizável.
-
-**Tempo estimado:** 35 segundos
+**Tempo estimado:** 40 segundos
 
 ---
 
-## Slide 3 — Volume de dados e arquitetura em camadas
+## Slide 2 - Base analítica e arquitetura
+
 - A tabela analítica principal do projeto é a `fact_orders_enriched`, com `112.650` registros.
-- A solução foi organizada em camadas inspiradas em Data Lake: `raw`, `standardized`, `staging`, `curated` e `published`.
-- Essa separação ajuda a manter rastreabilidade, qualidade e clareza de uso por camada.
-- Para o dashboard, eu não uso a camada interna completa; eu publico uma camada segura, específica para consumo analítico.
+- A arquitetura foi organizada em `raw`, `standardized`, `staging`, `curated` e `published`.
+- O consumo executivo não usa a camada interna diretamente; ele usa uma camada publicada e controlada.
 
 ```text
 raw/landing -> standardized -> staging -> curated -> published -> dashboard
 ```
 
-Referência de apoio:
-- `docs/architecture.md`
-
 **Notas do apresentador:**
-Aqui eu falaria de forma bem objetiva: eu preservei uma camada analítica interna para engenharia e auditoria, e criei uma camada publicada para consumo no app. Isso reforça governança e deixa a solução mais madura, porque separa o dado de trabalho do dado de exposição.
+Aqui eu explicaria que a arquitetura foi pensada para separar bem o que é dado bruto, o que é tratamento, o que é base interna e o que pode ser exposto para consumo. Isso ajuda a defender qualidade, rastreabilidade e governança. A camada publicada existe justamente para equilibrar uso executivo e controle técnico.
 
-**Tempo estimado:** 40 segundos
+**Tempo estimado:** 45 segundos
 
 ---
 
-## Slide 4 — Ativos criados, catalogação e documentação
-- Além da tabela principal, eu materializei uma camada publicada, uma coleção local catalogável e um inventário de ativos.
-- O ativo principal foi publicado na Dadosfera e documentado com metadados e evidências visuais.
-- A coleção seguiu o padrão solicitado no case e o projeto também manteve documentação técnica em Markdown no GitHub.
-- O que está comprovado na plataforma é o ativo publicado; pipeline nativo ainda fica como evolução futura.
+## Slide 3 - Publicação na Dadosfera e coleção do case
 
-![Catálogo e metadados do ativo](../images/dadosfera/02_catalogo_metadados.png)
-![Ativo publicado na coleção do case](../images/dadosfera/03_colecao_case.png)
+- A coleção publicada na Dadosfera centraliza os ativos do case em um único ponto de navegação.
+- Nela ficam organizados perguntas, visualizações, dashboard final e ativo analítico principal.
+- O que está comprovado publicamente hoje é a coleção `Samuel Maia - 03_2026` e o ativo `Fact Orders Dashboardss`.
+
+![Coleção publicada com os ativos do case](../images/dadosfera/dadosfera_colecao_ativos_publicados.png)
 
 **Notas do apresentador:**
-Esse é um ponto importante da defesa. Eu não tratei a publicação como detalhe. O ativo foi organizado e documentado para ser encontrado, entendido e reutilizado. Ao mesmo tempo, eu tomo cuidado para não vender como pronto algo que ainda é evolução, como pipeline nativo na plataforma.
+Esse slide serve para mostrar que a entrega não terminou no notebook ou no script local. Os ativos foram organizados em coleção, com uma estrutura mais próxima de produto analítico. Eu também manteria honestidade técnica: a coleção pública está confirmada, o ativo principal está acessível e os links individuais ainda não confirmados foram tratados como pendência documentada.
 
-**Tempo estimado:** 40 segundos
+**Tempo estimado:** 50 segundos
 
 ---
 
-## Slide 5 — Query SQL principal e o que ela demonstrou
+## Slide 4 - SQL e leituras de negócio
+
 - A base analítica foi usada para responder perguntas executivas com SQL versionada no repositório.
-- A query principal consolida KPIs, evolução temporal, categorias, distribuição por status e leitura de atraso.
-- Isso mostra que o projeto não parou na modelagem: ele chegou em consumo analítico reproduzível.
-- A evidência do resultado também foi documentada no GitHub.
+- As leituras principais cobrem receita, evolução temporal, status dos pedidos, geografia e atraso logístico.
+- Isso mostra que o projeto não para na modelagem; ele chega em consumo analítico reproduzível.
 
-![Resultado principal da query SQL](../powerbi/query_principal_resultado.png)
+![Visualização de pedidos atrasados no Metabase](../images/dadosfera/dadosfera_query_08_pedidos_atrasados.png)
 
 **Notas do apresentador:**
-Eu apresentaria esse slide como a ponte entre engenharia e decisão. A query principal mostra que a base final já responde perguntas reais do negócio: receita, pedidos, ticket, atraso, categoria e recorte operacional. Isso reforça que a modelagem foi construída para uso, e não só para estrutura.
+Aqui eu faria a ponte entre engenharia e decisão. Eu diria que a modelagem importa porque ela permite responder perguntas reais de negócio com consistência. A camada analítica não foi criada só para existir como tabela; ela foi criada para sustentar leitura prática sobre receita, operação e experiência.
 
-**Tempo estimado:** 35 segundos
+**Tempo estimado:** 40 segundos
 
 ---
 
-## Slide 6 — Dashboard e principais análises
+## Slide 5 - Dashboard executivo
+
 - Com a camada publicada, eu construí um dashboard Streamlit com visão executiva da operação.
-- O dashboard cobre KPIs, análise temporal, categorias e leitura geográfica.
-- As principais análises ajudam a identificar concentração de receita, comportamento ao longo do tempo e gargalos operacionais.
-- A solução foi desenhada para ser clara para negócio sem perder consistência técnica.
+- O dashboard consolida KPIs, análise temporal, leitura geográfica e comportamento operacional.
+- Isso cria uma camada de consumo simples para o avaliador explorar depois da apresentação.
 
-![Visão geral do dashboard](../images/dashboard/01_overview.png)
-![Análise temporal do dashboard](../images/dashboard/03_temporal.png)
+![Dashboard final publicado no Metabase](../images/dadosfera/dadosfera_dashboard_final.png)
 
 **Notas do apresentador:**
-Aqui eu diria que o dashboard é a parte mais visível, mas ele só funciona bem porque existe uma camada publicada adequada por trás. O objetivo foi dar uma leitura rápida do negócio, mostrando crescimento, concentração por categoria e sinais de eficiência ou atraso na operação.
+Aqui eu mostraria o consumo executivo do case. O ponto principal é que o dashboard não está solto: ele conversa com a mesma lógica analítica publicada e mantém coerência com o restante da solução. Então existe alinhamento entre dado, pergunta de negócio, visualização e documentação.
 
-**Tempo estimado:** 40 segundos
+**Tempo estimado:** 45 segundos
 
 ---
 
-## Slide 7 — Por que a Dadosfera acelera a jornada entre dados e valor
-- No estado atual, o projeto já funciona localmente de ponta a ponta, mas ainda depende de mais esforço operacional para publicação e compartilhamento.
-- A Dadosfera entra como o caminho mais rápido para reduzir essa distância entre ativo técnico e ativo consumível.
-- Ela pode substituir parcialmente ou, em um cenário mais maduro, absorver parte importante da camada de publicação, catalogação e distribuição.
-- Em termos práticos, isso acelera descoberta do ativo, governança, acesso e consumo por pessoas técnicas e de negócio.
+## Slide 6 - Encerramento e próximos passos
 
-![Importação do ativo na plataforma](../images/dadosfera/01_importacao_dataset.png)
-![Catálogo do ativo na plataforma](../images/dadosfera/02_catalogo_metadados.png)
+- O case entrega uma jornada defensável entre dado bruto, ativo analítico e consumo executivo.
+- Já existe evidência real de publicação, documentação e governança mínima aplicada ao ativo.
+- Como evolução, a solução pode avançar para pipeline recorrente, Data Apps e operação mais nativa na Dadosfera.
 
-**Notas do apresentador:**
-Minha defesa aqui é equilibrada. Eu não estou dizendo que toda a arquitetura já foi substituída pela plataforma. O que eu estou mostrando é que a Dadosfera reduz fricção exatamente onde muitas soluções locais começam a perder velocidade: publicação, descoberta, compartilhamento e governança do ativo.
-
-**Tempo estimado:** 40 segundos
-
----
-
-## Slide 8 — Evoluções futuras e encerramento
-- Como próximos passos, a solução pode evoluir para pipeline recorrente, Data Apps e aprofundamento de GenAI.
-- O projeto já tem uma prova de conceito de extração de features em texto desestruturado, validada localmente com API.
-- O pipeline nativo na Dadosfera continua como evolução futura e não como entrega já concluída.
-- Minha principal mensagem é que este case mostra uma jornada realista e defensável entre dado bruto, ativo analítico e valor para o negócio.
-
-![Categorias no dashboard](../images/dashboard/04_categories.png)
 ![Evidência do item de GenAI](../images/genai/01_product_text_features_openai.png)
 
 **Notas do apresentador:**
-Eu fecharia dizendo que este case demonstra mais do que uma entrega visual. Ele mostra estrutura, rastreabilidade e capacidade de transformar dados em algo utilizável. Para mim, a principal prova de valor da Dadosfera aqui é justamente acelerar essa passagem entre engenharia, publicação e consumo, sem perder governança.
+Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. O próximo passo natural é aprofundar a operação dentro da plataforma, mas a base do produto analítico já está construída e evidenciada.
 
 **Tempo estimado:** 40 segundos

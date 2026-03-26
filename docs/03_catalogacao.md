@@ -1,6 +1,14 @@
-# 03 Catalogacao
+# 03 Catalogação
 
-Este documento resume a parte de catalogação e governança do case.
+## Acesso Rápido
+
+- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
+- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+
+Este documento resume a estratégia de catalogação, governança mínima e evidências de publicação do ativo principal.
+
+Para a visão consolidada dos ativos publicados no Metabase, links confirmados, evidências por item e pendências de URLs individuais, consultar [docs/dadosfera_evidencias.md](./dadosfera_evidencias.md).
 
 ## O que já existe no projeto
 
@@ -21,14 +29,20 @@ Demonstrar:
 - preparo para publicação
 - governança mínima sobre dados e documentação
 
-## Referencias principais
+## Valor para a avaliação
+
+Esta etapa mostra que o projeto não termina na transformação dos dados. O ativo foi organizado para descoberta, entendimento e reuso, com separação clara entre base analítica interna e camada publicada.
+
+## Referências principais
 
 - coleção local: [docs/collection_catalog.md](./collection_catalog.md)
 - classificação de dados: [docs/data_classification.md](./data_classification.md)
 - política de governança: [docs/governance_policy.md](./governance_policy.md)
 - contexto de plataforma: [docs/about_dadosfera.md](./about_dadosfera.md)
 
-## Evidencias visuais da plataforma
+## Evidências visuais da plataforma
+
+As evidências visuais continuam organizadas em `images/dadosfera/`, com consolidação narrativa e links em [docs/dadosfera_evidencias.md](./dadosfera_evidencias.md).
 
 - importação do ativo publicado: [images/dadosfera/01_importacao_dataset.png](../images/dadosfera/01_importacao_dataset.png)
 - documentação e metadados do ativo: [images/dadosfera/02_catalogo_metadados.png](../images/dadosfera/02_catalogo_metadados.png)
