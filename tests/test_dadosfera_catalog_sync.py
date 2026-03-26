@@ -7,6 +7,7 @@ from src.dadosfera_catalog_sync import (
     CatalogAssetSpec,
     build_create_payload,
     build_update_payload,
+    extract_access_token,
     find_existing_asset,
     load_manifest,
     sync_assets,
@@ -152,3 +153,20 @@ def test_sync_assets_supports_dry_run() -> None:
     assert [result.action for result in results] == ["would_create"]
     assert client.created_payloads == []
     assert client.updated_payloads == []
+
+
+def test_extract_access_token_supports_nested_tokens_response() -> None:
+    assert extract_access_token({"tokens": {"accessToken": "abc123"}}) == "abc123"
+
+
+def test_extract_access_token_supports_flat_response() -> None:
+    assert extract_access_token({"accessToken": "abc123"}) == "abc123"
+
+
+def test_extract_access_token_raises_with_diagnostic_keys() -> None:
+    try:
+        extract_access_token({"message": "unauthorized"})
+    except RuntimeError as exc:
+        assert "Chaves recebidas: message" in str(exc)
+    else:
+        raise AssertionError("Expected RuntimeError when access token is missing")

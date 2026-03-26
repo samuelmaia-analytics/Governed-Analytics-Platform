@@ -59,7 +59,7 @@ class DadosferaMaestroClient:
         response = self.session.post(f"{self.base_url}/auth/sign-in", json=payload, timeout=60)
         response.raise_for_status()
         body = response.json()
-        access_token = body["tokens"]["accessToken"]
+        access_token = extract_access_token(body)
         self.session.headers.update({"access-token": access_token})
 
     def list_data_assets(self, *, size: int = 1000) -> list[dict[str, Any]]:
@@ -146,6 +146,43 @@ def extract_asset_id(response_body: dict[str, Any]) -> int | None:
         if isinstance(nested, dict) and isinstance(nested.get("id"), int):
             return nested["id"]
     return None
+
+
+def extract_access_token(response_body: dict[str, Any]) -> str:
+    token_candidates = [
+        response_body.get("accessToken"),
+        response_body.get("access_token"),
+    ]
+
+    nested_tokens = response_body.get("tokens")
+    if isinstance(nested_tokens, dict):
+        token_candidates.extend(
+            [
+                nested_tokens.get("accessToken"),
+                nested_tokens.get("access_token"),
+                nested_tokens.get("token"),
+            ]
+        )
+
+    auth_data = response_body.get("data")
+    if isinstance(auth_data, dict):
+        token_candidates.extend(
+            [
+                auth_data.get("accessToken"),
+                auth_data.get("access_token"),
+                auth_data.get("token"),
+            ]
+        )
+
+    for token in token_candidates:
+        if isinstance(token, str) and token.strip():
+            return token
+
+    available_keys = ", ".join(sorted(response_body.keys())) or "<none>"
+    raise RuntimeError(
+        "Nao foi possivel localizar o access token na resposta de autenticacao da Dadosfera. "
+        f"Chaves recebidas: {available_keys}"
+    )
 
 
 def find_existing_asset(existing_assets: list[dict[str, Any]], target: CatalogAssetSpec) -> dict[str, Any] | None:
