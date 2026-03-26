@@ -57,17 +57,22 @@ class DadosferaMaestroClient:
         last_headers: Any | None = None
 
         for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
-            response = self.session.post(f"{self.base_url}/auth/sign-in", json=payload, timeout=60)
-            response.raise_for_status()
-            body = response.json()
-            last_body = body
-            last_headers = response.headers
+            for endpoint in ("/auth/sign-in", "/auth/signin"):
+                response = self.session.post(f"{self.base_url}{endpoint}", json=payload, timeout=60)
+                if response.status_code >= 500:
+                    last_headers = response.headers
+                    continue
 
-            if apply_auth_from_response(self.session, body, response.headers):
-                return
+                response.raise_for_status()
+                body = response.json()
+                last_body = body
+                last_headers = response.headers
 
-            if try_refresh_access_token(self.session, self.base_url):
-                return
+                if apply_auth_from_response(self.session, body, response.headers):
+                    return
+
+                if try_refresh_access_token(self.session, self.base_url):
+                    return
 
         raise_runtime_for_auth_response(last_body, last_headers)
 

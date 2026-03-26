@@ -7,6 +7,7 @@ from src.dadosfera_catalog_sync import (
     apply_auth_from_response,
     build_sign_in_payloads,
     CatalogAssetSpec,
+    DadosferaMaestroClient,
     build_create_payload,
     build_update_payload,
     extract_access_token,
@@ -221,6 +222,48 @@ def test_try_refresh_access_token_uses_refresh_endpoint() -> None:
 
     assert refreshed is True
     assert session.headers["Authorization"] == "Bearer abc123"
+
+
+def test_sign_in_falls_back_to_legacy_signin_endpoint() -> None:
+    class DummyResponse:
+        def __init__(self, status_code: int, body: dict[str, str] | None = None) -> None:
+            self.status_code = status_code
+            self._body = body or {}
+            self.headers: dict[str, str] = {}
+
+        def raise_for_status(self) -> None:
+            if self.status_code >= 400:
+                raise RuntimeError(f"http {self.status_code}")
+
+        def json(self) -> dict[str, str]:
+            return self._body
+
+    class DummySession:
+        def __init__(self) -> None:
+            self.headers: dict[str, str] = {"Content-Type": "application/json"}
+            self.cookies: dict[str, str] = {}
+            self.calls: list[str] = []
+
+        def post(self, url: str, json: dict[str, str] | None = None, timeout: int = 60):  # type: ignore[override]
+            self.calls.append(url)
+            if url.endswith("/auth/sign-in"):
+                return DummyResponse(500)
+            if url.endswith("/auth/signin"):
+                return DummyResponse(200, {"accessToken": "abc123"})
+            if url.endswith("/auth/refresh-access-token"):
+                return DummyResponse(401)
+            raise AssertionError(f"Unexpected URL: {url}")
+
+    client = DadosferaMaestroClient(base_url="https://maestro.dadosfera.ai", username="user", password="secret")
+    client.session = DummySession()  # type: ignore[assignment]
+
+    client.sign_in()
+
+    assert client.session.headers["Authorization"] == "Bearer abc123"
+    assert client.session.calls[:2] == [
+        "https://maestro.dadosfera.ai/auth/sign-in",
+        "https://maestro.dadosfera.ai/auth/signin",
+    ]
 
 
 def test_raise_runtime_for_auth_response_includes_diagnostic_keys() -> None:
