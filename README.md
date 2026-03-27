@@ -6,6 +6,13 @@
 
 Entrega de analytics engineering orientada a produto sobre o dataset Olist. O projeto transforma dados transacionais em um ativo analítico governado, testado e consumível por dashboard, SQL, catálogo e BI externo.
 
+## Para Cada Leitor
+
+- banca e liderança: comece por [docs/executive_summary.md](docs/executive_summary.md)
+- avaliação técnica: siga [docs/case_answers.md](docs/case_answers.md) e [docs/operating_model.md](docs/operating_model.md)
+- operação e handoff: use [docs/release_runbook.md](docs/release_runbook.md), [docs/rollback_runbook.md](docs/rollback_runbook.md) e [CONTRIBUTING.md](CONTRIBUTING.md)
+- consumo analítico: veja [docs/05_dashboard.md](docs/05_dashboard.md), [docs/04_analises_sql.md](docs/04_analises_sql.md) e [powerbi/README.md](powerbi/README.md)
+
 ## Executive Summary
 
 O ativo central da solução é `fact_orders_enriched`, modelado com granularidade de item de pedido e `112.650` registros. A partir dele, o projeto deriva `fact_orders_dashboard`, camada publicada e minimizada para consumo executivo, com pseudonimização de identificadores e redução de exposição desnecessária.
@@ -104,9 +111,62 @@ A separação entre `curated` e `published` é uma decisão central do projeto. 
 pip install -r requirements.txt
 python src/run_case_pipeline.py
 python -m pytest tests
+ruff check .
 streamlit run streamlit_app/app.py
 python src/dadosfera_catalog_sync.py --dry-run
 ```
+
+## Quickstart
+
+### 1. Preparar ambiente
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 2. Gerar ativos locais
+
+```bash
+python src/run_case_pipeline.py
+python src/run_analytics_queries.py
+```
+
+### 3. Validar qualidade
+
+```bash
+python -m pytest tests
+ruff check .
+```
+
+### 4. Subir aplicação
+
+```bash
+streamlit run streamlit_app/app.py
+```
+
+## Mapa do Repositório
+
+| Caminho | Papel |
+| --- | --- |
+| `src/` | pipeline, qualidade, publicação, catálogo e utilitários |
+| `streamlit_app/` | aplicação analítica publicada |
+| `sql/` | análises exploratórias e consultas executivas |
+| `contracts/` | contratos de schema por camada |
+| `docs/` | narrativa técnica, governança, runbooks e evidências |
+| `presentation/` | deck, roteiro e material de defesa |
+| `powerbi/` | evidências e exportações para consumo complementar |
+| `data/` | lake local versionado apenas nas camadas necessárias ao case |
+
+## Sinais de Maturidade
+
+- pipeline ponta a ponta reproduzível por comando
+- contratos por camada analítica e publicada
+- testes automatizados com gate mínimo de cobertura
+- lint e workflows separados para qualidade e integração
+- branch de deploy dedicada para publicação do Streamlit
+- runbooks explícitos de release, rollback e captura de evidências
 
 ## Governança
 
@@ -137,3 +197,10 @@ Referências:
 - operação de transformação totalmente absorvida pela plataforma
 
 Essa distinção é deliberada. O projeto já demonstra engenharia, publicação e automação relevantes, mas evita inflar o escopo para além do que está objetivamente comprovado.
+
+## Evolução Natural
+
+- automatizar publicação da camada `published` com credencial não interativa na plataforma
+- adicionar monitoramento recorrente de freshness e qualidade da camada publicada
+- empacotar execução operacional em jobs agendados com observabilidade de falha
+- expandir camada semântica para novos recortes de logística, seller e cohort
