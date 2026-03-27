@@ -34,6 +34,7 @@ Se a apresentação precisar ser resumida em poucos segundos, a formulação mai
 
 ## Artefatos já prontos
 
+- resumo executivo: `docs/executive_summary.md`
 - deck: `presentation/case_deck.md`
 - roteiro: `presentation/talk_track.md`
 - vídeo: `https://youtu.be/SqJ0UF1Em9k`

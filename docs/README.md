@@ -18,6 +18,7 @@ Este diretório concentra a documentação principal do case. A navegação abai
 
 ## Guias centrais
 
+- [executive_summary.md](executive_summary.md): visão executiva única para banca, entrevista e revisão rápida
 - [case_answers.md](case_answers.md): narrativa principal do case
 - [architecture.md](architecture.md): arquitetura implementada
 - [operating_model.md](operating_model.md): visão única de pipeline, governança, publicação e consumo

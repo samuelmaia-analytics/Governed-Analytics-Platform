@@ -50,15 +50,15 @@ O escopo core do case está concentrado em ingestão, padronização, modelagem 
 
 ## Leitura Recomendada
 
-1. [docs/case_answers.md](docs/case_answers.md)
-2. [docs/operating_model.md](docs/operating_model.md)
-3. [docs/02_carga_e_modelagem.md](docs/02_carga_e_modelagem.md)
-4. [docs/03_catalogacao.md](docs/03_catalogacao.md)
-5. [docs/05_dashboard.md](docs/05_dashboard.md)
-6. [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
-7. [docs/release_runbook.md](docs/release_runbook.md)
-8. [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
-9. [docs/genai_bonus.md](docs/genai_bonus.md)
+1. [docs/executive_summary.md](docs/executive_summary.md)
+2. [docs/case_answers.md](docs/case_answers.md)
+3. [docs/operating_model.md](docs/operating_model.md)
+4. [docs/02_carga_e_modelagem.md](docs/02_carga_e_modelagem.md)
+5. [docs/03_catalogacao.md](docs/03_catalogacao.md)
+6. [docs/05_dashboard.md](docs/05_dashboard.md)
+7. [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
+8. [docs/release_runbook.md](docs/release_runbook.md)
+9. [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
 10. [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
 ## Arquitetura
