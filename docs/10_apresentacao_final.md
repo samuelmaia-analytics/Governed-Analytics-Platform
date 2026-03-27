@@ -26,6 +26,7 @@ Se a apresentação precisar ser resumida em poucos segundos, a formulação mai
 - arquitetura em camadas
 - racional da modelagem
 - governança da camada publicada
+- robustez técnica com testes, cobertura e gates
 - SQL e insights de negócio
 - dashboard em operação
 - publicação e catálogo na Dadosfera
@@ -55,8 +56,17 @@ Adote uma defesa objetiva. O que fortalece a apresentação não é prometer mat
 - o que foi implementado
 - o que foi publicado
 - o que foi automatizado
+- o que foi testado e endurecido em engenharia
 - o que ainda seria uma evolução natural
+
+## Números que valem mencionar
+
+- `fact_orders_enriched` com `112.650` registros
+- `fact_orders_dashboard` com `22` colunas publicadas
+- `114/114` testes passando
+- cobertura total acima de `86%`
+- gate mínimo de cobertura em `80%`
 
 ## Frase de fechamento
 
-“Em termos práticos, a entrega prova capacidade de modelar um ativo analítico confiável, controlar sua exposição e operacionalizar o consumo com evidência suficiente para revisão técnica.”
+“Em termos práticos, a entrega prova capacidade de modelar um ativo analítico confiável, controlar sua exposição, endurecer sua operação e operacionalizar o consumo com evidência suficiente para revisão técnica.”
