@@ -20,12 +20,14 @@ Este diretório concentra a documentação principal do case. A navegação abai
 
 - [case_answers.md](case_answers.md): narrativa principal do case
 - [architecture.md](architecture.md): arquitetura implementada
+- [operating_model.md](operating_model.md): visão única de pipeline, governança, publicação e consumo
 - [collection_catalog.md](collection_catalog.md): coleção local e inventário catalogável
 - [dadosfera_evidencias.md](dadosfera_evidencias.md): links e evidências publicadas
 - [dadosfera_api_sync.md](dadosfera_api_sync.md): sincronização de catálogo via API
 - [privacy_governance.md](privacy_governance.md): decisões de minimização e publicação
 - [governance_policy.md](governance_policy.md): governança, retenção e responsabilidades
 - [engineering_governance.md](engineering_governance.md): guardrails de CI, ownership e contribuição
+- [branch_protection_recommendation.md](branch_protection_recommendation.md): configuração recomendada no GitHub para merge e deploy
 
 ## Relatórios gerados pelo pipeline
 
@@ -40,6 +42,8 @@ Este diretório concentra a documentação principal do case. A navegação abai
 
 - [dadosfera_capture_runbook.md](dadosfera_capture_runbook.md)
 - [streamlit_capture_runbook.md](streamlit_capture_runbook.md)
+- [release_runbook.md](release_runbook.md)
+- [rollback_runbook.md](rollback_runbook.md)
 - [final_pre_delivery_audit.md](final_pre_delivery_audit.md)
 - [case_delivery_checklist.md](case_delivery_checklist.md)
 

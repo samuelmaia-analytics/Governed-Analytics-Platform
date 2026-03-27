@@ -33,7 +33,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov=streamlit_app --cov-report=term-missing --cov-fail-under=75"
+addopts = "--cov=src --cov=streamlit_app --cov-report=term-missing --cov-fail-under=80"
 testpaths = ["tests"]
 
 [tool.ruff]

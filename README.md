@@ -44,16 +44,22 @@ A proposta não foi apenas “fazer um dashboard”. O repositório foi estrutur
 
 O branch `streamlit-prod` já está provisionado no repositório remoto para ser usado diretamente como branch de deploy no Streamlit Cloud.
 
+## Escopo Core vs Bônus
+
+O escopo core do case está concentrado em ingestão, padronização, modelagem analítica, qualidade, contratos, catálogo, publicação segura e dashboard. Artefatos como GenAI e exportação de texto/PDF são complementares e não alteram a operação principal do case.
+
 ## Leitura Recomendada
 
 1. [docs/case_answers.md](docs/case_answers.md)
-2. [docs/02_carga_e_modelagem.md](docs/02_carga_e_modelagem.md)
-3. [docs/03_catalogacao.md](docs/03_catalogacao.md)
-4. [docs/05_dashboard.md](docs/05_dashboard.md)
-5. [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
-6. [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
-7. [docs/genai_bonus.md](docs/genai_bonus.md)
-8. [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
+2. [docs/operating_model.md](docs/operating_model.md)
+3. [docs/02_carga_e_modelagem.md](docs/02_carga_e_modelagem.md)
+4. [docs/03_catalogacao.md](docs/03_catalogacao.md)
+5. [docs/05_dashboard.md](docs/05_dashboard.md)
+6. [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
+7. [docs/release_runbook.md](docs/release_runbook.md)
+8. [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
+9. [docs/genai_bonus.md](docs/genai_bonus.md)
+10. [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
 ## Arquitetura
 
@@ -119,6 +125,10 @@ Referências:
 - [docs/data_classification.md](docs/data_classification.md)
 - [docs/governance_policy.md](docs/governance_policy.md)
 - [docs/engineering_governance.md](docs/engineering_governance.md)
+- [docs/operating_model.md](docs/operating_model.md)
+- [docs/release_runbook.md](docs/release_runbook.md)
+- [docs/rollback_runbook.md](docs/rollback_runbook.md)
+- [docs/branch_protection_recommendation.md](docs/branch_protection_recommendation.md)
 - [docs/dadosfera_api_sync.md](docs/dadosfera_api_sync.md)
 
 ## O Que Não Está Sendo Vendido Como Feito
