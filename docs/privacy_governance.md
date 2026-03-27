@@ -54,7 +54,6 @@ Este documento registra as decisões de privacidade por design e governança apl
 - Arquivo publicado para upload manual: `data/published/dashboard/fact_orders_dashboard.csv`
 - Registros publicados: **112,650**
 - Colunas publicadas: **22**
-- Colunas publicadas: **22**
 
 ## Política de Uso
 

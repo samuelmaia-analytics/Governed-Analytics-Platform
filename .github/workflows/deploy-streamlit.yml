@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: deploy-streamlit
+  cancel-in-progress: true
+
 jobs:
   promote-streamlit-branch:
     if: >
@@ -23,6 +27,7 @@ jobs:
         )
       )
     runs-on: ubuntu-latest
+    environment: streamlit-production
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -37,6 +42,20 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Re-run release guardrails
+        run: |
+          python -m ruff check src streamlit_app tests
+          python -m pytest tests
 
       - name: Push deployment branch
         run: |

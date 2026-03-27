@@ -65,6 +65,9 @@ No contexto deste case, os papéis estão acumulados pelo autor do projeto, mas 
 - a qualidade da camada analítica é registrada em `docs/data_quality_report.md`
 - a política de publicação segura é registrada em `docs/privacy_governance.md`
 - contratos simples de schema validam estrutura mínima em `standardized`, `curated` e `published`
+- ownership mínimo do repositório foi formalizado em `.github/CODEOWNERS`
+- fluxo de contribuição e validação local foi formalizado em `CONTRIBUTING.md`
+- tratamento de incidentes e exposição indevida foi formalizado em `SECURITY.md`
 
 ## Limitações
 

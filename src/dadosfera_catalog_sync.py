@@ -4,9 +4,9 @@ import argparse
 import json
 import os
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 from typing import Any
 
 import requests
@@ -16,7 +16,6 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.config import DOCS_DIR, ROOT_DIR
-
 
 DEFAULT_MAESTRO_BASE_URL = "https://maestro.dadosfera.ai"
 DEFAULT_MANIFEST_PATH = ROOT_DIR / "contracts" / "catalog" / "dadosfera_catalog_assets.json"

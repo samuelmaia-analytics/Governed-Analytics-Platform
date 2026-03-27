@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 
 import pandas as pd
 
@@ -11,7 +11,6 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.config import DOCS_DIR, LANDING_DIR
-
 
 LOGGER = logging.getLogger(__name__)
 OLIST_RAW_DIR = LANDING_DIR / "olist"

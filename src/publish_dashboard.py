@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 
 import pandas as pd
 
@@ -14,7 +14,6 @@ if __package__ is None or __package__ == "":
 from src.config import ANALYTICS_DIR, DOCS_DIR, PUBLISHED_DASHBOARD_DIR
 from src.ingest import configure_logging
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 SOURCE_FACT_PATH = ANALYTICS_DIR / "fact_orders_enriched.parquet"
@@ -81,6 +80,14 @@ class PublishedArtifacts:
     csv_path: Path
     rows: int
     columns: int
+
+
+def to_project_relative_path(path: Path) -> str:
+    project_root = Path(__file__).resolve().parent.parent
+    try:
+        return path.relative_to(project_root).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def pseudonymize(value: object, prefix: str) -> str | pd.NA:
@@ -162,7 +169,8 @@ def render_report(artifacts: PublishedArtifacts) -> str:
             "",
             "## Resultado da Publicação Segura",
             "",
-            f"- Arquivo publicado: `{PUBLISHED_PARQUET_PATH.relative_to(Path(__file__).resolve().parent.parent).as_posix()}`",
+            f"- Arquivo publicado para o app: `{to_project_relative_path(PUBLISHED_PARQUET_PATH)}`",
+            f"- Arquivo publicado para upload manual: `{to_project_relative_path(PUBLISHED_CSV_PATH)}`",
             f"- Registros publicados: **{artifacts.rows:,}**",
             f"- Colunas publicadas: **{artifacts.columns}**",
             "",
@@ -171,6 +179,7 @@ def render_report(artifacts: PublishedArtifacts) -> str:
             "- o dashboard deve consumir exclusivamente a camada `published/dashboard`.",
             "- a camada `curated/analytics` permanece interna ao pipeline e não deve ser tratada como camada de exposição.",
             "- tabelas detalhadas do app devem exibir apenas chaves pseudonimizadas e dimensões agregadas necessárias ao case.",
+            "- uploads manuais em plataforma devem usar preferencialmente o CSV da camada publicada.",
             "",
             "## Limitações e Escopo",
             "",

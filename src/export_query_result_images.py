@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
-from pathlib import Path
 import sys
 import textwrap
+from dataclasses import dataclass
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -15,7 +15,6 @@ if __package__ is None or __package__ == "":
 from src.config import QUERY_RESULTS_DIR, SCREENSHOTS_DIR
 from src.ingest import configure_logging
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 OUTPUT_DIR = SCREENSHOTS_DIR / "query_results"

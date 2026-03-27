@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import streamlit as st
 
-
 APP_FONT = "IBM Plex Sans"
 
 COLORS = {

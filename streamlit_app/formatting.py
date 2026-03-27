@@ -24,6 +24,8 @@ def format_pct(value: float) -> str:
 
 
 def calc_delta(current: float, previous: float) -> str:
+    if current is None or pd.isna(current):
+        return "Sem base comparável"
     if previous in (0, None) or pd.isna(previous):
         return "Sem base anterior"
     delta = ((current / previous) - 1) * 100

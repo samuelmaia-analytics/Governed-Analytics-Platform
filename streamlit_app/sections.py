@@ -4,7 +4,13 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from streamlit_app.analytics import build_executive_insights, build_filter_context_summary, build_regional_insights, build_smart_summary, build_state_table
+from streamlit_app.analytics import (
+    build_executive_insights,
+    build_filter_context_summary,
+    build_regional_insights,
+    build_smart_summary,
+    build_state_table,
+)
 from streamlit_app.charts import (
     chart_category_share_donut,
     chart_category_value_vs_satisfaction,
@@ -22,7 +28,12 @@ from streamlit_app.charts import (
     chart_top_categories_revenue,
 )
 from streamlit_app.data import FilterState
-from streamlit_app.formatting import format_currency, format_number, format_pct, to_csv_bytes
+from streamlit_app.formatting import (
+    format_currency,
+    format_number,
+    format_pct,
+    to_csv_bytes,
+)
 from streamlit_app.theme import COLORS
 
 

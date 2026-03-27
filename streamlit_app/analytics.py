@@ -3,11 +3,26 @@ from __future__ import annotations
 import pandas as pd
 
 from streamlit_app.data import FilterState
-from streamlit_app.formatting import calc_delta, format_currency, format_currency_compact, format_number, format_pct
+from streamlit_app.formatting import (
+    calc_delta,
+    format_currency,
+    format_currency_compact,
+    format_number,
+    format_pct,
+)
 
 
 def to_order_level(df: pd.DataFrame) -> pd.DataFrame:
     return df.sort_values("order_purchase_timestamp").drop_duplicates(subset=["order_id"], keep="last").copy()
+
+
+def safe_mean(series: pd.Series) -> float | None:
+    if series.empty:
+        return None
+    value = series.mean()
+    if pd.isna(value):
+        return None
+    return float(value)
 
 
 def build_metrics(current_df: pd.DataFrame, previous_df: pd.DataFrame) -> list[dict[str, str]]:
@@ -24,24 +39,26 @@ def build_metrics(current_df: pd.DataFrame, previous_df: pd.DataFrame) -> list[d
     avg_ticket_prev = revenue_prev / total_orders_prev if total_orders_prev else 0.0
     customers = float(current_orders["customer_unique_id"].nunique())
     customers_prev = float(previous_orders["customer_unique_id"].nunique())
-    avg_delivery = float(current_delivered["delivery_time_days"].mean()) if len(current_delivered) else 0.0
-    avg_delivery_prev = float(previous_delivered["delivery_time_days"].mean()) if len(previous_delivered) else 0.0
-    delay_rate = float(current_delivered["is_delayed"].mean() * 100) if len(current_delivered) else 0.0
-    delay_rate_prev = float(previous_delivered["is_delayed"].mean() * 100) if len(previous_delivered) else 0.0
-    avg_review = float(current_orders["review_score_mean"].mean()) if len(current_orders) else 0.0
-    avg_review_prev = float(previous_orders["review_score_mean"].mean()) if len(previous_orders) else 0.0
-    avg_freight = float(current_df["freight_value"].mean()) if len(current_df) else 0.0
-    avg_freight_prev = float(previous_df["freight_value"].mean()) if len(previous_df) else 0.0
+    avg_delivery = safe_mean(current_delivered["delivery_time_days"])
+    avg_delivery_prev = safe_mean(previous_delivered["delivery_time_days"])
+    delay_rate_base = safe_mean(current_delivered["is_delayed"])
+    delay_rate_prev_base = safe_mean(previous_delivered["is_delayed"])
+    delay_rate = delay_rate_base * 100 if delay_rate_base is not None else None
+    delay_rate_prev = delay_rate_prev_base * 100 if delay_rate_prev_base is not None else None
+    avg_review = safe_mean(current_orders["review_score_mean"])
+    avg_review_prev = safe_mean(previous_orders["review_score_mean"])
+    avg_freight = safe_mean(current_df["freight_value"])
+    avg_freight_prev = safe_mean(previous_df["freight_value"])
 
     return [
         {"label": "Receita total", "value": format_currency_compact(revenue), "delta": calc_delta(revenue, revenue_prev), "help": "Soma de item e frete no recorte filtrado."},
         {"label": "Total de pedidos", "value": format_number(total_orders), "delta": calc_delta(total_orders, total_orders_prev), "help": "Quantidade única de pedidos no período."},
         {"label": "Ticket médio", "value": format_currency(avg_ticket), "delta": calc_delta(avg_ticket, avg_ticket_prev), "help": "Receita total dividida pelo número de pedidos."},
         {"label": "Total de clientes", "value": format_number(customers), "delta": calc_delta(customers, customers_prev), "help": "Clientes únicos no recorte filtrado."},
-        {"label": "Prazo médio", "value": f"{avg_delivery:.1f} dias" if avg_delivery else "N/A", "delta": calc_delta(avg_delivery, avg_delivery_prev), "help": "Tempo médio entre compra e entrega para pedidos entregues."},
-        {"label": "Taxa de atraso", "value": format_pct(delay_rate), "delta": calc_delta(delay_rate, delay_rate_prev), "help": "Percentual de pedidos entregues após a data estimada."},
-        {"label": "Nota média", "value": f"{avg_review:.2f}" if avg_review else "N/A", "delta": calc_delta(avg_review, avg_review_prev), "help": "Média de review em nível de pedido."},
-        {"label": "Frete médio", "value": format_currency(avg_freight), "delta": calc_delta(avg_freight, avg_freight_prev), "help": "Valor médio de frete por item vendido."},
+        {"label": "Prazo médio", "value": f"{avg_delivery:.1f} dias" if avg_delivery is not None else "N/A", "delta": calc_delta(avg_delivery, avg_delivery_prev), "help": "Tempo médio entre compra e entrega para pedidos entregues."},
+        {"label": "Taxa de atraso", "value": format_pct(delay_rate) if delay_rate is not None else "N/A", "delta": calc_delta(delay_rate, delay_rate_prev), "help": "Percentual de pedidos entregues após a data estimada."},
+        {"label": "Nota média", "value": f"{avg_review:.2f}" if avg_review is not None else "N/A", "delta": calc_delta(avg_review, avg_review_prev), "help": "Média de review em nível de pedido."},
+        {"label": "Frete médio", "value": format_currency(avg_freight) if avg_freight is not None else "N/A", "delta": calc_delta(avg_freight, avg_freight_prev), "help": "Valor médio de frete por item vendido."},
     ]
 
 

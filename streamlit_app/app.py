@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import streamlit as st
 
@@ -9,7 +9,13 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from streamlit_app.analytics import build_metrics
-from streamlit_app.data import build_app_mode, build_sidebar_filters, filter_dataframe, get_previous_period_df, load_data
+from streamlit_app.data import (
+    build_app_mode,
+    build_sidebar_filters,
+    filter_dataframe,
+    get_previous_period_df,
+    load_data,
+)
 from streamlit_app.formatting import format_number
 from streamlit_app.sections import (
     render_category_section,
@@ -24,7 +30,6 @@ from streamlit_app.sections import (
     render_temporal_section,
 )
 from streamlit_app.theme import apply_theme, render_story_nav
-
 
 st.set_page_config(
     page_title="SAMUEL_MAIA_DDF_TECH_032026 | Executive Commerce Analytics",

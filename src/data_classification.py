@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pandas as pd
 
@@ -12,7 +12,6 @@ if __package__ is None or __package__ == "":
 from src.config import CATALOG_DIR, DOCS_DIR
 from src.ingest import configure_logging
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 CLASSIFICATION_PATH = CATALOG_DIR / "data_classification_inventory.csv"

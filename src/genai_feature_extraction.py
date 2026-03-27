@@ -1,9 +1,9 @@
 import argparse
 import json
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 from typing import Any
 from urllib import error, request
 
@@ -14,7 +14,6 @@ if __package__ is None or __package__ == "":
 
 from src.config import GENAI_INPUT_DIR, GENAI_OUTPUT_DIR
 from src.utils import ensure_directory, write_csv
-
 
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 DEFAULT_MODEL = "gpt-4.1-mini"

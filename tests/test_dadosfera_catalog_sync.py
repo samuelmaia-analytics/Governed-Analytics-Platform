@@ -4,18 +4,18 @@ import json
 from pathlib import Path
 
 from src.dadosfera_catalog_sync import (
-    apply_auth_from_response,
-    build_sign_in_payloads,
     CatalogAssetSpec,
     DadosferaMaestroClient,
+    apply_auth_from_response,
     build_create_payload,
+    build_sign_in_payloads,
     build_update_payload,
     extract_access_token,
     find_existing_asset,
     load_manifest,
     raise_runtime_for_auth_response,
-    try_refresh_access_token,
     sync_assets,
+    try_refresh_access_token,
 )
 
 

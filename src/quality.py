@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, asdict
-from pathlib import Path
 import sys
+from dataclasses import asdict, dataclass
+from pathlib import Path
 
 import pandas as pd
 
@@ -13,7 +13,6 @@ if __package__ is None or __package__ == "":
 from src.config import ANALYTICS_DIR, DOCS_DIR, QUALITY_DIR
 from src.ingest import configure_logging
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 FACT_TABLE_PATH = ANALYTICS_DIR / "fact_orders_enriched.parquet"

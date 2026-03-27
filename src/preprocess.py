@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 
 import pandas as pd
 from pandas.api.types import (
@@ -18,7 +18,6 @@ if __package__ is None or __package__ == "":
 
 from src.config import DOCS_DIR, PROFILING_DIR, STANDARDIZED_DIR
 from src.ingest import configure_logging, load_csv, validate_expected_files
-
 
 LOGGER = logging.getLogger(__name__)
 EDA_SUMMARY_PATH = DOCS_DIR / "eda_summary.md"

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-import sys
 
 import pandas as pd
 
@@ -16,8 +16,8 @@ from src.config import (
     CATALOG_DIR,
     DOCS_DIR,
     LANDING_DIR,
-    PUBLISHED_DASHBOARD_DIR,
     PROFILING_DIR,
+    PUBLISHED_DASHBOARD_DIR,
     QUALITY_DIR,
     QUERY_RESULTS_DIR,
     SCREENSHOTS_DIR,
@@ -26,7 +26,6 @@ from src.config import (
 )
 from src.ingest import configure_logging
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 PROJECT_NAME = "samuelmaia_DDF_032026"
@@ -50,6 +49,14 @@ class CatalogAsset:
     record_count: int | None
     column_count: int | None
     publication_ready: bool
+
+
+def to_project_relative_path(path: Path) -> str:
+    project_root = Path(__file__).resolve().parent.parent
+    try:
+        return path.relative_to(project_root).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def detect_file_format(path: Path) -> str:
@@ -98,7 +105,7 @@ def build_asset(
         asset_name=path.stem,
         zone=zone,
         asset_type=asset_type,
-        relative_path=path.relative_to(Path(__file__).resolve().parent.parent).as_posix(),
+        relative_path=to_project_relative_path(path),
         file_format=detect_file_format(path),
         description=description,
         grain=grain,
@@ -379,8 +386,8 @@ def render_report(assets: list[CatalogAsset]) -> str:
         "",
         "## Artefatos Gerados",
         "",
-        f"- Manifesto JSON da coleção: `{COLLECTION_PATH.relative_to(Path(__file__).resolve().parent.parent).as_posix()}`",
-        f"- Inventário tabular dos ativos: `{ASSET_INVENTORY_PATH.relative_to(Path(__file__).resolve().parent.parent).as_posix()}`",
+        f"- Manifesto JSON da coleção: `{to_project_relative_path(COLLECTION_PATH)}`",
+        f"- Inventário tabular dos ativos: `{to_project_relative_path(ASSET_INVENTORY_PATH)}`",
         "",
         "## Resumo por Zona",
         "",

@@ -25,6 +25,7 @@ Este diretório concentra a documentação principal do case. A navegação abai
 - [dadosfera_api_sync.md](dadosfera_api_sync.md): sincronização de catálogo via API
 - [privacy_governance.md](privacy_governance.md): decisões de minimização e publicação
 - [governance_policy.md](governance_policy.md): governança, retenção e responsabilidades
+- [engineering_governance.md](engineering_governance.md): guardrails de CI, ownership e contribuição
 
 ## Relatórios gerados pelo pipeline
 

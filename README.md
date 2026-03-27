@@ -109,6 +109,7 @@ python src/dadosfera_catalog_sync.py --dry-run
 - `order_id` e `customer_unique_id` são pseudonimizados na publicada
 - upload manual na plataforma deve usar `fact_orders_dashboard.csv`
 - ativos públicos complementares podem ser sincronizados por API do Maestro
+- ownership do repositório, contribuição e política de segurança foram formalizados em `CODEOWNERS`, `CONTRIBUTING.md` e `SECURITY.md`
 
 Observação operacional: a sincronização em GitHub Actions exige credencial não interativa. Se a conta da Dadosfera usar MFA/TOTP, o workflow entra em modo seguro e não tenta o login automatizado.
 
@@ -117,6 +118,7 @@ Referências:
 - [docs/privacy_governance.md](docs/privacy_governance.md)
 - [docs/data_classification.md](docs/data_classification.md)
 - [docs/governance_policy.md](docs/governance_policy.md)
+- [docs/engineering_governance.md](docs/engineering_governance.md)
 - [docs/dadosfera_api_sync.md](docs/dadosfera_api_sync.md)
 
 ## O Que Não Está Sendo Vendido Como Feito

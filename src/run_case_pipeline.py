@@ -2,26 +2,30 @@ from __future__ import annotations
 
 import argparse
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 from time import perf_counter
 
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from src.build_analytics import run_build
 from src.catalog import main as catalog_main
 from src.data_classification import main as classification_main
 from src.export_power_bi import run_export
 from src.export_query_result_images import export_all_query_result_images
 from src.ingest import configure_logging, run_inventory
-from src.publish_dashboard import run_publish_dashboard
 from src.preprocess import run_profiling
-from src.build_analytics import run_build
-from src.quality import load_fact_table, run_quality_checks, save_quality_report, save_quality_results
+from src.publish_dashboard import run_publish_dashboard
+from src.quality import (
+    load_fact_table,
+    run_quality_checks,
+    save_quality_report,
+    save_quality_results,
+)
 from src.run_analytics_queries import run_queries, save_execution_manifest
 from src.schema_contracts import main as schema_contracts_main
-
 
 LOGGER = logging.getLogger(__name__)
 

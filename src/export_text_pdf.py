@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 from textwrap import wrap
-
 
 PAGE_WIDTH = 595
 PAGE_HEIGHT = 842

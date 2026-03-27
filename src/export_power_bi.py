@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 
 import pandas as pd
 
@@ -14,7 +14,6 @@ from src.config import DATA_DIR
 from src.ingest import configure_logging
 from src.publish_dashboard import pseudonymize
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 FACT_SOURCE_PATH = DATA_DIR / "curated" / "analytics" / "fact_orders_enriched.parquet"

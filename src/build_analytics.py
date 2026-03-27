@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import logging
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 
 import pandas as pd
 
@@ -15,7 +15,6 @@ from src.config import ANALYTICS_DIR, DOCS_DIR, LANDING_DIR, STANDARDIZED_DIR
 from src.ingest import configure_logging, load_csv
 from src.quality import validate_not_empty
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 OLIST_LANDING_DIR = LANDING_DIR / "olist"

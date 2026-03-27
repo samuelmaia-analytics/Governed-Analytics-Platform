@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-import sys
 
 import pandas as pd
 from pandas.api.types import (
@@ -22,7 +22,6 @@ if __package__ is None or __package__ == "":
 from src.config import DOCS_DIR, QUALITY_DIR, ROOT_DIR
 from src.ingest import configure_logging
 from src.utils import ensure_directory
-
 
 LOGGER = logging.getLogger(__name__)
 CONTRACTS_DIR = ROOT_DIR / "contracts"

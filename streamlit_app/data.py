@@ -8,7 +8,6 @@ import streamlit as st
 from src.config import PUBLISHED_DASHBOARD_DIR
 from streamlit_app.theme import MONTH_NAME_MAP, WEEKDAY_MAP
 
-
 FACT_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
 FACT_CSV_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.csv"
 
@@ -67,7 +66,8 @@ def load_data() -> pd.DataFrame:
     df["seller_state"] = df["seller_state"].fillna("NA")
     df["order_status"] = df["order_status"].fillna("unknown").astype(str)
     df["payment_type_mode"] = df["payment_type_mode"].fillna("unknown").astype(str)
-    df["is_delayed"] = df["is_delayed"].fillna(False).astype(bool)
+    delayed_series = df["is_delayed"]
+    df["is_delayed"] = delayed_series.where(delayed_series.notna(), False).astype(bool)
     df["month_start"] = df["order_purchase_timestamp"].dt.to_period("M").dt.to_timestamp()
     df["month_name"] = df["order_purchase_timestamp"].dt.month.map(MONTH_NAME_MAP)
     df["weekday_name"] = df["order_purchase_timestamp"].dt.weekday.map(WEEKDAY_MAP)
@@ -172,6 +172,10 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
     )
     if isinstance(date_value, tuple) and len(date_value) == 2:
         start_date, end_date = date_value
+    elif isinstance(date_value, (list, tuple)) and len(date_value) == 1:
+        start_date = end_date = date_value[0]
+    elif hasattr(date_value, "year") and hasattr(date_value, "month") and hasattr(date_value, "day"):
+        start_date = end_date = date_value
     else:
         start_date = end_date = min_date
 
