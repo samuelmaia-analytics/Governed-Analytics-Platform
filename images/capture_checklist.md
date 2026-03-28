@@ -26,10 +26,10 @@
 
 ## Presentation
 
-- `images/presentation/cover.png`
-- `images/presentation/architecture.png`
-- `images/presentation/dashboard.png`
-- `images/presentation/dadosfera.png`
+- `presentation/case_deck.md`
+- `presentation/talk_track.md`
+- `images/presentation/` reservado para exports finais do deck
+- no estado atual, apenas `.gitkeep` esta versionado nesse diretorio
 
 ## Regra de uso
 

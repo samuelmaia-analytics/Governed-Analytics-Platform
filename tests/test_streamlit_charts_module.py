@@ -84,5 +84,5 @@ def test_chart_category_share_donut_groups_long_tail_into_outras() -> None:
 
     fig = charts.chart_category_share_donut(df)
 
-    labels = list(fig.data[0]["labels"])
+    labels = [label for trace in fig.data for label in trace["y"]]
     assert "Outras" in labels

@@ -211,11 +211,8 @@ def render_category_section(df: pd.DataFrame) -> None:
         render_chart(chart_top_categories_revenue(df), "O ranking por receita revela os grupos com maior peso comercial e maior sensibilidade para preço, estoque e sortimento.")
     with top_row_right:
         render_chart(chart_top_categories_orders(df), "O ranking por pedidos mostra quais categorias sustentam volume transacional e ajudam a separar escala de monetização.")
-    bottom_row_left, bottom_row_right = st.columns(2, gap="large")
-    with bottom_row_left:
-        render_chart(chart_category_share_donut(df), "A participação por categoria mostra o grau de concentração da receita e a dependência do negócio em poucos clusters.")
-    with bottom_row_right:
-        render_chart(chart_category_value_vs_satisfaction(df), "A dispersão cruza preço médio, escala e satisfação para destacar categorias com alto volume e percepção inferior à média.")
+    render_chart(chart_category_share_donut(df), "A participação por categoria mostra o grau de concentração da receita e a dependência do negócio em poucos clusters.")
+    render_chart(chart_category_value_vs_satisfaction(df), "A dispersão cruza preço médio, escala e satisfação para destacar categorias com alto volume e percepção inferior à média.")
     close_section()
 
 

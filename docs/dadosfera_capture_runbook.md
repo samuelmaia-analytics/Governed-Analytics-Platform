@@ -40,84 +40,86 @@ Tenha em mãos:
 
 ## Sequencia exata de capturas
 
-### 1. Lista de ativos ou datasets
+### 1. Importacao do dataset
 
 **Objetivo**
 
-Mostrar que o ativo existe na plataforma.
+Mostrar o momento de carga do arquivo publicado na plataforma.
 
 **Salvar como**
 
-`images/dadosfera/01_asset_list.png`
+`images/dadosfera/01_importacao_dataset.png`
 
 **O que precisa aparecer**
 
-- nome do workspace ou área do projeto
-- nome do ativo publicado
-- tela de listagem ou home de datasets
+- nome do arquivo ou ativo publicado
+- tela de importacao, upload ou confirmacao inicial
+- contexto visivel de que a acao ocorreu dentro da plataforma
 
-### 2. Preview do dataset
+### 2. Catalogo e metadados do ativo
 
 **Objetivo**
 
-Mostrar que o arquivo foi reconhecido e está acessível.
+Mostrar que o ativo foi reconhecido, estruturado e catalogado.
 
 **Salvar como**
 
-`images/dadosfera/02_asset_preview.png`
+`images/dadosfera/02_catalogo_metadados.png`
 
 **O que precisa aparecer**
 
 - nome do ativo
-- colunas ou linhas de preview
-- indicação visual de que os dados foram carregados
+- colunas, schema ou painel de metadados
+- indicacao visual de classificacao ou descricao do ativo
 
-### 3. Esquema ou metadados do ativo
-
-**Objetivo**
-
-Mostrar estrutura técnica do dataset.
-
-**Salvar como**
-
-`images/dadosfera/03_schema.png`
-
-**O que precisa aparecer**
-
-- lista de colunas, schema, ou painel de metadados
-- se existir, tipo de dado ou descricao do ativo
-
-### 4. Catálogo, coleção ou tela equivalente
+### 3. Colecao do case
 
 **Objetivo**
 
-Mostrar a parte de descoberta, organização ou publicação do ativo.
+Mostrar o ativo dentro da colecao publicada do case.
 
 **Salvar como**
 
-`images/dadosfera/04_catalog.png`
+`images/dadosfera/03_colecao_case.png`
 
 **O que precisa aparecer**
 
-- área de catálogo, coleção, classificação ou organização
-- o ativo publicado dentro desse contexto
+- nome da colecao
+- ativo publicado dentro do contexto da colecao
+- navegacao ou organizacao reconhecivel da plataforma
+
+### 4. Evidencia de volume relevante
+
+**Objetivo**
+
+Mostrar que o ativo publicado possui escala compativel com a narrativa do case.
+
+**Salvar como**
+
+`images/dadosfera/04_volume_100k.png`
+
+**O que precisa aparecer**
+
+- total de linhas, volume processado ou indicador equivalente
+- nome do ativo publicado
+- contexto da plataforma visivel
 
 ### 5. Captura opcional extra
 
 **Objetivo**
 
-Enriquecer a defesa se a plataforma oferecer query, notebook, app ou detalhes de uso.
+Enriquecer a defesa com uma visao mais executiva do que ja foi publicado.
 
 **Salvar como**
 
-`images/dadosfera/05_usage_or_query.png`
+`images/dadosfera/dadosfera_dashboard_final.png`
 
 **Exemplos válidos**
 
-- preview expandido
-- query executada
-- notebook aberto
-- detalhe do ativo com tags, descricao ou dominio
+- dashboard publicado
+- lista de ativos publicados
+- query executada na plataforma
+- detalhe adicional do ativo com contexto de uso
 
 ## O que não fazer
 
@@ -137,15 +139,15 @@ Enriquecer a defesa se a plataforma oferecer query, notebook, app ou detalhes de
 
 Inserir principalmente:
 
-- `01_asset_list.png`
-- `02_asset_preview.png`
-- `04_catalog.png`
+- `01_importacao_dataset.png`
+- `02_catalogo_metadados.png`
+- `03_colecao_case.png`
 
 Essas três imagens juntas contam a história mínima:
 
-- o ativo foi publicado
-- os dados existem e podem ser lidos
-- o ativo está organizado/publicado na plataforma
+- o ativo foi carregado na plataforma
+- o ativo foi descrito e catalogado
+- o ativo foi organizado dentro da colecao do case
 
 
 
