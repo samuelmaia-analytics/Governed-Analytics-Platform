@@ -197,4 +197,7 @@ O case está pronto como produto analítico, mas não infla o que ainda não foi
 - repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
 - app: `https://samuelmaia-032026.streamlit.app/`
 - vídeo: `https://youtu.be/SqJ0UF1Em9k`
+- coleção publicada: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
+- dashboard publicado: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - modelo principal: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- tabela pública: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`

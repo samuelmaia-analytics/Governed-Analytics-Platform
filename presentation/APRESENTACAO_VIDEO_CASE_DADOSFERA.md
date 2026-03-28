@@ -5,7 +5,9 @@
 - Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
 - Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
 - Coleção principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
+- Dashboard final na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo analítico principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
 - Documentação de apoio: `docs/dadosfera_evidencias.md`
 
 ## Estrutura sugerida
@@ -52,12 +54,12 @@ Aqui eu explicaria que a arquitetura foi pensada para separar bem o que é dado 
 
 - A coleção publicada na Dadosfera centraliza os ativos do case em um único ponto de navegação.
 - Nela ficam organizados perguntas, visualizações, dashboard final e ativo analítico principal.
-- O que está comprovado publicamente hoje é a coleção `Samuel Maia - 03_2026` e o modelo principal publicado em `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`.
+- O que está comprovado publicamente hoje é a coleção `Samuel Maia - 03_2026`, o dashboard final, o modelo principal publicado e a tabela `PUBLIC.SAMUELMAIA-03_2026`.
 
 ![Coleção publicada com os ativos do case](../images/dadosfera/dadosfera_colecao_ativos_publicados.png)
 
 **Notas do apresentador:**
-Esse slide mostra que a entrega não terminou no notebook ou no script local. Os ativos foram organizados em coleção, com uma estrutura mais próxima de produto analítico. E eu manteria honestidade técnica: a coleção pública está confirmada, o ativo principal está acessível e os links individuais ainda não confirmados foram tratados como pendência documentada.
+Esse slide mostra que a entrega não terminou no notebook ou no script local. Os ativos foram organizados em coleção, com uma estrutura mais próxima de produto analítico. Aqui já dá para sustentar que coleção, dashboard final, modelo principal e tabela publicada estão evidenciados publicamente, além das perguntas executivas confirmadas.
 
 **Tempo estimado:** 50 segundos
 
@@ -69,7 +71,7 @@ Esse slide mostra que a entrega não terminou no notebook ou no script local. Os
 - As leituras principais cobrem receita, evolução temporal, status dos pedidos, geografia e atraso logístico.
 - Isso mostra que o projeto não para na modelagem; ele chega em consumo analítico reproduzível.
 
-![Visualização de pedidos atrasados no Metabase](../images/dadosfera/dadosfera_query_08_pedidos_atrasados.png)
+![Visualização de status de pedidos no Metabase](../images/dadosfera/dadosfera_query_03_status_pedidos.png)
 
 **Notas do apresentador:**
 Aqui eu faria a ponte entre engenharia e decisão. Eu diria que a modelagem importa porque ela permite responder perguntas reais de negócio com consistência. A camada analítica não foi criada só para existir como tabela, mas para sustentar leitura prática sobre receita, operação e experiência.
