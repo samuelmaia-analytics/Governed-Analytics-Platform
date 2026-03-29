@@ -20,7 +20,7 @@ Produto analítico sobre o dataset Olist com modelagem em camadas, governança d
 - marts semânticos publicados para logística, seller e cohort
 - monitoramento recorrente de freshness e qualidade da camada publicada
 - operação agendada com artefatos de execução e observabilidade de falha
-- catálogo e publicação externa comprovados na Dadosfera/Metabase
+- catálogo local, classificação de dados e publicação externa comprovados na Dadosfera/Metabase
 - consumo analítico por Streamlit, SQL versionado e exportações para Power BI
 
 ## Snapshot
@@ -63,6 +63,7 @@ Hoje o repositório já possui:
 - camada semântica expandida em [src/semantic_layer.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/semantic_layer.py)
 - sync de catálogo por API em [src/dadosfera_catalog_sync.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/dadosfera_catalog_sync.py)
 - operador de pipeline nativo por API em [src/dadosfera_pipeline_ops.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/dadosfera_pipeline_ops.py)
+- coleção e classificação de dados alinhadas aos ativos `published/semantic` e `published/monitoring`
 - job agendado em [operate-published-layer.yml](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/.github/workflows/operate-published-layer.yml)
 - promoção automática de `main` para `streamlit-prod`
 
