@@ -37,11 +37,23 @@ PUBLISHED_COLUMNS = [
     "order_date",
     "order_year",
     "order_month",
+    "purchase_cohort_month",
+    "cohort_order_month_number",
+    "customer_order_sequence",
+    "is_first_order",
+    "seller_key",
+    "seller_volume_tier",
+    "seller_order_count",
+    "seller_avg_delivery_days",
+    "seller_delay_rate",
     "delivery_time_days",
+    "seller_dispatch_time_days",
+    "carrier_delivery_time_days",
     "estimated_delay_days",
     "is_delayed",
     "price",
     "freight_value",
+    "freight_to_price_ratio",
     "total_item_value",
     "payment_type_mode",
     "review_score_mean",
@@ -110,6 +122,8 @@ def build_published_dashboard_table(df: pd.DataFrame) -> pd.DataFrame:
 
     for source_column, prefix in PSEUDONYMIZED_COLUMNS.items():
         published[source_column] = published[source_column].map(lambda value: pseudonymize(value, prefix))
+    if "seller_id" in published.columns:
+        published["seller_key"] = published["seller_id"].map(lambda value: pseudonymize(value, "seller_id"))
 
     existing_columns = [column for column in PUBLISHED_COLUMNS if column in published.columns]
     published = published[existing_columns].copy()
@@ -118,6 +132,8 @@ def build_published_dashboard_table(df: pd.DataFrame) -> pd.DataFrame:
     published["seller_state"] = published["seller_state"].fillna("NA")
     published["order_status"] = published["order_status"].fillna("unknown")
     published["payment_type_mode"] = published["payment_type_mode"].fillna("unknown")
+    if "seller_volume_tier" in published.columns:
+        published["seller_volume_tier"] = published["seller_volume_tier"].fillna("long_tail")
 
     return published
 
@@ -151,9 +167,10 @@ def render_report(artifacts: PublishedArtifacts) -> str:
         "## Medidas Aplicadas na Camada Publicada",
         "",
         "- pseudonimização não reversível de `order_id` e `customer_unique_id` antes do consumo pelo dashboard.",
+        "- pseudonimização não reversível de `seller_id` em `seller_key` para permitir recortes por seller sem expor o identificador bruto.",
         "- remoção de identificadores desnecessários para apresentação, como `customer_id`, `seller_id` e `product_id`.",
         "- remoção de quase-identificadores mais sensíveis na camada publicada, como cidade e prefixo de CEP.",
-        "- manutenção apenas de atributos necessários para responder às perguntas do case: tempo, categoria, UF, pagamento, valor, atraso e satisfação.",
+        "- manutenção apenas de atributos necessários para responder às perguntas do case: tempo, categoria, UF, pagamento, valor, atraso, seller, logística e cohort.",
         "- preservação da camada analítica interna para engenharia e auditoria, separada da camada publicada.",
         "",
         "## Colunas Removidas da Camada Publicada",

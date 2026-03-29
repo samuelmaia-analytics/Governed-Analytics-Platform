@@ -43,15 +43,32 @@ class SyncResult:
 
 
 class DadosferaMaestroClient:
-    def __init__(self, *, base_url: str, username: str, password: str, totp: str | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        username: str | None = None,
+        password: str | None = None,
+        totp: str | None = None,
+        access_token: str | None = None,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
-        self.username = username
-        self.password = password
+        self.username = username or ""
+        self.password = password or ""
         self.totp = totp
         self.session = requests.Session()
         self.session.headers.update({"Content-Type": "application/json"})
+        if access_token:
+            self.session.headers.update(
+                {
+                    "access-token": access_token,
+                    "Authorization": f"Bearer {access_token}",
+                }
+            )
 
     def sign_in(self) -> None:
+        if self.session.headers.get("Authorization"):
+            return
         last_body: dict[str, Any] = {}
         last_headers: Any | None = None
 
@@ -367,8 +384,11 @@ def main() -> None:
     username = os.getenv("DADOSFERA_USERNAME")
     password = os.getenv("DADOSFERA_PASSWORD")
     totp = os.getenv("DADOSFERA_TOTP")
-    if not username or not password:
-        raise RuntimeError("Defina DADOSFERA_USERNAME e DADOSFERA_PASSWORD para sincronizar o catalogo.")
+    access_token = os.getenv("DADOSFERA_ACCESS_TOKEN") or os.getenv("DADOSFERA_API_TOKEN")
+    if not access_token and (not username or not password):
+        raise RuntimeError(
+            "Defina DADOSFERA_ACCESS_TOKEN/DADOSFERA_API_TOKEN ou DADOSFERA_USERNAME e DADOSFERA_PASSWORD para sincronizar o catalogo."
+        )
 
     manifest_path = args.manifest.resolve()
     assets = load_manifest(manifest_path)
@@ -377,6 +397,7 @@ def main() -> None:
         username=username,
         password=password,
         totp=totp,
+        access_token=access_token,
     )
     client.sign_in()
     results = sync_assets(client=client, assets=assets, dry_run=args.dry_run)

@@ -23,11 +23,22 @@ def build_source_df() -> pd.DataFrame:
             "order_date": [pd.Timestamp("2018-01-01").date()],
             "order_year": [2018],
             "order_month": [1],
+            "purchase_cohort_month": ["2018-01"],
+            "cohort_order_month_number": [0],
+            "customer_order_sequence": [1],
+            "is_first_order": [True],
+            "seller_volume_tier": [None],
+            "seller_order_count": [10],
+            "seller_avg_delivery_days": [4.0],
+            "seller_delay_rate": [0.1],
             "delivery_time_days": [4.0],
+            "seller_dispatch_time_days": [1.0],
+            "carrier_delivery_time_days": [3.0],
             "estimated_delay_days": [1.0],
             "is_delayed": [True],
             "price": [100.0],
             "freight_value": [10.0],
+            "freight_to_price_ratio": [0.1],
             "total_item_value": [110.0],
             "payment_type_mode": [None],
             "review_score_mean": [4.5],
@@ -53,6 +64,8 @@ def test_build_published_dashboard_table_applies_defaults() -> None:
     assert published.loc[0, "seller_state"] == "NA"
     assert published.loc[0, "order_status"] == "unknown"
     assert published.loc[0, "payment_type_mode"] == "unknown"
+    assert published.loc[0, "seller_volume_tier"] == "long_tail"
+    assert str(published.loc[0, "seller_key"]).startswith("seller_id_")
 
 
 def test_save_outputs_save_report_and_run_publish_dashboard(tmp_path: Path, monkeypatch) -> None:

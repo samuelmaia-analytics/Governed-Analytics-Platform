@@ -5,8 +5,10 @@ Este runbook reduz o gap entre publicação/catálogo e tentativa real de opera�
 ## O que este repositório passa a suportar
 
 - autenticação na Dadosfera via API do Maestro
+- suporte a credencial não interativa por `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN`
 - listagem de pipelines por endpoint configurável
 - criação de pipeline a partir de payload JSON versionado
+- deploy idempotente reaproveitando pipeline existente pelo nome
 - execução de pipeline já existente via API
 
 O ponto de entrada operacional é `src/dadosfera_pipeline_ops.py`.
@@ -28,6 +30,15 @@ Em outras palavras: o repositório agora consegue operar a API de pipelines, mas
 - consumidor final lendo o output da plataforma, e não apenas o artefato gerado localmente
 
 ## Uso do operador de pipelines
+
+### Credenciais recomendadas
+
+Para automação não interativa, prefira:
+
+- `DADOSFERA_ACCESS_TOKEN`
+- `DADOSFERA_API_TOKEN`
+
+O fallback por `DADOSFERA_USERNAME` + `DADOSFERA_PASSWORD` continua suportado, mas MFA/TOTP não é apropriado para job recorrente.
 
 ### 1. Listar pipelines
 
@@ -53,13 +64,19 @@ python src/dadosfera_pipeline_ops.py create --definition path/to/pipeline.json
 python src/dadosfera_pipeline_ops.py create --definition path/to/pipeline.json --execute
 ```
 
-### 5. Executar pipeline existente
+### 5. Garantir pipeline e executar em seguida
+
+```bash
+python src/dadosfera_pipeline_ops.py deploy --definition path/to/pipeline.json --execute
+```
+
+### 6. Executar pipeline existente
 
 ```bash
 python src/dadosfera_pipeline_ops.py run --pipeline-id <PIPELINE_ID>
 ```
 
-### 6. Listar execuções da pipeline
+### 7. Listar execuções da pipeline
 
 ```bash
 python src/dadosfera_pipeline_ops.py runs --pipeline-id <PIPELINE_ID>
@@ -80,6 +97,12 @@ Uso recomendado:
 
 ```bash
 python src/dadosfera_pipeline_ops.py create --definition contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json
+```
+
+Para operação recorrente, prefira o comando idempotente:
+
+```bash
+python src/dadosfera_pipeline_ops.py deploy --definition contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json --execute
 ```
 
 ## Escolha de conexão recomendada

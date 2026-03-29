@@ -15,6 +15,19 @@ def test_run_selected_steps_executes_requested_functions_in_order(monkeypatch) -
     assert called_steps == ["inventory", "build", "publish"]
 
 
+def test_run_selected_steps_executes_semantic_and_monitor_steps(monkeypatch) -> None:
+    called_steps: list[str] = []
+
+    monkeypatch.setattr(pipeline, "run_semantic_layer", lambda: called_steps.append("semantic"))
+    monkeypatch.setattr(pipeline, "run_monitoring", lambda: called_steps.append("monitor") or ["ok"])
+    monkeypatch.setattr(pipeline, "save_published_monitoring_results", lambda results: called_steps.append("save_results"))
+    monkeypatch.setattr(pipeline, "save_published_monitoring_report", lambda results: called_steps.append("save_report"))
+
+    pipeline.run_selected_steps(["semantic", "monitor"])
+
+    assert called_steps == ["semantic", "monitor", "save_results", "save_report"]
+
+
 def test_run_selected_steps_executes_quality_flow(monkeypatch) -> None:
     called_steps: list[str] = []
 
@@ -77,8 +90,9 @@ def test_main_runs_selected_pipeline(monkeypatch) -> None:
     monkeypatch.setattr(pipeline, "parse_args", lambda: Args())
     monkeypatch.setattr(pipeline, "configure_logging", lambda: calls.append("logging"))
     monkeypatch.setattr(pipeline, "resolve_steps", lambda steps: ["build"] if steps == ["build"] else [])
-    monkeypatch.setattr(pipeline, "run_selected_steps", lambda steps: calls.append(f"run:{','.join(steps)}"))
+    monkeypatch.setattr(pipeline, "run_selected_steps", lambda steps: calls.append(f"run:{','.join(steps)}") or [])
+    monkeypatch.setattr(pipeline, "save_pipeline_execution_report", lambda selected_steps, executions: calls.append("report"))
 
     pipeline.main()
 
-    assert calls == ["logging", "run:build"]
+    assert calls == ["logging", "run:build", "report"]

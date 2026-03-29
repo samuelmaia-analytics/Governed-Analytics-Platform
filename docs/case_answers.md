@@ -2,7 +2,7 @@
 
 ## Resumo Executivo
 
-Este projeto transforma o dataset Olist em um produto analítico utilizável, com separação clara entre camada interna de engenharia e camada publicada para consumo executivo. O núcleo técnico da entrega é `fact_orders_enriched`, uma fato com granularidade de item de pedido e `112.650` registros, construída para responder perguntas de negócio sem sacrificar rastreabilidade técnica.
+Este projeto transforma o dataset Olist em um produto analítico utilizável, com separação clara entre camada interna de engenharia e camada publicada para consumo executivo. O núcleo técnico da entrega é `fact_orders_enriched`, uma tabela fato com granularidade de item de pedido e `112.650` registros, construída para responder perguntas de negócio sem sacrificar rastreabilidade técnica.
 
 A camada derivada `fact_orders_dashboard` reduz risco de exposição, preserva utilidade analítica e serve como fonte oficial do Streamlit e do ativo publicado. Isso dá ao case um desenho mais maduro do que uma entrega centrada apenas em visualização.
 
@@ -87,10 +87,13 @@ O projeto já vai além de um manifesto local. Hoje ele possui:
 - coleção publicada com evidências versionadas
 - manifesto local da coleção e inventário de ativos
 - sincronização programática de ativos públicos via API do Maestro
+- monitoramento recorrente de freshness e qualidade da camada publicada
+- job agendado com artefatos operacionais e observabilidade de falha
+- expansão da camada semântica para recortes de logística, seller e cohort
 - preparação operacional para criação e execução de pipelines nativos via API
 - automação de promoção do branch de deploy do Streamlit
 
-Essa combinação é importante porque demonstra que a entrega não termina na geração da base. Ela cobre também a etapa em que muitos projetos falham: tornar o ativo encontrável, publicável e reutilizável.
+Essa combinação é importante porque demonstra que a entrega não termina na geração da base. Ela cobre também a etapa em que muitos projetos falham: tornar o ativo encontrável, publicável, monitorável e reutilizável.
 
 ## O Que Não Está Sendo Superestimado
 
@@ -105,7 +108,7 @@ Essa postura é parte da qualidade da entrega. Um case senior não infla maturid
 
 ## Por Que Esta Entrega É Forte
 
-Esta entrega é forte porque demonstra critério. O projeto não tenta parecer uma plataforma completa; ele mostra capacidade real de estruturar dados, modelar uma fato útil, controlar exposição, publicar ativos, documentar decisões e automatizar o suficiente para sair do artesanal.
+Esta entrega é forte porque demonstra critério. O projeto não tenta parecer uma plataforma completa; ele mostra capacidade real de estruturar dados, modelar uma tabela fato útil, controlar exposição, publicar ativos, documentar decisões e automatizar o suficiente para sair do artesanal.
 
 Em termos de avaliação, isso sinaliza:
 
@@ -121,7 +124,7 @@ Em termos de avaliação, isso sinaliza:
 - transformar a preparação operacional de pipeline via API em execução real com evidência de run e output
 - incluir marts adicionais por cliente, seller e categoria
 - ampliar testes para regressão analítica e componentes de consumo
-- evoluir métricas para cohort, recorrência e valor por cliente
+- ampliar o monitoramento com alerta externo e SLA operacional
 
 ## Conclusão
 

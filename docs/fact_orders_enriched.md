@@ -1,21 +1,11 @@
 # fact_orders_enriched
 
-
-## Acesso Rápido
-
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
-
 Tabela analítica principal derivada do dataset Olist com granularidade por item de pedido.
 
 ## Resumo
 
 - Total de registros: **112,650**
-- Total de colunas: **48**
+- Total de colunas: **60**
 
 ## Regras de Negócio
 
@@ -24,8 +14,13 @@ Tabela analítica principal derivada do dataset Olist com granularidade por item
 - `payments` e `reviews` são agregados por `order_id` antes do join para evitar duplicação artificial de itens.
 - `total_item_value` é calculado como `price + freight_value` no nível do item.
 - `delivery_time_days` mede o tempo entre compra e entrega ao cliente.
+- `seller_dispatch_time_days` mede o tempo entre aprovacao e despacho para a transportadora.
+- `carrier_delivery_time_days` mede o trecho transportadora -> cliente quando a origem traz os timestamps.
 - `estimated_delay_days` mede a diferença entre a entrega real e a data estimada; permanece nulo quando não há entrega registrada.
 - `is_delayed` sinaliza pedidos entregues após a data estimada.
+- `purchase_cohort_month`, `customer_order_sequence` e `cohort_order_month_number` habilitam analise de cohort e recorrencia.
+- `seller_order_count`, `seller_avg_delivery_days`, `seller_delay_rate` e `seller_volume_tier` habilitam recortes semanticos de seller.
+- `freight_to_price_ratio` qualifica o peso relativo do frete sobre o item vendido.
 - Registros com chaves essenciais ausentes, valores monetários negativos ou entrega anterior à compra são removidos.
 
 ## Cobertura de Enriquecimento
@@ -57,5 +52,3 @@ Tabela analítica principal derivada do dataset Olist com granularidade por item
 - Algumas colunas de data do dataset original possuem ausências; nesses casos, as métricas derivadas podem ficar nulas ou simplificadas.
 - A regra de inconsistência é propositalmente conservadora e remove apenas anomalias óbvias.
 - O campo `order_approved_at` pode permanecer nulo ou texto convertido para `NaT` quando a origem estiver incompleta.
-
-

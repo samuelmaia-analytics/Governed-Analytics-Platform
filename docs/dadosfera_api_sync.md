@@ -13,6 +13,7 @@ Este fluxo resolve a sincronizacao programatica de publicacao/catalogacao do pro
 Defina no ambiente local ou nos secrets do GitHub:
 
 - `DADOSFERA_MAESTRO_BASE_URL`
+- `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN` para automacao nao interativa
 - `DADOSFERA_USERNAME`
 - `DADOSFERA_PASSWORD`
 - `DADOSFERA_TOTP` apenas para execucao manual e interativa
@@ -21,8 +22,9 @@ Defina no ambiente local ou nos secrets do GitHub:
 
 O workflow do GitHub Actions foi endurecido para nao tentar autenticacao interativa com MFA.
 
-- se `DADOSFERA_TOTP` estiver definido nos secrets, o job encerra com aviso e sem erro
-- para automacao nao interativa, o caminho recomendado e conta tecnica sem MFA ou credencial oficial de API
+- se `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN` estiver definido, o workflow usa o token e ignora MFA
+- se a automacao cair no modo usuario/senha e `DADOSFERA_TOTP` estiver definido nos secrets, o job encerra com aviso e sem erro
+- para automacao nao interativa, o caminho recomendado e token tecnico ou conta tecnica sem MFA
 - para uso manual local, `DADOSFERA_TOTP` continua suportado pelo script
 
 ## Como rodar localmente

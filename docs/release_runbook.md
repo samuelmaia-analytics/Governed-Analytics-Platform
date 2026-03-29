@@ -23,15 +23,20 @@ python src/run_case_pipeline.py --list-steps
 4. Se a mudança impactar dados publicados, regenerar os artefatos críticos:
 
 ```bash
-python src/run_case_pipeline.py --steps build publish quality contracts catalog queries bi
+python src/run_case_pipeline.py --steps build publish semantic quality contracts monitor catalog queries bi
 ```
 
 5. Revisar se os arquivos abaixo refletem a mudança:
 - `data/published/dashboard/fact_orders_dashboard.parquet`
 - `data/published/dashboard/fact_orders_dashboard.csv`
+- `data/published/semantic/`
+- `data/published/monitoring/`
 - `docs/privacy_governance.md`
 - `docs/data_quality_report.md`
 - `docs/schema_contract_report.md`
+- `docs/published_layer_monitoring.md`
+- `docs/semantic_layer.md`
+- `docs/operational_job_report.md`
 
 ## Critérios de promoção
 
@@ -45,11 +50,14 @@ python src/run_case_pipeline.py --steps build publish quality contracts catalog 
 1. Fazer merge em `main`.
 2. Confirmar `CI` verde em `main`.
 3. Confirmar execução do workflow `Deploy Streamlit`, que promove o commit validado para `streamlit-prod`.
-4. Validar o app Streamlit e os principais links públicos do case.
-5. Se houver incidente de publicação no branch principal do app, usar `streamlit-prod` como fallback explícito no Streamlit Cloud até normalização.
+4. Confirmar execução do workflow `Operate Published Layer` quando a release impactar a camada publicada ou a operação recorrente.
+5. Validar o app Streamlit e os principais links públicos do case.
+6. Se houver incidente de publicação no branch principal do app, usar `streamlit-prod` como fallback explícito no Streamlit Cloud até normalização.
 
 ## Pós-release
 
 - revisar se o dashboard abre corretamente
 - validar os filtros principais e a navegação executiva
 - validar se a camada publicada segue pseudonimizada e minimizada
+- validar se o monitoramento da camada publicada ficou sem alertas críticos
+- validar se os marts `logistics_slice`, `seller_slice` e `cohort_slice` foram materializados

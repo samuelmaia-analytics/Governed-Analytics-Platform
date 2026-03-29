@@ -32,6 +32,7 @@ Este diretório concentra a documentação principal do case. A navegação abai
 - [collection_catalog.md](collection_catalog.md): coleção local e inventário catalogável
 - [dadosfera_evidencias.md](dadosfera_evidencias.md): links e evidências publicadas
 - [dadosfera_api_sync.md](dadosfera_api_sync.md): sincronização de catálogo via API
+- [dadosfera_native_pipeline_runbook.md](dadosfera_native_pipeline_runbook.md): operação de pipeline nativo via API
 - [privacy_governance.md](privacy_governance.md): decisões de minimização e publicação
 - [governance_policy.md](governance_policy.md): governança, retenção e responsabilidades
 - [engineering_governance.md](engineering_governance.md): guardrails de CI, ownership e contribuição
@@ -41,7 +42,7 @@ Este diretório concentra a documentação principal do case. A navegação abai
 
 - avaliador de negócio: [executive_summary.md](executive_summary.md), [05_dashboard.md](05_dashboard.md), [dadosfera_evidencias.md](dadosfera_evidencias.md)
 - avaliador técnico: [case_answers.md](case_answers.md), [02_carga_e_modelagem.md](02_carga_e_modelagem.md), [architecture.md](architecture.md), [schema_contract_report.md](schema_contract_report.md)
-- operação e plataforma: [operating_model.md](operating_model.md), [release_runbook.md](release_runbook.md), [rollback_runbook.md](rollback_runbook.md), [engineering_governance.md](engineering_governance.md)
+- operação e plataforma: [operating_model.md](operating_model.md), [release_runbook.md](release_runbook.md), [rollback_runbook.md](rollback_runbook.md), [dadosfera_native_pipeline_runbook.md](dadosfera_native_pipeline_runbook.md), [engineering_governance.md](engineering_governance.md)
 
 ## Relatórios gerados pelo pipeline
 
@@ -51,6 +52,9 @@ Este diretório concentra a documentação principal do case. A navegação abai
 - [data_quality_report.md](data_quality_report.md)
 - [schema_contract_report.md](schema_contract_report.md)
 - [data_classification.md](data_classification.md)
+- [published_layer_monitoring.md](published_layer_monitoring.md)
+- [semantic_layer.md](semantic_layer.md)
+- [operational_job_report.md](operational_job_report.md)
 
 ## Operação e evidências
 

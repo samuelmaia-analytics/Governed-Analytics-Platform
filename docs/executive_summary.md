@@ -9,8 +9,10 @@ Transformar o dataset Olist em um ativo analítico utilizável, governado e cons
 - pipeline reproduzível de ingestão, padronização, modelagem, qualidade e publicação
 - ativo analítico interno `fact_orders_enriched`
 - camada publicada `fact_orders_dashboard` para consumo executivo
+- recortes semânticos publicados para logística, seller e cohort
 - dashboard Streamlit publicado
 - ativo catalogado e evidenciado na Dadosfera/Metabase
+- monitoramento recorrente da camada publicada
 - documentação operacional, governança e runbooks
 
 ## Decisão arquitetural central
@@ -30,7 +32,7 @@ Essa separação evita acoplamento entre o dashboard e a camada analítica compl
 | Granularidade | `1 linha por item de pedido` |
 | Volume | `112.650` registros |
 | Camada publicada | `fact_orders_dashboard` |
-| Colunas publicadas | `22` |
+| Colunas publicadas | `34` |
 
 ## Consumo comprovado
 
@@ -41,12 +43,12 @@ Essa separação evita acoplamento entre o dashboard e a camada analítica compl
 
 ## Robustez de engenharia
 
-Snapshot de validação em `2026-03-28`:
+Snapshot de validação em `2026-03-29`:
 
 | Métrica | Valor |
 | --- | --- |
-| Testes | `114/114` passando |
-| Cobertura total | `86.53%` |
+| Testes | `124/124` passando |
+| Cobertura total | `83.71%` |
 | Gate mínimo | `80%` |
 | Qualidade estática | `ruff check` verde |
 | Entrega | CI, lint e fluxo de deploy versionados |
@@ -76,6 +78,7 @@ Itens como GenAI e exportações auxiliares existem como extensão e não são u
 
 - escolha por Streamlit para acelerar consumo e prova de valor
 - execução principal do pipeline fora da plataforma, com publicação comprovada na Dadosfera
+- autenticação não interativa por token preparada para sync de catálogo e operação por API
 - governança aplicada sem vender operação “enterprise” não implementada
 - métricas de testes e cobertura devem ser lidas como snapshot operacional da data de validação, não como valor imutável do repositório
 

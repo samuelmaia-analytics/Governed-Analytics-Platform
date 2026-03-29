@@ -6,8 +6,11 @@ from pathlib import Path
 from src.dadosfera_pipeline_ops import (
     DadosferaPipelineClient,
     PipelineApiConfig,
+    extract_pipeline_items,
+    find_pipeline_by_name,
     load_json_file,
     normalize_endpoint_path,
+    resolve_pipeline_id,
 )
 
 
@@ -84,3 +87,22 @@ def test_pipeline_client_uses_configured_endpoints() -> None:
         ("POST", "https://maestro.dadosfera.ai/custom/pipelines/execute", {"pipeline_id": "123", "force": True}),
         ("GET", "https://maestro.dadosfera.ai/custom/pipelines/123/runs", None),
     ]
+
+
+def test_extract_pipeline_items_and_find_pipeline_by_name_support_generic_payloads() -> None:
+    response = {"items": [{"id": "1", "name": "pipe-a"}, {"id": "2", "name": "pipe-b"}]}
+
+    assert extract_pipeline_items(response) == response["items"]
+
+    class DummyClient:
+        @staticmethod
+        def list_pipelines() -> dict[str, object]:
+            return response
+
+    matched = find_pipeline_by_name(DummyClient(), "pipe-b")  # type: ignore[arg-type]
+
+    assert matched == {"id": "2", "name": "pipe-b"}
+
+
+def test_resolve_pipeline_id_supports_common_identifier_keys() -> None:
+    assert resolve_pipeline_id({"uuid": "pipe-123"}) == "pipe-123"

@@ -35,7 +35,7 @@ O foco do repositório é demonstrar um produto analítico completo: ingestão, 
 | Granularidade | `1 linha por item de pedido` |
 | Volume final | `112.650` registros |
 | Camada publicada | `fact_orders_dashboard` |
-| Colunas publicadas | `22` |
+| Colunas publicadas | `34` |
 | Consumo | Streamlit + Dadosfera/Metabase + Power BI |
 | Status | implementado, evidenciado, automatizado e testado |
 
@@ -56,6 +56,8 @@ O foco do repositório é demonstrar um produto analítico completo: ingestão, 
 - ativo em CSV para publicação manual em `data/published/dashboard/fact_orders_dashboard.csv`
 - sincronização programática de catálogo via API em `src/dadosfera_catalog_sync.py`
 - operador de pipelines nativos da Dadosfera via API em `src/dadosfera_pipeline_ops.py`
+- monitoramento recorrente da camada publicada em `src/published_monitoring.py`
+- camada semântica expandida em `src/semantic_layer.py`
 - dashboard Streamlit publicado
 - exportações auxiliares para Power BI
 - CI, lint e promoção automática de `main` para `streamlit-prod`
@@ -70,7 +72,7 @@ O escopo core do case está concentrado em ingestão, padronização, modelagem 
 
 - `Streamlit` foi escolhido para acelerar prova de valor e consumo executivo
 - a transformação principal roda localmente em Python, com publicação comprovada na Dadosfera
-- a solução explicita o que está automatizado e o que ainda é backlog, em vez de inflar escopo de plataforma
+- a solução explicita o que está automatizado e o que ainda depende de evolução real na plataforma, em vez de inflar escopo
 
 ## Leitura Recomendada
 
@@ -127,6 +129,7 @@ A separação entre `curated` e `published` é uma decisão central do projeto. 
 - SQLs versionadas com resultados exportados
 - sync de catálogo via API do Maestro
 - preparação operacional para pipeline nativo via API
+- operação recorrente da camada publicada com monitoramento e relatório operacional
 - CI, lint e promoção automática de `main` para o branch de deploy
 
 ## Execução
@@ -201,7 +204,7 @@ streamlit run streamlit_app/app.py
 - ativos públicos complementares podem ser sincronizados por API do Maestro
 - ownership do repositório, contribuição e política de segurança foram formalizados em `CODEOWNERS`, `CONTRIBUTING.md` e `SECURITY.md`
 
-Observação operacional: a sincronização em GitHub Actions exige credencial não interativa. Se a conta da Dadosfera usar MFA/TOTP, o workflow entra em modo seguro e não tenta o login automatizado.
+Observação operacional: a sincronização e o deploy por API aceitam `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN` como credencial não interativa. Se a automação depender de usuário/senha e a conta da Dadosfera usar MFA/TOTP, o workflow entra em modo seguro e não tenta o login automatizado.
 
 Referências:
 
@@ -226,7 +229,6 @@ Essa distinção é deliberada. O projeto já demonstra engenharia, publicação
 
 ## Evolução Natural
 
-- automatizar publicação da camada `published` com credencial não interativa na plataforma
-- adicionar monitoramento recorrente de freshness e qualidade da camada publicada
-- empacotar execução operacional em jobs agendados com observabilidade de falha
-- expandir camada semântica para novos recortes de logística, seller e cohort
+- evoluir a definição JSON do pipeline nativo com parâmetros reais de bucket e connection manager no tenant alvo
+- integrar alertas externos ao monitoramento recorrente da camada publicada
+- ampliar os marts semânticos publicados com recortes adicionais por produto e retenção

@@ -1,15 +1,5 @@
 # Privacidade, LGPD e Governança
 
-
-## Acesso Rápido
-
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
-
 Este documento registra as decisões de privacidade por design e governança aplicadas ao case.
 
 ## Camadas de Exposição
@@ -22,9 +12,10 @@ Este documento registra as decisões de privacidade por design e governança apl
 ## Medidas Aplicadas na Camada Publicada
 
 - pseudonimização não reversível de `order_id` e `customer_unique_id` antes do consumo pelo dashboard.
+- pseudonimização não reversível de `seller_id` em `seller_key` para permitir recortes por seller sem expor o identificador bruto.
 - remoção de identificadores desnecessários para apresentação, como `customer_id`, `seller_id` e `product_id`.
 - remoção de quase-identificadores mais sensíveis na camada publicada, como cidade e prefixo de CEP.
-- manutenção apenas de atributos necessários para responder às perguntas do case: tempo, categoria, UF, pagamento, valor, atraso e satisfação.
+- manutenção apenas de atributos necessários para responder às perguntas do case: tempo, categoria, UF, pagamento, valor, atraso, seller, logística e cohort.
 - preservação da camada analítica interna para engenharia e auditoria, separada da camada publicada.
 
 ## Colunas Removidas da Camada Publicada
@@ -56,7 +47,7 @@ Este documento registra as decisões de privacidade por design e governança apl
 - Arquivo publicado para o app: `data/published/dashboard/fact_orders_dashboard.parquet`
 - Arquivo publicado para upload manual: `data/published/dashboard/fact_orders_dashboard.csv`
 - Registros publicados: **112,650**
-- Colunas publicadas: **22**
+- Colunas publicadas: **34**
 
 ## Política de Uso
 
@@ -69,6 +60,3 @@ Este documento registra as decisões de privacidade por design e governança apl
 
 - o dataset Olist é público e anonimizado, mas o projeto adota privacidade por design para refletir prática corporativa.
 - esta camada não substitui controles organizacionais de acesso, mas reduz exposição desnecessária no produto analítico publicado.
-
-
-

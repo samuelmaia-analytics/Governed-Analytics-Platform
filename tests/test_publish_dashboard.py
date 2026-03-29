@@ -21,11 +21,22 @@ def test_build_published_dashboard_table_minimizes_sensitive_columns_and_pseudon
             "order_date": [pd.Timestamp("2018-01-01").date()],
             "order_year": [2018],
             "order_month": [1],
+            "purchase_cohort_month": ["2018-01"],
+            "cohort_order_month_number": [0],
+            "customer_order_sequence": [1],
+            "is_first_order": [True],
+            "seller_volume_tier": ["core"],
+            "seller_order_count": [10],
+            "seller_avg_delivery_days": [4.1],
+            "seller_delay_rate": [0.2],
             "delivery_time_days": [4.1],
+            "seller_dispatch_time_days": [1.0],
+            "carrier_delivery_time_days": [3.0],
             "estimated_delay_days": [1.0],
             "is_delayed": [True],
             "price": [100.0],
             "freight_value": [15.0],
+            "freight_to_price_ratio": [0.15],
             "total_item_value": [115.0],
             "payment_type_mode": ["credit_card"],
             "review_score_mean": [4.5],
@@ -47,7 +58,10 @@ def test_build_published_dashboard_table_minimizes_sensitive_columns_and_pseudon
     assert "product_id" not in published.columns
     assert "customer_city" not in published.columns
     assert "customer_zip_code_prefix" not in published.columns
+    assert "seller_id" not in published.columns
     assert published.loc[0, "order_id"] != "order-1"
     assert published.loc[0, "customer_unique_id"] != "cust-uniq-1"
+    assert published.loc[0, "seller_key"] != "seller-1"
     assert str(published.loc[0, "order_id"]).startswith("order_id_")
     assert str(published.loc[0, "customer_unique_id"]).startswith("customer_unique_id_")
+    assert str(published.loc[0, "seller_key"]).startswith("seller_id_")

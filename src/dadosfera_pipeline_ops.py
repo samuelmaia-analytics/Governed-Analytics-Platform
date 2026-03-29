@@ -46,20 +46,30 @@ class DadosferaPipelineClient:
         self,
         *,
         base_url: str,
-        username: str,
-        password: str,
+        username: str | None = None,
+        password: str | None = None,
         totp: str | None = None,
+        access_token: str | None = None,
         config: PipelineApiConfig | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
-        self.username = username
-        self.password = password
+        self.username = username or ""
+        self.password = password or ""
         self.totp = totp
         self.config = config or PipelineApiConfig()
         self.session = requests.Session()
         self.session.headers.update({"Content-Type": "application/json"})
+        if access_token:
+            self.session.headers.update(
+                {
+                    "access-token": access_token,
+                    "Authorization": f"Bearer {access_token}",
+                }
+            )
 
     def sign_in(self) -> None:
+        if self.session.headers.get("Authorization"):
+            return
         last_body: dict[str, Any] = {}
         last_headers: Any | None = None
 
@@ -123,6 +133,32 @@ def load_json_file(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def extract_pipeline_items(response_body: dict[str, Any]) -> list[dict[str, Any]]:
+    for key in ("items", "pipelines", "data_assets", "data"):
+        candidate = response_body.get(key)
+        if isinstance(candidate, list):
+            return [item for item in candidate if isinstance(item, dict)]
+    if isinstance(response_body.get("pipeline"), dict):
+        return [response_body["pipeline"]]
+    return []
+
+
+def resolve_pipeline_id(pipeline_body: dict[str, Any]) -> str:
+    for key in ("id", "pipeline_id", "uuid"):
+        value = pipeline_body.get(key)
+        if value:
+            return str(value)
+    raise RuntimeError("Resposta da pipeline sem identificador utilizavel.")
+
+
+def find_pipeline_by_name(client: DadosferaPipelineClient, pipeline_name: str) -> dict[str, Any] | None:
+    response = client.list_pipelines()
+    for pipeline in extract_pipeline_items(response):
+        if str(pipeline.get("name") or pipeline.get("display_name") or "") == pipeline_name:
+            return pipeline
+    return None
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Opera pipelines nativos da Dadosfera via API usando a mesma autenticacao do sync de catalogo."
@@ -165,6 +201,14 @@ def parse_args() -> argparse.Namespace:
     runs_parser = subparsers.add_parser("runs", help="Lista execucoes de uma pipeline.")
     runs_parser.add_argument("--pipeline-id", required=True)
 
+    deploy_parser = subparsers.add_parser(
+        "deploy",
+        help="Garante a existencia da pipeline pelo nome da definicao e opcionalmente executa logo em seguida.",
+    )
+    deploy_parser.add_argument("--definition", type=Path, required=True)
+    deploy_parser.add_argument("--execute", action="store_true")
+    deploy_parser.add_argument("--run-payload", type=Path)
+
     return parser.parse_args()
 
 
@@ -172,8 +216,11 @@ def build_client_from_args(args: argparse.Namespace) -> DadosferaPipelineClient:
     username = os.getenv("DADOSFERA_USERNAME")
     password = os.getenv("DADOSFERA_PASSWORD")
     totp = os.getenv("DADOSFERA_TOTP")
-    if not username or not password:
-        raise RuntimeError("Defina DADOSFERA_USERNAME e DADOSFERA_PASSWORD para operar pipelines da Dadosfera.")
+    access_token = os.getenv("DADOSFERA_ACCESS_TOKEN") or os.getenv("DADOSFERA_API_TOKEN")
+    if not access_token and (not username or not password):
+        raise RuntimeError(
+            "Defina DADOSFERA_ACCESS_TOKEN/DADOSFERA_API_TOKEN ou DADOSFERA_USERNAME e DADOSFERA_PASSWORD para operar pipelines da Dadosfera."
+        )
 
     config = PipelineApiConfig(
         list_endpoint=args.list_endpoint,
@@ -187,6 +234,7 @@ def build_client_from_args(args: argparse.Namespace) -> DadosferaPipelineClient:
         username=username,
         password=password,
         totp=totp,
+        access_token=access_token,
         config=config,
     )
 
@@ -206,9 +254,7 @@ def main() -> None:
         response = client.create_pipeline(definition)
         print(json.dumps(response, indent=2, ensure_ascii=False))
         if args.execute:
-            pipeline_id = str(response.get("id") or response.get("pipeline_id") or response.get("uuid") or "")
-            if not pipeline_id:
-                raise RuntimeError("Pipeline criada, mas a resposta nao trouxe identificador para execucao automatica.")
+            pipeline_id = resolve_pipeline_id(response)
             payload = load_json_file(args.run_payload.resolve()) if args.run_payload else {}
             run_response = client.run_pipeline(pipeline_id, payload)
             print(json.dumps(run_response, indent=2, ensure_ascii=False))
@@ -225,6 +271,20 @@ def main() -> None:
 
     if args.command == "runs":
         print(json.dumps(client.list_pipeline_runs(args.pipeline_id), indent=2, ensure_ascii=False))
+        return
+
+    if args.command == "deploy":
+        definition = load_json_file(args.definition.resolve())
+        pipeline_name = str(definition.get("name") or "").strip()
+        if not pipeline_name:
+            raise RuntimeError("A definicao JSON precisa conter o campo `name` para deploy idempotente.")
+        existing = find_pipeline_by_name(client, pipeline_name)
+        response = existing or client.create_pipeline(definition)
+        print(json.dumps(response, indent=2, ensure_ascii=False))
+        if args.execute:
+            payload = load_json_file(args.run_payload.resolve()) if args.run_payload else {}
+            run_response = client.run_pipeline(resolve_pipeline_id(response), payload)
+            print(json.dumps(run_response, indent=2, ensure_ascii=False))
         return
 
     raise RuntimeError(f"Comando nao suportado: {args.command}")

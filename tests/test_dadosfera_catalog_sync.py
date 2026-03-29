@@ -274,3 +274,14 @@ def test_raise_runtime_for_auth_response_includes_diagnostic_keys() -> None:
         assert "Headers recebidos: content-type" in str(exc)
     else:
         raise AssertionError("Expected RuntimeError when access token is missing")
+
+
+def test_client_with_access_token_skips_interactive_sign_in() -> None:
+    client = DadosferaMaestroClient(
+        base_url="https://maestro.dadosfera.ai",
+        access_token="abc123",
+    )
+
+    client.sign_in()
+
+    assert client.session.headers["Authorization"] == "Bearer abc123"

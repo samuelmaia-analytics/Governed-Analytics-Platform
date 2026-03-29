@@ -1,0 +1,66 @@
+name: Operate Published Layer
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1-5"
+
+jobs:
+  published-ops:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      DADOSFERA_MAESTRO_BASE_URL: ${{ vars.DADOSFERA_MAESTRO_BASE_URL || 'https://maestro.dadosfera.ai' }}
+      DADOSFERA_ACCESS_TOKEN: ${{ secrets.DADOSFERA_ACCESS_TOKEN }}
+      DADOSFERA_API_TOKEN: ${{ secrets.DADOSFERA_API_TOKEN }}
+      DADOSFERA_USERNAME: ${{ secrets.DADOSFERA_USERNAME }}
+      DADOSFERA_PASSWORD: ${{ secrets.DADOSFERA_PASSWORD }}
+      DADOSFERA_TOTP: ${{ secrets.DADOSFERA_TOTP }}
+      PUBLISHED_MONITOR_MAX_FRESHNESS_HOURS: ${{ vars.PUBLISHED_MONITOR_MAX_FRESHNESS_HOURS || '36' }}
+      DADOSFERA_AUTODEPLOY_PIPELINE: ${{ vars.DADOSFERA_AUTODEPLOY_PIPELINE || 'false' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build, publish and expand semantic layer
+        run: python src/run_case_pipeline.py --steps build publish semantic
+
+      - name: Monitor published layer
+        run: python src/published_monitoring.py --max-freshness-hours "$PUBLISHED_MONITOR_MAX_FRESHNESS_HOURS" --fail-on-alert
+
+      - name: Deploy Dadosfera native pipeline
+        if: ${{ env.DADOSFERA_AUTODEPLOY_PIPELINE == 'true' && (env.DADOSFERA_ACCESS_TOKEN != '' || env.DADOSFERA_API_TOKEN != '' || (env.DADOSFERA_USERNAME != '' && env.DADOSFERA_PASSWORD != '' && env.DADOSFERA_TOTP == '')) }}
+        run: python src/dadosfera_pipeline_ops.py deploy --definition contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json --execute
+
+      - name: Upload operational artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-layer-ops-artifacts
+          path: |
+            docs/published_layer_monitoring.md
+            docs/operational_job_report.md
+            docs/semantic_layer.md
+            data/published/monitoring/
+            data/published/semantic/
+            data/curated/ops/
+
+      - name: Write job summary
+        if: ${{ always() }}
+        run: |
+          echo "## Published layer operations" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Workflow date (UTC): $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Monitoring report: docs/published_layer_monitoring.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Operational report: docs/operational_job_report.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Semantic report: docs/semantic_layer.md" >> "$GITHUB_STEP_SUMMARY"

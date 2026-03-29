@@ -13,7 +13,7 @@ Use a sequência abaixo:
 3. o ativo central é `fact_orders_enriched`
 4. o consumo executivo acontece sobre `fact_orders_dashboard`
 5. a publicação está comprovada na Dadosfera/Metabase
-6. o que permanece fora do escopo é pipeline nativo dentro da plataforma
+6. o que permanece fora do escopo comprovado é a execução nativa do pipeline dentro da plataforma
 
 ## Mensagem central
 
@@ -26,6 +26,8 @@ Se a apresentação precisar ser resumida em poucos segundos, a formulação mai
 - arquitetura em camadas
 - racional da modelagem
 - governança da camada publicada
+- monitoramento recorrente e jobs operacionais
+- recortes semânticos de logística, seller e cohort
 - robustez técnica com testes, cobertura e gates
 - SQL e insights de negócio
 - dashboard em operação
@@ -36,7 +38,7 @@ Se a apresentação precisar ser resumida em poucos segundos, a formulação mai
 
 - a transformação principal foi endurecida fora da plataforma para garantir reprodutibilidade e controle técnico
 - a Dadosfera já comprova publicação, catálogo e consumo, mas não deve ser vendida aqui como motor nativo já validado de ponta a ponta
-- a evolução natural é reduzir esse gap operacional com execução nativa evidenciada, não reabrir a discussão de modelagem
+- a evolução natural é reduzir esse gap operacional com execução nativa evidenciada e alertas externos, não reabrir a discussão de modelagem
 
 ## Artefatos já prontos
 
@@ -71,14 +73,14 @@ Adote uma defesa objetiva. O que fortalece a apresentação não é prometer mat
 
 ## Pergunta difícil esperada
 
-Se perguntarem por que a transformação ainda roda majoritariamente fora da plataforma, a resposta mais forte é: porque o objetivo do case foi provar valor analítico com governança e consumo reais sem alegar automação nativa não evidenciada. A plataforma já está integrada ao fluxo publicado, e o próximo ganho natural é operacionalizar a execução nativa com a mesma disciplina de evidência.
+Se perguntarem por que a transformação ainda roda majoritariamente fora da plataforma, a resposta mais forte é: porque o objetivo do case foi provar valor analítico com governança e consumo reais sem alegar automação nativa não evidenciada. A plataforma já está integrada ao fluxo publicado, e o próximo ganho natural é operacionalizar a execução nativa e o alerta recorrente com a mesma disciplina de evidência.
 
 ## Números que valem mencionar
 
 - `fact_orders_enriched` com `112.650` registros
-- `fact_orders_dashboard` com `22` colunas publicadas
-- `114/114` testes passando
-- cobertura total acima de `86%`
+- `fact_orders_dashboard` com `34` colunas publicadas
+- `124/124` testes passando
+- cobertura total acima de `83%`
 - gate mínimo de cobertura em `80%`
 
 ## Frase de fechamento

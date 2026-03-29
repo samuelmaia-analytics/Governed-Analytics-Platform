@@ -23,15 +23,18 @@ python -m pytest tests
 4. Se necessário, regenerar a camada publicada:
 
 ```bash
-python src/run_case_pipeline.py --steps build publish quality contracts
+python src/run_case_pipeline.py --steps build publish semantic quality contracts monitor
 ```
 
 5. Revalidar o workflow de promoção para `streamlit-prod`.
-6. Se o app estiver apontando temporariamente para `streamlit-prod`, confirmar se o branch publicado já recebeu o commit de rollback ou se o apontamento precisa ser ajustado manualmente no Streamlit Cloud.
+6. Revalidar o workflow `Operate Published Layer` se o incidente envolver freshness, semântica publicada ou operação recorrente.
+7. Se o app estiver apontando temporariamente para `streamlit-prod`, confirmar se o branch publicado já recebeu o commit de rollback ou se o apontamento precisa ser ajustado manualmente no Streamlit Cloud.
 
 ## Evidências mínimas após rollback
 
 - dashboard carregando
 - camada `published/dashboard` íntegra
+- camada `published/semantic` íntegra
+- monitoramento da camada publicada sem falha crítica aberta
 - contratos e quality checks válidos
 - documentação central sem inconsistência óbvia

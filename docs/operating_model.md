@@ -13,7 +13,8 @@ O projeto opera com separação explícita entre branch de desenvolvimento e bra
 3. Construção da camada analítica `fact_orders_enriched`
 4. Qualidade, contratos e catálogo
 5. Publicação da camada `fact_orders_dashboard`
-6. Consumo por Streamlit, SQL, Power BI e evidências
+6. Expansão semântica e monitoramento recorrente da camada publicada
+7. Consumo por Streamlit, SQL, Power BI e evidências
 
 ## Fluxo de branches e deploy
 
@@ -40,6 +41,9 @@ Leitura correta:
 
 - `src/run_case_pipeline.py`: geração ponta a ponta dos ativos analíticos
 - `src/publish_dashboard.py`: construção da camada publicada minimizada
+- `src/semantic_layer.py`: marts publicados para logística, seller e cohort
+- `src/published_monitoring.py`: freshness e qualidade recorrente da camada publicada
+- `.github/workflows/operate-published-layer.yml`: job agendado com artefatos operacionais e falha observável
 - `.github/workflows/deploy-streamlit.yml`: promoção controlada de `main` para `streamlit-prod`
 - `docs/release_runbook.md`: checklist mínimo antes e depois de release
 - `docs/rollback_runbook.md`: resposta operacional para regressão de app ou artefato publicado
@@ -51,6 +55,7 @@ Leitura correta:
 - catálogo local versionado em `src/catalog.py`
 - publicação minimizada em `src/publish_dashboard.py`
 - CI, lint e deploy versionados em `.github/workflows/`
+- autenticação não interativa na API da Dadosfera por `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN`
 
 ## Responsabilidade por camada
 
@@ -73,6 +78,8 @@ Uma operação saudável deste projeto exige, ao mesmo tempo:
 
 - docs centrais alinhadas ao fluxo real
 - camada `published/dashboard` consistente com contratos e quality checks
+- camada `published/semantic` materializada e coerente com o dashboard
+- monitoramento de freshness da camada publicada sem alertas abertos
 - branch `main` íntegra
 - branch `streamlit-prod` atualizada pelo fluxo de promoção
 - app publicado carregando a versão esperada da camada minimizada

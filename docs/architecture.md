@@ -32,6 +32,8 @@ flowchart LR
     D --> E[Quality]
     D --> F[Catalog]
     D --> G[Published Dashboard]
+    G --> G2[Published Semantic Marts]
+    G --> G3[Published Monitoring]
     D --> H[SQL]
     D --> I[Power BI Exports]
     G --> J[Streamlit]
@@ -60,10 +62,13 @@ data/
     analytics/
     catalog/
     genai/
+    ops/
     quality/
     query_results/
   published/
     dashboard/
+    monitoring/
+    semantic/
   external/
     genai/
   screenshots/
@@ -79,10 +84,13 @@ data/
 | `staging` | guardar profiling e apoio técnico | nulos, duplicatas e chaves candidatas |
 | `curated/analytics` | manter a base analítica interna | `fact_orders_enriched` |
 | `curated/catalog` | materializar catálogo e inventário | manifesto JSON e inventário tabular |
+| `curated/ops` | registrar execução operacional | relatórios e resultados do runner |
 | `curated/quality` | registrar checks e contratos | relatórios e resultados de qualidade |
 | `curated/query_results` | persistir resultados SQL | saídas das queries em DuckDB |
 | `curated/genai` | guardar artefatos do bônus de GenAI | features extraídas de texto |
 | `published/dashboard` | expor camada minimizada para consumo | `fact_orders_dashboard` |
+| `published/semantic` | expor marts agregados para recortes operacionais | `logistics_slice`, `seller_slice`, `cohort_slice` |
+| `published/monitoring` | persistir monitoramento recorrente | checks de freshness e qualidade |
 | `external/genai` | entrada auxiliar externa ao fluxo principal | amostra textual para GenAI |
 
 ## Camadas e papel no projeto
@@ -165,11 +173,15 @@ Separar a camada de exposição do produto analítico da camada analítica inter
 **Caminho**
 
 - `data/published/dashboard/`
+- `data/published/semantic/`
+- `data/published/monitoring/`
 
 **Uso no projeto**
 
 - `fact_orders_dashboard.parquet`
 - `fact_orders_dashboard.csv`
+- marts de logística, seller e cohort
+- relatórios recorrentes de freshness e qualidade da camada publicada
 - fonte do Streamlit
 - ativo usado para publicação e evidência na Dadosfera
 
@@ -181,6 +193,8 @@ flowchart TD
     B --> C[build_analytics.py]
     C --> D[quality.py]
     C --> E[publish_dashboard.py]
+    E --> E2[semantic_layer.py]
+    E --> E3[published_monitoring.py]
     C --> F[catalog.py]
     C --> G[run_analytics_queries.py]
     G --> H[export_query_result_images.py]
@@ -216,25 +230,31 @@ Leitura operacional:
 6. `src/data_classification.py`
    Materializa a classificação de dados com foco em sensibilidade e publicação.
 
-7. `src/schema_contracts.py`
+7. `src/semantic_layer.py`
+   Materializa marts agregados para logística, seller e cohort a partir da camada publicada.
+
+8. `src/published_monitoring.py`
+   Monitora freshness, schema e cobertura semântica da camada publicada.
+
+9. `src/schema_contracts.py`
    Aplica contratos simples de schema sobre as camadas principais.
 
-8. `src/catalog.py`
+10. `src/catalog.py`
    Materializa o manifesto da coleção e o inventário catalogável dos ativos.
 
-9. `src/run_analytics_queries.py`
+11. `src/run_analytics_queries.py`
    Executa as queries SQL sobre a camada analítica.
 
-10. `src/export_query_result_images.py`
+12. `src/export_query_result_images.py`
    Converte resultados tabulares em imagens PNG para documentação.
 
-11. `src/export_power_bi.py`
+13. `src/export_power_bi.py`
    Gera os exports do modelo complementar para Power BI.
 
-12. `streamlit_app/app.py`
+14. `streamlit_app/app.py`
    Consome exclusivamente a camada publicada do dashboard.
 
-13. `src/genai_feature_extraction.py`
+15. `src/genai_feature_extraction.py`
    Materializa o bônus de extração de features em texto desestruturado.
 
 ## Decisões de arquitetura que importam na avaliação
@@ -252,13 +272,15 @@ Leitura operacional:
 - arquitetura local em camadas
 - camada analítica interna
 - camada publicada para dashboard
+- camada semântica publicada para logística, seller e cohort
+- monitoramento recorrente com artefatos operacionais
 - catálogo local materializado
 - publicação do ativo principal na Dadosfera com evidência visual
 
 **Evolução futura**
 
 - pipeline nativo recorrente na plataforma
-- integração por API com catálogo/publicação, já implementada no repositório via `src/dadosfera_catalog_sync.py`
+- alerta externo para falhas de monitoramento e execução
 - maior absorção da arquitetura local pela Dadosfera
 
 ## Resumo executivo

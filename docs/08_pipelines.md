@@ -28,9 +28,11 @@ Etapas disponiveis:
 - `profiling`
 - `build`
 - `publish`
+- `semantic`
 - `classify`
 - `contracts`
 - `quality`
+- `monitor`
 - `catalog`
 - `queries`
 - `screenshots`
@@ -42,6 +44,9 @@ Etapas disponiveis:
 - profiling exploratorio
 - `fact_orders_enriched`
 - `fact_orders_dashboard`
+- marts semanticos de logistica, seller e cohort
+- relatorio operacional do job
+- relatorio de freshness e qualidade da camada published
 - relatorios de qualidade
 - contratos de schema
 - coleção local
@@ -55,6 +60,7 @@ Etapas disponiveis:
 - lint em `.github/workflows/lint.yml`
 - promoção automática de `main` para `streamlit-prod` em `.github/workflows/deploy-streamlit.yml`
 - sincronização de ativos do catálogo por API em `.github/workflows/sync-dadosfera-catalog.yml`
+- job agendado da camada published em `.github/workflows/operate-published-layer.yml`
 
 ## Leitura de maturidade
 
@@ -97,6 +103,8 @@ Para fechar a parte especificamente nativa da plataforma, ainda falta:
 Mesmo sem evidência final de um pipeline nativo executado na interface da plataforma, o repositório já foi preparado para a próxima etapa:
 
 - operador de pipelines via API em `src/dadosfera_pipeline_ops.py`
+- suporte a credencial não interativa por token no operador e no sync de catálogo
+- comando `deploy` idempotente para reaproveitar pipeline existente e executar por API
 - runbook operacional em `docs/dadosfera_native_pipeline_runbook.md`
 - template versionado para tentativa real em `contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json`
 
@@ -156,6 +164,9 @@ Se houver aprofundamento futuro na plataforma, os campos que precisam ser preenc
 - pipeline local em Python: feito
 - CI/CD de promoção para o branch de deploy do Streamlit: feito
 - sync de catálogo via API: feito
+- monitoramento recorrente da camada published: feito
+- jobs agendados com observabilidade de falha: feito
+- expansão semântica de logística, seller e cohort: feita
 - preparação operacional para pipeline nativo via API: feita
 - pipeline real na Dadosfera: pendente
 - catalogação do pipeline na plataforma: pendente
