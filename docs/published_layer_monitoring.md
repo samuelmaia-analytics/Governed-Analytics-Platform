@@ -2,6 +2,8 @@
 
 Relatorio recorrente de freshness e qualidade da camada `fact_orders_dashboard`.
 
+Quando o sumario JSON de monitoramento esta publicado no ambiente do app, o Streamlit tambem exibe esse estado operacional em uma secao propria, aproximando observabilidade e consumo executivo.
+
 ## Resumo
 
 - Checks executados: **12**
@@ -28,3 +30,9 @@ Relatorio recorrente de freshness e qualidade da camada `fact_orders_dashboard`.
 ## Alertas
 
 - Nenhum alerta aberto na execucao atual.
+
+## Consumo no App
+
+- o app nao depende desse artefato para abrir
+- quando `published_layer_monitoring.json` esta disponivel, o Streamlit exibe status, total de checks, falhas abertas e preview do resultado
+- quando o arquivo nao esta presente no ambiente, o app mostra um estado degradado explicito sem quebrar a navegacao principal

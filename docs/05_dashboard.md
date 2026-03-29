@@ -45,6 +45,11 @@ Regra prática:
 - `published/semantic`: marts publicados para novos recortes analíticos
 - `published/monitoring`: operação e observabilidade da camada publicada
 
+No estado atual do projeto, o Streamlit continua tendo `published/dashboard` como base principal, mas também passou a ler:
+
+- `published/monitoring` para exibir o bloco de saúde operacional da camada publicada
+- `published/semantic` para exibir os recortes publicados de logística, seller e cohort
+
 ## Perguntas de Negócio que o Dashboard Responde
 
 - qual é o nível atual de receita, ticket e atraso
@@ -58,10 +63,12 @@ Além disso, a evolução recente da camada publicada passou a permitir desdobra
 - cohort e recorrência de compra
 - recortes por seller pseudonimizado
 - leitura mais detalhada de despacho, transporte e peso relativo do frete
+- leitura do status operacional mais recente da camada publicada sem sair do app
 
 ## Decisões de Design Analítico
 
 - o app consome apenas `published/dashboard`, nunca `curated/analytics`
+- o app pode enriquecer a leitura com `published/monitoring` e `published/semantic`, mas sem depender da camada interna
 - a navegação é organizada por perguntas executivas, não por tabela de origem
 - a visualização prioriza velocidade de leitura e capacidade de filtro
 - a cauda longa de categorias é resumida quando isso melhora clareza visual
@@ -75,6 +82,7 @@ O Streamlit é a camada oficial de exposição executiva do projeto. Isso signif
 - o dashboard não precisa replicar regras pesadas de transformação
 - qualidade, contratos e governança acontecem antes da etapa de visualização
 - a mesma camada publicada sustenta o app e a publicação evidenciada na Dadosfera
+- monitoramento e semântica entram no app como extensões publicadas, não como atalhos para a camada interna
 
 Esse desenho aproxima o case de um produto analítico real, e não apenas de uma interface sobre a base inteira.
 
@@ -88,6 +96,7 @@ Em termos de avaliação, isso demonstra:
 - critério de exposição de dados
 - alinhamento entre arquitetura, visualização e governança
 - preocupação com reuso do ativo publicado fora do app
+- capacidade de levar operação e semântica para a interface executiva sem romper a separação entre camadas
 
 ## Tradeoff Explícito
 

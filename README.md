@@ -19,6 +19,7 @@ Produto analítico sobre o dataset Olist com modelagem em camadas, governança d
 - `fact_orders_dashboard` como camada publicada minimizada e pseudonimizada
 - marts semânticos publicados para logística, seller e cohort
 - monitoramento recorrente de freshness e qualidade da camada publicada
+- dashboard Streamlit consumindo a camada publicada principal e exibindo blocos de saúde operacional e recortes semânticos quando os artefatos estão publicados
 - operação agendada com artefatos de execução e observabilidade de falha
 - catálogo local, classificação de dados e publicação externa comprovados na Dadosfera/Metabase
 - consumo analítico por Streamlit, SQL versionado e exportações para Power BI
@@ -61,6 +62,7 @@ Hoje o repositório já possui:
 - publicação segura da camada `published/dashboard` em [src/publish_dashboard.py](src/publish_dashboard.py)
 - monitoramento recorrente em [src/published_monitoring.py](src/published_monitoring.py)
 - camada semântica expandida em [src/semantic_layer.py](src/semantic_layer.py)
+- Streamlit alinhado aos ativos `published/dashboard`, `published/monitoring` e `published/semantic`
 - sync de catálogo por API em [src/dadosfera_catalog_sync.py](src/dadosfera_catalog_sync.py)
 - operador de pipeline nativo por API em [src/dadosfera_pipeline_ops.py](src/dadosfera_pipeline_ops.py)
 - coleção e classificação de dados alinhadas aos ativos `published/semantic` e `published/monitoring`
@@ -148,6 +150,7 @@ O fallback por `DADOSFERA_USERNAME` + `DADOSFERA_PASSWORD` continua suportado. S
 
 - publicação do ativo principal na Dadosfera/Metabase
 - dashboard Streamlit público consumindo a camada publicada
+- dashboard Streamlit exibindo também o estado mais recente de monitoramento e os recortes semânticos publicados quando presentes no ambiente
 - SQLs versionadas com resultados exportados
 - sync de catálogo via API do Maestro
 - operação recorrente da camada publicada com relatório operacional
