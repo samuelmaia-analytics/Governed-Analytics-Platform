@@ -55,6 +55,7 @@ O objetivo deste repositório não é vender apenas um dashboard, mas demonstrar
 - camada publicada para consumo em `data/published/dashboard/fact_orders_dashboard.parquet`
 - ativo em CSV para publicação manual em `data/published/dashboard/fact_orders_dashboard.csv`
 - sincronização programática de catálogo via API em `src/dadosfera_catalog_sync.py`
+- operador de pipelines nativos da Dadosfera via API em `src/dadosfera_pipeline_ops.py`
 - dashboard Streamlit publicado
 - exportações auxiliares para Power BI
 - CI, lint e promoção automática de `main` para `streamlit-prod`
@@ -119,6 +120,7 @@ A separação entre `curated` e `published` é uma decisão central do projeto. 
 - dashboard Streamlit público consumindo a camada publicada
 - SQLs versionadas com resultados exportados
 - sync de catálogo via API do Maestro
+- preparação operacional para pipeline nativo via API
 - CI, lint e promoção automática de `main` para o branch de deploy
 
 ## Execução
@@ -211,6 +213,8 @@ Referências:
 
 - pipeline nativo executando dentro da Dadosfera
 - operação de transformação totalmente absorvida pela plataforma
+
+O repositório já está preparado para tentar operar pipelines nativos via API da plataforma, mas isso ainda não substitui evidência de execução real, output gerado e catalogação do pipeline no tenant avaliado.
 
 Essa distinção é deliberada. O projeto já demonstra engenharia, publicação e automação relevantes, mas evita inflar o escopo para além do que está objetivamente comprovado.
 

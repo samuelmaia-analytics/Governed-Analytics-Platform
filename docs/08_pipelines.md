@@ -66,6 +66,17 @@ O projeto já não depende apenas de execução manual. Há uma separação clar
 
 Isso eleva o padrão da entrega porque aproxima o case de um fluxo real de operação, sem alegar que toda a transformação já roda nativamente dentro da plataforma.
 
+## Leitura correta do item do case
+
+O case pede um pipeline na Dadosfera, mas a leitura tecnicamente rigorosa deste repositório é a seguinte:
+
+- o pipeline analítico principal foi implementado e validado em `Python`
+- o ativo final `fact_orders_dashboard` foi efetivamente publicado na Dadosfera
+- o consumo do ativo na plataforma foi comprovado por catálogo, visualização e evidências
+- a execução nativa completa da transformação dentro do módulo de pipelines da Dadosfera ainda não foi comprovada como fluxo final deste tenant
+
+Essa distinção é intencional. O projeto evita marcar o item como concluído de forma inflada quando o que existe com evidência é publicação, catálogo, visualização e preparação operacional para pipeline nativo.
+
 ## Comando principal local
 
 ```powershell
@@ -80,6 +91,16 @@ Para fechar a parte especificamente nativa da plataforma, ainda falta:
 - executar esse pipeline na plataforma
 - catalogar esse pipeline
 - gerar evidências visuais da execução
+
+## O que foi preparado para reduzir esse gap
+
+Mesmo sem evidência final de um pipeline nativo executado na interface da plataforma, o repositório já foi preparado para a próxima etapa:
+
+- operador de pipelines via API em `src/dadosfera_pipeline_ops.py`
+- runbook operacional em `docs/dadosfera_native_pipeline_runbook.md`
+- template versionado para tentativa real em `contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json`
+
+Com isso, a lacuna remanescente deixa de ser modelagem conceitual e passa a ser dependência de origem compatível, configuração real no tenant e evidência de run bem-sucedido.
 
 ## Desenho recomendado para pipeline nativo na Dadosfera
 
@@ -135,6 +156,7 @@ Se houver aprofundamento futuro na plataforma, os campos que precisam ser preenc
 - pipeline local em Python: feito
 - CI/CD de promoção para o branch de deploy do Streamlit: feito
 - sync de catálogo via API: feito
+- preparação operacional para pipeline nativo via API: feita
 - pipeline real na Dadosfera: pendente
 - catalogação do pipeline na plataforma: pendente
 

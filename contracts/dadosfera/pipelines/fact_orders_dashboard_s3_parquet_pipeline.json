@@ -1,0 +1,27 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "name": "fact_orders_dashboard_s3_parquet",
+  "description": "Pipeline nativo da Dadosfera para ingestao da camada publicada fact_orders_dashboard a partir de arquivo Parquet em bucket S3.",
+  "cron": null,
+  "jobs": [
+    {
+      "input": {
+        "plugin": "parquet",
+        "source_bucket": "SUBSTITUIR_BUCKET_S3",
+        "source_prefix": "SUBSTITUIR_PREFIX/fact_orders_dashboard.parquet",
+        "replication_method": "FULL_TABLE",
+        "auth_parameters": {
+          "auth_type": "connection_manager",
+          "config_id": "SUBSTITUIR_CONFIG_ID_S3"
+        },
+        "file_format_params": {
+          "file_format": "parquet"
+        }
+      },
+      "transformations": [],
+      "output": {
+        "plugin": "dadosfera_snowflake"
+      }
+    }
+  ]
+}
