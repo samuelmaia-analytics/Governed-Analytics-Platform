@@ -1,15 +1,5 @@
 # Classificação de Dados
 
-
-## Acesso Rápido
-
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
-
 Este documento materializa a classificação dos principais campos com impacto de privacidade e governança no projeto.
 
 ## Critérios
@@ -34,8 +24,15 @@ Este documento materializa a classificação dos principais campos com impacto d
 | `fact_orders_enriched` | `review_comment_message` | `source_only` | `texto_livre_potencialmente_sensivel` | `high` | `aggregate_or_remove` | `False` |
 | `fact_orders_dashboard` | `order_id` | `published_dashboard` | `identificador_pseudonimizado` | `low_medium` | `keep` | `True` |
 | `fact_orders_dashboard` | `customer_unique_id` | `published_dashboard` | `identificador_pseudonimizado` | `low_medium` | `keep` | `True` |
+| `fact_orders_dashboard` | `seller_key` | `published_dashboard` | `identificador_pseudonimizado` | `low_medium` | `keep` | `True` |
 | `fact_orders_dashboard` | `customer_state` | `published_dashboard` | `analitico_agregado` | `low` | `keep` | `True` |
 | `fact_orders_dashboard` | `seller_state` | `published_dashboard` | `analitico_agregado` | `low` | `keep` | `True` |
+| `fact_orders_dashboard` | `purchase_cohort_month` | `published_dashboard` | `analitico_agregado` | `low` | `keep` | `True` |
+| `fact_orders_dashboard` | `customer_order_sequence` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
+| `fact_orders_dashboard` | `seller_volume_tier` | `published_dashboard` | `analitico_agregado` | `low` | `keep` | `True` |
+| `fact_orders_dashboard` | `seller_delay_rate` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
 | `fact_orders_dashboard` | `total_item_value` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
 | `fact_orders_dashboard` | `delivery_time_days` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
-
+| `fact_orders_dashboard` | `seller_dispatch_time_days` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
+| `fact_orders_dashboard` | `carrier_delivery_time_days` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |
+| `fact_orders_dashboard` | `freight_to_price_ratio` | `published_dashboard` | `analitico_publico` | `low` | `keep` | `True` |

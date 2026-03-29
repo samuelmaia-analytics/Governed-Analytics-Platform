@@ -1,18 +1,6 @@
 # Coleção e Catálogo de Ativos
 
-
-## Acesso Rápido
-
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
-
 Este documento materializa a coleção do case em formato versionável, pronta para publicação e catalogação.
-
-Para a visão da coleção já publicada na Dadosfera/Metabase, com links confirmados e evidências visuais por item, consultar [docs/dadosfera_evidencias.md](./dadosfera_evidencias.md).
 
 ## Objetivo
 
@@ -31,11 +19,14 @@ Para a visão da coleção já publicada na Dadosfera/Metabase, com links confir
 | --- | ---: | ---: |
 | `analytics_sql` | 5 | 5 |
 | `curated_analytics` | 1 | 0 |
+| `curated_ops` | 1 | 1 |
 | `curated_quality` | 2 | 2 |
 | `curated_query_results` | 6 | 6 |
-| `documentation` | 11 | 11 |
+| `documentation` | 14 | 14 |
 | `documentation_media` | 5 | 5 |
 | `published_dashboard` | 1 | 1 |
+| `published_monitoring` | 1 | 1 |
+| `published_semantic` | 3 | 3 |
 | `raw_landing` | 9 | 0 |
 | `staging_profiling` | 41 | 0 |
 | `standardized` | 9 | 0 |
@@ -49,6 +40,7 @@ Para a visão da coleção já publicada na Dadosfera/Metabase, com links confir
 | `03_revenue_by_state` | `analytics_sql` | `sql_query` | `sql/analytics/03_revenue_by_state.sql` |
 | `04_delivery_delay_by_category` | `analytics_sql` | `sql_query` | `sql/analytics/04_delivery_delay_by_category.sql` |
 | `05_payment_method_distribution` | `analytics_sql` | `sql_query` | `sql/analytics/05_payment_method_distribution.sql` |
+| `operational_job_results` | `curated_ops` | `operational_execution_log` | `data/curated/ops/operational_job_results.json` |
 | `fact_orders_enriched_quality_checks` | `curated_quality` | `quality_report_table` | `data/curated/quality/fact_orders_enriched_quality_checks.csv` |
 | `schema_contract_results` | `curated_quality` | `schema_contract_results` | `data/curated/quality/schema_contract_results.csv` |
 | `01_top_categories_by_revenue` | `curated_query_results` | `query_result` | `data/curated/query_results/01_top_categories_by_revenue.csv` |
@@ -66,25 +58,30 @@ Para a visão da coleção já publicada na Dadosfera/Metabase, com links confir
 | `data_dictionary` | `documentation` | `documentation_asset` | `docs/data_dictionary.md` |
 | `genai_bonus` | `documentation` | `documentation_asset` | `docs/genai_bonus.md` |
 | `governance_policy` | `documentation` | `documentation_asset` | `docs/governance_policy.md` |
+| `operational_job_report` | `documentation` | `documentation_asset` | `docs/operational_job_report.md` |
 | `privacy_governance` | `documentation` | `documentation_asset` | `docs/privacy_governance.md` |
+| `published_layer_monitoring` | `documentation` | `documentation_asset` | `docs/published_layer_monitoring.md` |
 | `schema_contract_report` | `documentation` | `documentation_asset` | `docs/schema_contract_report.md` |
+| `semantic_layer` | `documentation` | `documentation_asset` | `docs/semantic_layer.md` |
 | `01_top_categories_by_revenue` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/01_top_categories_by_revenue.png` |
 | `02_monthly_revenue_evolution` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/02_monthly_revenue_evolution.png` |
 | `03_revenue_by_state` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/03_revenue_by_state.png` |
 | `04_delivery_delay_by_category` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/04_delivery_delay_by_category.png` |
 | `05_payment_method_distribution` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/05_payment_method_distribution.png` |
 | `fact_orders_dashboard` | `published_dashboard` | `published_analytics_table` | `data/published/dashboard/fact_orders_dashboard.parquet` |
+| `published_layer_monitoring` | `published_monitoring` | `monitoring_result` | `data/published/monitoring/published_layer_monitoring.csv` |
+| `cohort_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/cohort_slice.parquet` |
+| `logistics_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/logistics_slice.parquet` |
+| `seller_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/seller_slice.parquet` |
 
 ## Uso no Case
 
 - `fact_orders_enriched` é o ativo analítico interno principal da coleção.
 - `fact_orders_dashboard` é a camada publicada e minimizada usada pelo Streamlit.
 - os resultados de qualidade, queries SQL e documentação derivada compõem a camada de evidência técnica do case.
-- o manifesto JSON pode ser usado como payload base para publicação ou extensão do sync já implementado com a API de catálogo.
+- o manifesto JSON pode ser usado como payload base para publicação ou integração futura com uma API de catálogo.
 
 ## Observação
 
-- esta implementação representa uma coleção operacional em nível de projeto, adequada para operação catalogável no contexto do case.
+- esta implementação representa uma coleção operacional em nível de projeto, adequada para prova de conceito local.
 - uma integração nativa com uma plataforma externa exigiria autenticação, endpoint e contrato específicos, que não foram fornecidos no enunciado.
-
-

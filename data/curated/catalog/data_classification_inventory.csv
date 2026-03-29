@@ -10,7 +10,15 @@ fact_orders_enriched,seller_zip_code_prefix,curated_internal,quase_identificador
 fact_orders_enriched,review_comment_message,source_only,texto_livre_potencialmente_sensivel,high,aggregate_or_remove,sinal de existência de comentário,False
 fact_orders_dashboard,order_id,published_dashboard,identificador_pseudonimizado,low_medium,keep,contagem e drill-down controlado,True
 fact_orders_dashboard,customer_unique_id,published_dashboard,identificador_pseudonimizado,low_medium,keep,clientes únicos,True
+fact_orders_dashboard,seller_key,published_dashboard,identificador_pseudonimizado,low_medium,keep,análise por seller sem expor identificador bruto,True
 fact_orders_dashboard,customer_state,published_dashboard,analitico_agregado,low,keep,análise regional,True
 fact_orders_dashboard,seller_state,published_dashboard,analitico_agregado,low,keep,análise regional por seller,True
+fact_orders_dashboard,purchase_cohort_month,published_dashboard,analitico_agregado,low,keep,análise de cohort e recorrência,True
+fact_orders_dashboard,customer_order_sequence,published_dashboard,analitico_publico,low,keep,ordem de compra do cliente em leitura de recorrência,True
+fact_orders_dashboard,seller_volume_tier,published_dashboard,analitico_agregado,low,keep,segmentação operacional de seller,True
+fact_orders_dashboard,seller_delay_rate,published_dashboard,analitico_publico,low,keep,desempenho logístico por seller,True
 fact_orders_dashboard,total_item_value,published_dashboard,analitico_publico,low,keep,receita e ticket,True
 fact_orders_dashboard,delivery_time_days,published_dashboard,analitico_publico,low,keep,logística e SLA,True
+fact_orders_dashboard,seller_dispatch_time_days,published_dashboard,analitico_publico,low,keep,tempo de despacho para análise logística,True
+fact_orders_dashboard,carrier_delivery_time_days,published_dashboard,analitico_publico,low,keep,tempo de transporte até o cliente,True
+fact_orders_dashboard,freight_to_price_ratio,published_dashboard,analitico_publico,low,keep,peso relativo do frete sobre o item,True

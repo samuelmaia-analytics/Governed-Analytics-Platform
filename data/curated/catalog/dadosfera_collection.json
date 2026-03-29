@@ -16,11 +16,14 @@
     "curated_analytics",
     "curated_quality",
     "curated_query_results",
-    "published_dashboard"
+    "curated_ops",
+    "published_dashboard",
+    "published_semantic",
+    "published_monitoring"
   ],
   "publication_summary": {
-    "total_assets": 90,
-    "publishable_assets": 30,
+    "total_assets": 98,
+    "publishable_assets": 38,
     "core_asset": "fact_orders_enriched",
     "dashboard_consumer": "data/published/dashboard/fact_orders_dashboard.parquet",
     "catalog_version": "1.0.0"
@@ -289,7 +292,7 @@
       "primary_key": "order_id + order_item_id + product_id + seller_id",
       "source_assets": "olist_orders, olist_order_items, olist_products, olist_customers, olist_sellers, olist_order_payments, olist_order_reviews, product_category_name_translation",
       "record_count": 112650,
-      "column_count": 48,
+      "column_count": 60,
       "publication_ready": false
     },
     {
@@ -317,7 +320,77 @@
       "primary_key": "order_id + order_item_id",
       "source_assets": "fact_orders_enriched",
       "record_count": 112650,
-      "column_count": 22,
+      "column_count": 34,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "logistics_slice",
+      "zone": "published_semantic",
+      "asset_type": "published_semantic_mart",
+      "relative_path": "data/published/semantic/logistics_slice.parquet",
+      "file_format": "parquet",
+      "description": "Mart agregado para leitura logística por período e geografia publicada.",
+      "grain": "1 linha por combinação agregada",
+      "primary_key": "order_year + order_month + customer_state + seller_state",
+      "source_assets": "fact_orders_dashboard",
+      "record_count": 3821,
+      "column_count": 10,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "seller_slice",
+      "zone": "published_semantic",
+      "asset_type": "published_semantic_mart",
+      "relative_path": "data/published/semantic/seller_slice.parquet",
+      "file_format": "parquet",
+      "description": "Mart agregado para desempenho de seller pseudonimizado.",
+      "grain": "1 linha por seller_key",
+      "primary_key": "seller_key",
+      "source_assets": "fact_orders_dashboard",
+      "record_count": 3095,
+      "column_count": 9,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "cohort_slice",
+      "zone": "published_semantic",
+      "asset_type": "published_semantic_mart",
+      "relative_path": "data/published/semantic/cohort_slice.parquet",
+      "file_format": "parquet",
+      "description": "Mart agregado para cohort e maturação de compra.",
+      "grain": "1 linha por cohort e mês relativo",
+      "primary_key": "purchase_cohort_month + cohort_order_month_number",
+      "source_assets": "fact_orders_dashboard",
+      "record_count": 220,
+      "column_count": 7,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "published_layer_monitoring",
+      "zone": "published_monitoring",
+      "asset_type": "monitoring_result",
+      "relative_path": "data/published/monitoring/published_layer_monitoring.csv",
+      "file_format": "csv",
+      "description": "Resultado estruturado do monitoramento recorrente da camada publicada.",
+      "grain": "1 linha por check",
+      "primary_key": "check_name",
+      "source_assets": "fact_orders_dashboard",
+      "record_count": 12,
+      "column_count": 6,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "operational_job_results",
+      "zone": "curated_ops",
+      "asset_type": "operational_execution_log",
+      "relative_path": "data/curated/ops/operational_job_results.json",
+      "file_format": "json",
+      "description": "Resumo operacional do runner por etapa executada.",
+      "grain": "1 documento por execução",
+      "primary_key": "não aplicável",
+      "source_assets": "run_case_pipeline",
+      "record_count": null,
+      "column_count": null,
       "publication_ready": true
     },
     {
@@ -1105,6 +1178,48 @@
       "publication_ready": true
     },
     {
+      "asset_name": "published_layer_monitoring",
+      "zone": "documentation",
+      "asset_type": "documentation_asset",
+      "relative_path": "docs/published_layer_monitoring.md",
+      "file_format": "markdown",
+      "description": "Documento de apoio para catálogo, arquitetura, case e bônus.",
+      "grain": "não aplicável",
+      "primary_key": "não aplicável",
+      "source_assets": "documentacao_do_projeto",
+      "record_count": null,
+      "column_count": null,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "semantic_layer",
+      "zone": "documentation",
+      "asset_type": "documentation_asset",
+      "relative_path": "docs/semantic_layer.md",
+      "file_format": "markdown",
+      "description": "Documento de apoio para catálogo, arquitetura, case e bônus.",
+      "grain": "não aplicável",
+      "primary_key": "não aplicável",
+      "source_assets": "documentacao_do_projeto",
+      "record_count": null,
+      "column_count": null,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "operational_job_report",
+      "zone": "documentation",
+      "asset_type": "documentation_asset",
+      "relative_path": "docs/operational_job_report.md",
+      "file_format": "markdown",
+      "description": "Documento de apoio para catálogo, arquitetura, case e bônus.",
+      "grain": "não aplicável",
+      "primary_key": "não aplicável",
+      "source_assets": "documentacao_do_projeto",
+      "record_count": null,
+      "column_count": null,
+      "publication_ready": true
+    },
+    {
       "asset_name": "collection_catalog",
       "zone": "documentation",
       "asset_type": "documentation_asset",
@@ -1128,7 +1243,7 @@
       "grain": "1 linha por coluna classificada",
       "primary_key": "asset + column",
       "source_assets": "governance_policy, privacy_governance, fact_orders_enriched, fact_orders_dashboard",
-      "record_count": 15,
+      "record_count": 23,
       "column_count": 8,
       "publication_ready": true
     },

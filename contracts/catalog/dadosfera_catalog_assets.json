@@ -34,5 +34,23 @@
     "location": "github_docs",
     "tags": ["genai", "llm", "documentacao", "olist", "case-tecnico"],
     "share_type": "public"
+  },
+  {
+    "display_name": "Samuel Maia | Monitoramento da Camada Published",
+    "description": "Documentacao da rotina recorrente de freshness e qualidade da camada publicada, com checks estruturados e observabilidade operacional.",
+    "data_asset_type": "documentation",
+    "external_url": "https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026/blob/main/docs/published_layer_monitoring.md",
+    "location": "github_docs",
+    "tags": ["monitoring", "quality", "freshness", "documentacao", "olist", "case-tecnico"],
+    "share_type": "public"
+  },
+  {
+    "display_name": "Samuel Maia | Camada Semantica Expandida",
+    "description": "Documentacao dos marts publicados de logistica, seller e cohort derivados da camada published do case Olist.",
+    "data_asset_type": "documentation",
+    "external_url": "https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026/blob/main/docs/semantic_layer.md",
+    "location": "github_docs",
+    "tags": ["semantic-layer", "logistica", "seller", "cohort", "documentacao", "olist", "case-tecnico"],
+    "share_type": "public"
   }
 ]

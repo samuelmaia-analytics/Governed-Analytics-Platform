@@ -16,8 +16,11 @@ from src.config import (
     CATALOG_DIR,
     DOCS_DIR,
     LANDING_DIR,
+    OPS_DIR,
     PROFILING_DIR,
     PUBLISHED_DASHBOARD_DIR,
+    PUBLISHED_MONITORING_DIR,
+    PUBLISHED_SEMANTIC_DIR,
     QUALITY_DIR,
     QUERY_RESULTS_DIR,
     SCREENSHOTS_DIR,
@@ -212,6 +215,73 @@ def collect_assets() -> list[CatalogAsset]:
                 )
             )
 
+    semantic_specs = [
+        (
+            PUBLISHED_SEMANTIC_DIR / "logistics_slice.parquet",
+            "published_semantic",
+            "published_semantic_mart",
+            "Mart agregado para leitura logística por período e geografia publicada.",
+            "1 linha por combinação agregada",
+            "order_year + order_month + customer_state + seller_state",
+            "fact_orders_dashboard",
+            True,
+        ),
+        (
+            PUBLISHED_SEMANTIC_DIR / "seller_slice.parquet",
+            "published_semantic",
+            "published_semantic_mart",
+            "Mart agregado para desempenho de seller pseudonimizado.",
+            "1 linha por seller_key",
+            "seller_key",
+            "fact_orders_dashboard",
+            True,
+        ),
+        (
+            PUBLISHED_SEMANTIC_DIR / "cohort_slice.parquet",
+            "published_semantic",
+            "published_semantic_mart",
+            "Mart agregado para cohort e maturação de compra.",
+            "1 linha por cohort e mês relativo",
+            "purchase_cohort_month + cohort_order_month_number",
+            "fact_orders_dashboard",
+            True,
+        ),
+        (
+            PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv",
+            "published_monitoring",
+            "monitoring_result",
+            "Resultado estruturado do monitoramento recorrente da camada publicada.",
+            "1 linha por check",
+            "check_name",
+            "fact_orders_dashboard",
+            True,
+        ),
+        (
+            OPS_DIR / "operational_job_results.json",
+            "curated_ops",
+            "operational_execution_log",
+            "Resumo operacional do runner por etapa executada.",
+            "1 documento por execução",
+            "não aplicável",
+            "run_case_pipeline",
+            True,
+        ),
+    ]
+    for path, zone, asset_type, description, grain, primary_key, source_assets, publication_ready in semantic_specs:
+        if path.exists():
+            assets.append(
+                build_asset(
+                    path=path,
+                    zone=zone,
+                    asset_type=asset_type,
+                    description=description,
+                    grain=grain,
+                    primary_key=primary_key,
+                    source_assets=source_assets,
+                    publication_ready=publication_ready,
+                )
+            )
+
     for path in sorted(QUERY_RESULTS_DIR.glob("*.csv")):
         assets.append(
             build_asset(
@@ -250,6 +320,9 @@ def collect_assets() -> list[CatalogAsset]:
         DOCS_DIR / "privacy_governance.md",
         DOCS_DIR / "governance_policy.md",
         DOCS_DIR / "schema_contract_report.md",
+        DOCS_DIR / "published_layer_monitoring.md",
+        DOCS_DIR / "semantic_layer.md",
+        DOCS_DIR / "operational_job_report.md",
         REPORT_PATH,
     ]
     for path in docs_to_catalog:
@@ -341,7 +414,18 @@ def build_collection_payload(assets: list[CatalogAsset]) -> dict[str, object]:
         ),
         "owner": "samuelmaia-analytics",
         "domains": ["e-commerce", "analytics-engineering", "data-apps"],
-        "zones": ["raw_landing", "standardized", "staging_profiling", "curated_analytics", "curated_quality", "curated_query_results", "published_dashboard"],
+        "zones": [
+            "raw_landing",
+            "standardized",
+            "staging_profiling",
+            "curated_analytics",
+            "curated_quality",
+            "curated_query_results",
+            "curated_ops",
+            "published_dashboard",
+            "published_semantic",
+            "published_monitoring",
+        ],
         "publication_summary": {
             "total_assets": len(assets),
             "publishable_assets": len(publishable_assets),
