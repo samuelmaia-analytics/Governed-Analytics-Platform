@@ -81,7 +81,7 @@ Para fechar a parte especificamente nativa da plataforma, ainda falta:
 - catalogar esse pipeline
 - gerar evidências visuais da execução
 
-## Sugestao de pipeline na Dadosfera
+## Desenho recomendado para pipeline nativo na Dadosfera
 
 Pipeline mínimo sugerido:
 
@@ -90,11 +90,11 @@ Pipeline mínimo sugerido:
 3. etapa de validação
 4. etapa de publicação do ativo final
 
-Sugestao de narrativa:
+Narrativa recomendada:
 
 - ETL de modelagem e qualidade dos dados
 
-## Evidencias que devem ser adicionadas depois
+## Evidências esperadas se a implementação nativa ocorrer
 
 Salvar em `images/dadosfera/`:
 
@@ -103,31 +103,32 @@ Salvar em `images/dadosfera/`:
 - `08_pipeline_run.png`
 - `09_pipeline_catalog.png`
 
-## Campos para preencher após a execução na plataforma
+## Critério de aceite para evoluir este item
 
-### Nome do pipeline na Dadosfera
+Este tópico só deve ser promovido de backlog para entrega implementada quando houver, no mínimo:
 
-- `PREENCHER`
+- nome real do pipeline na plataforma
+- link navegável do pipeline
+- evidência visual da execução
+- evidência visual da catalogação
+- descrição dos ativos de entrada e saída baseada em implementação real, não em plano
 
-### Objetivo do pipeline
+Até lá, a leitura correta é:
 
-- `PREENCHER`
+- existe pipeline local ponta a ponta em Python
+- existe automação de engenharia e promoção de deploy no GitHub
+- não existe pipeline nativo da plataforma comprovado por evidência
 
-### Steps utilizados
+## Backlog explícito de evolução
 
-- `PREENCHER`
+Se houver aprofundamento futuro na plataforma, os campos que precisam ser preenchidos com evidência real são:
 
-### Ativos de entrada
-
-- `PREENCHER`
-
-### Ativos de saída
-
-- `PREENCHER`
-
-### Link do pipeline
-
-- `PREENCHER`
+- nome do pipeline na Dadosfera
+- objetivo operacional do pipeline
+- steps efetivamente utilizados
+- ativos de entrada
+- ativos de saída
+- link do pipeline
 
 ## Status atual
 
