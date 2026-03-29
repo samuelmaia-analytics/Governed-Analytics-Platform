@@ -1,6 +1,5 @@
 # Auditoria Final Pre-Entrega
 
-
 ## Acesso Rápido
 
 - Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
@@ -12,17 +11,17 @@
 
 Projeto: `samuelmaia_DDF_032026`  
 Dataset: `Brazilian E-Commerce Public Dataset by Olist`  
-Data da auditoria: `2026-03-22`
+Data da auditoria consolidada: `2026-03-29`
 
 ## 1. Resumo Executivo Final
 
-- Nota geral atual: `8.5/10`
+- Nota geral atual: `8.8/10`
 - Classificação atual: `avançado`
 - Atende o mínimo do case: `sim`
 - Está competitivo: `sim`
-- Se destacaria: `sim, com ressalvas`
-- Maior risco atual: vender a solução como mais pronta para produção do que ela realmente está
-- Maior oportunidade de ganho rápido: conectar alertas externos ao monitoramento recorrente já implementado
+- Se destacaria: `sim`
+- Maior risco atual: vender integração com a plataforma como execução nativa comprovada
+- Maior oportunidade de ganho rápido: integrar alerta externo ao monitoramento recorrente já implementado
 - Veredito de reviewer técnico: `aprovaria`
 
 ## 2. Síntese de Aderência
@@ -31,17 +30,17 @@ Data da auditoria: `2026-03-22`
 | --- | --- | --- |
 | Carregamento e análise descritiva | feito | scripts e docs presentes |
 | Volume acima de 100k | feito | `fact_orders_enriched` com 112.650 registros |
-| Catalogação de ativos | feito | manifesto, inventário e coleção local materializados |
+| Catalogação de ativos | feito | manifesto, inventário, coleção e sync por API materializados |
 | Data Lake por zonas | feito | raw / standardized / staging / curated / published |
-| Coleção no padrão solicitado | feito | implementada localmente e complementada com sync por API externa |
+| Coleção no padrão solicitado | feito | implementada localmente e complementada com sync por API |
 | Dashboard de categorias | feito | presente no Streamlit |
 | Dashboard temporal | feito | presente no Streamlit |
 | SQL salvo | feito | queries em `sql/analytics` |
-| Print da query em markdown | feito | screenshots referenciados em `docs/case_answers.md` |
+| Print da query em markdown | feito | screenshots referenciados nos docs |
 | 5 visualizações e 5 tipos | feito | linha, área, heatmap, barras, donut, scatter, boxplot |
 | GitHub | feito | remoto configurado e repositório publicado |
-| Sobre Dadosfera | feito | documento dedicado |
-| Bônus GenAI + Data Apps | feito | heurístico, sem LLM real |
+| Sobre Dadosfera | feito | documento dedicado e atualizado |
+| Bônus GenAI + Data Apps | feito | implementado como extensão e não como eixo central |
 
 ## 3. Pontos Fortes Reais
 
@@ -53,55 +52,46 @@ Data da auditoria: `2026-03-22`
 - recortes semânticos publicados para logística, seller e cohort
 - pseudonimização e minimização no dashboard e nos exports BI
 - contratos simples de schema cobrindo `standardized`, `curated` e `published`
-- documentação acima da média
+- documentação elevada e coerente com o estado atual do repositório
 
 ## 4. Lacunas Relevantes
 
 - sem RBAC ou controle de acesso real
-- sync da coleção com plataforma externa implementado via API, ainda sem pipeline nativo na plataforma
 - sem alerta externo integrado ao monitoramento recorrente
-- parte do bônus GenAI ainda é heurística e não IA real
+- sem pipeline nativo comprovadamente executado no tenant
+- parte do bônus GenAI ainda não representa operação de IA em produção
 
 ## 5. Governança e Privacidade
 
-- `fact_orders_enriched` foi mantida como camada interna
-- `fact_orders_dashboard` foi criada como camada publicada
-- `order_id` e `customer_unique_id` foram pseudonimizados
+- `fact_orders_enriched` permanece como camada interna
+- `fact_orders_dashboard` é a camada publicada de consumo executivo
+- `order_id`, `customer_unique_id` e `seller_key` são pseudonimizados na exposição
 - cidade e CEP prefixado foram removidos da camada publicada
-- exports para Power BI agora usam chaves pseudonimizadas
+- a operação da camada publicada já produz artefatos de monitoramento e execução
 
 ## 6. Estado de Entrevista
 
 O projeto está defensável em entrevista se o discurso for preciso:
 
 - forte para analytics engineering, data product e dashboard
-- bom para governança e privacidade por design em contexto de case
-- parcial para plataforma de dados corporativa pronta para produção
+- forte para governança e privacidade por design em contexto de case
+- bom para integração com plataforma
+- parcial para plataforma corporativa plenamente absorvida por execução nativa
 
 ## 7. Pendências Finais Prioritárias
 
-1. alinhar todos os documentos finais com a camada `published/dashboard`
-2. gerar classificação por coluna em formato operacional
-3. integrar alerta externo ao job operacional agendado
-4. preencher parâmetros reais da pipeline nativa no tenant
-5. evitar qualquer oversell de Dadosfera, LGPD ou GenAI
+1. integrar alerta externo ao job operacional agendado
+2. preencher parâmetros reais da pipeline nativa no tenant
+3. só promover pipeline nativo como “feito” quando houver evidência final de execução
+4. evitar qualquer oversell de Dadosfera, LGPD ou GenAI
 
 ## 8. Validações Executadas
 
-- `python src/publish_dashboard.py`
+- `python src/run_case_pipeline.py --steps build publish semantic monitor`
 - `python src/published_monitoring.py --fail-on-alert`
-- `python src/semantic_layer.py`
-- `python src/data_classification.py`
-- `python src/schema_contracts.py`
-- `python src/catalog.py`
-- `python src/export_power_bi.py`
 - `python -m pytest tests` -> `124 passed`
 - `ruff check .`
 
 ## 9. Veredito Final
 
-Hoje, o projeto já parece uma entrega madura de case técnico, com boa chance de avançar em processo seletivo.  
-Não parece outlier de engenharia de plataforma, mas já transmite senioridade real em analytics engineering, produto de dados, documentação, contratos de qualidade estrutural e preocupação com governança.
-
-
-
+Hoje, o projeto já se apresenta como uma entrega madura de case técnico. Ele não tenta parecer uma plataforma completa, mas mostra domínio real de modelagem, publicação, governança, operação da camada publicada e consumo executivo com evidência suficiente para revisão técnica séria.
