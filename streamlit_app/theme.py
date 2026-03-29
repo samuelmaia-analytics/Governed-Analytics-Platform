@@ -52,6 +52,8 @@ NAVIGATION_OPTIONS = [
     ("Categorias", "Categorias"),
     ("Regional", "Regional"),
     ("Operação", "Operação"),
+    ("Saúde", "Saúde"),
+    ("Semântica", "Semântica"),
     ("Insights", "Insights"),
 ]
 

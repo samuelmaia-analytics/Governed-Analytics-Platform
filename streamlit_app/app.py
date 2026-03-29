@@ -15,6 +15,8 @@ from streamlit_app.data import (
     filter_dataframe,
     get_previous_period_df,
     load_data,
+    load_monitoring_status,
+    load_semantic_assets,
 )
 from streamlit_app.formatting import format_number
 from streamlit_app.sections import (
@@ -23,8 +25,10 @@ from streamlit_app.sections import (
     render_executive_insights,
     render_geography_section,
     render_header,
+    render_health_section,
     render_kpi_row,
     render_operations_section,
+    render_semantic_section,
     render_smart_summary,
     render_support_tables,
     render_temporal_section,
@@ -46,6 +50,8 @@ def main() -> None:
     except FileNotFoundError as exc:
         st.error(str(exc))
         st.stop()
+    semantic_assets = load_semantic_assets()
+    monitoring_status = load_monitoring_status()
 
     filters = build_sidebar_filters(df)
     presentation_mode = build_app_mode()
@@ -90,6 +96,10 @@ def main() -> None:
         render_geography_section(filtered_df, filters.geography_mode)
     elif selected_section == "Operação":
         render_operations_section(filtered_df)
+    elif selected_section == "Saúde":
+        render_health_section(monitoring_status)
+    elif selected_section == "Semântica":
+        render_semantic_section(semantic_assets)
     elif selected_section == "Insights":
         render_executive_insights(filtered_df)
     elif selected_section == "Visão completa":
@@ -97,6 +107,8 @@ def main() -> None:
         render_category_section(filtered_df)
         render_geography_section(filtered_df, filters.geography_mode)
         render_operations_section(filtered_df)
+        render_health_section(monitoring_status)
+        render_semantic_section(semantic_assets)
         render_executive_insights(filtered_df)
 
     if selected_section == "Visão completa":

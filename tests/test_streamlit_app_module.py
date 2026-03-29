@@ -111,6 +111,8 @@ def test_main_runs_presentation_mode_flow(monkeypatch) -> None:
     monkeypatch.setattr(app_module, "st", fake_st)
     monkeypatch.setattr(app_module, "apply_theme", lambda: calls.append("theme"))
     monkeypatch.setattr(app_module, "load_data", build_app_frame)
+    monkeypatch.setattr(app_module, "load_semantic_assets", lambda: {})
+    monkeypatch.setattr(app_module, "load_monitoring_status", lambda: None)
     monkeypatch.setattr(app_module, "build_sidebar_filters", lambda _df: build_filters())
     monkeypatch.setattr(app_module, "build_app_mode", lambda: True)
     monkeypatch.setattr(app_module, "filter_dataframe", lambda df, _filters: df.copy())
@@ -135,6 +137,8 @@ def test_main_runs_full_view_flow(monkeypatch) -> None:
     monkeypatch.setattr(app_module, "st", fake_st)
     monkeypatch.setattr(app_module, "apply_theme", lambda: calls.append("theme"))
     monkeypatch.setattr(app_module, "load_data", build_app_frame)
+    monkeypatch.setattr(app_module, "load_semantic_assets", lambda: {})
+    monkeypatch.setattr(app_module, "load_monitoring_status", lambda: None)
     monkeypatch.setattr(app_module, "build_sidebar_filters", lambda _df: build_filters())
     monkeypatch.setattr(app_module, "build_app_mode", lambda: False)
     monkeypatch.setattr(app_module, "filter_dataframe", lambda df, _filters: df.copy())
@@ -149,9 +153,11 @@ def test_main_runs_full_view_flow(monkeypatch) -> None:
     monkeypatch.setattr(app_module, "render_category_section", lambda _df: calls.append("categoria"))
     monkeypatch.setattr(app_module, "render_geography_section", lambda _df, _mode: calls.append("geo"))
     monkeypatch.setattr(app_module, "render_operations_section", lambda _df: calls.append("ops"))
+    monkeypatch.setattr(app_module, "render_health_section", lambda _status: calls.append("health"))
+    monkeypatch.setattr(app_module, "render_semantic_section", lambda _assets: calls.append("semantic"))
     monkeypatch.setattr(app_module, "render_executive_insights", lambda _df: calls.append("insights"))
     monkeypatch.setattr(app_module, "render_support_tables", lambda _df: calls.append("tables"))
 
     app_module.main()
 
-    assert calls == ["theme", "header", "context", "smart", "kpi", "tempo", "categoria", "geo", "ops", "insights", "tables"]
+    assert calls == ["theme", "header", "context", "smart", "kpi", "tempo", "categoria", "geo", "ops", "health", "semantic", "insights", "tables"]

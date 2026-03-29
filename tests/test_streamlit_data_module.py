@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import date
 from pathlib import Path
 
@@ -191,3 +192,31 @@ def test_build_app_mode_reads_sidebar_toggle(monkeypatch) -> None:
     monkeypatch.setattr(data_module, "st", fake_st)
 
     assert data_module.build_app_mode() is True
+
+
+def test_load_semantic_assets_reads_available_parquets(tmp_path: Path, monkeypatch) -> None:
+    logistics_path = tmp_path / "logistics.parquet"
+    seller_path = tmp_path / "seller.parquet"
+    pd.DataFrame({"a": [1]}).to_parquet(logistics_path, index=False)
+    pd.DataFrame({"b": [2]}).to_parquet(seller_path, index=False)
+
+    monkeypatch.setattr(data_module, "LOGISTICS_PARQUET_PATH", logistics_path)
+    monkeypatch.setattr(data_module, "SELLER_PARQUET_PATH", seller_path)
+    monkeypatch.setattr(data_module, "COHORT_PARQUET_PATH", tmp_path / "missing.parquet")
+    data_module.load_semantic_assets.clear()
+
+    assets = data_module.load_semantic_assets()
+
+    assert set(assets) == {"logistics", "seller"}
+
+
+def test_load_monitoring_status_reads_json_summary(tmp_path: Path, monkeypatch) -> None:
+    summary_path = tmp_path / "published_layer_monitoring.json"
+    summary_path.write_text(json.dumps({"failed_checks": 1, "total_checks": 3}), encoding="utf-8")
+
+    monkeypatch.setattr(data_module, "MONITORING_SUMMARY_PATH", summary_path)
+    data_module.load_monitoring_status.clear()
+
+    status = data_module.load_monitoring_status()
+
+    assert status == {"failed_checks": 1, "total_checks": 3}

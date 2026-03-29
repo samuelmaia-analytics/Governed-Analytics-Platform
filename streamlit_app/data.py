@@ -1,15 +1,24 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 
 import pandas as pd
 import streamlit as st
 
-from src.config import PUBLISHED_DASHBOARD_DIR
+from src.config import (
+    PUBLISHED_DASHBOARD_DIR,
+    PUBLISHED_MONITORING_DIR,
+    PUBLISHED_SEMANTIC_DIR,
+)
 from streamlit_app.theme import MONTH_NAME_MAP, WEEKDAY_MAP
 
 FACT_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
 FACT_CSV_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.csv"
+LOGISTICS_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "logistics_slice.parquet"
+SELLER_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "seller_slice.parquet"
+COHORT_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "cohort_slice.parquet"
+MONITORING_SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
 
 
 @dataclass(frozen=True)
@@ -77,6 +86,26 @@ def load_data() -> pd.DataFrame:
         + df["order_purchase_timestamp"].dt.quarter.astype("Int64").astype(str)
     )
     return df
+
+
+@st.cache_data(show_spinner=False)
+def load_semantic_assets() -> dict[str, pd.DataFrame]:
+    assets: dict[str, pd.DataFrame] = {}
+    for asset_name, path in (
+        ("logistics", LOGISTICS_PARQUET_PATH),
+        ("seller", SELLER_PARQUET_PATH),
+        ("cohort", COHORT_PARQUET_PATH),
+    ):
+        if path.exists():
+            assets[asset_name] = pd.read_parquet(path)
+    return assets
+
+
+@st.cache_data(show_spinner=False)
+def load_monitoring_status() -> dict[str, object] | None:
+    if not MONITORING_SUMMARY_PATH.exists():
+        return None
+    return json.loads(MONITORING_SUMMARY_PATH.read_text(encoding="utf-8"))
 
 
 def build_default_filter_state(df: pd.DataFrame) -> None:

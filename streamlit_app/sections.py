@@ -283,6 +283,89 @@ def render_operations_section(df: pd.DataFrame) -> None:
     close_section()
 
 
+def render_health_section(monitoring_status: dict[str, object] | None) -> None:
+    render_section_header(
+        "Saúde da Camada Publicada",
+        "Freshness e qualidade operacional da camada oficial",
+        "Este bloco expõe o estado mais recente do monitoramento recorrente da camada published usada pelo dashboard.",
+    )
+    if not monitoring_status:
+        st.info("Nenhum artefato de monitoramento foi encontrado para a camada publicada.")
+        close_section()
+        return
+
+    generated_at = str(monitoring_status.get("generated_at_utc") or "N/A")
+    total_checks = int(monitoring_status.get("total_checks") or 0)
+    failed_checks = int(monitoring_status.get("failed_checks") or 0)
+    status_label = "Saudável" if failed_checks == 0 else "Em alerta"
+    results = pd.DataFrame(monitoring_status.get("results") or [])
+
+    col1, col2, col3 = st.columns(3, gap="large")
+    with col1:
+        render_regional_kpi("Status atual", status_label, f"Última geração UTC: {generated_at}.")
+    with col2:
+        render_regional_kpi("Checks executados", format_number(total_checks), "Cobertura total do monitoramento recorrente.")
+    with col3:
+        render_regional_kpi("Falhas abertas", format_number(failed_checks), "Quantidade de checks em FAIL na última execução.")
+
+    if not results.empty:
+        preview = results[["check_name", "status", "severity", "metric_value"]].copy()
+        st.dataframe(preview, use_container_width=True, height=260)
+        st.caption("Resumo dos checks mais recentes da camada publicada.")
+    close_section()
+
+
+def render_semantic_section(semantic_assets: dict[str, pd.DataFrame]) -> None:
+    render_section_header(
+        "Camada Semântica",
+        "Recortes publicados para seller, logística e cohort",
+        "Os marts semânticos materializados fora da tabela principal ampliam a leitura executiva sem reexpor a camada interna.",
+    )
+    if not semantic_assets:
+        st.info("Nenhum mart semântico publicado foi encontrado no ambiente atual.")
+        close_section()
+        return
+
+    logistics_df = semantic_assets.get("logistics", pd.DataFrame())
+    seller_df = semantic_assets.get("seller", pd.DataFrame())
+    cohort_df = semantic_assets.get("cohort", pd.DataFrame())
+
+    top_logistics = logistics_df.sort_values("delayed_rate", ascending=False).head(10) if not logistics_df.empty else pd.DataFrame()
+    top_sellers = seller_df.sort_values("delay_rate", ascending=False).head(10) if not seller_df.empty else pd.DataFrame()
+    top_cohorts = cohort_df.sort_values(["purchase_cohort_month", "cohort_order_month_number"]).head(12) if not cohort_df.empty else pd.DataFrame()
+
+    col1, col2, col3 = st.columns(3, gap="large")
+    with col1:
+        render_regional_kpi("Slices logísticos", format_number(float(len(logistics_df))), "Recortes agregados por mês e UF origem/destino.")
+    with col2:
+        render_regional_kpi("Sellers publicados", format_number(float(len(seller_df))), "Base comparável por seller pseudonimizado.")
+    with col3:
+        render_regional_kpi("Linhas de cohort", format_number(float(len(cohort_df))), "Evolução de cohorts por janela de maturação.")
+
+    tabs = st.tabs(["Logística", "Seller", "Cohort"])
+    with tabs[0]:
+        if top_logistics.empty:
+            st.info("Sem dados logísticos materializados.")
+        else:
+            logistics_view = top_logistics.copy()
+            logistics_view["delayed_rate"] = logistics_view["delayed_rate"].mul(100).round(1)
+            logistics_view["avg_freight_to_price_ratio"] = logistics_view["avg_freight_to_price_ratio"].mul(100).round(1)
+            st.dataframe(logistics_view, use_container_width=True, height=320)
+    with tabs[1]:
+        if top_sellers.empty:
+            st.info("Sem dados de seller materializados.")
+        else:
+            seller_view = top_sellers.copy()
+            seller_view["delay_rate"] = seller_view["delay_rate"].mul(100).round(1)
+            st.dataframe(seller_view, use_container_width=True, height=320)
+    with tabs[2]:
+        if top_cohorts.empty:
+            st.info("Sem dados de cohort materializados.")
+        else:
+            st.dataframe(top_cohorts, use_container_width=True, height=320)
+    close_section()
+
+
 def render_executive_insights(df: pd.DataFrame) -> None:
     render_section_header("Insights Executivos", "Síntese final para decisão de negócio", "Esta camada final resume o recorte em sinais de ação, destacando o que merece atenção imediata de negócio e operação.")
     cards_html = "".join(f"<div class='insight-card'><h4>{card['title']}</h4><p>{card['text']}</p></div>" for card in build_executive_insights(df))

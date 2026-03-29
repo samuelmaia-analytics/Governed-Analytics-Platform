@@ -157,11 +157,50 @@ def test_render_chart_and_visual_sections(monkeypatch) -> None:
     sections.render_category_section(df)
     sections.render_geography_section(df, "Cliente")
     sections.render_operations_section(df)
+    sections.render_health_section(
+        {
+            "generated_at_utc": "2026-03-29T12:00:00+00:00",
+            "total_checks": 4,
+            "failed_checks": 1,
+            "results": [
+                {"check_name": "check_a", "status": "PASS", "severity": "high", "metric_value": 1},
+                {"check_name": "check_b", "status": "FAIL", "severity": "medium", "metric_value": 2},
+            ],
+        }
+    )
+    sections.render_semantic_section(
+        {
+            "logistics": pd.DataFrame(
+                {
+                    "order_year": [2018],
+                    "order_month": [1],
+                    "customer_state": ["SP"],
+                    "seller_state": ["RJ"],
+                    "delayed_rate": [0.12],
+                    "avg_freight_to_price_ratio": [0.15],
+                }
+            ),
+            "seller": pd.DataFrame(
+                {
+                    "seller_key": ["s1"],
+                    "delay_rate": [0.08],
+                    "seller_volume_tier": ["core"],
+                }
+            ),
+            "cohort": pd.DataFrame(
+                {
+                    "purchase_cohort_month": ["2018-01"],
+                    "cohort_order_month_number": [1],
+                    "customers": [10],
+                }
+            ),
+        }
+    )
     sections.render_executive_insights(df)
     sections.render_support_tables(df)
 
     assert fake_st.plots >= 11
-    assert fake_st.dataframes >= 2
+    assert fake_st.dataframes >= 4
     assert fake_st.downloads == 3
 
 
@@ -188,3 +227,16 @@ def test_render_geography_section_handles_insufficient_volume(monkeypatch) -> No
     sections.render_geography_section(build_sections_frame(), "Cliente")
 
     assert fake_st.infos == ["O recorte atual não possui massa suficiente para uma análise regional comparável por UF."]
+
+
+def test_render_health_and_semantic_sections_handle_missing_assets(monkeypatch) -> None:
+    fake_st = FakeStreamlit()
+    monkeypatch.setattr(sections, "st", fake_st)
+
+    sections.render_health_section(None)
+    sections.render_semantic_section({})
+
+    assert fake_st.infos == [
+        "Nenhum artefato de monitoramento foi encontrado para a camada publicada.",
+        "Nenhum mart semântico publicado foi encontrado no ambiente atual.",
+    ]
