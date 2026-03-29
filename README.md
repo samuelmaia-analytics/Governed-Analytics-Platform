@@ -13,11 +13,19 @@ Entrega de analytics engineering orientada a produto sobre o dataset Olist. O pr
 - operação e handoff: use [docs/release_runbook.md](docs/release_runbook.md), [docs/rollback_runbook.md](docs/rollback_runbook.md) e [CONTRIBUTING.md](CONTRIBUTING.md)
 - consumo analítico: veja [docs/05_dashboard.md](docs/05_dashboard.md), [docs/04_analises_sql.md](docs/04_analises_sql.md) e [powerbi/README.md](powerbi/README.md)
 
-## Executive Summary
+## Como Ler Este Repositório
+
+- `README.md`: índice executivo, snapshot da solução e links principais
+- `docs/executive_summary.md`: mensagem executiva curta para banca e liderança
+- `docs/case_answers.md`: defesa técnica e narrativa da solução
+- `docs/operating_model.md`: fluxo operacional, branches, deploy e guardrails
+- `docs/05_dashboard.md`: decisões e evidências da camada de consumo
+
+## Snapshot Executivo
 
 O ativo central da solução é `fact_orders_enriched`, modelado com granularidade de item de pedido e `112.650` registros. A partir dele, o projeto deriva `fact_orders_dashboard`, camada publicada e minimizada para consumo executivo, com pseudonimização de identificadores e redução de exposição desnecessária.
 
-A proposta não foi apenas “fazer um dashboard”. O repositório foi estruturado para demonstrar ciclo de vida completo de dados: ingestão, padronização, modelagem, qualidade, contratos, publicação, documentação, evidência operacional e automação de engenharia.
+O objetivo deste repositório não é vender apenas um dashboard, mas demonstrar ciclo de vida completo de dados: ingestão, padronização, modelagem, qualidade, contratos, publicação, documentação, evidência operacional e automação de engenharia.
 
 ## Snapshot
 
@@ -56,6 +64,12 @@ O fluxo operacional recomendado usa `main` como branch fonte e promove automatic
 ## Escopo Core vs Bônus
 
 O escopo core do case está concentrado em ingestão, padronização, modelagem analítica, qualidade, contratos, catálogo, publicação segura e dashboard. Artefatos como GenAI e exportação de texto/PDF são complementares e não alteram a operação principal do case.
+
+## Tradeoffs Deliberados
+
+- `Streamlit` foi escolhido para acelerar prova de valor e consumo executivo
+- a transformação principal roda localmente em Python, com publicação comprovada na Dadosfera
+- a solução explicita o que está automatizado e o que ainda é backlog, em vez de inflar escopo de plataforma
 
 ## Leitura Recomendada
 

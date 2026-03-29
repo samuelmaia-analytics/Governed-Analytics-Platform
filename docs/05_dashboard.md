@@ -40,6 +40,13 @@ Transformar a camada analítica publicada em leitura executiva de:
 - operação
 - insights
 
+## Decisões de design analítico
+
+- o app consome apenas `published/dashboard`, nunca a camada `curated`
+- a navegação foi separada por perguntas executivas, não por tabela de origem
+- os visuais priorizam leitura rápida, concentração de valor, risco operacional e possibilidade de filtro
+- quando há agregação de cauda longa em categoria, isso é assumido como decisão de clareza visual, não como detalhe escondido
+
 ## Evidências
 
 - dashboard online:
@@ -54,6 +61,10 @@ Transformar a camada analítica publicada em leitura executiva de:
 ## Valor do dashboard no case
 
 O dashboard representa a camada de consumo executivo da solução. Ele não lê a base analítica interna diretamente; consome apenas o ativo publicado e minimizado, reforçando a coerência entre engenharia, governança e apresentação final.
+
+## Tradeoff explícito
+
+O dashboard abre mão de expor toda a riqueza da camada analítica interna para ganhar governança, simplicidade de leitura e menor risco de exposição desnecessária. Essa escolha é intencional: a profundidade exploratória permanece na camada `curated`, enquanto o Streamlit funciona como camada oficial de consumo executivo.
 
 ## Referências detalhadas
 

@@ -41,6 +41,8 @@ Essa separação evita acoplamento entre o dashboard e a camada analítica compl
 
 ## Robustez de engenharia
 
+Snapshot de validação em `2026-03-28`:
+
 | Métrica | Valor |
 | --- | --- |
 | Testes | `114/114` passando |
@@ -75,6 +77,7 @@ Itens como GenAI e exportações auxiliares existem como extensão e não são u
 - escolha por Streamlit para acelerar consumo e prova de valor
 - execução principal do pipeline fora da plataforma, com publicação comprovada na Dadosfera
 - governança aplicada sem vender operação “enterprise” não implementada
+- métricas de testes e cobertura devem ser lidas como snapshot operacional da data de validação, não como valor imutável do repositório
 
 ## Mensagem de defesa
 
