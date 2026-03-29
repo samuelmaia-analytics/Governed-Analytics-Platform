@@ -148,7 +148,7 @@ Os pontos mais sensíveis do case são:
 | documentação técnica | concluído em grande parte |
 | Streamlit | concluído |
 | Dadosfera real | concluído em publicação, catálogo e sync por API |
-| Power BI bônus | opcional e pendente |
+| Power BI bônus | fora do escopo core, com material complementar já disponível |
 | apresentação e vídeo | concluído |
 
 ## Alocação de Recursos

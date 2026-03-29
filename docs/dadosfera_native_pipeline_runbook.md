@@ -1,31 +1,31 @@
-# Operacao de Pipeline Nativo na Dadosfera
+# Operação de Pipeline Nativo na Dadosfera
 
-Este runbook fecha o gap entre publicacao/catalogacao e tentativa real de operacao nativa de pipeline na plataforma.
+Este runbook reduz o gap entre publicação/catálogo e tentativa real de operação nativa de pipeline na plataforma.
 
 ## O que este repositório passa a suportar
 
-- autenticacao na Dadosfera via API do Maestro
-- listagem de pipelines por endpoint configuravel
-- criacao de pipeline a partir de payload JSON versionado
-- execucao de pipeline ja existente via API
+- autenticação na Dadosfera via API do Maestro
+- listagem de pipelines por endpoint configurável
+- criação de pipeline a partir de payload JSON versionado
+- execução de pipeline já existente via API
 
-O ponto de entrada operacional e `src/dadosfera_pipeline_ops.py`.
+O ponto de entrada operacional é `src/dadosfera_pipeline_ops.py`.
 
 ## O que isso ainda nao resolve sozinho
 
-- nao inventa automaticamente uma conexao de origem acessivel pela plataforma
-- nao gera payload valido sem definicao real do pipeline da Dadosfera
-- nao substitui evidencias visuais de execucao e catalogacao na plataforma
+- não cria automaticamente uma conexão de origem acessível pela plataforma
+- não gera payload válido sem definição real do pipeline da Dadosfera
+- não substitui evidências visuais de execução e catalogação na plataforma
 
-Em outras palavras: o repositório agora consegue operar a API de pipelines, mas a absorcao nativa total ainda depende de modelar e executar um pipeline real no ambiente da Dadosfera.
+Em outras palavras: o repositório agora consegue operar a API de pipelines, mas a absorção nativa total ainda depende de modelar e executar um pipeline real no ambiente da Dadosfera.
 
 ## Pre-requisitos reais para dizer que a transformacao foi absorvida pela plataforma
 
-- fonte de dados acessivel pela Dadosfera
-- definicao real do pipeline em JSON ou export equivalente da plataforma
-- execucao bem-sucedida na interface ou na API
-- evidencias visuais de run, output e catalogacao
-- consumidor final lendo o output da plataforma, e nao apenas o artefato gerado localmente
+- fonte de dados acessível pela Dadosfera
+- definição real do pipeline em JSON ou export equivalente da plataforma
+- execução bem-sucedida na interface ou na API
+- evidências visuais de run, output e catalogação
+- consumidor final lendo o output da plataforma, e não apenas o artefato gerado localmente
 
 ## Uso do operador de pipelines
 
@@ -59,7 +59,7 @@ python src/dadosfera_pipeline_ops.py create --definition path/to/pipeline.json -
 python src/dadosfera_pipeline_ops.py run --pipeline-id <PIPELINE_ID>
 ```
 
-### 6. Listar execucoes da pipeline
+### 6. Listar execuções da pipeline
 
 ```bash
 python src/dadosfera_pipeline_ops.py runs --pipeline-id <PIPELINE_ID>
@@ -73,50 +73,50 @@ O repositório agora inclui um template inicial em:
 
 Uso recomendado:
 
-1. criar ou identificar uma conexao na Dadosfera e obter o `config_id`
-2. subir `data/published/dashboard/fact_orders_dashboard.parquet` para um bucket S3 acessivel pela conexao
+1. criar ou identificar uma conexão na Dadosfera e obter o `config_id`
+2. subir `data/published/dashboard/fact_orders_dashboard.parquet` para um bucket S3 acessível pela conexão
 3. substituir `SUBSTITUIR_BUCKET_S3`, `SUBSTITUIR_PREFIX` e `SUBSTITUIR_CONFIG_ID_S3`
-3. criar a pipeline:
+4. criar a pipeline:
 
 ```bash
 python src/dadosfera_pipeline_ops.py create --definition contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json
 ```
 
-## Escolha de conexao recomendada
+## Escolha de conexão recomendada
 
-Para este case, a conexao mais defensavel e:
+Para este case, a conexão mais defensável é:
 
 - `AWS S3` como origem
 - `Parquet` como formato do ativo publicado
 
 Motivos:
 
-- a camada publicada ja existe como artefato fisico controlado
+- a camada publicada já existe como artefato físico controlado
 - `Parquet` preserva schema melhor do que `CSV`
-- o desenho fica mais proximo de operacao recorrente e menos dependente de upload manual
-- evita vender a plataforma como transformadora principal antes de validar a ingestao nativa do ativo publicado
+- o desenho fica mais próximo de operação recorrente e menos dependente de upload manual
+- evita vender a plataforma como transformadora principal antes de validar a ingestão nativa do ativo publicado
 
-## Campos que voce precisa preencher com valores reais
+## Campos que você precisa preencher com valores reais
 
 - `source_bucket`: nome do bucket S3
 - `source_prefix`: caminho do arquivo ou prefixo dentro do bucket
-- `config_id`: identificador da conexao S3 cadastrada na Dadosfera
+- `config_id`: identificador da conexão S3 cadastrada na Dadosfera
 
-## Sequencia minima para dizer que a plataforma passou a executar pipeline nativo
+## Sequência mínima para dizer que a plataforma passou a executar pipeline nativo
 
-1. criar a conexao S3 na Dadosfera
+1. criar a conexão S3 na Dadosfera
 2. subir o Parquet publicado para o bucket
 3. criar a pipeline com o JSON versionado
 4. executar a pipeline
-5. capturar evidencias de:
+5. capturar evidências de:
    - pipeline criada
    - pipeline executada
    - output gerado
-   - ativo catalogado ou utilizavel na plataforma
+   - ativo catalogado ou utilizável na plataforma
 
-## Endpoints configuraveis
+## Endpoints configuráveis
 
-Como a estrutura da API pode variar por modulo, tenant ou versao, o operador aceita override por argumentos ou variaveis de ambiente:
+Como a estrutura da API pode variar por módulo, tenant ou versão, o operador aceita override por argumentos ou variáveis de ambiente:
 
 - `DADOSFERA_PIPELINE_LIST_ENDPOINT`
 - `DADOSFERA_PIPELINE_CREATE_ENDPOINT`
@@ -132,11 +132,11 @@ Defaults atuais:
 - run: `/platform/pipeline/execute`
 - runs: `/platform/pipeline/{pipeline_id}/pipeline_run`
 
-Esses defaults foram alinhados aos endpoints da documentação oficial da Dadosfera Maestro Platform API. Se a plataforma responder `404` ou `405`, ajuste o endpoint para o caminho real do seu tenant ou modulo.
+Esses defaults foram alinhados aos endpoints da documentação oficial da Dadosfera Maestro Platform API. Se a plataforma responder `404` ou `405`, ajuste o endpoint para o caminho real do seu tenant ou módulo.
 
 ## Leitura rigorosa de status
 
-Depois desta adicao, a afirmacao correta passa a ser:
+Depois desta adição, a afirmação correta passa a ser:
 
-- o repositório agora esta preparado para tentar criar e executar pipelines nativos via API
-- a absorcao nativa total ainda depende de pipeline real, fonte real e evidencias de run bem-sucedido
+- o repositório agora está preparado para tentar criar e executar pipelines nativos via API
+- a absorção nativa total ainda depende de pipeline real, fonte real e evidências de run bem-sucedido

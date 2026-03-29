@@ -61,8 +61,8 @@ Pendências locais atuais fora da submissão principal:
 - [x] publicar dataset real na plataforma
 - [x] validar preview/esquema do ativo publicado
 - [x] catalogar ou registrar o ativo na plataforma
-- [ ] criar pipeline real na plataforma
-- [ ] catalogar o pipeline na plataforma
+- [ ] evidenciar pipeline nativo real na plataforma
+- [ ] evidenciar catalogação do pipeline na plataforma
 - [x] gerar evidências reais da plataforma
 - [x] salvar capturas em `images/dadosfera/`
 
@@ -95,7 +95,7 @@ Pendências locais atuais fora da submissão principal:
 - o projeto local está pronto para demonstração técnica
 - o GitHub já está consolidado com as evidências principais
 - a parte da Dadosfera já está comprovada para o ativo principal
-- pipeline nativo na plataforma permanece pendente
+- pipeline nativo na plataforma segue sem evidência final de execução
 - item de GenAI com LLM externa já foi validado localmente
 - vídeo final da apresentação já foi publicado no YouTube
 - o `README.md` principal já foi ajustado com links relativos compatíveis com GitHub web
