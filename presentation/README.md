@@ -24,6 +24,7 @@ Esta pasta concentra os artefatos da defesa final do case.
 - separar claramente o que foi implementado localmente, o que foi publicado e o que ainda é evolução
 - usar links e screenshots reais do repositório
 - manter consistência entre narrativa executiva e evidência técnica
+- não vender pipeline nativo na plataforma como concluído sem evidência de execução
 
 ## Referências
 

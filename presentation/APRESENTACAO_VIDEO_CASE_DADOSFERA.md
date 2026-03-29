@@ -22,7 +22,7 @@
 
 - Este case parte do dataset Olist e foi tratado como uma jornada completa de dados.
 - A proposta foi transformar tabelas transacionais brutas em um ativo analítico confiável, documentado e pronto para consumo.
-- A entrega reúne pipeline, modelagem, SQL, dashboard e publicação evidenciada na Dadosfera.
+- A entrega reúne pipeline local em Python, modelagem, SQL, dashboard e publicação evidenciada na Dadosfera.
 
 ![Importação do dataset na Dadosfera](../images/dadosfera/01_importacao_dataset.png)
 
@@ -59,7 +59,7 @@ Aqui eu explicaria que a arquitetura foi pensada para separar bem o que é dado 
 ![Coleção publicada com os ativos do case](../images/dadosfera/dadosfera_colecao_ativos_publicados.png)
 
 **Notas do apresentador:**
-Esse slide mostra que a entrega não terminou no notebook ou no script local. Os ativos foram organizados em coleção, com uma estrutura mais próxima de produto analítico. Aqui já dá para sustentar que coleção, dashboard final, modelo principal e tabela publicada estão evidenciados publicamente, além das perguntas executivas confirmadas.
+Esse slide mostra que a entrega não terminou no notebook ou no script local. Os ativos foram organizados em coleção, com uma estrutura mais próxima de produto analítico. Aqui já dá para sustentar que coleção, dashboard final, modelo principal e tabela publicada estão evidenciados publicamente, além das perguntas executivas confirmadas. O que eu não afirmo é que a transformação já rode nativamente na plataforma.
 
 **Tempo estimado:** 50 segundos
 
@@ -99,11 +99,11 @@ Aqui eu mostraria o consumo executivo do case. O ponto principal é que o dashbo
 
 - O case entrega uma jornada defensável entre dado bruto, ativo analítico e consumo executivo.
 - Já existe evidência real de publicação, documentação e governança mínima aplicada ao ativo.
-- Como evolução, a solução pode avançar para pipeline recorrente, Data Apps, uso de GenAI sobre dados e operação mais nativa na Dadosfera.
+- Como evolução, a solução pode avançar para pipeline recorrente, Data Apps, uso de GenAI sobre dados e execução nativa de pipeline com evidência final na Dadosfera.
 
 ![Evidência do item de GenAI](../images/genai/01_product_text_features_openai.png)
 
 **Notas do apresentador:**
-Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline, modelagem, publicação, consumo e documentação. E eu também destacaria que existe uma frente de GenAI no projeto, usada como extensão controlada para enriquecer a leitura analítica com dados textuais. O próximo passo natural é aprofundar essa camada junto da operação dentro da plataforma.
+Eu fecharia dizendo que esse case busca ser consistente, não inflado. O que está entregue hoje já demonstra pipeline local, modelagem, publicação, consumo e documentação. E eu também destacaria que existe uma frente de GenAI no projeto, usada como extensão controlada para enriquecer a leitura analítica com dados textuais. O próximo passo natural é aprofundar a operação nativa dentro da plataforma com a mesma disciplina de evidência.
 
 **Tempo estimado:** 40 segundos
