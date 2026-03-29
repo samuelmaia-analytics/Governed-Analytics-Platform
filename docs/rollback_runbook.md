@@ -26,7 +26,8 @@ python -m pytest tests
 python src/run_case_pipeline.py --steps build publish quality contracts
 ```
 
-5. Revalidar o workflow de deploy do Streamlit.
+5. Revalidar o workflow de promoção para `streamlit-prod`.
+6. Se o app estiver apontando temporariamente para `streamlit-prod`, confirmar se o branch publicado já recebeu o commit de rollback ou se o apontamento precisa ser ajustado manualmente no Streamlit Cloud.
 
 ## Evidências mínimas após rollback
 

@@ -49,9 +49,9 @@ A proposta não foi apenas “fazer um dashboard”. O repositório foi estrutur
 - sincronização programática de catálogo via API em `src/dadosfera_catalog_sync.py`
 - dashboard Streamlit publicado
 - exportações auxiliares para Power BI
-- CI, lint e promoção automática do branch `streamlit-prod`
+- CI, lint e promoção automática de `main` para `streamlit-prod`
 
-O branch `streamlit-prod` já está provisionado no repositório remoto para ser usado diretamente como branch de deploy no Streamlit Cloud.
+O fluxo operacional recomendado usa `main` como branch fonte e promove automaticamente o commit validado para `streamlit-prod`, branch dedicada de deploy no Streamlit Cloud. Em contingência, o app também pode apontar diretamente para `streamlit-prod`.
 
 ## Escopo Core vs Bônus
 
@@ -105,7 +105,7 @@ A separação entre `curated` e `published` é uma decisão central do projeto. 
 - dashboard Streamlit público consumindo a camada publicada
 - SQLs versionadas com resultados exportados
 - sync de catálogo via API do Maestro
-- CI, lint e promoção do branch de deploy
+- CI, lint e promoção automática de `main` para o branch de deploy
 
 ## Execução
 
@@ -167,7 +167,7 @@ streamlit run streamlit_app/app.py
 - contratos por camada analítica e publicada
 - testes automatizados com gate mínimo de cobertura
 - lint e workflows separados para qualidade e integração
-- branch de deploy dedicada para publicação do Streamlit
+- branch de deploy dedicada para publicação do Streamlit com promoção automatizada a partir de `main`
 - runbooks explícitos de release, rollback e captura de evidências
 
 ## Governança

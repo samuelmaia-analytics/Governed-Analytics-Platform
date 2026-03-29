@@ -53,7 +53,7 @@ Etapas disponiveis:
 
 - CI de testes em `.github/workflows/ci.yml`
 - lint em `.github/workflows/lint.yml`
-- promoção automática do branch `streamlit-prod` em `.github/workflows/deploy-streamlit.yml`
+- promoção automática de `main` para `streamlit-prod` em `.github/workflows/deploy-streamlit.yml`
 - sincronização de ativos do catálogo por API em `.github/workflows/sync-dadosfera-catalog.yml`
 
 ## Leitura de maturidade
@@ -132,7 +132,7 @@ Salvar em `images/dadosfera/`:
 ## Status atual
 
 - pipeline local em Python: feito
-- CI/CD do branch de deploy do Streamlit: feito
+- CI/CD de promoção para o branch de deploy do Streamlit: feito
 - sync de catálogo via API: feito
 - pipeline real na Dadosfera: pendente
 - catalogação do pipeline na plataforma: pendente
