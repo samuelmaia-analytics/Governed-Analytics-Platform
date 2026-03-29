@@ -6,12 +6,14 @@ from dataclasses import dataclass
 import pandas as pd
 import streamlit as st
 
-from src.config import (
-    PUBLISHED_DASHBOARD_DIR,
-    PUBLISHED_MONITORING_DIR,
-    PUBLISHED_SEMANTIC_DIR,
-)
+from src.config import PUBLISHED_DASHBOARD_DIR
 from streamlit_app.theme import MONTH_NAME_MAP, WEEKDAY_MAP
+
+try:
+    from src.config import PUBLISHED_MONITORING_DIR, PUBLISHED_SEMANTIC_DIR
+except ImportError:
+    PUBLISHED_MONITORING_DIR = PUBLISHED_DASHBOARD_DIR.parent / "monitoring"
+    PUBLISHED_SEMANTIC_DIR = PUBLISHED_DASHBOARD_DIR.parent / "semantic"
 
 FACT_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
 FACT_CSV_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.csv"
@@ -187,7 +189,7 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
         "<div class='filter-note'>Os filtros afetam todo o dashboard, incluindo KPIs, gráficos, tabelas e insights.</div>",
         unsafe_allow_html=True,
     )
-    if st.sidebar.button("Resetar filtros", use_container_width=True):
+    if st.sidebar.button("Resetar filtros", width="stretch"):
         reset_filters()
 
     min_date = df["order_purchase_timestamp"].min().date()

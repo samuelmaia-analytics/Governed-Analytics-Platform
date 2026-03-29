@@ -77,7 +77,7 @@ def render_story_nav() -> str:
             st.button(
                 label,
                 key=f"nav_{value}",
-                use_container_width=True,
+                width="stretch",
                 type="primary" if current == value else "secondary",
                 on_click=set_navigation,
                 args=(value,),

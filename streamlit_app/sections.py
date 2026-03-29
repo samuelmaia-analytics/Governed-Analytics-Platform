@@ -185,7 +185,7 @@ def style_regional_table(df: pd.DataFrame) -> pd.io.formats.style.Styler:
 
 
 def render_chart(fig: go.Figure, insight: str) -> None:
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     st.caption(insight)
 
 
@@ -251,7 +251,7 @@ def render_geography_section(df: pd.DataFrame, geography_mode: str) -> None:
     col3, col4 = st.columns((1.15, 0.85), gap="large")
     with col3:
         table_df = regional_df[["uf", "receita", "pedidos", "ticket_medio", "frete_medio", "prazo_medio", "atraso_pct", "review_medio"]].sort_values("receita", ascending=False)
-        st.dataframe(style_regional_table(table_df), use_container_width=True, height=420)
+        st.dataframe(style_regional_table(table_df), width="stretch", height=420)
         st.caption("Tabela analítica por UF com foco em escala comercial, custo logístico e percepção de experiência.")
     with col4:
         render_chart(chart_state_delay_rate(df), "A taxa de atraso por UF ajuda a localizar gargalos operacionais persistentes e orientar revisão de SLA regional.")
@@ -310,7 +310,7 @@ def render_health_section(monitoring_status: dict[str, object] | None) -> None:
 
     if not results.empty:
         preview = results[["check_name", "status", "severity", "metric_value"]].copy()
-        st.dataframe(preview, use_container_width=True, height=260)
+        st.dataframe(preview, width="stretch", height=260)
         st.caption("Resumo dos checks mais recentes da camada publicada.")
     close_section()
 
@@ -350,19 +350,19 @@ def render_semantic_section(semantic_assets: dict[str, pd.DataFrame]) -> None:
             logistics_view = top_logistics.copy()
             logistics_view["delayed_rate"] = logistics_view["delayed_rate"].mul(100).round(1)
             logistics_view["avg_freight_to_price_ratio"] = logistics_view["avg_freight_to_price_ratio"].mul(100).round(1)
-            st.dataframe(logistics_view, use_container_width=True, height=320)
+            st.dataframe(logistics_view, width="stretch", height=320)
     with tabs[1]:
         if top_sellers.empty:
             st.info("Sem dados de seller materializados.")
         else:
             seller_view = top_sellers.copy()
             seller_view["delay_rate"] = seller_view["delay_rate"].mul(100).round(1)
-            st.dataframe(seller_view, use_container_width=True, height=320)
+            st.dataframe(seller_view, width="stretch", height=320)
     with tabs[2]:
         if top_cohorts.empty:
             st.info("Sem dados de cohort materializados.")
         else:
-            st.dataframe(top_cohorts, use_container_width=True, height=320)
+            st.dataframe(top_cohorts, width="stretch", height=320)
     close_section()
 
 
@@ -395,6 +395,6 @@ def render_support_tables(df: pd.DataFrame) -> None:
     tabs = st.tabs(["Categorias", "Estados", "Pedidos"])
     for tab, table_name, table_df in [(tabs[0], "categorias", category_table), (tabs[1], "estados", state_table), (tabs[2], "pedidos", order_table)]:
         with tab:
-            st.dataframe(table_df, use_container_width=True, height=380)
-            st.download_button(label=f"Exportar tabela de {table_name}", data=to_csv_bytes(table_df), file_name=f"{table_name}_dashboard.csv", mime="text/csv", use_container_width=True)
+            st.dataframe(table_df, width="stretch", height=380)
+            st.download_button(label=f"Exportar tabela de {table_name}", data=to_csv_bytes(table_df), file_name=f"{table_name}_dashboard.csv", mime="text/csv", width="stretch")
     close_section()
