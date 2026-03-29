@@ -18,7 +18,7 @@ Este case não foi desenhado como exercício de visualização. Ele foi estrutur
 
 ## Modelagem e qualidade
 
-“A modelagem foi tratada como estrutura de produto, não como tabela final isolada. Além da fato principal, o projeto inclui checks de qualidade, contratos simples de schema, classificação de dados e documentação de privacidade. Isso importa porque a base não fica apenas utilizável; ela fica defensável.”
+“A modelagem foi tratada como estrutura de produto, não como tabela final isolada. Além da fato principal, o projeto inclui checks de qualidade, contratos simples de schema, classificação de dados, documentação de privacidade, CI, lint e testes automatizados. Isso importa porque a base não fica apenas utilizável; ela fica defensável.”
 
 ## Consumo analítico
 
@@ -28,13 +28,21 @@ Este case não foi desenhado como exercício de visualização. Ele foi estrutur
 
 “O Streamlit é a camada executiva da solução. Ele consome exclusivamente a camada publicada e traduz a base em KPIs, tendência, categorias, geografia e insights. O ponto forte não é o visual em si; é a coerência entre modelagem, governança e produto.”
 
+## Robustez técnica
+
+“No estado final, o repositório sustenta `114` testes passando, cobertura total acima de `86%` e gate mínimo de `80%` em CI. Isso é relevante porque transforma o case em algo revisável por engenharia com muito menos risco de regressão silenciosa.”
+
 ## Dadosfera
 
 “Além do ambiente local, o ativo principal foi publicado na Dadosfera/Metabase e está documentado com evidências visuais de importação, catálogo, coleção e volume. O repositório também inclui sincronização complementar de catálogo via API do Maestro. O que não se afirma é pipeline nativo rodando dentro da plataforma, porque isso não está comprovado.”
 
+## Escopo core vs bônus
+
+“O escopo core do case está em ingestão, padronização, modelagem, governança, publicação e dashboard. Power BI, GenAI e exportações complementares entram como extensões. Isso foi mantido explícito para não inflar o escopo além do que realmente sustenta o produto principal.”
+
 ## Fechamento
 
-“A leitura correta desta entrega é: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe e o único limite estrutural remanescente é a ausência de pipeline nativo dentro da plataforma. Para um case técnico, isso mostra capacidade real de construir ativo, governar exposição e fechar a jornada entre engenharia e consumo.”
+“A leitura correta desta entrega é: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe, a robustez de engenharia foi demonstrada e o único limite estrutural remanescente é a ausência de pipeline nativo dentro da plataforma. Para um case técnico, isso mostra capacidade real de construir ativo, governar exposição e fechar a jornada entre engenharia e consumo.”
 
 ## Encerramento sugerido
 

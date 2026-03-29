@@ -15,8 +15,17 @@ def base_layout(fig: go.Figure, *, show_legend: bool = False) -> go.Figure:
         plot_bgcolor=COLORS["surface"],
         font=dict(family=APP_FONT, size=13, color=COLORS["text"]),
         title_font=dict(size=18, color=COLORS["text"]),
-        margin=dict(l=24, r=20, t=62, b=24),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+        margin=dict(l=24, r=20, t=86, b=24),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            x=0,
+            font=dict(size=12, color=COLORS["text"]),
+            bgcolor="rgba(255,255,255,0.96)",
+            bordercolor=COLORS["border"],
+            borderwidth=1,
+        ),
         showlegend=show_legend,
         hoverlabel=dict(bgcolor=COLORS["surface"], bordercolor=COLORS["border"], font=dict(family=APP_FONT, color=COLORS["text"])),
         height=375,
@@ -89,15 +98,37 @@ def chart_category_share_donut(df: pd.DataFrame) -> go.Figure:
     if others_revenue > 0:
         top_df = pd.concat([top_df, pd.DataFrame([{"category_label": "Outras", "revenue": others_revenue}])], ignore_index=True)
 
-    fig = px.pie(
+    top_df["share_pct"] = (top_df["revenue"] / top_df["revenue"].sum()) * 100
+    top_df = top_df.sort_values("share_pct", ascending=True)
+
+    fig = px.bar(
         top_df,
-        names="category_label",
-        values="revenue",
-        hole=0.58,
+        x="share_pct",
+        y="category_label",
+        orientation="h",
         title="Participação de receita por categoria",
-        color_discrete_sequence=[COLORS["primary"], COLORS["secondary"], "#93C5FD", "#BFDBFE", "#DBEAFE", COLORS["teal"], "#9CA3AF", "#E5E7EB"],
+        labels={"share_pct": "Participação (%)", "category_label": "Categoria"},
+        text=top_df["share_pct"].map(lambda value: f"{value:.1f}%"),
+        color="category_label",
+        color_discrete_sequence=[
+            COLORS["primary"],
+            COLORS["secondary"],
+            COLORS["teal"],
+            COLORS["highlight"],
+            COLORS["success"],
+            "#2563EB",
+            "#475569",
+            "#64748B",
+        ],
     )
-    return base_layout(fig, show_legend=True)
+    fig.update_traces(textposition="outside", cliponaxis=False)
+    fig = base_layout(fig, show_legend=False)
+    fig.update_layout(
+        margin=dict(l=24, r=52, t=72, b=32),
+        height=440,
+    )
+    fig.update_xaxes(range=[0, max(55, float(top_df["share_pct"].max()) + 5)])
+    return fig
 
 
 def chart_category_value_vs_satisfaction(df: pd.DataFrame) -> go.Figure:

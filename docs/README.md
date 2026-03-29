@@ -2,6 +2,13 @@
 
 Este diretório concentra a documentação principal do case. A navegação abaixo foi reorganizada para leitura rápida por avaliador e para manutenção do projeto.
 
+## Comece Por Objetivo
+
+- leitura executiva: [executive_summary.md](executive_summary.md)
+- defesa técnica: [case_answers.md](case_answers.md)
+- operação e governança: [operating_model.md](operating_model.md)
+- apresentação final: [10_apresentacao_final.md](10_apresentacao_final.md)
+
 ## Ordem recomendada
 
 1. [00_planejamento.md](00_planejamento.md)
@@ -18,6 +25,7 @@ Este diretório concentra a documentação principal do case. A navegação abai
 
 ## Guias centrais
 
+- [executive_summary.md](executive_summary.md): visão executiva única para banca, entrevista e revisão rápida
 - [case_answers.md](case_answers.md): narrativa principal do case
 - [architecture.md](architecture.md): arquitetura implementada
 - [operating_model.md](operating_model.md): visão única de pipeline, governança, publicação e consumo
@@ -28,6 +36,12 @@ Este diretório concentra a documentação principal do case. A navegação abai
 - [governance_policy.md](governance_policy.md): governança, retenção e responsabilidades
 - [engineering_governance.md](engineering_governance.md): guardrails de CI, ownership e contribuição
 - [branch_protection_recommendation.md](branch_protection_recommendation.md): configuração recomendada no GitHub para merge e deploy
+
+## Trilhas por Perfil
+
+- avaliador de negócio: [executive_summary.md](executive_summary.md), [05_dashboard.md](05_dashboard.md), [dadosfera_evidencias.md](dadosfera_evidencias.md)
+- avaliador técnico: [case_answers.md](case_answers.md), [02_carga_e_modelagem.md](02_carga_e_modelagem.md), [architecture.md](architecture.md), [schema_contract_report.md](schema_contract_report.md)
+- operação e plataforma: [operating_model.md](operating_model.md), [release_runbook.md](release_runbook.md), [rollback_runbook.md](rollback_runbook.md), [engineering_governance.md](engineering_governance.md)
 
 ## Relatórios gerados pelo pipeline
 
@@ -52,3 +66,7 @@ Este diretório concentra a documentação principal do case. A navegação abai
 - [bi_bonus.md](bi_bonus.md)
 - [genai_bonus.md](genai_bonus.md)
 - [about_dadosfera.md](about_dadosfera.md)
+
+## Critério de Navegação
+
+Se o objetivo for entender rapidamente o valor entregue, não comece pela ordem cronológica dos arquivos `00` a `10`. A ordem cronológica ajuda a reconstruir a evolução do case, mas os guias centrais e as trilhas por perfil foram organizados para acelerar avaliação, entrevista e handoff.

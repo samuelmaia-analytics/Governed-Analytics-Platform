@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
 import re
 import time
+from pathlib import Path
 
 from playwright.sync_api import Page, expect, sync_playwright
-
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = ROOT_DIR / "images" / "dashboard"

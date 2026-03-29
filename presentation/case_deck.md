@@ -144,11 +144,27 @@ A solução foi pensada para resistir à revisão técnica.
 **Pontos**
 
 - testes automatizados
+- `114/114` testes passando
+- cobertura total acima de `86%`
+- gate mínimo de cobertura em `80%`
 - contratos simples de schema
 - checks de qualidade
 - workflows de CI, lint e promoção do branch de deploy
 
-## Slide 10 | Extensões
+## Slide 10 | Operação e Governança
+
+**Mensagem**
+
+O case não termina no código; ele inclui operação mínima e governança explícita.
+
+**Pontos**
+
+- `CODEOWNERS`, `CONTRIBUTING.md` e `SECURITY.md`
+- runbooks de release, rollback e operating model
+- recomendação formal de branch protection e environment control
+- separação clara entre escopo core e extensões
+
+## Slide 11 | Extensões
 
 **Mensagem**
 
@@ -159,7 +175,7 @@ A solução já se abre para múltiplos canais de consumo.
 - Power BI com modelo auxiliar
 - GenAI com extração estruturada de features textuais
 
-## Slide 11 | Escopo Real
+## Slide 12 | Escopo Real
 
 **Mensagem**
 
@@ -170,15 +186,18 @@ O case está pronto como produto analítico, mas não infla o que ainda não foi
 - feito: modelagem, governança, publicação, dashboard, catálogo, sync API, automação GitHub
 - não feito: pipeline nativo dentro da Dadosfera
 
-## Slide 12 | Fechamento
+## Slide 13 | Fechamento
 
 **Mensagem final**
 
-“Se eu resumir a entrega em uma frase: este projeto demonstra a capacidade de transformar dado bruto em ativo analítico operacionalizado, com critério de modelagem, controle de exposição e prova real de consumo.”
+“Se eu resumir a entrega em uma frase: este projeto demonstra a capacidade de transformar dado bruto em ativo analítico operacionalizado, com critério de modelagem, controle de exposição, robustez de engenharia e prova real de consumo.”
 
 ## Materiais de apoio
 
 - repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
 - app: `https://samuelmaia-032026.streamlit.app/`
 - vídeo: `https://youtu.be/SqJ0UF1Em9k`
+- coleção publicada: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
+- dashboard publicado: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - modelo principal: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
+- tabela pública: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
