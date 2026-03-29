@@ -9,66 +9,114 @@
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 - Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
 
-Este documento resume o dashboard final do case, sua fonte de dados, o link público de acesso e as evidências visuais do produto analítico.
+Este documento descreve o dashboard final do case como camada oficial de consumo executivo, explicando a origem dos dados, a lógica de exposição e a leitura de negócio que o app sustenta.
 
-## Aplicação
+## Tese do Dashboard
 
-- app: `streamlit_app/app.py`
-- link público: `https://samuelmaia-032026.streamlit.app/`
-- fonte exclusiva:
-  - `data/published/dashboard/fact_orders_dashboard.parquet`
+O dashboard não é um front-end conectado diretamente à camada analítica interna. Ele existe para consumir a camada publicada `fact_orders_dashboard`, com governança, minimização e chaves pseudonimizadas, preservando coerência entre engenharia, publicação e consumo.
 
-## Ativo publicado equivalente
+Essa escolha é central para o case porque:
 
-Para upload manual em plataforma e demonstração de publicação, o arquivo equivalente é:
+- desacopla consumo executivo da base analítica interna
+- reduz exposição desnecessária de identificadores e localidade fina
+- mantém o Streamlit alinhado ao ativo publicado na plataforma
+- permite evoluir semântica e monitoramento sem alterar a lógica do app como fonte oficial de leitura
+
+## Fontes de Dados do App
+
+### Fonte principal
+
+- `data/published/dashboard/fact_orders_dashboard.parquet`
+
+### Fonte equivalente para upload manual em plataforma
 
 - `data/published/dashboard/fact_orders_dashboard.csv`
 
-Regra prática de uso:
+### Camadas complementares já materializadas no projeto
 
-- `parquet`: execução local do Streamlit
-- `csv`: upload na Dadosfera
+- `data/published/semantic/logistics_slice.parquet`
+- `data/published/semantic/seller_slice.parquet`
+- `data/published/semantic/cohort_slice.parquet`
+- `data/published/monitoring/published_layer_monitoring.csv`
 
-## Objetivo
+Regra prática:
 
-Transformar a camada analítica publicada em leitura executiva de:
+- `published/dashboard`: fonte oficial do app e do consumo executivo
+- `published/semantic`: marts publicados para novos recortes analíticos
+- `published/monitoring`: operação e observabilidade da camada publicada
 
-- KPIs
-- tendência temporal
-- categorias
-- geografia
-- operação
-- insights
+## Perguntas de Negócio que o Dashboard Responde
 
-## Decisões de design analítico
+- qual é o nível atual de receita, ticket e atraso
+- como a receita evolui ao longo do tempo
+- quais categorias concentram valor e pressão logística
+- quais estados concentram receita e pior performance operacional
+- como os meios de pagamento se distribuem
 
-- o app consome apenas `published/dashboard`, nunca a camada `curated`
-- a navegação foi separada por perguntas executivas, não por tabela de origem
-- os visuais priorizam leitura rápida, concentração de valor, risco operacional e possibilidade de filtro
-- quando há agregação de cauda longa em categoria, isso é assumido como decisão de clareza visual, não como detalhe escondido
+Além disso, a evolução recente da camada publicada passou a permitir desdobramentos em:
+
+- cohort e recorrência de compra
+- recortes por seller pseudonimizado
+- leitura mais detalhada de despacho, transporte e peso relativo do frete
+
+## Decisões de Design Analítico
+
+- o app consome apenas `published/dashboard`, nunca `curated/analytics`
+- a navegação é organizada por perguntas executivas, não por tabela de origem
+- a visualização prioriza velocidade de leitura e capacidade de filtro
+- a cauda longa de categorias é resumida quando isso melhora clareza visual
+- recortes mais granulares permanecem na camada analítica interna ou nos marts semânticos publicados
+
+## Leitura Correta da Arquitetura de Consumo
+
+O Streamlit é a camada oficial de exposição executiva do projeto. Isso significa:
+
+- o dado já chega ao app tratado para consumo
+- o dashboard não precisa replicar regras pesadas de transformação
+- qualidade, contratos e governança acontecem antes da etapa de visualização
+- a mesma camada publicada sustenta o app e a publicação evidenciada na Dadosfera
+
+Esse desenho aproxima o case de um produto analítico real, e não apenas de uma interface sobre a base inteira.
+
+## Valor do Dashboard no Case
+
+O valor do dashboard não está apenas na estética ou nos gráficos. Ele materializa a etapa final da arquitetura: transformar uma camada publicada segura em leitura executiva utilizável.
+
+Em termos de avaliação, isso demonstra:
+
+- capacidade de modelar para consumo e não apenas para exploração
+- critério de exposição de dados
+- alinhamento entre arquitetura, visualização e governança
+- preocupação com reuso do ativo publicado fora do app
+
+## Tradeoff Explícito
+
+O dashboard abre mão de expor toda a riqueza da camada interna para ganhar:
+
+- governança
+- simplicidade de leitura
+- menor risco de exposição
+- consistência com o ativo publicado externamente
+
+Essa é uma decisão deliberada. A profundidade exploratória continua existindo, mas não é a função da camada de consumo executivo.
 
 ## Evidências
 
-- dashboard online:
-  - `https://samuelmaia-032026.streamlit.app/`
-- screenshots finais do Streamlit:
-  - `images/dashboard/01_overview.png`
-  - `images/dashboard/02_kpis.png`
-  - `images/dashboard/03_temporal.png`
-  - `images/dashboard/04_categories.png`
-  - `images/dashboard/05_geography.png`
+### Dashboard online
 
-## Valor do dashboard no case
+- `https://samuelmaia-032026.streamlit.app/`
 
-O dashboard representa a camada de consumo executivo da solução. Ele não lê a base analítica interna diretamente; consome apenas o ativo publicado e minimizado, reforçando a coerência entre engenharia, governança e apresentação final.
+### Screenshots finais do app
 
-## Tradeoff explícito
+- `images/dashboard/01_overview.png`
+- `images/dashboard/02_kpis.png`
+- `images/dashboard/03_temporal.png`
+- `images/dashboard/04_categories.png`
+- `images/dashboard/05_geography.png`
 
-O dashboard abre mão de expor toda a riqueza da camada analítica interna para ganhar governança, simplicidade de leitura e menor risco de exposição desnecessária. Essa escolha é intencional: a profundidade exploratória permanece na camada `curated`, enquanto o Streamlit funciona como camada oficial de consumo executivo.
-
-## Referências detalhadas
+## Referências
 
 - runbook de captura: [docs/streamlit_capture_runbook.md](./streamlit_capture_runbook.md)
+- operação do projeto: [docs/operating_model.md](./operating_model.md)
+- publicação segura: [docs/privacy_governance.md](./privacy_governance.md)
 - deck: [presentation/case_deck.md](../presentation/case_deck.md)
-
-

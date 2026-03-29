@@ -27,6 +27,8 @@ Para a visão consolidada dos ativos publicados no Metabase, com links confirmad
   - `contracts/catalog/dadosfera_catalog_assets.json`
 - cliente de sync por API:
   - `src/dadosfera_catalog_sync.py`
+- autenticação não interativa por token para sync:
+  - `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN`
 
 ## Objetivo
 
@@ -34,6 +36,7 @@ Demonstrar:
 
 - organização dos ativos
 - preparo para publicação
+- distinção entre catálogo local, catálogo sincronizado e pipeline nativo
 - governança mínima sobre dados e documentação
 
 ## Valor para a avaliação
@@ -58,6 +61,16 @@ Leitura arquitetural:
 - o projeto possui manifesto local, inventário versionado e sync complementar por API
 - isso reduz dependência de manutenção manual para ativos públicos recorrentes
 
+## Leitura Correta de Maturidade
+
+Este documento cobre três níveis diferentes, e eles não devem ser confundidos:
+
+- `catálogo local`: manifesto, inventário e classificação versionados no repositório
+- `catálogo sincronizado`: ativos públicos sincronizados por API para a plataforma
+- `pipeline nativo`: operação de transformação dentro da plataforma, ainda sem evidência final no tenant
+
+Essa separação importa porque o projeto já comprovou publicação e catálogo, mas não vende como concluída a execução nativa do pipeline.
+
 ## Referências principais
 
 - coleção local: [docs/collection_catalog.md](./collection_catalog.md)
@@ -80,6 +93,7 @@ As evidências visuais continuam organizadas em `images/dadosfera/`, com consoli
 - catalogação local: feita
 - publicação real em plataforma: feita com evidência visual de importação, catálogo, coleção e volume do ativo publicado
 - sincronização complementar por API: implementada no repositório
+- pipeline nativo na plataforma: ainda pendente de evidência final
 
 ## Ativo recomendado para upload na Dadosfera
 

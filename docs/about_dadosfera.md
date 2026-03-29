@@ -1,6 +1,5 @@
 # Sobre a Dadosfera
 
-
 ## Acesso Rápido
 
 - Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
@@ -10,212 +9,155 @@
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 - Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
 
-## Status Atual do Case
+## Tese Central
 
-Este projeto já possui uma solução local funcional para o dataset Olist, com pipeline em Python, organização em camadas, modelagem analítica, validação de qualidade, SQL e dashboard Streamlit.
+Neste case, a Dadosfera entra menos como substituta imediata do pipeline local e mais como camada de publicação, descoberta, compartilhamento e evolução operacional do ativo analítico.
 
-## Leitura Executiva
+A engenharia principal do projeto continua em Python, mas a plataforma já aparece de forma concreta em quatro frentes:
 
-Do ponto de vista do case, a Dadosfera entra menos como substituta imediata do pipeline local e mais como aceleradora da etapa em que muitos projetos começam a perder eficiência: publicação, descoberta, compartilhamento e governança de ativos analíticos.
+- publicação do ativo principal
+- catálogo e coleção navegáveis
+- sincronização programática por API
+- preparação operacional para pipeline nativo e operação não interativa
 
-Essa é a tese central deste documento. A engenharia local já resolve transformação e modelagem; a plataforma amplia escala operacional, reduz atrito de publicação e melhora a capacidade de distribuição do ativo analítico.
+## Estado Atual do Case
 
-Para evitar ambiguidade na leitura do case, o status real até o momento é:
+### Feito localmente no projeto
 
-- **feito localmente no projeto**
-  - ingestão dos CSVs do Olist
-  - promoção para `standardized`
-  - profiling em `staging`
-  - construção da `fact_orders_enriched`
-  - publicação segura da `fact_orders_dashboard`
-  - queries SQL, screenshots tabulares, catálogo local e dashboard Streamlit
-- **feito no Git local**
-  - repositório inicializado e remoto GitHub configurado
-  - versionamento da estrutura, documentação e código
-- **já comprovado neste repositório na interface da Dadosfera**
-  - upload/publicação do dataset na plataforma
-  - catálogo/coleção materializados na interface da plataforma
-  - screenshots da plataforma em `images/dadosfera/`
-- **já implementado via integração programática**
-  - sincronização de ativos públicos no catálogo via API do Maestro
-  - manifesto versionado em `contracts/catalog/dadosfera_catalog_assets.json`
-  - cliente de sync em `src/dadosfera_catalog_sync.py`
-  - operador de pipelines nativos via API em `src/dadosfera_pipeline_ops.py`
-  - template versionado de pipeline em `contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json`
-- **ainda não comprovado neste repositório como execução real na Dadosfera**
-  - pipeline real executado na plataforma
-  - catálogo do pipeline na interface
-  - query, notebook ou app materializado nativamente dentro da plataforma
+- ingestão dos CSVs do Olist
+- promoção para `standardized`
+- profiling em `staging`
+- construção da `fact_orders_enriched`
+- derivação da `fact_orders_dashboard`
+- expansão semântica para logística, seller e cohort
+- monitoramento recorrente da camada publicada
+- dashboard Streamlit, SQL versionado e exportações para Power BI
 
-Em outras palavras, a solução técnica do case já está pronta localmente, o ativo principal já foi publicado com evidência visual na Dadosfera e o repositório já possui integração via API para sincronizar ativos públicos de catálogo e preparar a operação de pipelines nativos. O ponto ainda pendente é a evidência final de execução nativa dentro da plataforma.
+### Já comprovado na plataforma
 
-## Contexto
+- upload/publicação do ativo principal
+- catálogo e coleção materializados na interface
+- screenshots da plataforma em `images/dadosfera/`
 
-Este case foi desenvolvido a partir do dataset Olist, com um pipeline local em Python para ingestão, profiling, modelagem analítica, validação de qualidade, consultas SQL e consumo em dashboard Streamlit.
+### Já implementado via integração programática
 
-Na configuração atual, essa arquitetura atende bem ao objetivo de demonstrar capacidade técnica ponta a ponta. Ainda assim, quando o problema é observado em um contexto mais próximo de produção, surgem limitações típicas de uma operação local: dependência de execução manual, baixa padronização de publicação de dados, maior esforço de governança e dificuldade de escalar o compartilhamento entre times.
+- sync de catálogo por API em `src/dadosfera_catalog_sync.py`
+- autenticação não interativa por `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN`
+- operador de pipelines nativos via API em `src/dadosfera_pipeline_ops.py`
+- comando `deploy` idempotente para criar ou reaproveitar pipeline
+- template versionado em `contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json`
+- job agendado de operação da camada publicada em `.github/workflows/operate-published-layer.yml`
 
-É nesse ponto que a Dadosfera passa a ser relevante: não como substituição artificial do que já funciona, mas como camada de publicação, descoberta e compartilhamento capaz de reduzir atrito operacional.
+### Ainda não comprovado no tenant avaliado
 
-## 1. Principal Problema a Ser Resolvido
+- pipeline nativo executado na plataforma com evidência final de run
+- output gerado por pipeline nativo real no tenant
+- catálogo do pipeline nativo na interface
 
-O problema central não é apenas armazenar ou transformar dados do e-commerce, mas reduzir o tempo entre:
+Em outras palavras: a plataforma já participa de publicação, catálogo e automação por API, mas a absorção nativa completa da transformação ainda não está comprovada.
 
-- chegada do dado bruto
+## Por Que a Dadosfera Faz Sentido Aqui
+
+O problema do case não é apenas transformar dados. É reduzir o tempo entre:
+
+- chegada da fonte bruta
 - preparação analítica confiável
 - disponibilização para consumo
-- geração de insight acionável para negócio
+- reutilização do ativo em múltiplos canais
 
-No contexto do Olist, isso significa transformar múltiplas tabelas transacionais em um ativo analítico consistente que permita responder com rapidez a perguntas como:
+Em uma arquitetura puramente local, isso funciona para desenvolvimento e defesa técnica, mas escala pior quando cresce a necessidade de:
 
-- quais categorias vendem mais
-- como a receita evolui ao longo do tempo
-- quais regiões concentram maior valor
-- onde existem gargalos logísticos
-- como está a experiência do cliente
+- compartilhar ativos entre consumidores
+- reduzir upload e publicação manual
+- manter descoberta e documentação em um ponto central
+- preparar operação recorrente com menos atrito
 
-Em um pipeline puramente local, esse fluxo funciona para desenvolvimento e apresentação do case, mas tende a perder eficiência quando cresce a necessidade de:
+É nesse ponto que a Dadosfera se torna economicamente e operacionalmente interessante.
 
-- colaboração entre áreas
-- controle de versões de ativos analíticos
-- reprocessamento confiável
-- distribuição de dados para diferentes consumidores
-- governança sobre qualidade e publicação
-
-Em resumo, o principal problema a ser resolvido é transformar uma solução analítica funcional em uma operação de dados mais escalável, governável e economicamente eficiente.
-
-## 2. Diagrama Textual da Solução Proposta
-
-A arquitetura atual pode ser parcialmente ou totalmente substituída por uma abordagem baseada na Dadosfera, mantendo a lógica analítica do projeto, mas melhorando a forma como os dados são publicados, organizados e consumidos.
+## Leitura Arquitetural Correta
 
 ### Arquitetura atual do case
 
 ```text
 Dataset Olist CSV
     -> pipeline local em Python
-    -> camadas raw / standardized / staging / curated
-    -> tabela fact_orders_enriched
-    -> validação de qualidade
-    -> queries SQL
-    -> dashboard Streamlit
+    -> raw / standardized / staging / curated
+    -> fact_orders_enriched
+    -> fact_orders_dashboard
+    -> published semantic marts
+    -> monitoramento da camada publicada
+    -> Streamlit / SQL / Power BI / publicação na Dadosfera
 ```
 
-### Arquitetura proposta com Dadosfera
+### Papel atual da Dadosfera
 
 ```text
-Fontes Olist / arquivos brutos
-    -> ingestão e disponibilização na Dadosfera
-    -> organização de datasets e ativos analíticos em ambiente governado
-    -> transformações e publicação de camada analítica
-    -> consumo por:
-       - Streamlit
-       - SQL / notebooks
-       - BI externo
-       - aplicações analíticas com IA
+Ativo publicado e controlado
+    -> publicação na plataforma
+    -> catálogo e coleção
+    -> sync por API
+    -> preparação para operação nativa de pipeline
 ```
 
-### Visão de substituição parcial
+### Evolução natural com a plataforma
 
 ```text
 Pipeline Python local
-    -> mantém regras de negócio e modelagem analítica
-    -> publica outputs na Dadosfera
-    -> Dadosfera centraliza distribuição, descoberta e consumo
+    -> continua como motor de transformação
+    -> publica outputs governados
+    -> Dadosfera centraliza descoberta, compartilhamento e operação externa
 ```
 
-### Visão de substituição mais ampla
+O desenho não exige descartar a arquitetura local. Ele permite ampliar distribuição e governança sem reabrir a modelagem já resolvida.
 
-```text
-Dadosfera
-    -> concentra ingestão, organização e publicação dos datasets
-    -> reduz dependência de camadas locais intermediárias
-    -> expõe ativos prontos para analytics, BI e Data Apps
-```
+## Ganhos Concretos da Abordagem
 
-Na prática, a proposta não exige descartar o que já foi construído. O pipeline atual pode continuar como motor de transformação, enquanto a Dadosfera atua como camada de publicação, compartilhamento e escalabilidade. Em um estágio mais maduro, parte relevante da arquitetura local pode ser simplificada ou absorvida pela plataforma.
+### Menor atrito operacional
 
-Nesta entrega, essa visão já foi materializada em um manifesto versionável da coleção, salvo em `data/curated/catalog/dadosfera_collection.json`, acompanhado do inventário `data/curated/catalog/collection_assets_inventory.csv`. Além disso, o repositório inclui evidências visuais da publicação do ativo principal na interface da Dadosfera em `images/dadosfera/`, um fluxo complementar de sincronização por API em `src/dadosfera_catalog_sync.py` e uma base operacional para pipelines nativos em `src/dadosfera_pipeline_ops.py`. Ainda não há evidência de pipeline nativo executado no tenant avaliado.
+- menos dependência de upload manual
+- catálogo mais consistente
+- ativo mais fácil de localizar e compartilhar
 
-## 3. Por que a Abordagem Baseada na Dadosfera é Mais Viável e/ou Mais Barata
+### Governança melhor distribuída
 
-Do ponto de vista técnico, a principal vantagem da Dadosfera está em reduzir o custo de complexidade operacional.
-
-Na arquitetura local, vários componentes precisam ser mantidos manualmente:
-
-- organização de arquivos e camadas
-- execução dos scripts
-- controle de disponibilidade dos ativos
-- distribuição de datasets para consumo externo
-- governança sobre o que é versão bruta, intermediária e final
-
-Uma abordagem baseada na Dadosfera tende a ser mais viável porque centraliza essas responsabilidades em uma camada mais próxima de plataforma. Isso gera ganhos como:
-
-- menor esforço para publicar e compartilhar datasets
-- maior padronização de acesso e consumo
-- menor dependência de máquina local ou estrutura artesanal
-- facilidade maior para conectar consumidores diferentes ao mesmo ativo analítico
-
-Do ponto de vista econômico, ela pode ser mais barata por pelo menos quatro razões:
-
-- reduz tempo operacional gasto em tarefas de publicação e organização
-- diminui retrabalho na distribuição de dados para múltiplos consumidores
-- acelera a disponibilização de datasets confiáveis para análise
-- evita crescimento desnecessário de infraestrutura local e scripts auxiliares
-
-Ou seja, o ganho não está apenas em infraestrutura, mas no custo total da operação analítica. Quanto menor o atrito para disponibilizar dados confiáveis, menor tende a ser o custo de coordenação, publicação e reuso.
-
-## 4. Oportunidades e Ganhos Futuros
-
-Ao conectar o projeto a uma abordagem baseada na Dadosfera, surgem oportunidades relevantes de evolução:
-
-### Escala analítica
-
-- publicação recorrente da `fact_orders_enriched`
-- maior reutilização da camada analítica por diferentes áreas
-- redução do tempo entre atualização do dado e disponibilidade para consumo
-
-### Governança e qualidade
-
-- formalização melhor dos ativos publicados
-- rastreabilidade mais clara entre origem, transformação e consumo
-- evolução dos controles de qualidade para um padrão mais contínuo
+- separação explícita entre camada interna e camada publicada
+- visibilidade maior sobre o que está exposto
+- preparação melhor para evolução de controle operacional
 
 ### Multiconsumo
 
-- uso simultâneo por Streamlit, SQL, notebooks e BI externo
-- redução da duplicação de arquivos e exports manuais
-- maior consistência entre as diferentes leituras de negócio
+- Streamlit
+- SQL e consultas exploratórias
+- BI externo
+- futuras experiências analíticas na própria plataforma
 
-### Data Apps e IA
+### Evolução econômica
 
-- base mais preparada para experiências como o módulo `Insights Inteligentes`
-- possibilidade de integração futura com copilotos analíticos e LLMs
-- suporte a perguntas em linguagem natural sobre vendas, logística e experiência do cliente
+O ganho potencial não está apenas em infraestrutura. Ele está em reduzir o custo total da operação analítica:
 
-### Aceleração da decisão
+- menos retrabalho de publicação
+- menos duplicação de artefatos para consumo
+- menor esforço de coordenação entre geração e distribuição do ativo
 
-O ganho final mais importante é de negócio: reduzir o tempo necessário para transformar eventos transacionais em ação gerencial.
+## Limite Estrutural Atual
 
-Com uma camada de dados mais organizada e publicável, o time consegue responder com mais velocidade a perguntas críticas do e-commerce, como:
+O ponto que ainda separa “integração com a plataforma” de “pipeline nativo comprovado” é simples:
 
-- onde concentrar esforço comercial
-- quais categorias exigem atenção operacional
-- onde a logística compromete a experiência
-- quais regiões oferecem maior retorno potencial
+- já existe publicação comprovada
+- já existe catálogo comprovado
+- já existe automação por API
+- ainda não existe evidência final de execução nativa do pipeline no tenant
+
+Essa distinção precisa ser preservada para manter rigor técnico.
 
 ## Síntese Executiva
 
-Para este case, a solução local já demonstra capacidade de engenharia, modelagem e visualização. A Dadosfera entra como proposta de evolução da arquitetura, tornando a operação analítica mais simples de sustentar, mais fácil de compartilhar e mais preparada para crescer.
+Para este case, a Dadosfera já agrega valor real como camada de publicação, catálogo e evolução operacional. O que permanece pendente não é proposta conceitual, mas evidência final de run nativo dentro da plataforma.
 
-No estado atual do repositório, a conclusão correta é:
+Essa é a leitura mais defensável:
 
 - a engenharia local está implementada
-- a estrutura para publicação/catálogo está preparada
-- a integração por API para sincronização de catálogo está implementada
-- a preparação operacional para pipeline nativo via API está implementada
-- a publicação do ativo principal na plataforma já foi evidenciada
-- a execução de pipeline nativo na plataforma ainda precisa ser feita e evidenciada
-
-Em uma leitura tecnicamente rigorosa, a combinação entre pipeline analítico, camada publicada e plataforma de distribuição continua sendo o caminho mais defensável para aumentar velocidade de análise, governança e compartilhamento em contexto de e-commerce.
-
-
+- a publicação na plataforma está comprovada
+- a automação por API está implementada
+- a operação recorrente da camada publicada está empacotada
+- a execução nativa do pipeline ainda precisa ser feita e evidenciada

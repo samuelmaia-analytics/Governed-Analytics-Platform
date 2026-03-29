@@ -41,7 +41,10 @@ No contexto deste case, os papéis estão acumulados pelo autor do projeto, mas 
 | `standardized` | reuso técnico padronizado | interna ao pipeline |
 | `staging` | profiling e diagnósticos | interna ao pipeline |
 | `curated/analytics` | base analítica interna | não deve ser consumida diretamente por front-end ou material publicado |
+| `curated/ops` | rastreabilidade operacional | uso interno para observabilidade de jobs e execução |
 | `published/dashboard` | consumo do produto analítico | camada oficial do Streamlit e de exposição executiva |
+| `published/semantic` | recortes agregados publicados | consumo analítico derivado sem expor a granularidade completa |
+| `published/monitoring` | observabilidade da camada publicada | uso operacional e de governança; não é camada de apresentação executiva |
 
 ## Política de Minimização
 
@@ -58,7 +61,10 @@ No contexto deste case, os papéis estão acumulados pelo autor do projeto, mas 
 | `standardized` | regenerável; pode ser descartado e recriado |
 | `staging` | regenerável; pode ser descartado e recriado |
 | `curated/analytics` | mantido como camada interna do pipeline |
+| `curated/ops` | regenerável; manter histórico conforme necessidade operacional do projeto |
 | `published/dashboard` | regenerável; publicar apenas a versão vigente do dashboard |
+| `published/semantic` | regenerável; manter apenas a versão compatível com a camada publicada vigente |
+| `published/monitoring` | regenerável; manter histórico conforme necessidade de observabilidade e auditoria |
 | `screenshots/query_results` | mantidos por fazerem parte da documentação do case |
 
 ## Rastreabilidade e Accountability
