@@ -290,7 +290,7 @@ def render_health_section(monitoring_status: dict[str, object] | None) -> None:
         "Este bloco expõe o estado mais recente do monitoramento recorrente da camada published usada pelo dashboard.",
     )
     if not monitoring_status:
-        st.info("Nenhum artefato de monitoramento foi encontrado para a camada publicada.")
+        st.info("Monitoramento recorrente ainda não foi publicado neste ambiente. O dashboard segue operacional na camada published principal.")
         close_section()
         return
 
@@ -322,7 +322,7 @@ def render_semantic_section(semantic_assets: dict[str, pd.DataFrame]) -> None:
         "Os marts semânticos materializados fora da tabela principal ampliam a leitura executiva sem reexpor a camada interna.",
     )
     if not semantic_assets:
-        st.info("Nenhum mart semântico publicado foi encontrado no ambiente atual.")
+        st.info("Os recortes semânticos ainda não foram publicados neste ambiente. A navegação principal do dashboard continua disponível.")
         close_section()
         return
 

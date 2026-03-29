@@ -1,0 +1,103 @@
+{
+  "generated_at_utc": "2026-03-29T13:05:57.133106+00:00",
+  "total_checks": 12,
+  "failed_checks": 0,
+  "results": [
+    {
+      "check_name": "published_file_freshness_hours",
+      "status": "PASS",
+      "metric_value": 0.0,
+      "threshold": 36,
+      "severity": "high",
+      "details": "Ultima modificacao UTC: 2026-03-29T13:05:53.701573+00:00"
+    },
+    {
+      "check_name": "published_expected_schema",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Colunas ausentes: nenhuma"
+    },
+    {
+      "check_name": "published_primary_key_duplicates",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Duplicidades na granularidade publicada `order_id + order_item_id`."
+    },
+    {
+      "check_name": "published_min_rows",
+      "status": "PASS",
+      "metric_value": 112650,
+      "threshold": 100001,
+      "severity": "high",
+      "details": "Volume minimo esperado para a camada publicada."
+    },
+    {
+      "check_name": "published_critical_nulls__order_id",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Nulos observados na coluna `order_id`."
+    },
+    {
+      "check_name": "published_critical_nulls__order_item_id",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Nulos observados na coluna `order_item_id`."
+    },
+    {
+      "check_name": "published_critical_nulls__seller_key",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Nulos observados na coluna `seller_key`."
+    },
+    {
+      "check_name": "published_critical_nulls__order_purchase_timestamp",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Nulos observados na coluna `order_purchase_timestamp`."
+    },
+    {
+      "check_name": "published_critical_nulls__price",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Nulos observados na coluna `price`."
+    },
+    {
+      "check_name": "published_critical_nulls__freight_value",
+      "status": "PASS",
+      "metric_value": 0,
+      "threshold": 0,
+      "severity": "high",
+      "details": "Nulos observados na coluna `freight_value`."
+    },
+    {
+      "check_name": "published_missing_pct__purchase_cohort_month",
+      "status": "PASS",
+      "metric_value": 0.0,
+      "threshold": 0,
+      "severity": "medium",
+      "details": "Cobertura da semantica de cohort."
+    },
+    {
+      "check_name": "published_missing_pct__seller_delay_rate",
+      "status": "PASS",
+      "metric_value": 0.0,
+      "threshold": 1.0,
+      "severity": "medium",
+      "details": "Cobertura da semantica de seller."
+    }
+  ]
+}

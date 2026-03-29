@@ -237,6 +237,6 @@ def test_render_health_and_semantic_sections_handle_missing_assets(monkeypatch) 
     sections.render_semantic_section({})
 
     assert fake_st.infos == [
-        "Nenhum artefato de monitoramento foi encontrado para a camada publicada.",
-        "Nenhum mart semântico publicado foi encontrado no ambiente atual.",
+        "Monitoramento recorrente ainda não foi publicado neste ambiente. O dashboard segue operacional na camada published principal.",
+        "Os recortes semânticos ainda não foram publicados neste ambiente. A navegação principal do dashboard continua disponível.",
     ]

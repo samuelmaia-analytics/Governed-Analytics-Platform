@@ -40,6 +40,12 @@ data/published/*
 data/published/dashboard/*
 !data/published/dashboard/.gitkeep
 !data/published/dashboard/fact_orders_dashboard.csv
+!data/published/semantic/
+!data/published/semantic/*.parquet
+!data/published/semantic/*.csv
+!data/published/monitoring/
+!data/published/monitoring/*.json
+!data/published/monitoring/*.csv
 
 # Optional local-only data
 data/external/*
