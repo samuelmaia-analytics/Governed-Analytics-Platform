@@ -79,6 +79,10 @@ Itens como GenAI e exportações auxiliares existem como extensão e não são u
 - governança aplicada sem vender operação “enterprise” não implementada
 - métricas de testes e cobertura devem ser lidas como snapshot operacional da data de validação, não como valor imutável do repositório
 
+## Risco residual
+
+O principal risco remanescente não está em modelagem ou consumo, mas em operação nativa dentro da plataforma. O repositório já prepara esse passo por API, porém a execução final ainda depende de origem compatível, configuração do tenant e evidência de run bem-sucedido.
+
 ## Mensagem de defesa
 
 “A entrega demonstra construção de produto analítico ponta a ponta: modelagem, qualidade, publicação, governança e consumo com evidência real, mantendo clareza sobre o que está automatizado e o que permanece como evolução natural.”

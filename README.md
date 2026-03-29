@@ -25,7 +25,7 @@ Entrega de analytics engineering orientada a produto sobre o dataset Olist. O pr
 
 O ativo central da solução é `fact_orders_enriched`, modelado com granularidade de item de pedido e `112.650` registros. A partir dele, o projeto deriva `fact_orders_dashboard`, camada publicada e minimizada para consumo executivo, com pseudonimização de identificadores e redução de exposição desnecessária.
 
-O objetivo deste repositório não é vender apenas um dashboard, mas demonstrar ciclo de vida completo de dados: ingestão, padronização, modelagem, qualidade, contratos, publicação, documentação, evidência operacional e automação de engenharia.
+O foco do repositório é demonstrar um produto analítico completo: ingestão, padronização, modelagem, qualidade, contratos, publicação, documentação, evidência operacional e automação de engenharia.
 
 ## Snapshot
 
@@ -113,6 +113,12 @@ A separação entre `curated` e `published` é uma decisão central do projeto. 
 - diferencia claramente ativo interno de ativo publicado
 - sustenta o dashboard com uma camada controlada, e não com a base completa
 - conecta evidência visual, catálogo, testes e automação ao mesmo ativo analítico
+
+## Riscos e Limites Reais
+
+- a execução principal ainda depende do runtime local em Python
+- a publicação na plataforma está comprovada, mas a operação nativa completa do pipeline ainda não
+- métricas de testes e cobertura são snapshots operacionais e podem variar a cada evolução do repositório
 
 ## Evidências-Chave
 

@@ -32,6 +32,12 @@ Se a apresentação precisar ser resumida em poucos segundos, a formulação mai
 - publicação e catálogo na Dadosfera
 - extensões em Power BI e GenAI
 
+## Tradeoffs e riscos que valem dizer em voz alta
+
+- a transformação principal foi endurecida fora da plataforma para garantir reprodutibilidade e controle técnico
+- a Dadosfera já comprova publicação, catálogo e consumo, mas não deve ser vendida aqui como motor nativo já validado de ponta a ponta
+- a evolução natural é reduzir esse gap operacional com execução nativa evidenciada, não reabrir a discussão de modelagem
+
 ## Artefatos já prontos
 
 - resumo executivo: `docs/executive_summary.md`
@@ -62,6 +68,10 @@ Adote uma defesa objetiva. O que fortalece a apresentação não é prometer mat
 - o que foi automatizado
 - o que foi testado e endurecido em engenharia
 - o que ainda seria uma evolução natural
+
+## Pergunta difícil esperada
+
+Se perguntarem por que a transformação ainda roda majoritariamente fora da plataforma, a resposta mais forte é: porque o objetivo do case foi provar valor analítico com governança e consumo reais sem alegar automação nativa não evidenciada. A plataforma já está integrada ao fluxo publicado, e o próximo ganho natural é operacionalizar a execução nativa com a mesma disciplina de evidência.
 
 ## Números que valem mencionar
 
