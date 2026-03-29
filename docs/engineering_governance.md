@@ -7,6 +7,7 @@ Este documento consolida os guardrails operacionais do repositório para elevar 
 - `CI`: executa testes automatizados e smoke check do entrypoint do pipeline.
 - `Lint`: valida estilo e erros estáticos com Ruff.
 - `Deploy Streamlit`: reaplica os guardrails antes de promover o branch `streamlit-prod`.
+- `Operate Published Layer`: executa build, publicação, expansão semântica, monitoramento e upload de artefatos operacionais.
 - `Dependabot`: monitora dependências Python e GitHub Actions.
 
 ## Guardrails de Repositório
