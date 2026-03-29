@@ -4,28 +4,24 @@
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026/actions/workflows/lint.yml)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://samuelmaia-032026.streamlit.app/)
 
-Entrega de analytics engineering orientada a produto sobre o dataset Olist. O projeto transforma dados transacionais em um ativo analítico governado, testado e consumível por dashboard, SQL, catálogo e BI externo.
+Produto analítico sobre o dataset Olist com modelagem em camadas, governança da exposição, publicação comprovada na Dadosfera/Metabase e operação recorrente da camada publicada. A fonte utilizada é o `Brazilian E-Commerce Public Dataset by Olist`, disponibilizado no Kaggle: `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`. O projeto não apresenta apenas um dashboard: ele materializa um ativo analítico interno, deriva uma camada publicada segura, monitora freshness e qualidade, e organiza consumo por Streamlit, SQL e Power BI.
 
-## Para Cada Leitor
+## Leitura Rápida
 
-- banca e liderança: comece por [docs/executive_summary.md](docs/executive_summary.md)
-- avaliação técnica: siga [docs/case_answers.md](docs/case_answers.md) e [docs/operating_model.md](docs/operating_model.md)
-- operação e handoff: use [docs/release_runbook.md](docs/release_runbook.md), [docs/rollback_runbook.md](docs/rollback_runbook.md) e [CONTRIBUTING.md](CONTRIBUTING.md)
-- consumo analítico: veja [docs/05_dashboard.md](docs/05_dashboard.md), [docs/04_analises_sql.md](docs/04_analises_sql.md) e [powerbi/README.md](powerbi/README.md)
+- banca e liderança: [docs/executive_summary.md](docs/executive_summary.md)
+- avaliação técnica: [docs/case_answers.md](docs/case_answers.md) e [docs/architecture.md](docs/architecture.md)
+- operação e handoff: [docs/operating_model.md](docs/operating_model.md), [docs/release_runbook.md](docs/release_runbook.md), [docs/rollback_runbook.md](docs/rollback_runbook.md)
+- publicação e plataforma: [docs/dadosfera_api_sync.md](docs/dadosfera_api_sync.md), [docs/dadosfera_native_pipeline_runbook.md](docs/dadosfera_native_pipeline_runbook.md)
 
-## Como Ler Este Repositório
+## O Que Este Repositório Entrega
 
-- `README.md`: índice executivo, snapshot da solução e links principais
-- `docs/executive_summary.md`: mensagem executiva curta para banca e liderança
-- `docs/case_answers.md`: defesa técnica e narrativa da solução
-- `docs/operating_model.md`: fluxo operacional, branches, deploy e guardrails
-- `docs/05_dashboard.md`: decisões e evidências da camada de consumo
-
-## Snapshot Executivo
-
-O ativo central da solução é `fact_orders_enriched`, modelado com granularidade de item de pedido e `112.650` registros. A partir dele, o projeto deriva `fact_orders_dashboard`, camada publicada e minimizada para consumo executivo, com pseudonimização de identificadores e redução de exposição desnecessária.
-
-O foco do repositório é demonstrar um produto analítico completo: ingestão, padronização, modelagem, qualidade, contratos, publicação, documentação, evidência operacional e automação de engenharia.
+- `fact_orders_enriched` como ativo analítico interno com granularidade de item de pedido
+- `fact_orders_dashboard` como camada publicada minimizada e pseudonimizada
+- marts semânticos publicados para logística, seller e cohort
+- monitoramento recorrente de freshness e qualidade da camada publicada
+- operação agendada com artefatos de execução e observabilidade de falha
+- catálogo e publicação externa comprovados na Dadosfera/Metabase
+- consumo analítico por Streamlit, SQL versionado e exportações para Power BI
 
 ## Snapshot
 
@@ -39,6 +35,15 @@ O foco do repositório é demonstrar um produto analítico completo: ingestão, 
 | Consumo | Streamlit + Dadosfera/Metabase + Power BI |
 | Status | implementado, evidenciado, automatizado e testado |
 
+## Diferenciais Reais
+
+- separação explícita entre camada interna e camada publicada
+- pseudonimização de chaves antes do consumo executivo
+- contratos, qualidade e catálogo ligados ao mesmo ativo analítico
+- credencial não interativa por token para sync e operação por API
+- workflow agendado para build, publicação, expansão semântica e monitoramento
+- documentação operacional suficiente para release, rollback e defesa técnica
+
 ## Entregáveis Públicos
 
 - App Streamlit: [samuelmaia-032026.streamlit.app](https://samuelmaia-032026.streamlit.app/)
@@ -48,44 +53,29 @@ O foco do repositório é demonstrar um produto analítico completo: ingestão, 
 - Dashboard na Dadosfera: [Dashboard Executivo de Vendas](https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas)
 - Tabela pública na Dadosfera: [PUBLIC.SAMUELMAIA-03_2026](https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d)
 
-## O Que Está Implementado
+## Estado Operacional Atual
 
-- pipeline local reprodutível em `src/run_case_pipeline.py`
-- camada analítica interna em `data/curated/analytics/fact_orders_enriched.parquet`
-- camada publicada para consumo em `data/published/dashboard/fact_orders_dashboard.parquet`
-- ativo em CSV para publicação manual em `data/published/dashboard/fact_orders_dashboard.csv`
-- sincronização programática de catálogo via API em `src/dadosfera_catalog_sync.py`
-- operador de pipelines nativos da Dadosfera via API em `src/dadosfera_pipeline_ops.py`
-- monitoramento recorrente da camada publicada em `src/published_monitoring.py`
-- camada semântica expandida em `src/semantic_layer.py`
-- dashboard Streamlit publicado
-- exportações auxiliares para Power BI
-- CI, lint e promoção automática de `main` para `streamlit-prod`
+Hoje o repositório já possui:
 
-O fluxo operacional recomendado usa `main` como branch fonte e promove automaticamente o commit validado para `streamlit-prod`, branch dedicada de deploy no Streamlit Cloud. Em contingência, o app também pode apontar diretamente para `streamlit-prod`.
+- pipeline local reprodutível em [src/run_case_pipeline.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/run_case_pipeline.py)
+- publicação segura da camada `published/dashboard` em [src/publish_dashboard.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/publish_dashboard.py)
+- monitoramento recorrente em [src/published_monitoring.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/published_monitoring.py)
+- camada semântica expandida em [src/semantic_layer.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/semantic_layer.py)
+- sync de catálogo por API em [src/dadosfera_catalog_sync.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/dadosfera_catalog_sync.py)
+- operador de pipeline nativo por API em [src/dadosfera_pipeline_ops.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/dadosfera_pipeline_ops.py)
+- job agendado em [operate-published-layer.yml](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/.github/workflows/operate-published-layer.yml)
+- promoção automática de `main` para `streamlit-prod`
 
-## Escopo Core vs Bônus
+## Limites Reais
 
-O escopo core do case está concentrado em ingestão, padronização, modelagem analítica, qualidade, contratos, catálogo, publicação segura e dashboard. Artefatos como GenAI e exportação de texto/PDF são complementares e não alteram a operação principal do case.
+O projeto é rigoroso sobre o que está comprovado e o que ainda depende da plataforma:
 
-## Tradeoffs Deliberados
+- a transformação principal ainda roda em Python local
+- a publicação e o catálogo na Dadosfera estão comprovados
+- a automação por API está implementada para sync e operação
+- a execução nativa completa do pipeline dentro do tenant ainda não está evidenciada
 
-- `Streamlit` foi escolhido para acelerar prova de valor e consumo executivo
-- a transformação principal roda localmente em Python, com publicação comprovada na Dadosfera
-- a solução explicita o que está automatizado e o que ainda depende de evolução real na plataforma, em vez de inflar escopo
-
-## Leitura Recomendada
-
-1. [docs/executive_summary.md](docs/executive_summary.md)
-2. [docs/case_answers.md](docs/case_answers.md)
-3. [docs/operating_model.md](docs/operating_model.md)
-4. [docs/02_carga_e_modelagem.md](docs/02_carga_e_modelagem.md)
-5. [docs/03_catalogacao.md](docs/03_catalogacao.md)
-6. [docs/05_dashboard.md](docs/05_dashboard.md)
-7. [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
-8. [docs/release_runbook.md](docs/release_runbook.md)
-9. [powerbi/evidencia_query.md](powerbi/evidencia_query.md)
-10. [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
+Essa distinção é deliberada. O repositório evita vender operação nativa como concluída sem link real, run real e output real na plataforma.
 
 ## Arquitetura
 
@@ -95,55 +85,21 @@ flowchart LR
     B --> C[Staging Profiling]
     C --> D[Curated Analytics<br/>fact_orders_enriched]
     D --> E[Published Dashboard<br/>fact_orders_dashboard]
-    E --> F[Streamlit]
-    D --> G[SQL]
-    D --> H[Power BI]
-    E --> I[Dadosfera / Metabase]
+    E --> F[Published Semantic<br/>logistics seller cohort]
+    E --> G[Published Monitoring]
+    E --> H[Streamlit]
+    D --> I[SQL]
+    D --> J[Power BI]
+    E --> K[Dadosfera / Metabase]
 ```
 
 - `raw`: origem preservada
 - `standardized`: padronização para reuso técnico
 - `staging`: profiling e artefatos intermediários
 - `curated`: camada analítica interna
-- `published`: camada de exposição controlada
+- `published`: camada oficial de exposição controlada
 
-A separação entre `curated` e `published` é uma decisão central do projeto. Ela melhora governança, reduz acoplamento entre engenharia e consumo e evita que o dashboard dependa da camada interna completa.
-
-## Por Que Esta Solução É Forte
-
-- trata modelagem, governança e consumo como uma única arquitetura, não como entregas isoladas
-- diferencia claramente ativo interno de ativo publicado
-- sustenta o dashboard com uma camada controlada, e não com a base completa
-- conecta evidência visual, catálogo, testes e automação ao mesmo ativo analítico
-
-## Riscos e Limites Reais
-
-- a execução principal ainda depende do runtime local em Python
-- a publicação na plataforma está comprovada, mas a operação nativa completa do pipeline ainda não
-- métricas de testes e cobertura são snapshots operacionais e podem variar a cada evolução do repositório
-
-## Evidências-Chave
-
-- publicação do ativo principal na Dadosfera/Metabase
-- dashboard Streamlit público consumindo a camada publicada
-- SQLs versionadas com resultados exportados
-- sync de catálogo via API do Maestro
-- preparação operacional para pipeline nativo via API
-- operação recorrente da camada publicada com monitoramento e relatório operacional
-- CI, lint e promoção automática de `main` para o branch de deploy
-
-## Execução
-
-```bash
-pip install -r requirements.txt
-python src/run_case_pipeline.py
-python -m pytest tests
-ruff check .
-streamlit run streamlit_app/app.py
-python src/dadosfera_catalog_sync.py --dry-run
-```
-
-## Quickstart
+## Como Executar
 
 ### 1. Preparar ambiente
 
@@ -153,25 +109,48 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 2. Gerar ativos locais
+### 2. Gerar ativos principais
 
 ```bash
 python src/run_case_pipeline.py
-python src/run_analytics_queries.py
 ```
 
-### 3. Validar qualidade
+### 3. Rodar apenas a operação da camada publicada
+
+```bash
+python src/run_case_pipeline.py --steps build publish semantic monitor
+```
+
+### 4. Validar qualidade de engenharia
 
 ```bash
 python -m pytest tests
 ruff check .
 ```
 
-### 4. Subir aplicação
+### 5. Subir a aplicação
 
 ```bash
 streamlit run streamlit_app/app.py
 ```
+
+## Credenciais da Plataforma
+
+A automação da Dadosfera aceita credencial não interativa por:
+
+- `DADOSFERA_ACCESS_TOKEN`
+- `DADOSFERA_API_TOKEN`
+
+O fallback por `DADOSFERA_USERNAME` + `DADOSFERA_PASSWORD` continua suportado. Se a conta usar MFA/TOTP, o workflow entra em modo seguro e não tenta autenticação automatizada por usuário e senha.
+
+## Evidências-Chave
+
+- publicação do ativo principal na Dadosfera/Metabase
+- dashboard Streamlit público consumindo a camada publicada
+- SQLs versionadas com resultados exportados
+- sync de catálogo via API do Maestro
+- operação recorrente da camada publicada com relatório operacional
+- CI, lint e deploy versionados em GitHub Actions
 
 ## Mapa do Repositório
 
@@ -181,54 +160,34 @@ streamlit run streamlit_app/app.py
 | `streamlit_app/` | aplicação analítica publicada |
 | `sql/` | análises exploratórias e consultas executivas |
 | `contracts/` | contratos de schema por camada |
-| `docs/` | narrativa técnica, governança, runbooks e evidências |
-| `presentation/` | deck, roteiro e material de defesa |
+| `docs/` | narrativa técnica, runbooks, governança e evidências |
 | `powerbi/` | evidências e exportações para consumo complementar |
-| `data/` | lake local versionado apenas nas camadas necessárias ao case |
+| `presentation/` | deck, roteiro e material de defesa |
+| `data/` | camadas do lake e artefatos gerados |
 
-## Sinais de Maturidade
+## Documentação Recomendada
 
-- pipeline ponta a ponta reproduzível por comando
-- contratos por camada analítica e publicada
-- testes automatizados com gate mínimo de cobertura
-- lint e workflows separados para qualidade e integração
-- branch de deploy dedicada para publicação do Streamlit com promoção automatizada a partir de `main`
-- runbooks explícitos de release, rollback e captura de evidências
+1. [docs/executive_summary.md](docs/executive_summary.md)
+2. [docs/case_answers.md](docs/case_answers.md)
+3. [docs/operating_model.md](docs/operating_model.md)
+4. [docs/05_dashboard.md](docs/05_dashboard.md)
+5. [docs/08_pipelines.md](docs/08_pipelines.md)
+6. [docs/dadosfera_evidencias.md](docs/dadosfera_evidencias.md)
+7. [docs/release_runbook.md](docs/release_runbook.md)
+8. [docs/10_apresentacao_final.md](docs/10_apresentacao_final.md)
 
-## Governança
+## Evolução Natural
 
-- `fact_orders_enriched` permanece como camada interna de engenharia, qualidade e SQL
-- `fact_orders_dashboard` é a camada oficial de consumo executivo
-- `order_id` e `customer_unique_id` são pseudonimizados na publicada
-- upload manual na plataforma deve usar `fact_orders_dashboard.csv`
-- ativos públicos complementares podem ser sincronizados por API do Maestro
-- ownership do repositório, contribuição e política de segurança foram formalizados em `CODEOWNERS`, `CONTRIBUTING.md` e `SECURITY.md`
+- preencher parâmetros reais do pipeline nativo no tenant alvo
+- integrar alertas externos ao monitoramento recorrente
+- ampliar os marts semânticos com recortes adicionais por produto e retenção
 
-Observação operacional: a sincronização e o deploy por API aceitam `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN` como credencial não interativa. Se a automação depender de usuário/senha e a conta da Dadosfera usar MFA/TOTP, o workflow entra em modo seguro e não tenta o login automatizado.
-
-Referências:
+## Referências
 
 - [docs/privacy_governance.md](docs/privacy_governance.md)
 - [docs/data_classification.md](docs/data_classification.md)
 - [docs/governance_policy.md](docs/governance_policy.md)
 - [docs/engineering_governance.md](docs/engineering_governance.md)
 - [docs/operating_model.md](docs/operating_model.md)
-- [docs/release_runbook.md](docs/release_runbook.md)
-- [docs/rollback_runbook.md](docs/rollback_runbook.md)
-- [docs/branch_protection_recommendation.md](docs/branch_protection_recommendation.md)
 - [docs/dadosfera_api_sync.md](docs/dadosfera_api_sync.md)
-
-## O Que Não Está Sendo Vendido Como Feito
-
-- pipeline nativo executando dentro da Dadosfera
-- operação de transformação totalmente absorvida pela plataforma
-
-O repositório já está preparado para tentar operar pipelines nativos via API da plataforma, mas isso ainda não substitui evidência de execução real, output gerado e catalogação do pipeline no tenant avaliado.
-
-Essa distinção é deliberada. O projeto já demonstra engenharia, publicação e automação relevantes, mas evita inflar o escopo para além do que está objetivamente comprovado.
-
-## Evolução Natural
-
-- evoluir a definição JSON do pipeline nativo com parâmetros reais de bucket e connection manager no tenant alvo
-- integrar alertas externos ao monitoramento recorrente da camada publicada
-- ampliar os marts semânticos publicados com recortes adicionais por produto e retenção
+- [docs/dadosfera_native_pipeline_runbook.md](docs/dadosfera_native_pipeline_runbook.md)

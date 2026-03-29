@@ -27,6 +27,7 @@ Transformar o dataset Olist em uma solução de dados ponta a ponta, cobrindo:
 ## Dataset escolhido
 
 - fonte: `Brazilian E-Commerce Public Dataset by Olist`
+- disponibilização pública: `Kaggle - https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`
 - natureza: dados transacionais de e-commerce
 - entidades principais:
   - pedidos

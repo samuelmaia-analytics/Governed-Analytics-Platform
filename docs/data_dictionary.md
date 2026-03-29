@@ -12,7 +12,7 @@
 
 ## Visão Geral
 
-Este documento consolida o dicionário de dados do projeto `samuelmaia_DDF_032026`, descrevendo os principais ativos raw e processed, com foco especial na tabela analítica final `fact_orders_enriched`.
+Este documento consolida o dicionário de dados do projeto `samuelmaia_DDF_032026`, descrevendo os principais ativos raw e processed, com foco especial na tabela analítica final `fact_orders_enriched`. A fonte pública utilizada é o `Brazilian E-Commerce Public Dataset by Olist`, disponibilizado no Kaggle em `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`.
 
 O objetivo deste material é documentar:
 
