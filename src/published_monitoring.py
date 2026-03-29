@@ -26,11 +26,13 @@ EXPECTED_COLUMNS = {
     "order_id",
     "order_item_id",
     "customer_unique_id",
+    "order_purchase_timestamp",
     "purchase_cohort_month",
     "customer_order_sequence",
     "is_first_order",
     "seller_key",
     "seller_volume_tier",
+    "seller_delay_rate",
     "delivery_time_days",
     "seller_dispatch_time_days",
     "carrier_delivery_time_days",
@@ -136,6 +138,18 @@ def check_row_volume(df: pd.DataFrame) -> MonitoringCheckResult:
 def check_critical_nulls(df: pd.DataFrame) -> list[MonitoringCheckResult]:
     results: list[MonitoringCheckResult] = []
     for column in CRITICAL_COLUMNS:
+        if column not in df.columns:
+            results.append(
+                build_result(
+                    f"published_critical_nulls__{column}",
+                    False,
+                    "missing_column",
+                    0,
+                    "high",
+                    f"Coluna critica ausente no schema publicado: `{column}`.",
+                )
+            )
+            continue
         null_count = int(df[column].isna().sum())
         results.append(
             build_result(
@@ -151,6 +165,20 @@ def check_critical_nulls(df: pd.DataFrame) -> list[MonitoringCheckResult]:
 
 
 def check_semantic_coverage(df: pd.DataFrame) -> list[MonitoringCheckResult]:
+    missing_semantic_columns = [
+        column for column in ("purchase_cohort_month", "seller_delay_rate") if column not in df.columns
+    ]
+    if missing_semantic_columns:
+        return [
+            build_result(
+                "published_semantic_coverage_schema",
+                False,
+                len(missing_semantic_columns),
+                0,
+                "high",
+                f"Colunas semanticas ausentes: {missing_semantic_columns}",
+            )
+        ]
     cohort_missing_pct = round(float(df["purchase_cohort_month"].isna().mean() * 100), 2)
     seller_delay_missing_pct = round(float(df["seller_delay_rate"].isna().mean() * 100), 2)
     return [

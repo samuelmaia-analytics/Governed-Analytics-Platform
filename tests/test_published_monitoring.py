@@ -55,3 +55,19 @@ def test_run_monitoring_and_save_outputs(tmp_path: Path, monkeypatch) -> None:
     assert (monitoring_dir / "published_layer_monitoring.csv").exists()
     assert (monitoring_dir / "published_layer_monitoring.json").exists()
     assert (docs_dir / "published_layer_monitoring.md").exists()
+
+
+def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(tmp_path: Path, monkeypatch) -> None:
+    parquet_path = tmp_path / "fact_orders_dashboard.parquet"
+    incomplete_df = build_published_df().drop(columns=["seller_delay_rate", "order_purchase_timestamp"])
+    incomplete_df.to_parquet(parquet_path, index=False)
+
+    monkeypatch.setattr(monitoring, "PUBLISHED_PARQUET_PATH", parquet_path)
+
+    results = monitoring.run_monitoring(max_freshness_hours=999)
+
+    by_check = {result.check_name: result for result in results}
+    assert by_check["published_expected_schema"].status == "FAIL"
+    assert by_check["published_critical_nulls__order_purchase_timestamp"].status == "FAIL"
+    assert by_check["published_critical_nulls__order_purchase_timestamp"].metric_value == "missing_column"
+    assert by_check["published_semantic_coverage_schema"].status == "FAIL"

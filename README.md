@@ -57,14 +57,14 @@ Produto analítico sobre o dataset Olist com modelagem em camadas, governança d
 
 Hoje o repositório já possui:
 
-- pipeline local reprodutível em [src/run_case_pipeline.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/run_case_pipeline.py)
-- publicação segura da camada `published/dashboard` em [src/publish_dashboard.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/publish_dashboard.py)
-- monitoramento recorrente em [src/published_monitoring.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/published_monitoring.py)
-- camada semântica expandida em [src/semantic_layer.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/semantic_layer.py)
-- sync de catálogo por API em [src/dadosfera_catalog_sync.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/dadosfera_catalog_sync.py)
-- operador de pipeline nativo por API em [src/dadosfera_pipeline_ops.py](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/src/dadosfera_pipeline_ops.py)
+- pipeline local reprodutível em [src/run_case_pipeline.py](src/run_case_pipeline.py)
+- publicação segura da camada `published/dashboard` em [src/publish_dashboard.py](src/publish_dashboard.py)
+- monitoramento recorrente em [src/published_monitoring.py](src/published_monitoring.py)
+- camada semântica expandida em [src/semantic_layer.py](src/semantic_layer.py)
+- sync de catálogo por API em [src/dadosfera_catalog_sync.py](src/dadosfera_catalog_sync.py)
+- operador de pipeline nativo por API em [src/dadosfera_pipeline_ops.py](src/dadosfera_pipeline_ops.py)
 - coleção e classificação de dados alinhadas aos ativos `published/semantic` e `published/monitoring`
-- job agendado em [operate-published-layer.yml](/C:/Users/samue/PycharmProjects/SAMUEL_MAIA_DDF_TECH_032026/.github/workflows/operate-published-layer.yml)
+- job agendado em [operate-published-layer.yml](.github/workflows/operate-published-layer.yml)
 - promoção automática de `main` para `streamlit-prod`
 
 ## Limites Reais
