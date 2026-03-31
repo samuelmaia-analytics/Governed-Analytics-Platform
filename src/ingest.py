@@ -11,6 +11,7 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.config import DOCS_DIR, LANDING_DIR
+from src.observability import configure_logging as configure_application_logging
 
 LOGGER = logging.getLogger(__name__)
 OLIST_RAW_DIR = LANDING_DIR / "olist"
@@ -42,10 +43,7 @@ class DatasetSummary:
 
 
 def configure_logging() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)s | %(message)s",
-    )
+    configure_application_logging(logging.INFO)
 
 
 def detect_date_columns(path: Path) -> list[str]:

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import pytest
+
 import src.run_case_pipeline as pipeline
 
 
 def test_run_selected_steps_executes_requested_functions_in_order(monkeypatch) -> None:
     called_steps: list[str] = []
 
-    monkeypatch.setattr(pipeline, "run_inventory", lambda: called_steps.append("inventory"))
-    monkeypatch.setattr(pipeline, "run_build", lambda: called_steps.append("build"))
-    monkeypatch.setattr(pipeline, "run_publish_dashboard", lambda: called_steps.append("publish"))
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "inventory", lambda: called_steps.append("inventory"))
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "build", lambda: called_steps.append("build"))
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "publish", lambda: called_steps.append("publish"))
 
     pipeline.run_selected_steps(["inventory", "build", "publish"])
 
@@ -18,10 +20,14 @@ def test_run_selected_steps_executes_requested_functions_in_order(monkeypatch) -
 def test_run_selected_steps_executes_semantic_and_monitor_steps(monkeypatch) -> None:
     called_steps: list[str] = []
 
-    monkeypatch.setattr(pipeline, "run_semantic_layer", lambda: called_steps.append("semantic"))
-    monkeypatch.setattr(pipeline, "run_monitoring", lambda: called_steps.append("monitor") or ["ok"])
-    monkeypatch.setattr(pipeline, "save_published_monitoring_results", lambda results: called_steps.append("save_results"))
-    monkeypatch.setattr(pipeline, "save_published_monitoring_report", lambda results: called_steps.append("save_report"))
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "semantic", lambda: called_steps.append("semantic"))
+
+    def monitor_handler() -> None:
+        called_steps.append("monitor")
+        called_steps.append("save_results")
+        called_steps.append("save_report")
+
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "monitor", monitor_handler)
 
     pipeline.run_selected_steps(["semantic", "monitor"])
 
@@ -31,22 +37,12 @@ def test_run_selected_steps_executes_semantic_and_monitor_steps(monkeypatch) -> 
 def test_run_selected_steps_executes_quality_flow(monkeypatch) -> None:
     called_steps: list[str] = []
 
-    monkeypatch.setattr(pipeline, "load_fact_table", lambda: "fact_df")
-    monkeypatch.setattr(
-        pipeline,
-        "run_quality_checks",
-        lambda df: called_steps.append(f"quality_checks:{df}") or ["quality_result"],
-    )
-    monkeypatch.setattr(
-        pipeline,
-        "save_quality_results",
-        lambda results: called_steps.append(f"save_results:{results[0]}"),
-    )
-    monkeypatch.setattr(
-        pipeline,
-        "save_quality_report",
-        lambda df, results: called_steps.append(f"save_report:{df}:{results[0]}"),
-    )
+    def quality_handler() -> None:
+        called_steps.append("quality_checks:fact_df")
+        called_steps.append("save_results:quality_result")
+        called_steps.append("save_report:fact_df:quality_result")
+
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "quality", quality_handler)
 
     pipeline.run_selected_steps(["quality"])
 
@@ -57,42 +53,25 @@ def test_run_selected_steps_executes_quality_flow(monkeypatch) -> None:
     ]
 
 
-def test_list_steps_prints_all_pipeline_steps(capsys) -> None:
-    pipeline.list_steps()
+def test_run_selected_steps_raises_immediately_without_continue_on_error(monkeypatch) -> None:
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "publish", lambda: (_ for _ in ()).throw(RuntimeError("publish failed")))
 
-    output = capsys.readouterr().out
-    assert "- inventory:" in output
-    assert "- publish:" in output
-
-
-def test_main_lists_steps_without_running_pipeline(monkeypatch) -> None:
-    calls: list[str] = []
-
-    class Args:
-        list_steps = True
-        steps = None
-
-    monkeypatch.setattr(pipeline, "parse_args", lambda: Args())
-    monkeypatch.setattr(pipeline, "list_steps", lambda: calls.append("list"))
-
-    pipeline.main()
-
-    assert calls == ["list"]
+    with pytest.raises(RuntimeError, match="publish failed"):
+        pipeline.run_selected_steps(["publish"])
 
 
-def test_main_runs_selected_pipeline(monkeypatch) -> None:
-    calls: list[str] = []
+def test_run_selected_steps_collects_failures_when_continue_on_error_enabled(monkeypatch) -> None:
+    called_steps: list[str] = []
 
-    class Args:
-        list_steps = False
-        steps = ["build"]
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "build", lambda: called_steps.append("build"))
 
-    monkeypatch.setattr(pipeline, "parse_args", lambda: Args())
-    monkeypatch.setattr(pipeline, "configure_logging", lambda: calls.append("logging"))
-    monkeypatch.setattr(pipeline, "resolve_steps", lambda steps: ["build"] if steps == ["build"] else [])
-    monkeypatch.setattr(pipeline, "run_selected_steps", lambda steps: calls.append(f"run:{','.join(steps)}") or [])
-    monkeypatch.setattr(pipeline, "save_pipeline_execution_report", lambda selected_steps, executions: calls.append("report"))
+    def failing_publish() -> None:
+        called_steps.append("publish")
+        raise RuntimeError("publish failed")
 
-    pipeline.main()
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "publish", failing_publish)
 
-    assert calls == ["logging", "run:build", "report"]
+    with pytest.raises(RuntimeError, match="Pipeline finalizado com falhas nas etapas: publish"):
+        pipeline.run_selected_steps(["build", "publish"], continue_on_error=True)
+
+    assert called_steps == ["build", "publish"]

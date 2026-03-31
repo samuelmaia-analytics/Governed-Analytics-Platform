@@ -67,7 +67,7 @@ Hoje o repositório já possui:
 - operador de pipeline nativo por API em [src/dadosfera_pipeline_ops.py](src/dadosfera_pipeline_ops.py)
 - coleção e classificação de dados alinhadas aos ativos `published/semantic` e `published/monitoring`
 - job agendado em [operate-published-layer.yml](.github/workflows/operate-published-layer.yml)
-- promoção automática de `main` para `streamlit-prod`
+- promoção explícita por ambiente: `develop` -> `streamlit-dev`, `release` -> `streamlit-stage`, `main` -> `streamlit-prod`
 
 ## Limites Reais
 
@@ -145,6 +145,18 @@ A automação da Dadosfera aceita credencial não interativa por:
 - `DADOSFERA_API_TOKEN`
 
 O fallback por `DADOSFERA_USERNAME` + `DADOSFERA_PASSWORD` continua suportado. Se a conta usar MFA/TOTP, o workflow entra em modo seguro e não tenta autenticação automatizada por usuário e senha.
+
+## Ambientes de Deploy
+
+- `dev`: origem `develop`, branch publicada `streamlit-dev`
+- `stage`: origem `release`, branch publicada `streamlit-stage`
+- `prod`: origem `main`, branch publicada `streamlit-prod`
+
+O workflow `Deploy Streamlit` resolve esse plano explicitamente antes de promover qualquer commit.
+O contrato versionado dessa política está em `contracts/governance/release_governance.json`.
+O workflow `CI` valida esse contrato automaticamente com `python src/governance_validation.py`.
+`CI` e `Lint` executam em `develop`, `release` e `main`; a promoção automática de deploy continua restrita ao fluxo de produção.
+O workflow `Policy Check` valida também os gatilhos reais dos workflows com `python src/workflow_policy_validation.py`.
 
 ## Evidências-Chave
 

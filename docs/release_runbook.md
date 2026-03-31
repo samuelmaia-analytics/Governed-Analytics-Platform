@@ -7,12 +7,17 @@ Este runbook resume o fluxo mínimo de release do case para manter consistência
 - garantir que a branch principal esteja íntegra antes de promover o deploy
 - evitar divergência entre camada publicada, evidências e narrativa do case
 - deixar rollback e revalidação explícitos
+- tornar o ambiente de destino explícito na promoção (`dev`, `stage`, `prod`)
 
 ## Pré-release
 
 1. Confirmar que a branch está atualizada com `main`.
 2. Confirmar que a mudança que será publicada está mergeada em `main`, já que `main` é a origem da promoção automática para `streamlit-prod`.
-3. Executar:
+3. Para promoção manual, usar a branch compatível com o ambiente:
+- `develop` -> `dev`
+- `release` -> `stage`
+- `main` -> `prod`
+4. Executar:
 
 ```bash
 python -m ruff check src streamlit_app tests
@@ -20,13 +25,13 @@ python -m pytest tests
 python src/run_case_pipeline.py --list-steps
 ```
 
-4. Se a mudança impactar dados publicados, regenerar os artefatos críticos:
+5. Se a mudança impactar dados publicados, regenerar os artefatos críticos:
 
 ```bash
 python src/run_case_pipeline.py --steps build publish semantic quality contracts monitor catalog queries bi
 ```
 
-5. Revisar se os arquivos abaixo refletem a mudança:
+6. Revisar se os arquivos abaixo refletem a mudança:
 - `data/published/dashboard/fact_orders_dashboard.parquet`
 - `data/published/dashboard/fact_orders_dashboard.csv`
 - `data/published/semantic/`
@@ -47,12 +52,15 @@ python src/run_case_pipeline.py --steps build publish semantic quality contracts
 
 ## Deploy
 
-1. Fazer merge em `main`.
-2. Confirmar `CI` verde em `main`.
-3. Confirmar execução do workflow `Deploy Streamlit`, que promove o commit validado para `streamlit-prod`.
+1. Escolher o ambiente alvo da promoção:
+- `dev` publica em `streamlit-dev`
+- `stage` publica em `streamlit-stage`
+- `prod` publica em `streamlit-prod`
+2. Confirmar `CI` verde na branch fonte compatível com o ambiente.
+3. Executar ou validar o workflow `Deploy Streamlit` com o `target_environment` correto.
 4. Confirmar execução do workflow `Operate Published Layer` quando a release impactar a camada publicada ou a operação recorrente.
-5. Validar o app Streamlit e os principais links públicos do case.
-6. Se houver incidente de publicação no branch principal do app, usar `streamlit-prod` como fallback explícito no Streamlit Cloud até normalização.
+5. Validar o app Streamlit e os principais links públicos do case no ambiente promovido.
+6. Se houver incidente, manter o ambiente anterior intacto e promover rollback apenas no ambiente afetado.
 
 ## Pós-release
 

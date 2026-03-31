@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
+import logging
 import re
 import sys
 from dataclasses import dataclass
@@ -10,16 +10,19 @@ from pathlib import Path
 from typing import Any
 
 import requests
-from dotenv import load_dotenv
 
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.config import DOCS_DIR, ROOT_DIR
+from src.observability import configure_logging
+from src.resilient_http import DEFAULT_RETRY_POLICY, RetryPolicy, request_with_retry
+from src.settings import load_app_settings
 
 DEFAULT_MAESTRO_BASE_URL = "https://maestro.dadosfera.ai"
 DEFAULT_MANIFEST_PATH = ROOT_DIR / "contracts" / "catalog" / "dadosfera_catalog_assets.json"
 DEFAULT_REPORT_PATH = DOCS_DIR / "dadosfera_api_sync.md"
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -51,11 +54,13 @@ class DadosferaMaestroClient:
         password: str | None = None,
         totp: str | None = None,
         access_token: str | None = None,
+        retry_policy: RetryPolicy = DEFAULT_RETRY_POLICY,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.username = username or ""
         self.password = password or ""
         self.totp = totp
+        self.retry_policy = retry_policy
         self.session = requests.Session()
         self.session.headers.update({"Content-Type": "application/json"})
         if access_token:
@@ -66,6 +71,28 @@ class DadosferaMaestroClient:
                 }
             )
 
+    def _request(self, method: str, path: str, *, operation: str, raise_for_status: bool = True, **kwargs: Any) -> requests.Response:
+        response = request_with_retry(
+            self.session,
+            method,
+            f"{self.base_url}{path}",
+            logger=LOGGER,
+            operation=operation,
+            retry_policy=self.retry_policy,
+            raise_for_status=raise_for_status,
+            **kwargs,
+        )
+        LOGGER.info(
+            "Chamada à API concluída.",
+            extra={
+                "operation": operation,
+                "http_method": method.upper(),
+                "path": path,
+                "status_code": getattr(response, "status_code", 200),
+            },
+        )
+        return response
+
     def sign_in(self) -> None:
         if self.session.headers.get("Authorization"):
             return
@@ -74,7 +101,14 @@ class DadosferaMaestroClient:
 
         for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
             for endpoint in ("/auth/sign-in", "/auth/signin"):
-                response = self.session.post(f"{self.base_url}{endpoint}", json=payload, timeout=60)
+                response = self._request(
+                    "POST",
+                    endpoint,
+                    operation="dadosfera_sign_in",
+                    json=payload,
+                    timeout=60,
+                    raise_for_status=False,
+                )
                 if response.status_code >= 500:
                     last_headers = response.headers
                     continue
@@ -98,12 +132,13 @@ class DadosferaMaestroClient:
         total = None
 
         while total is None or len(assets) < total:
-            response = self.session.get(
-                f"{self.base_url}/catalog",
+            response = self._request(
+                "GET",
+                "/catalog",
+                operation="dadosfera_list_catalog_assets",
                 params={"size": size, "page": page, "sort_by": "created_at", "order": "desc"},
                 timeout=60,
             )
-            response.raise_for_status()
             body = response.json()
             assets.extend(body.get("data_assets", []))
             total = int(body.get("total", len(assets)))
@@ -114,13 +149,17 @@ class DadosferaMaestroClient:
         return assets
 
     def create_data_asset(self, payload: dict[str, Any]) -> dict[str, Any]:
-        response = self.session.post(f"{self.base_url}/catalog", json=payload, timeout=60)
-        response.raise_for_status()
+        response = self._request("POST", "/catalog", operation="dadosfera_create_catalog_asset", json=payload, timeout=60)
         return response.json()
 
     def update_data_asset(self, asset_id: int, payload: dict[str, Any]) -> dict[str, Any]:
-        response = self.session.put(f"{self.base_url}/catalog/data-asset/{asset_id}", json=payload, timeout=60)
-        response.raise_for_status()
+        response = self._request(
+            "PUT",
+            f"/catalog/data-asset/{asset_id}",
+            operation="dadosfera_update_catalog_asset",
+            json=payload,
+            timeout=60,
+        )
         return response.json()
 
 
@@ -212,7 +251,16 @@ def apply_auth_from_response(session: requests.Session, response_body: dict[str,
 
 
 def try_refresh_access_token(session: requests.Session, base_url: str) -> bool:
-    response = session.post(f"{base_url}/auth/refresh-access-token", timeout=60)
+    response = request_with_retry(
+        session,
+        "POST",
+        f"{base_url}/auth/refresh-access-token",
+        logger=LOGGER,
+        operation="dadosfera_refresh_access_token",
+        retry_policy=DEFAULT_RETRY_POLICY,
+        timeout=60,
+        raise_for_status=False,
+    )
     if response.status_code >= 400:
         return False
 
@@ -370,34 +418,29 @@ def save_report(report_path: Path, content: str) -> None:
 
 
 def parse_args() -> argparse.Namespace:
+    settings = load_app_settings()
     parser = argparse.ArgumentParser(description="Sincroniza ativos do manifesto local com o catalogo da Dadosfera via API.")
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST_PATH, help="Manifesto JSON com os ativos a sincronizar.")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT_PATH, help="Caminho do relatorio markdown gerado.")
-    parser.add_argument("--base-url", default=os.getenv("DADOSFERA_MAESTRO_BASE_URL", DEFAULT_MAESTRO_BASE_URL))
+    parser.add_argument("--base-url", default=settings.dadosfera.base_url)
     parser.add_argument("--dry-run", action="store_true", help="Mostra o plano de sincronizacao sem escrever na API.")
     return parser.parse_args()
 
 
 def main() -> None:
-    load_dotenv()
+    configure_logging()
     args = parse_args()
-    username = os.getenv("DADOSFERA_USERNAME")
-    password = os.getenv("DADOSFERA_PASSWORD")
-    totp = os.getenv("DADOSFERA_TOTP")
-    access_token = os.getenv("DADOSFERA_ACCESS_TOKEN") or os.getenv("DADOSFERA_API_TOKEN")
-    if not access_token and (not username or not password):
-        raise RuntimeError(
-            "Defina DADOSFERA_ACCESS_TOKEN/DADOSFERA_API_TOKEN ou DADOSFERA_USERNAME e DADOSFERA_PASSWORD para sincronizar o catalogo."
-        )
+    dadosfera_settings = load_app_settings().dadosfera
+    dadosfera_settings.validate_credentials(operation="catalog_sync")
 
     manifest_path = args.manifest.resolve()
     assets = load_manifest(manifest_path)
     client = DadosferaMaestroClient(
         base_url=args.base_url,
-        username=username,
-        password=password,
-        totp=totp,
-        access_token=access_token,
+        username=dadosfera_settings.username,
+        password=dadosfera_settings.password,
+        totp=dadosfera_settings.totp,
+        access_token=dadosfera_settings.effective_access_token,
     )
     client.sign_in()
     results = sync_assets(client=client, assets=assets, dry_run=args.dry_run)

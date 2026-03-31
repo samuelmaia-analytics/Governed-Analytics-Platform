@@ -9,6 +9,7 @@ duckdb
 pyarrow
 openpyxl
 python-dotenv
+PyYAML
 jinja2
 pytest
 pytest-cov

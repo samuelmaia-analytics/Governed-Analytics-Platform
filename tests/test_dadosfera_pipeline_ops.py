@@ -12,6 +12,7 @@ from src.dadosfera_pipeline_ops import (
     normalize_endpoint_path,
     resolve_pipeline_id,
 )
+from src.resilient_http import RetryPolicy
 
 
 def test_normalize_endpoint_path_adds_leading_slash() -> None:
@@ -106,3 +107,43 @@ def test_extract_pipeline_items_and_find_pipeline_by_name_support_generic_payloa
 
 def test_resolve_pipeline_id_supports_common_identifier_keys() -> None:
     assert resolve_pipeline_id({"uuid": "pipe-123"}) == "pipe-123"
+
+
+def test_pipeline_client_retries_create_request_on_retryable_status(monkeypatch) -> None:
+    class DummyResponse:
+        headers: dict[str, str] = {}
+
+        def __init__(self, status_code: int, body: dict[str, object]) -> None:
+            self.status_code = status_code
+            self._body = body
+
+        def raise_for_status(self) -> None:
+            if self.status_code >= 400:
+                raise RuntimeError(f"http {self.status_code}")
+
+        def json(self) -> dict[str, object]:
+            return self._body
+
+    class DummySession:
+        def __init__(self) -> None:
+            self.headers = {"Content-Type": "application/json"}
+            self.calls = 0
+
+        def post(self, url: str, json: dict[str, object] | None = None, timeout: int = 60):  # type: ignore[override]
+            self.calls += 1
+            if self.calls == 1:
+                return DummyResponse(503, {"message": "retry"})
+            return DummyResponse(200, {"id": "pipeline-1"})
+
+    monkeypatch.setattr("src.resilient_http.sleep", lambda seconds: None)
+    client = DadosferaPipelineClient(
+        base_url="https://maestro.dadosfera.ai",
+        access_token="token",
+        retry_policy=RetryPolicy(max_attempts=2, backoff_seconds=0),
+    )
+    client.session = DummySession()  # type: ignore[assignment]
+
+    response = client.create_pipeline({"name": "olist"})
+
+    assert response == {"id": "pipeline-1"}
+    assert client.session.calls == 2

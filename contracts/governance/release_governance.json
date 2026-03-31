@@ -1,0 +1,80 @@
+{
+  "branches": [
+    {
+      "name": "develop",
+      "role": "development",
+      "deployment_environment": "dev",
+      "deployment_branch": "streamlit-dev",
+      "requires_pull_request": true,
+      "required_reviews": 1,
+      "required_checks": ["CI", "Lint"],
+      "allow_force_push": false,
+      "allow_deletion": false
+    },
+    {
+      "name": "release",
+      "role": "staging",
+      "deployment_environment": "stage",
+      "deployment_branch": "streamlit-stage",
+      "requires_pull_request": true,
+      "required_reviews": 1,
+      "required_checks": ["CI", "Lint"],
+      "allow_force_push": false,
+      "allow_deletion": false
+    },
+    {
+      "name": "main",
+      "role": "production",
+      "deployment_environment": "prod",
+      "deployment_branch": "streamlit-prod",
+      "requires_pull_request": true,
+      "required_reviews": 1,
+      "required_checks": ["CI", "Lint"],
+      "allow_force_push": false,
+      "allow_deletion": false
+    }
+  ],
+  "environments": [
+    {
+      "name": "streamlit-development",
+      "target_environment": "dev",
+      "deployment_branch": "streamlit-dev",
+      "required_reviewers": 0
+    },
+    {
+      "name": "streamlit-staging",
+      "target_environment": "stage",
+      "deployment_branch": "streamlit-stage",
+      "required_reviewers": 1
+    },
+    {
+      "name": "streamlit-production",
+      "target_environment": "prod",
+      "deployment_branch": "streamlit-prod",
+      "required_reviewers": 1
+    }
+  ],
+  "workflows": [
+    {
+      "name": "CI",
+      "path": ".github/workflows/ci.yml",
+      "push_branches": ["develop", "release", "main", "master"]
+    },
+    {
+      "name": "Lint",
+      "path": ".github/workflows/lint.yml",
+      "push_branches": ["develop", "release", "main", "master"]
+    },
+    {
+      "name": "Sync Dadosfera Catalog",
+      "path": ".github/workflows/sync-dadosfera-catalog.yml",
+      "push_branches": ["release", "main", "master"]
+    },
+    {
+      "name": "Deploy Streamlit",
+      "path": ".github/workflows/deploy-streamlit.yml",
+      "workflow_run_workflows": ["CI"],
+      "workflow_run_branches": ["main", "master"]
+    }
+  ]
+}

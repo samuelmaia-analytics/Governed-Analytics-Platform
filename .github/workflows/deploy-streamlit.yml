@@ -4,9 +4,26 @@ on:
   workflow_run:
     workflows:
       - CI
+    branches:
+      - main
+      - master
     types:
       - completed
   workflow_dispatch:
+    inputs:
+      target_environment:
+        description: Ambiente alvo da promoção
+        required: true
+        type: choice
+        default: prod
+        options:
+          - dev
+          - stage
+          - prod
+      source_ref:
+        description: Ref opcional para promoção manual
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -16,7 +33,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  promote-streamlit-branch:
+  resolve-plan:
     if: >
       github.event_name == 'workflow_dispatch' ||
       (
@@ -27,7 +44,54 @@ jobs:
         )
       )
     runs-on: ubuntu-latest
-    environment: streamlit-production
+    outputs:
+      deployment_branch: ${{ steps.plan.outputs.deployment_branch }}
+      github_environment: ${{ steps.plan.outputs.github_environment }}
+      target_environment: ${{ steps.plan.outputs.target_environment }}
+      resolved_ref: ${{ steps.refs.outputs.resolved_ref }}
+      resolved_branch: ${{ steps.refs.outputs.resolved_branch }}
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Resolve source ref and branch
+        id: refs
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RESOLVED_REF="${{ inputs.source_ref || github.ref }}"
+            RESOLVED_BRANCH="${RESOLVED_REF#refs/heads/}"
+          else
+            RESOLVED_REF="${{ github.event.workflow_run.head_sha }}"
+            RESOLVED_BRANCH="${{ github.event.workflow_run.head_branch }}"
+          fi
+          echo "resolved_ref=$RESOLVED_REF" >> "$GITHUB_OUTPUT"
+          echo "resolved_branch=$RESOLVED_BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Resolve promotion plan
+        id: plan
+        run: |
+          python src/release_management.py \
+            --target-environment "${{ github.event_name == 'workflow_dispatch' && inputs.target_environment || 'prod' }}" \
+            --source-ref "${{ steps.refs.outputs.resolved_ref }}" \
+            --source-branch "${{ steps.refs.outputs.resolved_branch }}" \
+            --github-output "$GITHUB_OUTPUT"
+
+  promote-streamlit-branch:
+    needs: resolve-plan
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve-plan.outputs.github_environment }}
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -35,7 +99,7 @@ jobs:
       - name: Checkout source commit
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.event.workflow_run.head_sha }}
+          ref: ${{ needs.resolve-plan.outputs.resolved_ref }}
           fetch-depth: 0
 
       - name: Configure Git
@@ -59,4 +123,12 @@ jobs:
 
       - name: Push deployment branch
         run: |
-          git push origin HEAD:streamlit-prod --force
+          git push origin HEAD:${{ needs.resolve-plan.outputs.deployment_branch }} --force
+
+      - name: Write deployment summary
+        run: |
+          echo "## Streamlit promotion" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Target environment: ${{ needs.resolve-plan.outputs.target_environment }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source ref: ${{ needs.resolve-plan.outputs.resolved_ref }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Deployment branch: ${{ needs.resolve-plan.outputs.deployment_branch }}" >> "$GITHUB_STEP_SUMMARY"

@@ -2,27 +2,29 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import requests
-from dotenv import load_dotenv
 
 from src.dadosfera_catalog_sync import (
-    DEFAULT_MAESTRO_BASE_URL,
     apply_auth_from_response,
     build_sign_in_payloads,
     raise_runtime_for_auth_response,
     try_refresh_access_token,
 )
+from src.observability import configure_logging
+from src.resilient_http import DEFAULT_RETRY_POLICY, RetryPolicy, request_with_retry
+from src.settings import load_app_settings
 
 DEFAULT_LIST_ENDPOINT = "/platform/pipeline"
 DEFAULT_CREATE_ENDPOINT = "/platform/pipeline"
 DEFAULT_GET_ENDPOINT_TEMPLATE = "/platform/pipeline/{pipeline_id}"
 DEFAULT_RUN_ENDPOINT = "/platform/pipeline/execute"
 DEFAULT_RUNS_ENDPOINT_TEMPLATE = "/platform/pipeline/{pipeline_id}/pipeline_run"
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -51,12 +53,14 @@ class DadosferaPipelineClient:
         totp: str | None = None,
         access_token: str | None = None,
         config: PipelineApiConfig | None = None,
+        retry_policy: RetryPolicy = DEFAULT_RETRY_POLICY,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.username = username or ""
         self.password = password or ""
         self.totp = totp
         self.config = config or PipelineApiConfig()
+        self.retry_policy = retry_policy
         self.session = requests.Session()
         self.session.headers.update({"Content-Type": "application/json"})
         if access_token:
@@ -67,6 +71,27 @@ class DadosferaPipelineClient:
                 }
             )
 
+    def _request(self, method: str, path: str, *, operation: str, **kwargs: Any) -> requests.Response:
+        response = request_with_retry(
+            self.session,
+            method,
+            f"{self.base_url}{path}",
+            logger=LOGGER,
+            operation=operation,
+            retry_policy=self.retry_policy,
+            **kwargs,
+        )
+        LOGGER.info(
+            "Chamada à API concluída.",
+            extra={
+                "operation": operation,
+                "http_method": method.upper(),
+                "path": path,
+                "status_code": getattr(response, "status_code", 200),
+            },
+        )
+        return response
+
     def sign_in(self) -> None:
         if self.session.headers.get("Authorization"):
             return
@@ -75,7 +100,17 @@ class DadosferaPipelineClient:
 
         for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
             for endpoint in ("/auth/sign-in", "/auth/signin"):
-                response = self.session.post(f"{self.base_url}{endpoint}", json=payload, timeout=60)
+                response = request_with_retry(
+                    self.session,
+                    "POST",
+                    f"{self.base_url}{endpoint}",
+                    logger=LOGGER,
+                    operation="dadosfera_pipeline_sign_in",
+                    retry_policy=self.retry_policy,
+                    json=payload,
+                    timeout=60,
+                    raise_for_status=False,
+                )
                 if response.status_code >= 500:
                     last_headers = response.headers
                     continue
@@ -94,23 +129,27 @@ class DadosferaPipelineClient:
         raise_runtime_for_auth_response(last_body, last_headers)
 
     def list_pipelines(self) -> dict[str, Any]:
-        response = self.session.get(f"{self.base_url}{normalize_endpoint_path(self.config.list_endpoint)}", timeout=60)
-        response.raise_for_status()
+        response = self._request(
+            "GET",
+            normalize_endpoint_path(self.config.list_endpoint),
+            operation="dadosfera_list_pipelines",
+            timeout=60,
+        )
         return response.json()
 
     def create_pipeline(self, definition: dict[str, Any]) -> dict[str, Any]:
-        response = self.session.post(
-            f"{self.base_url}{normalize_endpoint_path(self.config.create_endpoint)}",
+        response = self._request(
+            "POST",
+            normalize_endpoint_path(self.config.create_endpoint),
+            operation="dadosfera_create_pipeline",
             json=definition,
             timeout=60,
         )
-        response.raise_for_status()
         return response.json()
 
     def get_pipeline(self, pipeline_id: str) -> dict[str, Any]:
         endpoint = normalize_endpoint_path(self.config.get_endpoint_template.format(pipeline_id=pipeline_id))
-        response = self.session.get(f"{self.base_url}{endpoint}", timeout=60)
-        response.raise_for_status()
+        response = self._request("GET", endpoint, operation="dadosfera_get_pipeline", timeout=60)
         return response.json()
 
     def run_pipeline(self, pipeline_id: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -118,14 +157,12 @@ class DadosferaPipelineClient:
         body = {"pipeline_id": pipeline_id}
         if payload:
             body.update(payload)
-        response = self.session.post(f"{self.base_url}{endpoint}", json=body, timeout=60)
-        response.raise_for_status()
+        response = self._request("POST", endpoint, operation="dadosfera_run_pipeline", json=body, timeout=60)
         return response.json()
 
     def list_pipeline_runs(self, pipeline_id: str) -> dict[str, Any]:
         endpoint = normalize_endpoint_path(self.config.runs_endpoint_template.format(pipeline_id=pipeline_id))
-        response = self.session.get(f"{self.base_url}{endpoint}", timeout=60)
-        response.raise_for_status()
+        response = self._request("GET", endpoint, operation="dadosfera_list_pipeline_runs", timeout=60)
         return response.json()
 
 
@@ -160,23 +197,24 @@ def find_pipeline_by_name(client: DadosferaPipelineClient, pipeline_name: str) -
 
 
 def parse_args() -> argparse.Namespace:
+    settings = load_app_settings()
     parser = argparse.ArgumentParser(
         description="Opera pipelines nativos da Dadosfera via API usando a mesma autenticacao do sync de catalogo."
     )
-    parser.add_argument("--base-url", default=os.getenv("DADOSFERA_MAESTRO_BASE_URL", DEFAULT_MAESTRO_BASE_URL))
-    parser.add_argument("--list-endpoint", default=os.getenv("DADOSFERA_PIPELINE_LIST_ENDPOINT", DEFAULT_LIST_ENDPOINT))
-    parser.add_argument("--create-endpoint", default=os.getenv("DADOSFERA_PIPELINE_CREATE_ENDPOINT", DEFAULT_CREATE_ENDPOINT))
+    parser.add_argument("--base-url", default=settings.dadosfera.base_url)
+    parser.add_argument("--list-endpoint", default=settings.dadosfera.list_endpoint)
+    parser.add_argument("--create-endpoint", default=settings.dadosfera.create_endpoint)
     parser.add_argument(
         "--get-endpoint-template",
-        default=os.getenv("DADOSFERA_PIPELINE_GET_ENDPOINT_TEMPLATE", DEFAULT_GET_ENDPOINT_TEMPLATE),
+        default=settings.dadosfera.get_endpoint_template,
     )
     parser.add_argument(
         "--run-endpoint",
-        default=os.getenv("DADOSFERA_PIPELINE_RUN_ENDPOINT", DEFAULT_RUN_ENDPOINT),
+        default=settings.dadosfera.run_endpoint,
     )
     parser.add_argument(
         "--runs-endpoint-template",
-        default=os.getenv("DADOSFERA_PIPELINE_RUNS_ENDPOINT_TEMPLATE", DEFAULT_RUNS_ENDPOINT_TEMPLATE),
+        default=settings.dadosfera.runs_endpoint_template,
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -213,14 +251,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_client_from_args(args: argparse.Namespace) -> DadosferaPipelineClient:
-    username = os.getenv("DADOSFERA_USERNAME")
-    password = os.getenv("DADOSFERA_PASSWORD")
-    totp = os.getenv("DADOSFERA_TOTP")
-    access_token = os.getenv("DADOSFERA_ACCESS_TOKEN") or os.getenv("DADOSFERA_API_TOKEN")
-    if not access_token and (not username or not password):
-        raise RuntimeError(
-            "Defina DADOSFERA_ACCESS_TOKEN/DADOSFERA_API_TOKEN ou DADOSFERA_USERNAME e DADOSFERA_PASSWORD para operar pipelines da Dadosfera."
-        )
+    dadosfera_settings = load_app_settings().dadosfera
+    dadosfera_settings.validate_credentials(operation="pipeline_ops")
 
     config = PipelineApiConfig(
         list_endpoint=args.list_endpoint,
@@ -231,16 +263,16 @@ def build_client_from_args(args: argparse.Namespace) -> DadosferaPipelineClient:
     )
     return DadosferaPipelineClient(
         base_url=args.base_url,
-        username=username,
-        password=password,
-        totp=totp,
-        access_token=access_token,
+        username=dadosfera_settings.username,
+        password=dadosfera_settings.password,
+        totp=dadosfera_settings.totp,
+        access_token=dadosfera_settings.effective_access_token,
         config=config,
     )
 
 
 def main() -> None:
-    load_dotenv()
+    configure_logging()
     args = parse_args()
     client = build_client_from_args(args)
     client.sign_in()

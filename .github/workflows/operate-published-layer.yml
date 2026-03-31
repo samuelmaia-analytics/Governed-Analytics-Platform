@@ -2,14 +2,27 @@ name: Operate Published Layer
 
 on:
   workflow_dispatch:
+    inputs:
+      target_environment:
+        description: Ambiente alvo da operação publicada
+        required: true
+        type: choice
+        default: prod
+        options:
+          - dev
+          - stage
+          - prod
   schedule:
     - cron: "0 9 * * 1-5"
 
 jobs:
   published-ops:
     runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'workflow_dispatch' && (inputs.target_environment == 'dev' && 'streamlit-development' || inputs.target_environment == 'stage' && 'streamlit-staging' || 'streamlit-production') || 'streamlit-production' }}
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      APP_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.target_environment || 'prod' }}
+      DADOSFERA_ENABLED: ${{ vars.DADOSFERA_ENABLED || 'false' }}
       DADOSFERA_MAESTRO_BASE_URL: ${{ vars.DADOSFERA_MAESTRO_BASE_URL || 'https://maestro.dadosfera.ai' }}
       DADOSFERA_ACCESS_TOKEN: ${{ secrets.DADOSFERA_ACCESS_TOKEN }}
       DADOSFERA_API_TOKEN: ${{ secrets.DADOSFERA_API_TOKEN }}
@@ -60,6 +73,7 @@ jobs:
         run: |
           echo "## Published layer operations" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- App environment: $APP_ENV" >> "$GITHUB_STEP_SUMMARY"
           echo "- Workflow date (UTC): $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_STEP_SUMMARY"
           echo "- Monitoring report: docs/published_layer_monitoring.md" >> "$GITHUB_STEP_SUMMARY"
           echo "- Operational report: docs/operational_job_report.md" >> "$GITHUB_STEP_SUMMARY"

@@ -20,6 +20,7 @@ dependencies = [
     "pyarrow",
     "openpyxl",
     "python-dotenv",
+    "PyYAML",
     "jinja2",
     "pytest",
     "requests",

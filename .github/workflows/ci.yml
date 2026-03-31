@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches:
+      - develop
+      - release
       - main
       - master
   pull_request:
@@ -32,6 +34,9 @@ jobs:
 
       - name: Smoke check pipeline entrypoint
         run: python src/run_case_pipeline.py --list-steps
+
+      - name: Validate release governance contract
+        run: python src/governance_validation.py
 
       - name: Run tests
         run: python -m pytest tests

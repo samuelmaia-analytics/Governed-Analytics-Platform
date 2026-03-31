@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import requests
+
 from src.dadosfera_catalog_sync import (
+    LOGGER,
     CatalogAssetSpec,
     DadosferaMaestroClient,
     apply_auth_from_response,
@@ -17,6 +20,7 @@ from src.dadosfera_catalog_sync import (
     sync_assets,
     try_refresh_access_token,
 )
+from src.resilient_http import RetryPolicy, request_with_retry
 
 
 class FakeDadosferaClient:
@@ -254,7 +258,12 @@ def test_sign_in_falls_back_to_legacy_signin_endpoint() -> None:
                 return DummyResponse(401)
             raise AssertionError(f"Unexpected URL: {url}")
 
-    client = DadosferaMaestroClient(base_url="https://maestro.dadosfera.ai", username="user", password="secret")
+    client = DadosferaMaestroClient(
+        base_url="https://maestro.dadosfera.ai",
+        username="user",
+        password="secret",
+        retry_policy=RetryPolicy(max_attempts=1, backoff_seconds=0),
+    )
     client.session = DummySession()  # type: ignore[assignment]
 
     client.sign_in()
@@ -285,3 +294,38 @@ def test_client_with_access_token_skips_interactive_sign_in() -> None:
     client.sign_in()
 
     assert client.session.headers["Authorization"] == "Bearer abc123"
+
+
+def test_request_with_retry_retries_retryable_status(monkeypatch) -> None:
+    class DummyResponse:
+        def __init__(self, status_code: int) -> None:
+            self.status_code = status_code
+            self.headers: dict[str, str] = {}
+
+        def raise_for_status(self) -> None:
+            if self.status_code >= 400:
+                raise requests.HTTPError(f"http {self.status_code}")
+
+    class DummySession:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def get(self, url: str, timeout: int = 60):  # type: ignore[override]
+            self.calls += 1
+            return DummyResponse(503 if self.calls == 1 else 200)
+
+    monkeypatch.setattr("src.resilient_http.sleep", lambda seconds: None)
+    session = DummySession()
+
+    response = request_with_retry(
+        session,  # type: ignore[arg-type]
+        "GET",
+        "https://example.com/catalog",
+        logger=LOGGER,
+        operation="catalog_test",
+        retry_policy=RetryPolicy(max_attempts=2, backoff_seconds=0),
+        timeout=60,
+    )
+
+    assert response.status_code == 200
+    assert session.calls == 2

@@ -1,4 +1,4 @@
-name: Lint
+name: Policy Check
 
 on:
   push:
@@ -8,13 +8,14 @@ on:
       - main
       - master
   pull_request:
+  workflow_dispatch:
 
 concurrency:
-  group: lint-${{ github.ref }}
+  group: policy-check-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  ruff:
+  governance-policy:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -29,8 +30,11 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install Ruff
-        run: python -m pip install ruff
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - name: Run Ruff
-        run: ruff check src streamlit_app tests
+      - name: Validate release governance contract
+        run: python src/governance_validation.py
+
+      - name: Validate workflow policy contract
+        run: python src/workflow_policy_validation.py

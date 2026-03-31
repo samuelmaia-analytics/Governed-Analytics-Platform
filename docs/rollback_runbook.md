@@ -11,7 +11,10 @@ Este runbook define a resposta mínima para rollback do case quando uma alteraç
 
 ## Procedimento
 
-1. Identificar o último commit estável em `main`.
+1. Identificar o último commit estável no ambiente afetado:
+- `develop` para `dev`
+- `release` para `stage`
+- `main` para `prod`
 2. Reverter com commit explícito, sem reescrever histórico.
 3. Reexecutar:
 
@@ -26,9 +29,9 @@ python -m pytest tests
 python src/run_case_pipeline.py --steps build publish semantic quality contracts monitor
 ```
 
-5. Revalidar o workflow de promoção para `streamlit-prod`.
+5. Revalidar o workflow de promoção para o branch de deploy do ambiente afetado (`streamlit-dev`, `streamlit-stage` ou `streamlit-prod`).
 6. Revalidar o workflow `Operate Published Layer` se o incidente envolver freshness, semântica publicada ou operação recorrente.
-7. Se o app estiver apontando temporariamente para `streamlit-prod`, confirmar se o branch publicado já recebeu o commit de rollback ou se o apontamento precisa ser ajustado manualmente no Streamlit Cloud.
+7. Confirmar se o ambiente publicado correto recebeu o commit de rollback antes de qualquer troca manual no Streamlit Cloud.
 
 ## Evidências mínimas após rollback
 

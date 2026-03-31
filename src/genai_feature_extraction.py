@@ -1,6 +1,5 @@
 import argparse
 import json
-import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,6 +12,7 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.config import GENAI_INPUT_DIR, GENAI_OUTPUT_DIR
+from src.settings import load_app_settings
 from src.utils import ensure_directory, write_csv
 
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
@@ -77,8 +77,10 @@ Product Description:
 
 
 def call_openai(prompt: str, model: str) -> dict[str, Any]:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
+    openai_settings = load_app_settings().openai
+    openai_settings.validate_credentials()
+    api_key = openai_settings.api_key
+    if api_key is None:  # pragma: no cover - defensive branch
         raise RuntimeError("OPENAI_API_KEY não encontrada. Use --mode reference ou configure a chave.")
 
     payload = {
