@@ -18,22 +18,26 @@ O projeto opera com separação explícita entre branch de desenvolvimento e bra
 
 ## Fluxo de branches e deploy
 
-- `main`: branch fonte de integração e branch de referência do repositório
-- `streamlit-prod`: branch dedicada de deploy do Streamlit Cloud
-- promoção de deploy: ocorre a partir de `main` via `.github/workflows/deploy-streamlit.yml`
-- fallback operacional: em incidente de publicação, o app pode apontar explicitamente para `streamlit-prod` até normalização do fluxo principal
+- `develop`: branch fonte do ambiente `dev`
+- `release`: branch fonte do ambiente `stage`
+- `main`: branch fonte do ambiente `prod` e branch de referência do repositório
+- `streamlit-dev`, `streamlit-stage`, `streamlit-prod`: branches dedicadas de deploy do Streamlit Cloud
+- promoção de deploy: ocorre via `.github/workflows/deploy-streamlit.yml`, com resolução explícita do plano de promoção por ambiente
+- fallback operacional: em incidente de publicação, o ambiente afetado pode permanecer no branch de deploy anterior até normalização do fluxo
 
 Leitura correta:
 
-- merge em `main` não é o deploy final por si só
-- o deploy efetivo depende da promoção bem-sucedida para `streamlit-prod`
-- a validação final inclui comportamento do app publicado, não apenas CI verde
+- merge em uma branch fonte não é o deploy final por si só
+- o deploy efetivo depende da promoção bem-sucedida para `streamlit-dev`, `streamlit-stage` ou `streamlit-prod`
+- a validação final inclui comportamento do app publicado no ambiente alvo, não apenas CI verde
 
 ## Guardrails de release
 
-- `CI` precisa estar verde em `main`
+- `CI` e `Lint` executam em `develop`, `release` e `main`
+- `Policy Check` valida o contrato versionado de governança e os gatilhos reais dos workflows
+- `CI` valida também `python src/governance_validation.py`
 - `ruff` e `pytest` são reaplicados no workflow de promoção
-- o branch de deploy é atualizado com `git push origin HEAD:streamlit-prod --force`
+- o branch de deploy é atualizado com `git push origin HEAD:<deployment_branch> --force`
 - mudanças que afetam a camada publicada exigem revalidação de artefatos, contratos e qualidade
 - rollback deve ocorrer com commit explícito, sem reescrita de histórico
 
@@ -44,7 +48,11 @@ Leitura correta:
 - `src/semantic_layer.py`: marts publicados para logística, seller e cohort
 - `src/published_monitoring.py`: freshness e qualidade recorrente da camada publicada
 - `.github/workflows/operate-published-layer.yml`: job agendado com artefatos operacionais e falha observável
-- `.github/workflows/deploy-streamlit.yml`: promoção controlada de `main` para `streamlit-prod`
+- `.github/workflows/deploy-streamlit.yml`: promoção controlada de `develop`, `release` ou `main` para o branch de deploy do ambiente correspondente
+- `.github/workflows/policy-check.yml`: valida aderência entre workflows e contrato de governança
+- `contracts/governance/release_governance.json`: contrato canônico de branches, ambientes e workflows
+- `src/governance_validation.py`: validação do contrato de release
+- `src/workflow_policy_validation.py`: validação dos workflows contra o contrato
 - `docs/release_runbook.md`: checklist mínimo antes e depois de release
 - `docs/rollback_runbook.md`: resposta operacional para regressão de app ou artefato publicado
 
@@ -68,7 +76,7 @@ Leitura correta:
 ## Responsabilidade por ambiente
 
 - ambiente local: geração, inspeção, testes e reprodutibilidade do case
-- GitHub Actions: validação contínua e promoção da branch de deploy
+- GitHub Actions: validação contínua, policy checks e promoção da branch de deploy por ambiente
 - Streamlit Cloud: consumo executivo publicado
 - Dadosfera/Metabase: catálogo, ativo publicado e evidências externas
 
@@ -80,9 +88,9 @@ Uma operação saudável deste projeto exige, ao mesmo tempo:
 - camada `published/dashboard` consistente com contratos e quality checks
 - camada `published/semantic` materializada e coerente com o dashboard
 - monitoramento de freshness da camada publicada sem alertas abertos
-- branch `main` íntegra
-- branch `streamlit-prod` atualizada pelo fluxo de promoção
-- app publicado carregando a versão esperada da camada minimizada
+- branches `develop`, `release` e `main` íntegras conforme o estágio de promoção
+- branch de deploy do ambiente alvo atualizada pelo fluxo de promoção
+- app publicado carregando a versão esperada da camada minimizada no ambiente alvo
 
 ## Decisões de escopo
 
