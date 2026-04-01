@@ -30,7 +30,10 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt ".[dev]"
+
+      - name: Run Ruff
+        run: python -m ruff check src streamlit_app tests
 
       - name: Smoke check pipeline entrypoint
         run: python src/run_case_pipeline.py --list-steps

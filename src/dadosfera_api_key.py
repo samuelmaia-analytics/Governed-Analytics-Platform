@@ -14,7 +14,6 @@ if __package__ is None or __package__ == "":
 
 from src.config import ROOT_DIR
 from src.dadosfera_catalog_sync import (
-    DadosferaMaestroClient,
     apply_auth_from_response,
     build_auth_diagnostics,
     build_sign_in_failure,
