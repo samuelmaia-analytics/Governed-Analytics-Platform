@@ -62,6 +62,13 @@ class DadosferaMaestroClient:
         self.totp = totp
         self.retry_policy = retry_policy
         self.session = requests.Session()
+        self.auth_diagnostics: dict[str, Any] = {
+            "mode": "none",
+            "endpoint": None,
+            "body_keys": [],
+            "header_keys": [],
+            "has_cookies": False,
+        }
         self.session.headers.update({"Content-Type": "application/json"})
         if access_token:
             self.session.headers.update(
@@ -70,18 +77,35 @@ class DadosferaMaestroClient:
                     "Authorization": f"Bearer {access_token}",
                 }
             )
+            self.auth_diagnostics = {
+                "mode": "token_env",
+                "endpoint": "env",
+                "body_keys": [],
+                "header_keys": ["access-token", "authorization"],
+                "has_cookies": False,
+            }
 
     def _request(self, method: str, path: str, *, operation: str, raise_for_status: bool = True, **kwargs: Any) -> requests.Response:
-        response = request_with_retry(
-            self.session,
-            method,
-            f"{self.base_url}{path}",
-            logger=LOGGER,
-            operation=operation,
-            retry_policy=self.retry_policy,
-            raise_for_status=raise_for_status,
-            **kwargs,
-        )
+        try:
+            response = request_with_retry(
+                self.session,
+                method,
+                f"{self.base_url}{path}",
+                logger=LOGGER,
+                operation=operation,
+                retry_policy=self.retry_policy,
+                raise_for_status=raise_for_status,
+                **kwargs,
+            )
+        except requests.HTTPError as exc:
+            raise_runtime_for_http_error(
+                exc,
+                path=path,
+                operation=operation,
+                has_authorization=bool(self.session.headers.get("Authorization")),
+                auth_diagnostics=self.auth_diagnostics,
+            )
+
         LOGGER.info(
             "Chamada à API concluída.",
             extra={
@@ -98,6 +122,7 @@ class DadosferaMaestroClient:
             return
         last_body: dict[str, Any] = {}
         last_headers: Any | None = None
+        last_sign_in_error: RuntimeError | None = None
 
         for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
             for endpoint in ("/auth/sign-in", "/auth/signin"):
@@ -113,17 +138,52 @@ class DadosferaMaestroClient:
                     last_headers = response.headers
                     continue
 
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except requests.HTTPError as exc:
+                    body = safe_json_body(response)
+                    status_code = getattr(response, "status_code", None)
+                    if status_code == 404:
+                        if not last_body:
+                            last_body = body
+                            last_headers = response.headers
+                        continue
+                    sign_in_error = build_sign_in_failure(
+                        exc,
+                        endpoint=endpoint,
+                        response_body=body,
+                        response_headers=response.headers,
+                    )
+                    last_sign_in_error = sign_in_error
+                    if status_code in {401, 403}:
+                        continue
+                    raise sign_in_error
+
                 body = response.json()
                 last_body = body
                 last_headers = response.headers
 
                 if apply_auth_from_response(self.session, body, response.headers):
+                    self.auth_diagnostics = build_auth_diagnostics(
+                        session=self.session,
+                        endpoint=endpoint,
+                        response_body=body,
+                        response_headers=response.headers,
+                    )
                     return
 
                 if try_refresh_access_token(self.session, self.base_url):
+                    self.auth_diagnostics = {
+                        "mode": detect_session_auth_mode(self.session),
+                        "endpoint": "/auth/refresh-access-token",
+                        "body_keys": [],
+                        "header_keys": [],
+                        "has_cookies": bool(self.session.cookies),
+                    }
                     return
 
+        if last_sign_in_error is not None:
+            raise last_sign_in_error
         raise_runtime_for_auth_response(last_body, last_headers)
 
     def list_data_assets(self, *, size: int = 1000) -> list[dict[str, Any]]:
@@ -250,6 +310,37 @@ def apply_auth_from_response(session: requests.Session, response_body: dict[str,
     return bool(session.cookies)
 
 
+def detect_session_auth_mode(session: requests.Session) -> str:
+    if session.headers.get("Authorization") and session.headers.get("access-token"):
+        return "bearer_and_access_token"
+    if session.headers.get("Authorization"):
+        return "bearer"
+    if session.headers.get("access-token"):
+        return "access-token"
+    if session.cookies:
+        return "cookies"
+    return "none"
+
+
+def build_auth_diagnostics(
+    *,
+    session: requests.Session,
+    endpoint: str,
+    response_body: dict[str, Any],
+    response_headers: Any | None,
+) -> dict[str, Any]:
+    header_keys: list[str] = []
+    if response_headers is not None:
+        header_keys = sorted(str(key).lower() for key in response_headers.keys())
+    return {
+        "mode": detect_session_auth_mode(session),
+        "endpoint": endpoint,
+        "body_keys": sorted(response_body.keys()),
+        "header_keys": header_keys,
+        "has_cookies": bool(session.cookies),
+    }
+
+
 def try_refresh_access_token(session: requests.Session, base_url: str) -> bool:
     response = request_with_retry(
         session,
@@ -336,11 +427,110 @@ def raise_runtime_for_auth_response(response_body: dict[str, Any], response_head
     mfa_hint = ""
     if mfa_status not in (None, False, "disabled", "DISABLED"):
         mfa_hint = " A resposta indica MFA ativo; valide DADOSFERA_TOTP e o formato do payload de autenticacao."
+    response_message = response_body.get("message")
+    response_error = response_body.get("error")
+    detail_parts: list[str] = []
+    if isinstance(response_message, str) and response_message.strip():
+        detail_parts.append(f"message={response_message.strip()!r}")
+    if isinstance(response_error, str) and response_error.strip():
+        detail_parts.append(f"error={response_error.strip()!r}")
+    detail_suffix = f" Detalhes da resposta: {', '.join(detail_parts)}." if detail_parts else ""
 
     raise RuntimeError(
         "Nao foi possivel localizar o access token nem cookies de sessao na resposta de autenticacao da Dadosfera. "
-        f"Chaves recebidas: {available_keys}. Headers recebidos: {header_keys}.{mfa_hint}"
+        f"Chaves recebidas: {available_keys}. Headers recebidos: {header_keys}.{mfa_hint}{detail_suffix}"
     )
+
+
+def safe_json_body(response: requests.Response) -> dict[str, Any]:
+    try:
+        body = response.json()
+    except ValueError:
+        return {}
+    return body if isinstance(body, dict) else {}
+
+
+def build_sign_in_failure(
+    error: requests.HTTPError,
+    *,
+    endpoint: str,
+    response_body: dict[str, Any],
+    response_headers: Any | None,
+) -> RuntimeError:
+    status_code = getattr(error.response, "status_code", None)
+    body_keys = sorted(response_body.keys())
+    header_keys = sorted(str(key).lower() for key in response_headers.keys()) if response_headers is not None else []
+    message = response_body.get("message")
+    error_code = response_body.get("code") or response_body.get("error")
+    details = []
+    if isinstance(message, str) and message.strip():
+        details.append(f"message={message.strip()!r}")
+    if isinstance(error_code, str) and error_code.strip():
+        details.append(f"error={error_code.strip()!r}")
+    detail_suffix = f" Detalhes: {', '.join(details)}." if details else ""
+    return RuntimeError(
+        f"Autenticacao da Dadosfera falhou em `{endpoint}` com HTTP {status_code or 'desconhecido'}. "
+        f"Chaves do body: {body_keys or ['<none>']}. Headers: {header_keys or ['<none>']}. "
+        f"Valide tenant, credenciais, MFA/TOTP e o contrato atual do endpoint de login.{detail_suffix}"
+    )
+
+
+def raise_runtime_for_sign_in_failure(
+    error: requests.HTTPError,
+    *,
+    endpoint: str,
+    response_body: dict[str, Any],
+    response_headers: Any | None,
+) -> None:
+    raise build_sign_in_failure(
+        error,
+        endpoint=endpoint,
+        response_body=response_body,
+        response_headers=response_headers,
+    ) from error
+
+
+def raise_runtime_for_http_error(
+    error: requests.HTTPError,
+    *,
+    path: str,
+    operation: str,
+    has_authorization: bool,
+    auth_diagnostics: dict[str, Any] | None = None,
+) -> None:
+    response = error.response
+    status_code = getattr(response, "status_code", None)
+
+    if status_code in {401, 403}:
+        auth_summary = ""
+        if auth_diagnostics:
+            auth_summary = (
+                " Diagnostico de auth: "
+                f"mode={auth_diagnostics.get('mode')}, "
+                f"endpoint={auth_diagnostics.get('endpoint')}, "
+                f"has_cookies={auth_diagnostics.get('has_cookies')}, "
+                f"body_keys={auth_diagnostics.get('body_keys')}, "
+                f"header_keys={auth_diagnostics.get('header_keys')}."
+            )
+        auth_hint = (
+            "A requisicao foi enviada com cabecalho de autorizacao, mas a API rejeitou o acesso. "
+            "Valide escopo, expiracao e tenant do token configurado."
+            if has_authorization
+            else "A autenticacao nao foi aceita. Valide DADOSFERA_ACCESS_TOKEN/DADOSFERA_API_TOKEN ou usuario e senha."
+        )
+        raise RuntimeError(
+            f"Falha de autenticacao/autorizacao na Dadosfera durante `{operation}` em `{path}` (HTTP {status_code}). {auth_hint}{auth_summary}"
+        ) from error
+
+    if status_code == 404:
+        raise RuntimeError(
+            f"Endpoint da Dadosfera nao encontrado durante `{operation}` em `{path}` (HTTP 404). "
+            "Valide a base URL do Maestro e o caminho real exposto pelo seu tenant."
+        ) from error
+
+    raise RuntimeError(
+        f"Chamada da Dadosfera falhou durante `{operation}` em `{path}` com HTTP {status_code or 'desconhecido'}."
+    ) from error
 
 
 def find_existing_asset(existing_assets: list[dict[str, Any]], target: CatalogAssetSpec) -> dict[str, Any] | None:
@@ -450,4 +640,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc))

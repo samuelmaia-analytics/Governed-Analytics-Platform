@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 DEFAULT_DADOSFERA_BASE_URL = "https://maestro.dadosfera.ai"
-DEFAULT_DADOSFERA_PIPELINE_LIST_ENDPOINT = "/platform/pipeline"
+DEFAULT_DADOSFERA_PIPELINE_LIST_ENDPOINT = "/platform/pipelines"
 DEFAULT_DADOSFERA_PIPELINE_CREATE_ENDPOINT = "/platform/pipeline"
 DEFAULT_DADOSFERA_PIPELINE_GET_ENDPOINT_TEMPLATE = "/platform/pipeline/{pipeline_id}"
 DEFAULT_DADOSFERA_PIPELINE_RUN_ENDPOINT = "/platform/pipeline/execute"

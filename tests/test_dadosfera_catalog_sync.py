@@ -17,6 +17,8 @@ from src.dadosfera_catalog_sync import (
     find_existing_asset,
     load_manifest,
     raise_runtime_for_auth_response,
+    raise_runtime_for_sign_in_failure,
+    safe_json_body,
     sync_assets,
     try_refresh_access_token,
 )
@@ -277,10 +279,12 @@ def test_sign_in_falls_back_to_legacy_signin_endpoint() -> None:
 
 def test_raise_runtime_for_auth_response_includes_diagnostic_keys() -> None:
     try:
-        raise_runtime_for_auth_response({"message": "unauthorized"}, {"Content-Type": "application/json"})
+        raise_runtime_for_auth_response({"message": "unauthorized", "error": "AUTH.UNAUTHORIZED"}, {"Content-Type": "application/json"})
     except RuntimeError as exc:
-        assert "Chaves recebidas: message" in str(exc)
+        assert "Chaves recebidas: error, message" in str(exc)
         assert "Headers recebidos: content-type" in str(exc)
+        assert "message='unauthorized'" in str(exc)
+        assert "error='AUTH.UNAUTHORIZED'" in str(exc)
     else:
         raise AssertionError("Expected RuntimeError when access token is missing")
 
@@ -329,3 +333,59 @@ def test_request_with_retry_retries_retryable_status(monkeypatch) -> None:
 
     assert response.status_code == 200
     assert session.calls == 2
+
+
+def test_catalog_client_raises_actionable_message_on_unauthorized() -> None:
+    class DummyResponse:
+        status_code = 401
+        headers: dict[str, str] = {}
+
+        def raise_for_status(self) -> None:
+            raise requests.HTTPError("401 unauthorized", response=self)
+
+        @staticmethod
+        def json() -> dict[str, object]:
+            return {"message": "unauthorized"}
+
+    class DummySession:
+        def __init__(self) -> None:
+            self.headers = {"Content-Type": "application/json", "Authorization": "Bearer token"}
+
+        def get(self, url: str, params: dict[str, object] | None = None, timeout: int = 60):  # type: ignore[override]
+            return DummyResponse()
+
+    client = DadosferaMaestroClient(base_url="https://maestro.dadosfera.ai", access_token="token")
+    client.session = DummySession()  # type: ignore[assignment]
+
+    try:
+        client.list_data_assets()
+    except RuntimeError as exc:
+        assert "Falha de autenticacao/autorizacao" in str(exc)
+        assert "Valide escopo, expiracao e tenant do token" in str(exc)
+    else:
+        raise AssertionError("Expected actionable RuntimeError for unauthorized catalog request")
+
+
+def test_raise_runtime_for_sign_in_failure_includes_body_and_header_keys() -> None:
+    response = requests.Response()
+    response.status_code = 401
+    response._content = b'{"message":"unauthorized","code":"AUTH.UNAUTHORIZED"}'
+    response.headers["Content-Type"] = "application/json"
+    error = requests.HTTPError("401 unauthorized", response=response)
+
+    try:
+        raise_runtime_for_sign_in_failure(
+            error,
+            endpoint="/auth/sign-in",
+            response_body=safe_json_body(response),
+            response_headers=response.headers,
+        )
+    except RuntimeError as exc:
+        assert "Autenticacao da Dadosfera falhou em `/auth/sign-in` com HTTP 401" in str(exc)
+        assert "message" in str(exc)
+        assert "code" in str(exc)
+        assert "content-type" in str(exc)
+        assert "message='unauthorized'" in str(exc)
+        assert "error='AUTH.UNAUTHORIZED'" in str(exc)
+    else:
+        raise AssertionError("Expected actionable RuntimeError for sign-in failure")

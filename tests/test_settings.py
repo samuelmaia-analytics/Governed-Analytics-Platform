@@ -25,12 +25,28 @@ def test_load_app_settings_reads_feature_flags_and_tokens(monkeypatch) -> None:
     assert settings.openai.api_key == "openai-secret"
 
 
+def test_load_app_settings_uses_current_pipeline_endpoint_defaults(monkeypatch) -> None:
+    monkeypatch.delenv("DADOSFERA_PIPELINE_LIST_ENDPOINT", raising=False)
+    monkeypatch.delenv("DADOSFERA_PIPELINE_CREATE_ENDPOINT", raising=False)
+    monkeypatch.delenv("DADOSFERA_PIPELINE_GET_ENDPOINT_TEMPLATE", raising=False)
+    monkeypatch.delenv("DADOSFERA_PIPELINE_RUN_ENDPOINT", raising=False)
+    monkeypatch.delenv("DADOSFERA_PIPELINE_RUNS_ENDPOINT_TEMPLATE", raising=False)
+
+    settings = load_app_settings()
+
+    assert settings.dadosfera.list_endpoint == "/platform/pipelines"
+    assert settings.dadosfera.create_endpoint == "/platform/pipeline"
+    assert settings.dadosfera.get_endpoint_template == "/platform/pipeline/{pipeline_id}"
+    assert settings.dadosfera.run_endpoint == "/platform/pipeline/execute"
+    assert settings.dadosfera.runs_endpoint_template == "/platform/pipeline/{pipeline_id}/pipeline_run"
+
+
 def test_dadosfera_settings_require_enablement_and_credentials(monkeypatch) -> None:
-    monkeypatch.delenv("DADOSFERA_ENABLED", raising=False)
-    monkeypatch.delenv("DADOSFERA_ACCESS_TOKEN", raising=False)
-    monkeypatch.delenv("DADOSFERA_API_TOKEN", raising=False)
-    monkeypatch.delenv("DADOSFERA_USERNAME", raising=False)
-    monkeypatch.delenv("DADOSFERA_PASSWORD", raising=False)
+    monkeypatch.setenv("DADOSFERA_ENABLED", "false")
+    monkeypatch.setenv("DADOSFERA_ACCESS_TOKEN", "")
+    monkeypatch.setenv("DADOSFERA_API_TOKEN", "")
+    monkeypatch.setenv("DADOSFERA_USERNAME", "")
+    monkeypatch.setenv("DADOSFERA_PASSWORD", "")
 
     settings = load_app_settings()
 

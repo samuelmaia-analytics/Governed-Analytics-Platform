@@ -147,3 +147,38 @@ def test_pipeline_client_retries_create_request_on_retryable_status(monkeypatch)
 
     assert response == {"id": "pipeline-1"}
     assert client.session.calls == 2
+
+
+def test_pipeline_client_raises_actionable_message_on_missing_endpoint() -> None:
+    class DummyResponse:
+        headers: dict[str, str] = {}
+
+        def __init__(self, status_code: int) -> None:
+            self.status_code = status_code
+
+        def raise_for_status(self) -> None:
+            raise requests.HTTPError("404 not found", response=self)
+
+        @staticmethod
+        def json() -> dict[str, object]:
+            return {"message": "not found"}
+
+    class DummySession:
+        def __init__(self) -> None:
+            self.headers = {"Content-Type": "application/json", "Authorization": "Bearer token"}
+
+        def get(self, url: str, timeout: int = 60):  # type: ignore[override]
+            return DummyResponse(404)
+
+    import requests
+
+    client = DadosferaPipelineClient(base_url="https://maestro.dadosfera.ai", access_token="token")
+    client.session = DummySession()  # type: ignore[assignment]
+
+    try:
+        client.list_pipelines()
+    except RuntimeError as exc:
+        assert "Endpoint de pipeline nao encontrado" in str(exc)
+        assert "DADOSFERA_PIPELINE_LIST_ENDPOINT" in str(exc)
+    else:
+        raise AssertionError("Expected actionable RuntimeError for missing pipeline endpoint")

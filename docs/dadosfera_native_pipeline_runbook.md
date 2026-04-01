@@ -149,13 +149,13 @@ Como a estrutura da API pode variar por módulo, tenant ou versão, o operador a
 
 Defaults atuais:
 
-- list: `/platform/pipeline`
+- list: `/platform/pipelines`
 - create: `/platform/pipeline`
 - get: `/platform/pipeline/{pipeline_id}`
 - run: `/platform/pipeline/execute`
 - runs: `/platform/pipeline/{pipeline_id}/pipeline_run`
 
-Esses defaults foram alinhados aos endpoints da documentação oficial da Dadosfera Maestro Platform API. Se a plataforma responder `404` ou `405`, ajuste o endpoint para o caminho real do seu tenant ou módulo.
+Esses defaults refletem o tenant validado em 31/03/2026: a listagem respondeu no caminho plural e os demais fluxos continuaram no namespace singular. Se a plataforma responder `404` ou `405`, ajuste o endpoint para o caminho real do seu tenant ou módulo.
 
 ## Leitura rigorosa de status
 

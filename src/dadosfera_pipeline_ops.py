@@ -3,23 +3,31 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import requests
 
+if __package__ is None or __package__ == "":
+    sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from src.dadosfera_catalog_sync import (
     apply_auth_from_response,
+    build_auth_diagnostics,
+    build_sign_in_failure,
     build_sign_in_payloads,
+    detect_session_auth_mode,
     raise_runtime_for_auth_response,
+    safe_json_body,
     try_refresh_access_token,
 )
 from src.observability import configure_logging
 from src.resilient_http import DEFAULT_RETRY_POLICY, RetryPolicy, request_with_retry
 from src.settings import load_app_settings
 
-DEFAULT_LIST_ENDPOINT = "/platform/pipeline"
+DEFAULT_LIST_ENDPOINT = "/platform/pipelines"
 DEFAULT_CREATE_ENDPOINT = "/platform/pipeline"
 DEFAULT_GET_ENDPOINT_TEMPLATE = "/platform/pipeline/{pipeline_id}"
 DEFAULT_RUN_ENDPOINT = "/platform/pipeline/execute"
@@ -62,6 +70,13 @@ class DadosferaPipelineClient:
         self.config = config or PipelineApiConfig()
         self.retry_policy = retry_policy
         self.session = requests.Session()
+        self.auth_diagnostics: dict[str, Any] = {
+            "mode": "none",
+            "endpoint": None,
+            "body_keys": [],
+            "header_keys": [],
+            "has_cookies": False,
+        }
         self.session.headers.update({"Content-Type": "application/json"})
         if access_token:
             self.session.headers.update(
@@ -70,17 +85,34 @@ class DadosferaPipelineClient:
                     "Authorization": f"Bearer {access_token}",
                 }
             )
+            self.auth_diagnostics = {
+                "mode": "token_env",
+                "endpoint": "env",
+                "body_keys": [],
+                "header_keys": ["access-token", "authorization"],
+                "has_cookies": False,
+            }
 
     def _request(self, method: str, path: str, *, operation: str, **kwargs: Any) -> requests.Response:
-        response = request_with_retry(
-            self.session,
-            method,
-            f"{self.base_url}{path}",
-            logger=LOGGER,
-            operation=operation,
-            retry_policy=self.retry_policy,
-            **kwargs,
-        )
+        try:
+            response = request_with_retry(
+                self.session,
+                method,
+                f"{self.base_url}{path}",
+                logger=LOGGER,
+                operation=operation,
+                retry_policy=self.retry_policy,
+                **kwargs,
+            )
+        except requests.HTTPError as exc:
+            raise_runtime_for_pipeline_http_error(
+                exc,
+                path=path,
+                operation=operation,
+                has_authorization=bool(self.session.headers.get("Authorization")),
+                auth_diagnostics=self.auth_diagnostics,
+            )
+
         LOGGER.info(
             "Chamada à API concluída.",
             extra={
@@ -97,6 +129,7 @@ class DadosferaPipelineClient:
             return
         last_body: dict[str, Any] = {}
         last_headers: Any | None = None
+        last_sign_in_error: RuntimeError | None = None
 
         for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
             for endpoint in ("/auth/sign-in", "/auth/signin"):
@@ -115,17 +148,52 @@ class DadosferaPipelineClient:
                     last_headers = response.headers
                     continue
 
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except requests.HTTPError as exc:
+                    body = safe_json_body(response)
+                    status_code = getattr(response, "status_code", None)
+                    if status_code == 404:
+                        if not last_body:
+                            last_body = body
+                            last_headers = response.headers
+                        continue
+                    sign_in_error = build_sign_in_failure(
+                        exc,
+                        endpoint=endpoint,
+                        response_body=body,
+                        response_headers=response.headers,
+                    )
+                    last_sign_in_error = sign_in_error
+                    if status_code in {401, 403}:
+                        continue
+                    raise sign_in_error
+
                 body = response.json()
                 last_body = body
                 last_headers = response.headers
 
                 if apply_auth_from_response(self.session, body, response.headers):
+                    self.auth_diagnostics = build_auth_diagnostics(
+                        session=self.session,
+                        endpoint=endpoint,
+                        response_body=body,
+                        response_headers=response.headers,
+                    )
                     return
 
                 if try_refresh_access_token(self.session, self.base_url):
+                    self.auth_diagnostics = {
+                        "mode": detect_session_auth_mode(self.session),
+                        "endpoint": "/auth/refresh-access-token",
+                        "body_keys": [],
+                        "header_keys": [],
+                        "has_cookies": bool(self.session.cookies),
+                    }
                     return
 
+        if last_sign_in_error is not None:
+            raise last_sign_in_error
         raise_runtime_for_auth_response(last_body, last_headers)
 
     def list_pipelines(self) -> dict[str, Any]:
@@ -194,6 +262,51 @@ def find_pipeline_by_name(client: DadosferaPipelineClient, pipeline_name: str) -
         if str(pipeline.get("name") or pipeline.get("display_name") or "") == pipeline_name:
             return pipeline
     return None
+
+
+def raise_runtime_for_pipeline_http_error(
+    error: requests.HTTPError,
+    *,
+    path: str,
+    operation: str,
+    has_authorization: bool,
+    auth_diagnostics: dict[str, Any] | None = None,
+) -> None:
+    response = error.response
+    status_code = getattr(response, "status_code", None)
+
+    if status_code in {401, 403}:
+        auth_summary = ""
+        if auth_diagnostics:
+            auth_summary = (
+                " Diagnostico de auth: "
+                f"mode={auth_diagnostics.get('mode')}, "
+                f"endpoint={auth_diagnostics.get('endpoint')}, "
+                f"has_cookies={auth_diagnostics.get('has_cookies')}, "
+                f"body_keys={auth_diagnostics.get('body_keys')}, "
+                f"header_keys={auth_diagnostics.get('header_keys')}."
+            )
+        auth_hint = (
+            "A requisicao foi enviada com cabecalho de autorizacao, mas a API rejeitou o acesso. "
+            "Valide escopo, expiracao e tenant do token configurado."
+            if has_authorization
+            else "A autenticacao nao foi aceita. Valide DADOSFERA_ACCESS_TOKEN/DADOSFERA_API_TOKEN ou usuario e senha."
+        )
+        raise RuntimeError(
+            f"Falha de autenticacao/autorizacao na Dadosfera durante `{operation}` em `{path}` (HTTP {status_code}). {auth_hint}{auth_summary}"
+        ) from error
+
+    if status_code == 404:
+        raise RuntimeError(
+            f"Endpoint de pipeline nao encontrado durante `{operation}` em `{path}` (HTTP 404). "
+            "Ajuste `DADOSFERA_PIPELINE_LIST_ENDPOINT`, `DADOSFERA_PIPELINE_CREATE_ENDPOINT`, "
+            "`DADOSFERA_PIPELINE_GET_ENDPOINT_TEMPLATE`, `DADOSFERA_PIPELINE_RUN_ENDPOINT` "
+            "e `DADOSFERA_PIPELINE_RUNS_ENDPOINT_TEMPLATE` para os caminhos reais do seu tenant."
+        ) from error
+
+    raise RuntimeError(
+        f"Chamada de pipeline da Dadosfera falhou durante `{operation}` em `{path}` com HTTP {status_code or 'desconhecido'}."
+    ) from error
 
 
 def parse_args() -> argparse.Namespace:
@@ -323,4 +436,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc))
