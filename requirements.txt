@@ -13,5 +13,5 @@ PyYAML
 jinja2
 pytest
 pytest-cov
-ruff>=0.12,<0.13
+ruff>=0.12,<0.16
 requests
