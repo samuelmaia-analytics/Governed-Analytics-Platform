@@ -61,6 +61,8 @@ Link final do repositório:
 - [x] salvar capturas em `images/dadosfera/`
 - [x] implementar sync complementar por API
 - [x] preparar operação por token não interativo
+- [x] validar `POST /auth/sign-in` com MFA real no tenant
+- [ ] obter do suporte o artefato de sessão ou token reutilizável para `catalog` e `pipelines`
 - [ ] evidenciar pipeline nativo real na plataforma
 - [ ] evidenciar catalogação do pipeline nativo na plataforma
 
@@ -94,5 +96,6 @@ Link final do repositório:
 - o GitHub já está consolidado com as evidências principais
 - a parte da Dadosfera já está comprovada para o ativo principal
 - a operação recorrente da camada publicada já está implementada
+- a API do Maestro foi validada até o limite exposto pelo tenant: `sign-in` com MFA funciona, mas `catalog` e `pipelines` seguem dependentes do fluxo oficial do suporte
 - pipeline nativo na plataforma segue sem evidência final de execução
 - item de GenAI com LLM externa já foi validado localmente

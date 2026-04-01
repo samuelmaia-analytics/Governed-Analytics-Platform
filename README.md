@@ -1,4 +1,4 @@
-# Projeto Olist | Case Técnico de Dados
+# Produto Analítico Olist | Analytics Engineering e Governança de Dados
 
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026/actions/workflows/ci.yml)
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026/actions/workflows/lint.yml)
@@ -69,6 +69,8 @@ Hoje o repositório já possui:
 - job agendado em [operate-published-layer.yml](.github/workflows/operate-published-layer.yml)
 - promoção explícita por ambiente: `develop` -> `streamlit-dev`, `release` -> `streamlit-stage`, `main` -> `streamlit-prod`
 
+Na validação final do tenant, `POST /auth/sign-in` com MFA no campo `code` respondeu `200`, mas a resposta não expôs `accessToken` nem cookie de sessão reutilizável para `catalog` e `pipelines`. Por isso, a integração protegida da API segue dependente do fluxo oficial detalhado pelo suporte.
+
 ## Limites Reais
 
 O projeto é rigoroso sobre o que está comprovado e o que ainda depende da plataforma:
@@ -76,6 +78,7 @@ O projeto é rigoroso sobre o que está comprovado e o que ainda depende da plat
 - a transformação principal ainda roda em Python local
 - a publicação e o catálogo na Dadosfera estão comprovados
 - a automação por API está implementada para sync e operação
+- o `sign-in` do Maestro foi validado com MFA, mas o tenant não retornou artefato de sessão reutilizável para `catalog` e `pipelines`
 - a execução nativa completa do pipeline dentro do tenant ainda não está evidenciada
 
 Essa distinção é deliberada. O repositório evita vender operação nativa como concluída sem link real, run real e output real na plataforma.

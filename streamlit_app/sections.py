@@ -48,8 +48,8 @@ def render_header(filters: FilterState, total_rows: int, filtered_rows: int) -> 
         <div class="hero-shell">
             <div class="hero-top">
                 <div>
-                    <span class="hero-badge">SAMUEL_MAIA_DDF_TECH_032026</span>
-                    <h1 class="hero-title">Executive Commerce Analytics</h1>
+                    <span class="hero-badge">Produto Analítico Olist</span>
+                    <h1 class="hero-title">Dashboard Executivo de Receita, Operação e Experiência</h1>
                     <p class="hero-subtitle">
                         Painel executivo para leitura rápida de receita, categorias, operação e experiência do cliente,
                         transformando o dataset Olist em uma camada analítica pronta para decisão.

@@ -27,6 +27,27 @@ O workflow do GitHub Actions foi endurecido para nao tentar autenticacao interat
 - para automacao nao interativa, o caminho recomendado e token tecnico ou conta tecnica sem MFA
 - para uso manual local, `DADOSFERA_TOTP` continua suportado pelo script
 
+## Status validado no tenant do case
+
+Durante o fechamento do case, a autenticacao real foi testada com credenciais do tenant:
+
+- `POST /auth/sign-in` respondeu `200` quando o MFA foi enviado no campo `code`
+- o body retornado trouxe `permissions`, `mfaStatus` e `customer`
+- a resposta nao trouxe `accessToken`
+- a resposta nao trouxe cookie de sessao reutilizavel
+- apos esse `sign-in`, `GET /catalog`, `GET /permissions` e `GET /platform/pipelines` continuaram retornando `401`
+
+Tambem foi validado com o suporte que:
+
+- `x-api-key` deve ser usado isoladamente para API key
+- essa API key nao concede acesso a informacoes de catalogo e pipelines
+- para autenticacao por usuario, a orientacao recebida foi usar `Authorization` sem `Bearer`
+
+Leitura correta:
+
+- a autenticacao inicial foi parcialmente validada
+- o contrato final para acesso a endpoints protegidos do Maestro segue dependente de orientacao adicional do suporte
+
 ## Como rodar localmente
 
 ```bash
@@ -52,3 +73,5 @@ python src/dadosfera_catalog_sync.py
 ## Observacao operacional
 
 O workflow de sincronizacao pode ser disparado manualmente ou automaticamente quando o manifesto de ativos mudar, desde que a credencial usada seja compativel com automacao nao interativa.
+
+No tenant usado neste case, a operacao automatizada de catalogo segue condicionada ao esclarecimento do suporte sobre o artefato final de sessao ou token aceito pelos endpoints protegidos do Maestro.

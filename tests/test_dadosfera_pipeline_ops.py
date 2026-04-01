@@ -165,7 +165,7 @@ def test_pipeline_client_raises_actionable_message_on_missing_endpoint() -> None
 
     class DummySession:
         def __init__(self) -> None:
-            self.headers = {"Content-Type": "application/json", "Authorization": "Bearer token"}
+            self.headers = {"Content-Type": "application/json", "Authorization": "token"}
 
         def get(self, url: str, timeout: int = 60):  # type: ignore[override]
             return DummyResponse(404)

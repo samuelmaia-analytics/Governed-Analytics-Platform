@@ -178,6 +178,10 @@ def test_extract_access_token_supports_authorization_header() -> None:
     assert extract_access_token({}, {"Authorization": "Bearer abc123"}) == "abc123"
 
 
+def test_extract_access_token_supports_raw_authorization_header() -> None:
+    assert extract_access_token({}, {"Authorization": "abc123"}) == "abc123"
+
+
 def test_extract_access_token_supports_access_token_header() -> None:
     assert extract_access_token({}, {"access-token": "abc123"}) == "abc123"
 
@@ -201,8 +205,7 @@ def test_apply_auth_from_response_sets_bearer_headers() -> None:
     authenticated = apply_auth_from_response(session, {"accessToken": "abc123"}, {})
 
     assert authenticated is True
-    assert session.headers["access-token"] == "abc123"
-    assert session.headers["Authorization"] == "Bearer abc123"
+    assert session.headers["Authorization"] == "abc123"
 
 
 def test_try_refresh_access_token_uses_refresh_endpoint() -> None:
@@ -227,7 +230,7 @@ def test_try_refresh_access_token_uses_refresh_endpoint() -> None:
     refreshed = try_refresh_access_token(session, "https://maestro.dadosfera.ai")
 
     assert refreshed is True
-    assert session.headers["Authorization"] == "Bearer abc123"
+    assert session.headers["Authorization"] == "abc123"
 
 
 def test_sign_in_falls_back_to_legacy_signin_endpoint() -> None:
@@ -270,7 +273,7 @@ def test_sign_in_falls_back_to_legacy_signin_endpoint() -> None:
 
     client.sign_in()
 
-    assert client.session.headers["Authorization"] == "Bearer abc123"
+    assert client.session.headers["Authorization"] == "abc123"
     assert client.session.calls[:2] == [
         "https://maestro.dadosfera.ai/auth/sign-in",
         "https://maestro.dadosfera.ai/auth/signin",
@@ -297,7 +300,7 @@ def test_client_with_access_token_skips_interactive_sign_in() -> None:
 
     client.sign_in()
 
-    assert client.session.headers["Authorization"] == "Bearer abc123"
+    assert client.session.headers["Authorization"] == "abc123"
 
 
 def test_request_with_retry_retries_retryable_status(monkeypatch) -> None:
@@ -349,7 +352,7 @@ def test_catalog_client_raises_actionable_message_on_unauthorized() -> None:
 
     class DummySession:
         def __init__(self) -> None:
-            self.headers = {"Content-Type": "application/json", "Authorization": "Bearer token"}
+            self.headers = {"Content-Type": "application/json", "Authorization": "token"}
 
         def get(self, url: str, params: dict[str, object] | None = None, timeout: int = 60):  # type: ignore[override]
             return DummyResponse()

@@ -81,15 +81,14 @@ class DadosferaPipelineClient:
         if access_token:
             self.session.headers.update(
                 {
-                    "access-token": access_token,
-                    "Authorization": f"Bearer {access_token}",
+                    "Authorization": access_token,
                 }
             )
             self.auth_diagnostics = {
                 "mode": "token_env",
                 "endpoint": "env",
                 "body_keys": [],
-                "header_keys": ["access-token", "authorization"],
+                "header_keys": ["authorization"],
                 "has_cookies": False,
             }
 

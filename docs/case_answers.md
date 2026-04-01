@@ -23,7 +23,8 @@ O projeto não depende de narrativa inflada. Ele sustenta avaliação porque con
 | --- | --- | --- |
 | Repositório local | concluído | pipeline, testes, docs, SQL, dashboard e artefatos |
 | GitHub | concluído | documentação, workflows e automação versionados |
-| Dadosfera/Metabase | concluído para publicação e catálogo | ativo publicado, coleção evidenciada, links reais e sync por API |
+| Dadosfera/Metabase | concluído para publicação e catálogo | ativo publicado, coleção evidenciada, links reais e sync por API implementado |
+| Dadosfera API protegida | parcialmente validada | o tenant aceita `POST /auth/sign-in` com MFA no campo `code`, mas não retorna token nem cookie reutilizável para `catalog` e `pipelines` sem orientação adicional do suporte |
 | Dadosfera nativa como motor de pipeline | parcialmente preparada | há operador via API e template versionado, mas não há execução nativa comprovada no tenant |
 
 Leitura correta:
@@ -31,6 +32,7 @@ Leitura correta:
 - o produto analítico está entregue
 - a publicação externa está comprovada
 - a integração programática de catálogo está implementada
+- a autenticação MFA do Maestro foi parcialmente validada, mas os endpoints protegidos ainda dependem do fluxo oficial indicado pelo suporte
 - o que segue sem comprovação final é pipeline nativo executando dentro da plataforma
 
 ## Problema de Negócio
@@ -95,12 +97,29 @@ O projeto já vai além de um manifesto local. Hoje ele possui:
 
 Essa combinação é importante porque demonstra que a entrega não termina na geração da base. Ela cobre também a etapa em que muitos projetos falham: tornar o ativo encontrável, publicável, monitorável e reutilizável.
 
+## Status Real da API da Dadosfera
+
+Durante o fechamento do case, a integração com a API do Maestro foi testada com credenciais reais do tenant. O cenário validado foi o seguinte:
+
+- `POST /auth/sign-in` respondeu `200` quando o MFA foi enviado no campo `code`
+- o mesmo fluxo não retornou `accessToken`
+- também não retornou cookie de sessão reutilizável
+- após o `sign-in`, os endpoints protegidos `GET /catalog`, `GET /permissions` e `GET /platform/pipelines` continuaram respondendo `401`
+- a orientação do suporte foi usar `x-api-key` apenas para API key e `Authorization` sem `Bearer` para autenticação por usuário
+
+Leitura correta:
+
+- o tenant aceitou a autenticação inicial
+- o contrato completo para operar endpoints protegidos ainda não ficou demonstrado
+- o bloqueio remanescente deixou de ser implementação local e passou a ser esclarecimento oficial do suporte sobre o formato final de sessão ou token para `catalog` e `pipelines`
+
 ## O Que Não Está Sendo Superestimado
 
 Alguns limites permanecem intencionais e precisam ser mantidos claros:
 
 - não há pipeline nativo comprovadamente executando dentro da Dadosfera
 - há preparação operacional para pipeline nativo via API, mas sem evidência de run final no tenant
+- a API do Maestro foi testada com credenciais reais, porém o tenant não retornou artefato de sessão reutilizável após o `sign-in`
 - a plataforma ainda não substitui o motor local de transformação
 - o bônus de GenAI existe como enriquecimento e prova de capacidade, não como eixo central da solução
 
@@ -122,6 +141,7 @@ Em termos de avaliação, isso sinaliza:
 - implementar pipeline nativo na Dadosfera, se houver exigência de aprofundamento
 - expandir o sync de catálogo para mais tipos de ativos
 - transformar a preparação operacional de pipeline via API em execução real com evidência de run e output
+- fechar com o suporte o contrato de autenticação para consumo de `catalog` e `pipelines` via API protegida
 - incluir marts adicionais por cliente, seller e categoria
 - ampliar testes para regressão analítica e componentes de consumo
 - ampliar o monitoramento com alerta externo e SLA operacional
@@ -130,4 +150,4 @@ Em termos de avaliação, isso sinaliza:
 
 O projeto atende ao case porque entrega uma solução de dados ponta a ponta com coerência entre engenharia, governança, consumo e evidência. Ele sai do dado bruto, constrói uma camada analítica defensável, publica uma versão segura para consumo executivo e prova o valor da solução em canais diferentes sem perder consistência.
 
-A síntese correta é simples: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe, a preparação para pipeline nativo via API foi implementada, e o limite estrutural remanescente é a ausência de execução nativa comprovada dentro da plataforma.
+A síntese correta é simples: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe, a preparação para pipeline nativo via API foi implementada, e os limites estruturais remanescentes são a ausência de execução nativa comprovada dentro da plataforma e a falta de um artefato de sessão reutilizável exposto pelo tenant para `catalog` e `pipelines`.

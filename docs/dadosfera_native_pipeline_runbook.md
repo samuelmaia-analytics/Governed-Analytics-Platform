@@ -21,6 +21,8 @@ O ponto de entrada operacional é `src/dadosfera_pipeline_ops.py`.
 
 Em outras palavras: o repositório agora consegue operar a API de pipelines, mas a absorção nativa total ainda depende de modelar e executar um pipeline real no ambiente da Dadosfera.
 
+Durante o fechamento do case, o tenant aceitou `POST /auth/sign-in` com MFA no campo `code`, mas não retornou `accessToken` nem cookie de sessão reutilizável. Na prática, isso significa que o bloqueio atual para `catalog` e `pipelines` deixou de ser payload de pipeline e passou a ser o contrato final de autenticação/autorização a ser confirmado com o suporte.
+
 ## Pre-requisitos reais para dizer que a transformacao foi absorvida pela plataforma
 
 - fonte de dados acessível pela Dadosfera
@@ -162,4 +164,5 @@ Esses defaults refletem o tenant validado em 31/03/2026: a listagem respondeu no
 Depois desta adição, a afirmação correta passa a ser:
 
 - o repositório agora está preparado para tentar criar e executar pipelines nativos via API
+- o tenant já aceitou a autenticação inicial, mas ainda não expôs artefato de sessão reutilizável para endpoints protegidos
 - a absorção nativa total ainda depende de pipeline real, fonte real e evidências de run bem-sucedido

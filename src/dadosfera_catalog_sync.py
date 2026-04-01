@@ -73,15 +73,14 @@ class DadosferaMaestroClient:
         if access_token:
             self.session.headers.update(
                 {
-                    "access-token": access_token,
-                    "Authorization": f"Bearer {access_token}",
+                    "Authorization": access_token,
                 }
             )
             self.auth_diagnostics = {
                 "mode": "token_env",
                 "endpoint": "env",
                 "body_keys": [],
-                "header_keys": ["access-token", "authorization"],
+                "header_keys": ["authorization"],
                 "has_cookies": False,
             }
 
@@ -301,8 +300,7 @@ def apply_auth_from_response(session: requests.Session, response_body: dict[str,
     if access_token:
         session.headers.update(
             {
-                "access-token": access_token,
-                "Authorization": f"Bearer {access_token}",
+                "Authorization": access_token,
             }
         )
         return True
@@ -311,10 +309,8 @@ def apply_auth_from_response(session: requests.Session, response_body: dict[str,
 
 
 def detect_session_auth_mode(session: requests.Session) -> str:
-    if session.headers.get("Authorization") and session.headers.get("access-token"):
-        return "bearer_and_access_token"
     if session.headers.get("Authorization"):
-        return "bearer"
+        return "authorization"
     if session.headers.get("access-token"):
         return "access-token"
     if session.cookies:
@@ -396,8 +392,8 @@ def extract_access_token(response_body: dict[str, Any], response_headers: Any | 
         )
 
         authorization = normalized_headers.get("authorization")
-        if isinstance(authorization, str) and authorization.lower().startswith("bearer "):
-            token_candidates.append(authorization[7:].strip())
+        if isinstance(authorization, str) and authorization.strip():
+            token_candidates.append(authorization[7:].strip() if authorization.lower().startswith("bearer ") else authorization.strip())
 
         set_cookie = normalized_headers.get("set-cookie")
         if isinstance(set_cookie, str):
