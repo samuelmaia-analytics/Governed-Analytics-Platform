@@ -2,13 +2,13 @@
 
 ## Objetivo
 
-Consolidar a defesa do case em uma narrativa curta, executiva e tecnicamente rigorosa. A apresentação deve demonstrar valor de produto analítico, robustez de engenharia, publicação comprovada e clareza sobre o que ainda não foi evidenciado na plataforma.
+Consolidar a defesa do projeto em uma narrativa curta, executiva e tecnicamente rigorosa. A apresentação deve demonstrar valor de produto analítico, robustez de engenharia, publicação comprovada e clareza sobre o que ainda não foi evidenciado na plataforma.
 
 ## Tese de Apresentação
 
 A formulação mais forte para a banca é:
 
-“Esta entrega mostra a construção de um produto analítico operacionalizado, não apenas de um dashboard. O ativo foi modelado, governado, publicado, monitorado e consumido com evidência real, mantendo honestidade sobre o que ainda não roda nativamente na plataforma.”
+“Este projeto mostra a construção de um produto analítico operacionalizado, não apenas de um dashboard. O ativo foi modelado, governado, publicado, monitorado e consumido com evidência real, mantendo honestidade sobre o que ainda não roda nativamente na plataforma.”
 
 ## Estrutura Narrativa Recomendada
 
@@ -63,15 +63,15 @@ Essa distinção precisa ser dita explicitamente. Ela fortalece a credibilidade 
 
 Se perguntarem por que a transformação ainda roda majoritariamente fora da plataforma, a resposta mais forte é:
 
-“Porque o objetivo do case foi provar valor analítico com governança e consumo reais sem alegar automação nativa não evidenciada. A plataforma já está integrada ao fluxo publicado, e o próximo ganho natural é operacionalizar a execução nativa com a mesma disciplina de evidência.”
+“Porque o objetivo do projeto foi provar valor analítico com governança e consumo reais sem alegar automação nativa não evidenciada. A plataforma já está integrada ao fluxo publicado, e o próximo ganho natural é operacionalizar a execução nativa com a mesma disciplina de evidência.”
 
 ## Artefatos Já Prontos
 
 - resumo executivo: `docs/executive_summary.md`
-- deck: `presentation/case_deck.md`
+- deck: `presentation/project_deck.md`
 - roteiro: `presentation/talk_track.md`
 - vídeo: `https://youtu.be/SqJ0UF1Em9k`
-- app: `https://samuelmaia-032026.streamlit.app/`
+- app: `https://olist-governed-analytics-platform.streamlit.app/`
 - coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -88,4 +88,4 @@ Se perguntarem por que a transformação ainda roda majoritariamente fora da pla
 
 ## Frase de Fechamento
 
-“Em termos práticos, a entrega prova capacidade de modelar um ativo analítico confiável, controlar sua exposição, endurecer sua operação e operacionalizar o consumo com evidência suficiente para revisão técnica.”
+“Em termos práticos, o projeto prova capacidade de modelar um ativo analítico confiável, controlar sua exposição, endurecer sua operação e operacionalizar o consumo com evidência suficiente para revisão técnica.”

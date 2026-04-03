@@ -25,6 +25,11 @@ def safe_mean(series: pd.Series) -> float | None:
     return float(value)
 
 
+def non_placeholder_mask(series: pd.Series) -> pd.Series:
+    normalized = series.fillna("").astype(str).str.strip()
+    return ~normalized.isin({"", "NA", "unknown", "Unknown", "nan", "NaN"})
+
+
 def build_metrics(current_df: pd.DataFrame, previous_df: pd.DataFrame) -> list[dict[str, str]]:
     current_orders = to_order_level(current_df)
     previous_orders = to_order_level(previous_df)
@@ -51,22 +56,23 @@ def build_metrics(current_df: pd.DataFrame, previous_df: pd.DataFrame) -> list[d
     avg_freight_prev = safe_mean(previous_df["freight_value"])
 
     return [
-        {"label": "Receita total", "value": format_currency_compact(revenue), "delta": calc_delta(revenue, revenue_prev), "help": "Soma de item e frete no recorte filtrado."},
-        {"label": "Total de pedidos", "value": format_number(total_orders), "delta": calc_delta(total_orders, total_orders_prev), "help": "Quantidade única de pedidos no período."},
-        {"label": "Ticket médio", "value": format_currency(avg_ticket), "delta": calc_delta(avg_ticket, avg_ticket_prev), "help": "Receita total dividida pelo número de pedidos."},
-        {"label": "Total de clientes", "value": format_number(customers), "delta": calc_delta(customers, customers_prev), "help": "Clientes únicos no recorte filtrado."},
-        {"label": "Prazo médio", "value": f"{avg_delivery:.1f} dias" if avg_delivery is not None else "N/A", "delta": calc_delta(avg_delivery, avg_delivery_prev), "help": "Tempo médio entre compra e entrega para pedidos entregues."},
-        {"label": "Taxa de atraso", "value": format_pct(delay_rate) if delay_rate is not None else "N/A", "delta": calc_delta(delay_rate, delay_rate_prev), "help": "Percentual de pedidos entregues após a data estimada."},
-        {"label": "Nota média", "value": f"{avg_review:.2f}" if avg_review is not None else "N/A", "delta": calc_delta(avg_review, avg_review_prev), "help": "Média de review em nível de pedido."},
-        {"label": "Frete médio", "value": format_currency(avg_freight) if avg_freight is not None else "N/A", "delta": calc_delta(avg_freight, avg_freight_prev), "help": "Valor médio de frete por item vendido."},
+        {"label": "Receita total", "value": format_currency_compact(revenue), "delta": calc_delta(revenue, revenue_prev), "delta_color": "normal", "help": "Soma de item e frete no recorte filtrado."},
+        {"label": "Total de pedidos", "value": format_number(total_orders), "delta": calc_delta(total_orders, total_orders_prev), "delta_color": "normal", "help": "Quantidade única de pedidos no período."},
+        {"label": "Ticket médio", "value": format_currency(avg_ticket), "delta": calc_delta(avg_ticket, avg_ticket_prev), "delta_color": "normal", "help": "Receita total dividida pelo número de pedidos."},
+        {"label": "Total de clientes", "value": format_number(customers), "delta": calc_delta(customers, customers_prev), "delta_color": "normal", "help": "Clientes únicos no recorte filtrado."},
+        {"label": "Prazo médio", "value": f"{avg_delivery:.1f} dias" if avg_delivery is not None else "N/A", "delta": calc_delta(avg_delivery, avg_delivery_prev), "delta_color": "inverse", "help": "Tempo médio entre compra e entrega para pedidos entregues."},
+        {"label": "Taxa de atraso", "value": format_pct(delay_rate) if delay_rate is not None else "N/A", "delta": calc_delta(delay_rate, delay_rate_prev), "delta_color": "inverse", "help": "Percentual de pedidos entregues após a data estimada."},
+        {"label": "Nota média", "value": f"{avg_review:.2f}" if avg_review is not None else "N/A", "delta": calc_delta(avg_review, avg_review_prev), "delta_color": "normal", "help": "Média de review em nível de pedido."},
+        {"label": "Frete médio por item", "value": format_currency(avg_freight) if avg_freight is not None else "N/A", "delta": calc_delta(avg_freight, avg_freight_prev), "delta_color": "inverse", "help": "Valor médio de frete por item vendido."},
     ]
 
 
 def build_smart_summary(df: pd.DataFrame) -> dict[str, object]:
     order_level = to_order_level(df)
     delivered = order_level[order_level["order_delivered_customer_date"].notna()].copy()
+    category_source = df.loc[non_placeholder_mask(df["category_label"])].copy()
     category_perf = (
-        df.groupby("category_label", as_index=False)
+        category_source.groupby("category_label", as_index=False)
         .agg(revenue=("total_item_value", "sum"), orders=("order_id", "nunique"), avg_review=("review_score_mean", "mean"))
         .sort_values("revenue", ascending=False)
     )
@@ -85,15 +91,16 @@ def build_smart_summary(df: pd.DataFrame) -> dict[str, object]:
         else:
             trend_text = f"A receita no fim do recorte permanece estável, com variação de {delta:.1f}%."
 
+    state_source = df.loc[non_placeholder_mask(df["selected_state"])].copy()
     state_perf = (
-        df.groupby("selected_state", as_index=False)
+        state_source.groupby("selected_state", as_index=False)
         .agg(revenue=("total_item_value", "sum"), avg_review=("review_score_mean", "mean"))
         .sort_values("revenue", ascending=False)
     )
     top_state = state_perf.iloc[0] if not state_perf.empty else None
 
     logistics = (
-        delivered.groupby("category_label", as_index=False)
+        delivered.loc[non_placeholder_mask(delivered["category_label"])].groupby("category_label", as_index=False)
         .agg(delayed_pct=("is_delayed", "mean"), avg_delivery_time=("delivery_time_days", "mean"), orders=("order_id", "nunique"))
         .query("orders >= 30")
         .sort_values(["delayed_pct", "avg_delivery_time"], ascending=[False, False])
@@ -113,7 +120,7 @@ def build_smart_summary(df: pd.DataFrame) -> dict[str, object]:
         recommendations.append(
             f"Abrir diagnóstico logístico em {top_logistics['category_label']}, que concentra o maior alerta de atraso."
         )
-    avg_review = float(order_level["review_score_mean"].mean()) if len(order_level) else 0
+    avg_review = safe_mean(order_level["review_score_mean"]) or 0
     if avg_review and avg_review < 4.0:
         recommendations.append(
             "Cruzar reviews, atraso e status de pedido para identificar a principal causa de deterioração da satisfação."
@@ -193,7 +200,7 @@ def build_executive_insights(df: pd.DataFrame) -> list[dict[str, str]]:
     delivered = order_level[order_level["order_delivered_customer_date"].notna()].copy()
 
     category_summary = (
-        df.groupby("category_label", as_index=False)
+        df.loc[non_placeholder_mask(df["category_label"])].groupby("category_label", as_index=False)
         .agg(revenue=("total_item_value", "sum"), orders=("order_id", "nunique"), avg_review=("review_score_mean", "mean"))
         .sort_values("revenue", ascending=False)
     )
@@ -201,14 +208,19 @@ def build_executive_insights(df: pd.DataFrame) -> list[dict[str, str]]:
     risky_category = risky_category_df.iloc[0] if not risky_category_df.empty else None
 
     state_summary = (
-        delivered.groupby("selected_state", as_index=False)
+        delivered.loc[non_placeholder_mask(delivered["selected_state"])].groupby("selected_state", as_index=False)
         .agg(revenue=("total_item_value", "sum"), avg_delivery=("delivery_time_days", "mean"), avg_review=("review_score_mean", "mean"))
         .sort_values("revenue", ascending=False)
     )
     slow_state_df = state_summary.query("revenue > 0").sort_values(["avg_delivery", "revenue"], ascending=[False, False])
     slow_state = slow_state_df.iloc[0] if not slow_state_df.empty else None
 
-    pay_summary = df.groupby("payment_type_mode", as_index=False).agg(revenue=("total_item_value", "sum")).sort_values("revenue", ascending=False)
+    pay_summary = (
+        df.loc[non_placeholder_mask(df["payment_type_mode"])]
+        .groupby("payment_type_mode", as_index=False)
+        .agg(revenue=("total_item_value", "sum"))
+        .sort_values("revenue", ascending=False)
+    )
     top_payment = pay_summary.iloc[0] if not pay_summary.empty else None
 
     monthly = df.groupby("month_start", as_index=False).agg(revenue=("total_item_value", "sum")).sort_values("month_start")

@@ -31,8 +31,8 @@ from src.ingest import configure_logging
 from src.utils import ensure_directory
 
 LOGGER = logging.getLogger(__name__)
-PROJECT_NAME = "samuelmaia_DDF_032026"
-COLLECTION_ID = "olist_analytics_case_collection"
+PROJECT_NAME = "olist_governed_analytics_platform"
+COLLECTION_ID = "olist_analytics_platform_collection"
 COLLECTION_PATH = CATALOG_DIR / "dadosfera_collection.json"
 ASSET_INVENTORY_PATH = CATALOG_DIR / "collection_assets_inventory.csv"
 REPORT_PATH = DOCS_DIR / "collection_catalog.md"
@@ -156,7 +156,7 @@ def collect_assets() -> list[CatalogAsset]:
             ANALYTICS_DIR / "fact_orders_enriched.parquet",
             "curated_analytics",
             "analytics_fact",
-            "Tabela analítica principal interna do case, pronta para SQL, qualidade e processamento analítico.",
+            "Tabela analítica principal interna do projeto, pronta para SQL, qualidade e processamento analítico.",
             "1 linha por item de pedido",
             "order_id + order_item_id + product_id + seller_id",
             "olist_orders, olist_order_items, olist_products, olist_customers, olist_sellers, olist_order_payments, olist_order_reviews, product_category_name_translation",
@@ -247,6 +247,26 @@ def collect_assets() -> list[CatalogAsset]:
             True,
         ),
         (
+            PUBLISHED_SEMANTIC_DIR / "category_slice.parquet",
+            "published_semantic",
+            "published_semantic_mart",
+            "Mart agregado para leitura de categoria, receita, atraso e pagamento por mês.",
+            "1 linha por categoria, mês e meio de pagamento",
+            "order_year + order_month + product_category_name_english + payment_type_mode",
+            "fact_orders_dashboard",
+            True,
+        ),
+        (
+            PUBLISHED_SEMANTIC_DIR / "state_performance_slice.parquet",
+            "published_semantic",
+            "published_semantic_mart",
+            "Mart agregado para leitura executiva de receita, atraso e satisfação por UF e mês.",
+            "1 linha por UF e mês",
+            "order_year + order_month + customer_state",
+            "fact_orders_dashboard",
+            True,
+        ),
+        (
             PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv",
             "published_monitoring",
             "monitoring_result",
@@ -263,7 +283,7 @@ def collect_assets() -> list[CatalogAsset]:
             "Resumo operacional do runner por etapa executada.",
             "1 documento por execução",
             "não aplicável",
-            "run_case_pipeline",
+            "run_platform_pipeline",
             True,
         ),
     ]
@@ -288,7 +308,7 @@ def collect_assets() -> list[CatalogAsset]:
                 path=path,
                 zone="curated_query_results",
                 asset_type="query_result",
-                description="Resultado materializado de query SQL do case para documentação e leitura executiva.",
+                description="Resultado materializado de query SQL do projeto para documentação e leitura executiva.",
                 grain="depende da query",
                 primary_key="não aplicável",
                 source_assets="fact_orders_enriched",
@@ -314,7 +334,7 @@ def collect_assets() -> list[CatalogAsset]:
         DOCS_DIR / "data_dictionary.md",
         DOCS_DIR / "data_classification.md",
         DOCS_DIR / "architecture.md",
-        DOCS_DIR / "case_answers.md",
+        DOCS_DIR / "technical_narrative.md",
         DOCS_DIR / "about_dadosfera.md",
         DOCS_DIR / "genai_bonus.md",
         DOCS_DIR / "privacy_governance.md",
@@ -332,7 +352,7 @@ def collect_assets() -> list[CatalogAsset]:
                     path=path,
                     zone="documentation",
                     asset_type="documentation_asset",
-                    description="Documento de apoio para catálogo, arquitetura, case e bônus.",
+                    description="Documento de apoio para catálogo, arquitetura e operação complementar.",
                     grain="não aplicável",
                     primary_key="não aplicável",
                     source_assets="documentacao_do_projeto",
@@ -376,7 +396,7 @@ def collect_assets() -> list[CatalogAsset]:
                 path=path,
                 zone="analytics_sql",
                 asset_type="sql_query",
-                description="Consulta analítica versionada para responder perguntas do case.",
+                description="Consulta analítica versionada para responder perguntas do projeto.",
                 grain="depende da query",
                 primary_key="não aplicável",
                 source_assets="fact_orders_enriched",
@@ -390,7 +410,7 @@ def collect_assets() -> list[CatalogAsset]:
                 path=path,
                 zone="documentation_media",
                 asset_type="query_screenshot",
-                description="Print tabular das queries do case para uso em markdown e revisão.",
+                description="Print tabular das queries do projeto para uso em markdown e revisão.",
                 grain="não aplicável",
                 primary_key="não aplicável",
                 source_assets="curated_query_results",
@@ -406,10 +426,10 @@ def build_collection_payload(assets: list[CatalogAsset]) -> dict[str, object]:
     publishable_assets = [asset for asset in assets if asset.publication_ready]
     return {
         "collection_id": COLLECTION_ID,
-        "collection_name": "Olist Analytics Case Collection",
+        "collection_name": "Olist Analytics Platform Collection",
         "project_name": PROJECT_NAME,
         "description": (
-            "Coleção de ativos do case técnico com dados do Olist, "
+            "Coleção de ativos analíticos com dados do Olist, "
             "organizada em zonas de Data Lake e pronta para catalogação/publicação."
         ),
         "owner": "samuelmaia-analytics",
@@ -460,13 +480,13 @@ def render_report(assets: list[CatalogAsset]) -> str:
     lines = [
         "# Coleção e Catálogo de Ativos",
         "",
-        "Este documento materializa a coleção do case em formato versionável, pronta para publicação e catalogação.",
+        "Este documento materializa a coleção do projeto em formato versionável, pronta para publicação e catalogação.",
         "",
         "## Objetivo",
         "",
         "- consolidar os ativos do projeto em um inventário único e rastreável",
         "- explicitar quais ativos estão prontos para publicação/consumo",
-        "- demonstrar uma representação concreta da coleção exigida pelo case",
+        "- demonstrar uma representação concreta da coleção publicada do projeto",
         "",
         "## Artefatos Gerados",
         "",
@@ -497,11 +517,11 @@ def render_report(assets: list[CatalogAsset]) -> str:
     lines.extend(
         [
             "",
-            "## Uso no Case",
+            "## Uso no Projeto",
             "",
             "- `fact_orders_enriched` é o ativo analítico interno principal da coleção.",
             "- `fact_orders_dashboard` é a camada publicada e minimizada usada pelo Streamlit.",
-            "- os resultados de qualidade, queries SQL e documentação derivada compõem a camada de evidência técnica do case.",
+            "- os resultados de qualidade, queries SQL e documentação derivada compõem a camada de evidência técnica do projeto.",
             "- o manifesto JSON pode ser usado como payload base para publicação ou integração futura com uma API de catálogo.",
             "",
             "## Observação",

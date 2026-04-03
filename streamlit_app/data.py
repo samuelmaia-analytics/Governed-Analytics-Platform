@@ -21,6 +21,7 @@ LOGISTICS_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "logistics_slice.parquet"
 SELLER_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "seller_slice.parquet"
 COHORT_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "cohort_slice.parquet"
 MONITORING_SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
+PLACEHOLDER_DIMENSION_VALUES = {"unknown", "Unknown", "NA", "nan", "NaN", ""}
 
 
 @dataclass(frozen=True)
@@ -60,6 +61,11 @@ def load_data() -> pd.DataFrame:
     for column in datetime_columns:
         if column in df.columns:
             df[column] = pd.to_datetime(df[column], errors="coerce")
+
+    fallback_order_date = pd.to_datetime(df["order_date"], errors="coerce") if "order_date" in df.columns else pd.Series(pd.NaT, index=df.index)
+    df["order_purchase_timestamp"] = pd.to_datetime(df["order_purchase_timestamp"], errors="coerce").fillna(fallback_order_date)
+    if df["order_purchase_timestamp"].notna().sum() == 0:
+        raise ValueError("A base publicada não possui datas válidas em `order_purchase_timestamp`.")
 
     df["order_date"] = pd.to_datetime(df.get("order_date", df["order_purchase_timestamp"]), errors="coerce")
     for column in ["review_score_mean", "delivery_time_days", "estimated_delay_days", "total_item_value", "price", "freight_value"]:
@@ -148,6 +154,15 @@ def resolve_single_or_all(mode_value: str, selected_value: str, full_options: li
     return [selected_value]
 
 
+def clean_dimension_options(values: pd.Series) -> list[str]:
+    cleaned_values = []
+    for value in values.dropna().astype(str):
+        if value.strip() in PLACEHOLDER_DIMENSION_VALUES:
+            continue
+        cleaned_values.append(value)
+    return sorted(set(cleaned_values))
+
+
 def build_select_filter(
     *,
     label: str,
@@ -157,6 +172,11 @@ def build_select_filter(
     focus_label: str,
     options: list[str],
 ) -> list[str]:
+    if not options:
+        st.sidebar.caption(f"Sem opções disponíveis para {label.lower()} no recorte atual.")
+        st.session_state[value_key] = all_label
+        return []
+
     mode = st.sidebar.selectbox(
         label,
         options=[all_label, focus_label],
@@ -179,10 +199,12 @@ def build_select_filter(
 def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
     build_default_filter_state(df)
 
-    category_options = sorted(df["category_label"].dropna().unique())
-    state_options = sorted(set(df["customer_state"].dropna().unique()).union(set(df["seller_state"].dropna().unique())))
-    status_options = sorted(df["order_status"].dropna().unique())
-    payment_options = sorted(df["payment_type_mode"].dropna().unique())
+    category_options = clean_dimension_options(df["category_label"])
+    customer_state_options = clean_dimension_options(df["customer_state"])
+    seller_state_options = clean_dimension_options(df["seller_state"])
+    state_options = sorted(set(customer_state_options).union(set(seller_state_options)))
+    status_options = clean_dimension_options(df["order_status"])
+    payment_options = clean_dimension_options(df["payment_type_mode"])
 
     st.sidebar.markdown("### Filtros Globais")
     st.sidebar.markdown(

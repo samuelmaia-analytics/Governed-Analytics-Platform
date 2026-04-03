@@ -3,8 +3,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -74,5 +74,6 @@ Relatório de validação da tabela `fact_orders_enriched`.
 - Cobertura mínima dos principais atributos enriquecidos da camada dimensional.
 - Reconciliação financeira entre valor do pedido na grain analítica e total pago por pedido.
 - Volume total acima de 100.000 registros.
+
 
 

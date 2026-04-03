@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-import src.run_case_pipeline as pipeline
+import src.run_platform_pipeline as pipeline
 
 
 def test_run_selected_steps_executes_requested_functions_in_order(monkeypatch) -> None:

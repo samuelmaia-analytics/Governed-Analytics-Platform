@@ -156,8 +156,7 @@ def test_main_runs_full_view_flow(monkeypatch) -> None:
     monkeypatch.setattr(app_module, "render_health_section", lambda _status: calls.append("health"))
     monkeypatch.setattr(app_module, "render_semantic_section", lambda _assets: calls.append("semantic"))
     monkeypatch.setattr(app_module, "render_executive_insights", lambda _df: calls.append("insights"))
-    monkeypatch.setattr(app_module, "render_support_tables", lambda _df: calls.append("tables"))
 
     app_module.main()
 
-    assert calls == ["theme", "header", "context", "smart", "kpi", "tempo", "categoria", "geo", "ops", "health", "semantic", "insights", "tables"]
+    assert calls == ["theme", "header", "context", "smart", "kpi", "tempo", "categoria", "geo", "insights"]

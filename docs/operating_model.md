@@ -2,9 +2,32 @@
 
 Este documento consolida o modelo operacional do projeto em uma única visão: pipeline, qualidade, governança, publicação e consumo.
 
+## Tese Operacional
+
+O projeto opera com uma separação deliberada entre construir o ativo analítico, publicar a camada de exposição e promover o app por ambiente. Isso reduz ambiguidade operacional e torna mais claro o que é dado interno, o que é ativo publicado e o que está efetivamente em produção.
+
 ## Princípio operacional
 
 O projeto opera com separação explícita entre branch de desenvolvimento e branch de deploy, entre camada interna e camada publicada, e entre automação comprovada e backlog futuro. Isso evita ambiguidade sobre o que está em produção, o que está em promoção e o que ainda é evolução planejada.
+
+## Mapa Operacional
+
+```mermaid
+flowchart TD
+    A[Build Analytics] --> B[Quality and Contracts]
+    B --> C[Publish Dashboard Layer]
+    C --> D[Semantic Layer]
+    C --> E[Published Monitoring]
+    C --> F[Streamlit and BI Consumption]
+    B --> G[Catalog and Documentation]
+    H[Branch Promotion] --> I[Deploy Branch]
+    I --> F
+```
+
+- `build` e `publish` definem a fronteira entre engenharia e exposição
+- `quality`, `contracts` e `catalog` sustentam confiança e auditabilidade
+- promoção de branch e deploy são fluxos separados da geração dos dados
+- o app publicado só deve consumir a camada já minimizada
 
 ## Fluxo operacional
 
@@ -15,6 +38,17 @@ O projeto opera com separação explícita entre branch de desenvolvimento e bra
 5. Publicação da camada `fact_orders_dashboard`
 6. Expansão semântica e monitoramento recorrente da camada publicada
 7. Consumo por Streamlit, SQL, Power BI e evidências
+
+## Leitura do Fluxo
+
+| Etapa | Objetivo operacional | Saída principal |
+| --- | --- | --- |
+| ingestão e padronização | garantir base reprodutível | tabelas raw e standardized |
+| build analítico | consolidar o ativo central | `fact_orders_enriched` |
+| qualidade e contratos | validar integridade e schema | relatórios e resultados de checks |
+| publicação | delimitar a camada exposta | `fact_orders_dashboard` |
+| semântica e monitoramento | ampliar reuso e observabilidade | marts e checks da camada publicada |
+| consumo | materializar valor analítico | Streamlit, Power BI e SQL |
 
 ## Fluxo de branches e deploy
 
@@ -31,6 +65,14 @@ Leitura correta:
 - o deploy efetivo depende da promoção bem-sucedida para `streamlit-dev`, `streamlit-stage` ou `streamlit-prod`
 - a validação final inclui comportamento do app publicado no ambiente alvo, não apenas CI verde
 
+## Separação Entre Operação de Dados e Operação de App
+
+| Domínio | O que controla | Artefatos centrais |
+| --- | --- | --- |
+| operação de dados | build, publish, qualidade, monitoramento | `src/run_platform_pipeline.py`, `src/publish_dashboard.py`, `src/published_monitoring.py` |
+| operação de app | promoção e deploy por ambiente | workflows de deploy e branches `streamlit-*` |
+| governança operacional | policy checks, contratos e runbooks | `contracts/governance/`, `docs/release_runbook.md`, `docs/rollback_runbook.md` |
+
 ## Guardrails de release
 
 - `CI` e `Lint` executam em `develop`, `release` e `main`
@@ -43,10 +85,11 @@ Leitura correta:
 
 ## Papéis operacionais por artefato
 
-- `src/run_case_pipeline.py`: geração ponta a ponta dos ativos analíticos
+- `src/run_platform_pipeline.py`: geração ponta a ponta dos ativos analíticos
 - `src/publish_dashboard.py`: construção da camada publicada minimizada
 - `src/semantic_layer.py`: marts publicados para logística, seller e cohort
 - `src/published_monitoring.py`: freshness e qualidade recorrente da camada publicada
+- `src/platform_publication.py`: orquestra sync de catálogo e publicação idempotente de pipeline em ambiente de plataforma
 - `.github/workflows/operate-published-layer.yml`: job agendado com artefatos operacionais e falha observável
 - `.github/workflows/deploy-streamlit.yml`: promoção controlada de `develop`, `release` ou `main` para o branch de deploy do ambiente correspondente
 - `.github/workflows/policy-check.yml`: valida aderência entre workflows e contrato de governança
@@ -63,7 +106,15 @@ Leitura correta:
 - catálogo local versionado em `src/catalog.py`
 - publicação minimizada em `src/publish_dashboard.py`
 - CI, lint e deploy versionados em `.github/workflows/`
-- autenticação não interativa na API da Dadosfera por `DADOSFERA_ACCESS_TOKEN` ou `DADOSFERA_API_TOKEN`
+- integrações externas permanecem opcionais e desacopladas do fluxo principal
+- alertas externos podem ser disparados via webhook quando o monitoramento detecta falhas
+
+## Critérios de Maturidade Operacional
+
+- a camada publicada precisa continuar coerente com contratos e checks
+- o fluxo de promoção deve refletir claramente o ambiente alvo
+- documentação operacional deve permanecer compatível com os workflows reais
+- incidentes precisam ser recuperáveis sem reescrita de histórico
 
 ## Responsabilidade por camada
 
@@ -75,10 +126,9 @@ Leitura correta:
 
 ## Responsabilidade por ambiente
 
-- ambiente local: geração, inspeção, testes e reprodutibilidade do case
+- ambiente local: geração, inspeção, testes e reprodutibilidade do projeto
 - GitHub Actions: validação contínua, policy checks e promoção da branch de deploy por ambiente
 - Streamlit Cloud: consumo executivo publicado
-- Dadosfera/Metabase: catálogo, ativo publicado e evidências externas
 
 ## Critério de operação saudável
 
@@ -94,6 +144,6 @@ Uma operação saudável deste projeto exige, ao mesmo tempo:
 
 ## Decisões de escopo
 
-- o core do case está nas camadas de analytics engineering e dashboard
-- artefatos bônus não mudam a operação principal do case
+- o núcleo do projeto está nas camadas de analytics engineering e dashboard
+- artefatos complementares não mudam a operação principal
 - integrações externas dependem de credencial e ambiente, então a automação local é a prova principal

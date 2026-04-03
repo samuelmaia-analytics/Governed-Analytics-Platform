@@ -37,8 +37,8 @@ from streamlit_app.formatting import (
 from streamlit_app.theme import COLORS
 
 
-def metric_card(label: str, value: str, delta: str, help_text: str) -> None:
-    st.metric(label=label, value=value, delta=delta, help=help_text)
+def metric_card(label: str, value: str, delta: str, help_text: str, delta_color: str = "normal") -> None:
+    st.metric(label=label, value=value, delta=delta, help=help_text, delta_color=delta_color)
 
 
 def render_header(filters: FilterState, total_rows: int, filtered_rows: int) -> None:
@@ -67,8 +67,8 @@ def render_header(filters: FilterState, total_rows: int, filtered_rows: int) -> 
                     Recorte ativo de {period_text}, com {format_number(filtered_rows)} registros filtrados refletidos em indicadores, visuais e insights.
                 </div>
                 <div class="hero-stat">
-                    <strong>Base do dashboard</strong>
-                    Camada publicada derivada de <code>fact_orders_enriched</code>, com {format_number(total_rows)} registros disponíveis para consumo executivo.
+                    <strong>Base executiva</strong>
+                    Base derivada de <code>fact_orders_enriched</code>, com {format_number(total_rows)} registros disponíveis para análise.
                 </div>
             </div>
         </div>
@@ -105,10 +105,10 @@ def render_kpi_row(metrics: list[dict[str, str]]) -> None:
     row2 = st.columns(4, gap="medium")
     for idx, metric in enumerate(metrics[:4]):
         with row1[idx]:
-            metric_card(metric["label"], metric["value"], metric["delta"], metric["help"])
+            metric_card(metric["label"], metric["value"], metric["delta"], metric["help"], metric.get("delta_color", "normal"))
     for idx, metric in enumerate(metrics[4:8]):
         with row2[idx]:
-            metric_card(metric["label"], metric["value"], metric["delta"], metric["help"])
+            metric_card(metric["label"], metric["value"], metric["delta"], metric["help"], metric.get("delta_color", "normal"))
     st.markdown("</div>", unsafe_allow_html=True)
 
 
@@ -138,11 +138,11 @@ def render_smart_summary(df: pd.DataFrame) -> None:
     st.markdown(
         f"""
         <div class="copilot-shell">
-            <div class="section-eyebrow">Insights Inteligentes</div>
-            <h2 class="section-title" style="margin-top:0.15rem;">Copiloto analítico do recorte filtrado</h2>
+            <div class="section-eyebrow">Síntese do Recorte</div>
+            <h2 class="section-title" style="margin-top:0.15rem;">Leitura automática dos principais sinais</h2>
             <p class="section-copy" style="margin-bottom:0.2rem;">{insights["summary"]}</p>
             <div class="copilot-grid">{chip_html}</div>
-            <div class="divider-label">Recomendações automáticas</div>
+            <div class="divider-label">Prioridades sugeridas</div>
             <ul style="margin:0.3rem 0 0.1rem 1.1rem; color:{COLORS["muted"]}; line-height:1.65;">
                 {rec_html}
             </ul>
@@ -286,11 +286,11 @@ def render_operations_section(df: pd.DataFrame) -> None:
 def render_health_section(monitoring_status: dict[str, object] | None) -> None:
     render_section_header(
         "Saúde da Camada Publicada",
-        "Freshness e qualidade operacional da camada oficial",
-        "Este bloco expõe o estado mais recente do monitoramento recorrente da camada published usada pelo dashboard.",
+        "Atualização e qualidade da base oficial",
+        "Este bloco resume o estado mais recente do monitoramento recorrente da base usada pelo dashboard.",
     )
     if not monitoring_status:
-        st.info("Monitoramento recorrente ainda não foi publicado neste ambiente. O dashboard segue operacional na camada published principal.")
+        st.info("O monitoramento recorrente ainda não está disponível neste ambiente. O dashboard segue operacional com a base principal.")
         close_section()
         return
 
@@ -311,18 +311,18 @@ def render_health_section(monitoring_status: dict[str, object] | None) -> None:
     if not results.empty:
         preview = results[["check_name", "status", "severity", "metric_value"]].copy()
         st.dataframe(preview, width="stretch", height=260)
-        st.caption("Resumo dos checks mais recentes da camada publicada.")
+        st.caption("Resumo das verificações mais recentes da base oficial.")
     close_section()
 
 
 def render_semantic_section(semantic_assets: dict[str, pd.DataFrame]) -> None:
     render_section_header(
         "Camada Semântica",
-        "Recortes publicados para seller, logística e cohort",
-        "Os marts semânticos materializados fora da tabela principal ampliam a leitura executiva sem reexpor a camada interna.",
+        "Recortes para seller, logística e cohort",
+        "Esses recortes ampliam a leitura executiva sem depender da tabela principal em todas as análises.",
     )
     if not semantic_assets:
-        st.info("Os recortes semânticos ainda não foram publicados neste ambiente. A navegação principal do dashboard continua disponível.")
+        st.info("Os recortes semânticos ainda não estão disponíveis neste ambiente. A navegação principal do dashboard continua disponível.")
         close_section()
         return
 
@@ -338,7 +338,7 @@ def render_semantic_section(semantic_assets: dict[str, pd.DataFrame]) -> None:
     with col1:
         render_regional_kpi("Slices logísticos", format_number(float(len(logistics_df))), "Recortes agregados por mês e UF origem/destino.")
     with col2:
-        render_regional_kpi("Sellers publicados", format_number(float(len(seller_df))), "Base comparável por seller pseudonimizado.")
+        render_regional_kpi("Sellers analisáveis", format_number(float(len(seller_df))), "Base comparável por seller pseudonimizado.")
     with col3:
         render_regional_kpi("Linhas de cohort", format_number(float(len(cohort_df))), "Evolução de cohorts por janela de maturação.")
 

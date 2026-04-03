@@ -3,14 +3,14 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 - Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
 
-Este documento organiza o item de GenAI do case, separando o que já existe no projeto do que ainda precisa ser implementado para aderir totalmente ao edital.
+Este documento organiza o item de GenAI do projeto, separando o que já existe no repositório do que ainda precisa ser implementado para aderir totalmente ao escopo.
 
 ## Objetivo do Item
 
@@ -26,7 +26,7 @@ Hoje o projeto já possui:
 
 - camada analítica estruturada do Olist
 - dashboard com insights executivos
-- documentação do bônus de GenAI em:
+- documentação da extensão de GenAI em:
   - `docs/genai_bonus.md`
 - script de extração de features:
   - `src/genai_feature_extraction.py`
@@ -82,7 +82,7 @@ Uma tabela ou arquivo com colunas como:
 - markdown com prompts usados
 - exemplos de entrada e saída
 
-## Campos preenchidos para a entrega atual
+## Campos preenchidos para a versão atual
 
 ### Dataset desestruturado escolhido
 
@@ -146,6 +146,7 @@ O maior risco é vender heurística como se fosse LLM real. A documentação fin
 - implementação mínima do item: pronta
 - chamada real à LLM: validada localmente com `gpt-4.1-mini`
 - saída final atual: `data/curated/genai/product_text_features.csv` com `extraction_mode=openai_api`
+
 
 
 

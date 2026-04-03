@@ -71,3 +71,60 @@ def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(tmp_path
     assert by_check["published_critical_nulls__order_purchase_timestamp"].status == "FAIL"
     assert by_check["published_critical_nulls__order_purchase_timestamp"].metric_value == "missing_column"
     assert by_check["published_semantic_coverage_schema"].status == "FAIL"
+
+
+def test_build_alert_payload_contains_failed_checks_only() -> None:
+    payload = monitoring.build_alert_payload(
+        [
+            monitoring.MonitoringCheckResult("check_pass", "PASS", 1, 0, "low", "ok"),
+            monitoring.MonitoringCheckResult("check_fail", "FAIL", 2, 0, "high", "broken"),
+        ],
+        environment="stage",
+    )
+
+    assert payload["status"] == "FAIL"
+    assert payload["failed_checks"] == 1
+    assert payload["environment"] == "stage"
+    assert payload["results"] == [
+        {
+            "check_name": "check_fail",
+            "status": "FAIL",
+            "metric_value": 2,
+            "threshold": 0,
+            "severity": "high",
+            "details": "broken",
+        }
+    ]
+
+
+def test_send_external_alert_posts_json_payload(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class DummyResponse:
+        status_code = 202
+
+        @staticmethod
+        def raise_for_status() -> None:
+            return None
+
+    def fake_post(url: str, json: dict[str, object], headers: dict[str, str], timeout: int) -> DummyResponse:
+        captured["url"] = url
+        captured["json"] = json
+        captured["headers"] = headers
+        captured["timeout"] = timeout
+        return DummyResponse()
+
+    monkeypatch.setattr(monitoring.requests, "post", fake_post)
+
+    result = monitoring.send_external_alert(
+        [monitoring.MonitoringCheckResult("check_fail", "FAIL", 2, 0, "high", "broken")],
+        webhook_url="https://alerts.example.com/hook",
+        token="secret",
+        environment="prod",
+    )
+
+    assert result.delivered is True
+    assert result.status_code == 202
+    assert captured["url"] == "https://alerts.example.com/hook"
+    assert captured["headers"] == {"Content-Type": "application/json", "Authorization": "secret"}
+    assert captured["timeout"] == 15

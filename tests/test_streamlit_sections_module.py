@@ -111,7 +111,7 @@ def test_render_kpi_row_and_context_components(monkeypatch) -> None:
 
     assert len(fake_st.metrics) == 8
     assert any("Contexto do Recorte" in markdown for markdown in fake_st.markdowns)
-    assert any("Copiloto analítico" in markdown for markdown in fake_st.markdowns)
+    assert any("Leitura automática dos principais sinais" in markdown for markdown in fake_st.markdowns)
 
 
 def test_render_chart_and_visual_sections(monkeypatch) -> None:
@@ -237,6 +237,6 @@ def test_render_health_and_semantic_sections_handle_missing_assets(monkeypatch) 
     sections.render_semantic_section({})
 
     assert fake_st.infos == [
-        "Monitoramento recorrente ainda não foi publicado neste ambiente. O dashboard segue operacional na camada published principal.",
-        "Os recortes semânticos ainda não foram publicados neste ambiente. A navegação principal do dashboard continua disponível.",
+        "O monitoramento recorrente ainda não está disponível neste ambiente. O dashboard segue operacional com a base principal.",
+        "Os recortes semânticos ainda não estão disponíveis neste ambiente. A navegação principal do dashboard continua disponível.",
     ]

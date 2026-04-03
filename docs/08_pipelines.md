@@ -3,14 +3,14 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 - Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
 
-Este documento organiza a parte de pipelines do case, separando o que já foi implementado localmente, o que já foi automatizado no GitHub e o que ainda precisa ser materializado nativamente na Dadosfera.
+Este documento organiza a parte de pipelines do projeto, separando o que já foi implementado localmente, o que já foi automatizado no GitHub e o que ainda precisa ser materializado nativamente na plataforma.
 
 ## Objetivo
 
@@ -20,7 +20,7 @@ Demonstrar a capacidade de transformar, validar e publicar dados de forma reprod
 
 O projeto já possui um pipeline ponta a ponta em Python, orquestrado por:
 
-- `src/run_case_pipeline.py`
+- `src/run_platform_pipeline.py`
 
 Etapas disponiveis:
 
@@ -70,11 +70,11 @@ O projeto já não depende apenas de execução manual. Há uma separação clar
 - automação de engenharia no GitHub, que valida e promove artefatos
 - automação de catálogo, que sincroniza ativos públicos
 
-Isso eleva o padrão da entrega porque aproxima o case de um fluxo real de operação, sem alegar que toda a transformação já roda nativamente dentro da plataforma.
+Isso eleva o padrão da solução porque aproxima o projeto de um fluxo real de operação, sem alegar que toda a transformação já roda nativamente dentro da plataforma.
 
-## Leitura correta do item do case
+## Leitura correta do item
 
-O case pede um pipeline na Dadosfera, mas a leitura tecnicamente rigorosa deste repositório é a seguinte:
+O escopo pedia um pipeline na plataforma, mas a leitura tecnicamente rigorosa deste repositório é a seguinte:
 
 - o pipeline analítico principal foi implementado e validado em `Python`
 - o ativo final `fact_orders_dashboard` foi efetivamente publicado na Dadosfera
@@ -86,7 +86,7 @@ Essa distinção é intencional. O projeto evita marcar o item como concluído d
 ## Comando principal local
 
 ```powershell
-.\.venv\Scripts\python.exe src\run_case_pipeline.py
+.\.venv\Scripts\python.exe src\run_platform_pipeline.py
 ```
 
 ## O que ainda permanece fora do escopo
@@ -134,7 +134,7 @@ Salvar em `images/dadosfera/`:
 
 ## Critério de aceite para evoluir este item
 
-Este tópico só deve ser promovido de backlog para entrega implementada quando houver, no mínimo:
+Este tópico só deve ser promovido de backlog para implementação concluída quando houver, no mínimo:
 
 - nome real do pipeline na plataforma
 - link navegável do pipeline
@@ -170,5 +170,6 @@ Se houver aprofundamento futuro na plataforma, os campos que precisam ser preenc
 - preparação operacional para pipeline nativo via API: feita
 - pipeline real na Dadosfera: pendente
 - catalogação do pipeline na plataforma: pendente
+
 
 

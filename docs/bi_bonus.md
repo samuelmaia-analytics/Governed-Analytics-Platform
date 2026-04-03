@@ -3,8 +3,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -12,7 +12,7 @@
 
 ## Objetivo
 
-Este bônus foi preparado para ampliar a entrega do case com uma camada de consumo externa ao Streamlit, pronta para uso no Power BI.
+Este material complementar foi preparado para ampliar a entrega do projeto com uma camada de consumo externa ao Streamlit, pronta para uso no Power BI.
 
 A proposta é disponibilizar um modelo simples de fato e dimensões auxiliares, facilitando a montagem de um dashboard mais corporativo, com exploração ad hoc, relacionamento visual entre tabelas e distribuição futura em ambiente de BI.
 
@@ -213,6 +213,7 @@ Este bônus aumenta o valor do projeto por quatro motivos principais:
 - reforça a maturidade do projeto ao separar camada factual e dimensões auxiliares
 
 Na prática, isso mostra que a solução não termina no código ou no dashboard customizado: ela também pode ser consumida em um fluxo analítico mais corporativo, com potencial de uso em ambiente executivo.
+
 
 
 

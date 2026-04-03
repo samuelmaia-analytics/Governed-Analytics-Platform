@@ -1,20 +1,17 @@
-# Dashboard Power BI | SAMUEL_MAIA_DDF_TECH_032026
+# Dashboard Power BI | Olist Governed Analytics Platform
 
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- App Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Dashboard Power BI: `https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare`
 
 ## Objetivo do dashboard
 
 Apresentar uma visão executiva e analítica do desempenho do e-commerce Olist, combinando indicadores de receita, volume, experiência do cliente, eficiência operacional e recortes por tempo, categoria, status e geografia.
 
-O dashboard foi desenhado para sustentar uma conversa de negócio, mas com base técnica rastreável e compatível com o modelo analítico do projeto.
+O dashboard foi desenhado para sustentar uma conversa de negócio com base técnica rastreável e compatível com o modelo analítico do projeto.
 
 ## Contexto do dataset
 
@@ -80,7 +77,7 @@ O dashboard foi estruturado para responder rapidamente:
 - quais categorias concentram maior geração de valor
 - quais estados combinam volume relevante com pior atraso
 - como os status dos pedidos impactam a leitura operacional
-- como a experiência do cliente se conecta com receita e entrega
+- como a experiência do cliente se conecta com receita e desempenho operacional
 
 ## Instruções de uso
 

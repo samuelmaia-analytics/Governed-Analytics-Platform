@@ -86,3 +86,39 @@ def test_chart_category_share_donut_groups_long_tail_into_outras() -> None:
 
     labels = [label for trace in fig.data for label in trace["y"]]
     assert "Outras" in labels
+
+
+def test_chart_functions_handle_empty_or_insufficient_data_with_placeholder() -> None:
+    sparse_df = pd.DataFrame(
+        {
+            "order_id": ["o1"],
+            "customer_unique_id": ["c1"],
+            "selected_state": ["SP"],
+            "category_label": ["Bed Bath Table"],
+            "payment_type_mode": ["credit_card"],
+            "order_status": ["processing"],
+            "order_purchase_timestamp": pd.to_datetime(["2018-01-10"]),
+            "order_delivered_customer_date": [pd.NaT],
+            "delivery_time_days": [pd.NA],
+            "is_delayed": [False],
+            "review_score_mean": [pd.NA],
+            "total_item_value": [100.0],
+            "freight_value": [10.0],
+            "price": [90.0],
+            "month_start": pd.to_datetime(["2018-01-01"]),
+            "quarter_label": ["2018 Q1"],
+        }
+    )
+
+    figures = [
+        charts.chart_delay_by_period(sparse_df),
+        charts.chart_state_delivery_time(sparse_df),
+        charts.chart_state_delay_rate(sparse_df),
+        charts.chart_delivery_boxplot(sparse_df),
+        charts.chart_delay_by_category(sparse_df),
+        charts.chart_delivery_vs_review(sparse_df),
+    ]
+
+    for fig in figures:
+        assert isinstance(fig, go.Figure)
+        assert len(fig.layout.annotations) == 1

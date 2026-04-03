@@ -2,24 +2,35 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 
-Este documento descreve o dashboard final do case como camada oficial de consumo executivo, explicando a origem dos dados, a lógica de exposição e a leitura de negócio que o app sustenta.
+Este documento descreve o dashboard final do projeto como camada oficial de consumo executivo, explicando a origem dos dados, a lógica de exposição e a leitura de negócio que o app sustenta.
 
 ## Tese do Dashboard
 
 O dashboard não é um front-end conectado diretamente à camada analítica interna. Ele existe para consumir a camada publicada `fact_orders_dashboard`, com governança, minimização e chaves pseudonimizadas, preservando coerência entre engenharia, publicação e consumo.
 
-Essa escolha é central para o case porque:
+## Papel do Dashboard na Solução
+
+```mermaid
+flowchart LR
+    A[Curated Analytics] --> B[Published Dashboard Layer]
+    B --> C[Streamlit App]
+    B --> D[Power BI]
+    B --> E[Published Monitoring]
+    B --> F[Published Semantic Marts]
+```
+
+- o app consome a camada oficial de exposição
+- a mesma base publicada atende mais de um canal de consumo
+- monitoramento e marts publicados ampliam leitura sem romper a fronteira arquitetural
+
+Essa escolha é central para o projeto porque:
 
 - desacopla consumo executivo da base analítica interna
 - reduz exposição desnecessária de identificadores e localidade fina
-- mantém o Streamlit alinhado ao ativo publicado na plataforma
+- mantém o Streamlit alinhado à camada oficial de exposição
 - permite evoluir semântica e monitoramento sem alterar a lógica do app como fonte oficial de leitura
 
 ## Fontes de Dados do App
@@ -37,6 +48,8 @@ Essa escolha é central para o case porque:
 - `data/published/semantic/logistics_slice.parquet`
 - `data/published/semantic/seller_slice.parquet`
 - `data/published/semantic/cohort_slice.parquet`
+- `data/published/semantic/category_slice.parquet`
+- `data/published/semantic/state_performance_slice.parquet`
 - `data/published/monitoring/published_layer_monitoring.csv`
 
 Regra prática:
@@ -62,6 +75,8 @@ Além disso, a evolução recente da camada publicada passou a permitir desdobra
 
 - cohort e recorrência de compra
 - recortes por seller pseudonimizado
+- leitura executiva de categoria por receita, review e meio de pagamento
+- leitura executiva por UF com sellers ativos, receita e atraso
 - leitura mais detalhada de despacho, transporte e peso relativo do frete
 - leitura do status operacional mais recente da camada publicada sem sair do app
 
@@ -74,6 +89,13 @@ Além disso, a evolução recente da camada publicada passou a permitir desdobra
 - a cauda longa de categorias é resumida quando isso melhora clareza visual
 - recortes mais granulares permanecem na camada analítica interna ou nos marts semânticos publicados
 
+## O Que o Dashboard Não Faz
+
+- não replica transformação pesada no front-end
+- não acessa diretamente a base analítica completa
+- não tenta substituir a camada exploratória interna
+- não mistura consumo executivo com inspeção operacional de baixo nível
+
 ## Leitura Correta da Arquitetura de Consumo
 
 O Streamlit é a camada oficial de exposição executiva do projeto. Isso significa:
@@ -81,12 +103,21 @@ O Streamlit é a camada oficial de exposição executiva do projeto. Isso signif
 - o dado já chega ao app tratado para consumo
 - o dashboard não precisa replicar regras pesadas de transformação
 - qualidade, contratos e governança acontecem antes da etapa de visualização
-- a mesma camada publicada sustenta o app e a publicação evidenciada na Dadosfera
+- a mesma camada publicada sustenta o app e o reuso em outros canais
 - monitoramento e semântica entram no app como extensões publicadas, não como atalhos para a camada interna
 
-Esse desenho aproxima o case de um produto analítico real, e não apenas de uma interface sobre a base inteira.
+Esse desenho aproxima o projeto de um produto analítico real, e não apenas de uma interface sobre a base inteira.
 
-## Valor do Dashboard no Case
+## Leitura de Produto
+
+| Dimensão | Como aparece no app | O que isso mostra |
+| --- | --- | --- |
+| desempenho comercial | KPIs e evolução temporal | capacidade de síntese executiva |
+| pressão operacional | atraso, prazo e geografia | coerência entre receita e logística |
+| concentração analítica | categorias e estados | leitura de foco e cauda longa |
+| saúde da camada publicada | monitoramento e semântica publicada | operação do ativo, não só visualização |
+
+## Valor do Dashboard no Projeto
 
 O valor do dashboard não está apenas na estética ou nos gráficos. Ele materializa a etapa final da arquitetura: transformar uma camada publicada segura em leitura executiva utilizável.
 
@@ -105,7 +136,7 @@ O dashboard abre mão de expor toda a riqueza da camada interna para ganhar:
 - governança
 - simplicidade de leitura
 - menor risco de exposição
-- consistência com o ativo publicado externamente
+- consistência com a camada oficial de consumo
 
 Essa é uma decisão deliberada. A profundidade exploratória continua existindo, mas não é a função da camada de consumo executivo.
 
@@ -113,7 +144,7 @@ Essa é uma decisão deliberada. A profundidade exploratória continua existindo
 
 ### Dashboard online
 
-- `https://samuelmaia-032026.streamlit.app/`
+- `https://olist-governed-analytics-platform.streamlit.app/`
 
 ### Screenshots finais do app
 
@@ -128,4 +159,4 @@ Essa é uma decisão deliberada. A profundidade exploratória continua existindo
 - runbook de captura: [docs/streamlit_capture_runbook.md](./streamlit_capture_runbook.md)
 - operação do projeto: [docs/operating_model.md](./operating_model.md)
 - publicação segura: [docs/privacy_governance.md](./privacy_governance.md)
-- deck: [presentation/case_deck.md](../presentation/case_deck.md)
+- deck: [presentation/project_deck.md](../presentation/project_deck.md)

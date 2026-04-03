@@ -1,12 +1,12 @@
 # Coleção e Catálogo de Ativos
 
-Este documento materializa a coleção do case em formato versionável, pronta para publicação e catalogação.
+Este documento materializa a coleção do projeto em formato versionável, pronta para publicação e catalogação.
 
 ## Objetivo
 
 - consolidar os ativos do projeto em um inventário único e rastreável
 - explicitar quais ativos estão prontos para publicação/consumo
-- demonstrar uma representação concreta da coleção exigida pelo case
+- demonstrar uma representação concreta da coleção publicada do projeto
 
 ## Artefatos Gerados
 
@@ -26,7 +26,7 @@ Este documento materializa a coleção do case em formato versionável, pronta p
 | `documentation_media` | 5 | 5 |
 | `published_dashboard` | 1 | 1 |
 | `published_monitoring` | 1 | 1 |
-| `published_semantic` | 3 | 3 |
+| `published_semantic` | 5 | 5 |
 | `raw_landing` | 9 | 0 |
 | `staging_profiling` | 41 | 0 |
 | `standardized` | 9 | 0 |
@@ -51,7 +51,6 @@ Este documento materializa a coleção do case em formato versionável, pronta p
 | `query_execution_manifest` | `curated_query_results` | `query_result` | `data/curated/query_results/query_execution_manifest.csv` |
 | `about_dadosfera` | `documentation` | `documentation_asset` | `docs/about_dadosfera.md` |
 | `architecture` | `documentation` | `documentation_asset` | `docs/architecture.md` |
-| `case_answers` | `documentation` | `documentation_asset` | `docs/case_answers.md` |
 | `collection_catalog` | `documentation` | `documentation_asset` | `docs/collection_catalog.md` |
 | `data_classification` | `documentation` | `documentation_asset` | `docs/data_classification.md` |
 | `data_classification_inventory` | `documentation` | `classification_inventory` | `data/curated/catalog/data_classification_inventory.csv` |
@@ -63,6 +62,7 @@ Este documento materializa a coleção do case em formato versionável, pronta p
 | `published_layer_monitoring` | `documentation` | `documentation_asset` | `docs/published_layer_monitoring.md` |
 | `schema_contract_report` | `documentation` | `documentation_asset` | `docs/schema_contract_report.md` |
 | `semantic_layer` | `documentation` | `documentation_asset` | `docs/semantic_layer.md` |
+| `technical_narrative` | `documentation` | `documentation_asset` | `docs/technical_narrative.md` |
 | `01_top_categories_by_revenue` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/01_top_categories_by_revenue.png` |
 | `02_monthly_revenue_evolution` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/02_monthly_revenue_evolution.png` |
 | `03_revenue_by_state` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/03_revenue_by_state.png` |
@@ -70,15 +70,17 @@ Este documento materializa a coleção do case em formato versionável, pronta p
 | `05_payment_method_distribution` | `documentation_media` | `query_screenshot` | `data/screenshots/query_results/05_payment_method_distribution.png` |
 | `fact_orders_dashboard` | `published_dashboard` | `published_analytics_table` | `data/published/dashboard/fact_orders_dashboard.parquet` |
 | `published_layer_monitoring` | `published_monitoring` | `monitoring_result` | `data/published/monitoring/published_layer_monitoring.csv` |
+| `category_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/category_slice.parquet` |
 | `cohort_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/cohort_slice.parquet` |
 | `logistics_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/logistics_slice.parquet` |
 | `seller_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/seller_slice.parquet` |
+| `state_performance_slice` | `published_semantic` | `published_semantic_mart` | `data/published/semantic/state_performance_slice.parquet` |
 
-## Uso no Case
+## Uso no Projeto
 
 - `fact_orders_enriched` é o ativo analítico interno principal da coleção.
 - `fact_orders_dashboard` é a camada publicada e minimizada usada pelo Streamlit.
-- os resultados de qualidade, queries SQL e documentação derivada compõem a camada de evidência técnica do case.
+- os resultados de qualidade, queries SQL e documentação derivada compõem a camada de evidência técnica do projeto.
 - o manifesto JSON pode ser usado como payload base para publicação ou integração futura com uma API de catálogo.
 
 ## Observação

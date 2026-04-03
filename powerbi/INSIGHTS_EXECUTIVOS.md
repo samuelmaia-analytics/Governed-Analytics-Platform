@@ -3,16 +3,13 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- App Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Dashboard Power BI: `https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare`
 
 ## Observação
 
-Os pontos abaixo foram preparados para apoiar a apresentação final do case. Eles devem ser tratados como leituras executivas prontas para uso e já contam com evidências visuais e SQLs materializadas na pasta `powerbi/`.
+Os pontos abaixo foram preparados para apoiar a apresentação final do projeto. Eles devem ser tratados como leituras executivas prontas para uso e já contam com evidências visuais e SQLs materializadas na pasta `powerbi/`.
 
 ## Insights
 
@@ -34,4 +31,4 @@ Os pontos abaixo foram preparados para apoiar a apresentação final do case. El
 
 9. O modelo estrela preparado para Power BI demonstra que a camada analítica do projeto é reutilizável em ambiente corporativo, sem retrabalho estrutural.
 
-10. A combinação entre indicadores comerciais, operacionais e de experiência torna o case mais defensável do ponto de vista de negócio e engenharia.
+10. A combinação entre indicadores comerciais, operacionais e de experiência torna o projeto mais defensável do ponto de vista de negócio e engenharia.

@@ -1,4 +1,4 @@
-# Case Deck
+# Project Deck
 
 ## Estrutura Narrativa
 
@@ -21,7 +21,7 @@ Transformar um dataset relacional bruto em um ativo analítico governado, public
 
 **Fala**
 
-“O objetivo deste case foi sair de dados transacionais fragmentados e chegar a um produto analítico utilizável. A entrega foi desenhada para mostrar modelagem, governança, publicação, operação recorrente e consumo como partes da mesma solução.”
+“O objetivo deste projeto foi sair de dados transacionais fragmentados e chegar a um produto analítico utilizável. A solução foi desenhada para mostrar modelagem, governança, publicação, operação recorrente e consumo como partes da mesma arquitetura.”
 
 ## Slide 2 | Problema
 
@@ -160,7 +160,7 @@ A solução foi pensada para resistir à revisão técnica.
 
 **Mensagem**
 
-O case está pronto como produto analítico, mas não infla o que ainda não foi evidenciado.
+O projeto está pronto como produto analítico, mas não infla o que ainda não foi evidenciado.
 
 **Pontos**
 

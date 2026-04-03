@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-import src.run_case_pipeline as pipeline
-from src.run_case_pipeline import PIPELINE_STEPS, resolve_steps
+import src.run_platform_pipeline as pipeline
+from src.run_platform_pipeline import PIPELINE_STEPS, resolve_steps
 
 
 def test_resolve_steps_returns_full_pipeline_when_none_provided() -> None:

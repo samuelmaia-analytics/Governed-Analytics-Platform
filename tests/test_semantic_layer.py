@@ -26,7 +26,9 @@ def build_semantic_source() -> pd.DataFrame:
             "delivery_time_days": [3.0, 4.0],
             "seller_dispatch_time_days": [1.0, 1.5],
             "carrier_delivery_time_days": [2.0, 2.5],
+            "payment_type_mode": ["credit_card", "boleto"],
             "freight_to_price_ratio": [0.1, 0.2],
+            "product_category_name_english": ["bed_bath_table", "bed_bath_table"],
             "purchase_cohort_month": ["2018-01", "2018-01"],
             "cohort_order_month_number": [0, 1],
             "total_item_value": [100.0, 120.0],
@@ -46,6 +48,8 @@ def test_run_semantic_layer_materializes_all_slices(tmp_path: Path, monkeypatch)
     monkeypatch.setattr(semantic_layer, "LOGISTICS_PATH", semantic_dir / "logistics_slice.parquet")
     monkeypatch.setattr(semantic_layer, "SELLER_PATH", semantic_dir / "seller_slice.parquet")
     monkeypatch.setattr(semantic_layer, "COHORT_PATH", semantic_dir / "cohort_slice.parquet")
+    monkeypatch.setattr(semantic_layer, "CATEGORY_PATH", semantic_dir / "category_slice.parquet")
+    monkeypatch.setattr(semantic_layer, "STATE_PATH", semantic_dir / "state_performance_slice.parquet")
     monkeypatch.setattr(semantic_layer, "DOCS_DIR", docs_dir)
     monkeypatch.setattr(semantic_layer, "REPORT_PATH", docs_dir / "semantic_layer.md")
 
@@ -54,5 +58,8 @@ def test_run_semantic_layer_materializes_all_slices(tmp_path: Path, monkeypatch)
     assert artifacts.logistics_path.exists()
     assert artifacts.seller_path.exists()
     assert artifacts.cohort_path.exists()
+    assert artifacts.category_path.exists()
+    assert artifacts.state_path.exists()
     assert (semantic_dir / "logistics_slice.csv").exists()
+    assert (semantic_dir / "category_slice.csv").exists()
     assert (docs_dir / "semantic_layer.md").exists()

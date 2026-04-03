@@ -1,11 +1,11 @@
 # Release Runbook
 
-Este runbook resume o fluxo mínimo de release do case para manter consistência entre código, artefatos de dados, dashboard e documentação publicada.
+Este runbook resume o fluxo mínimo de release do projeto para manter consistência entre código, artefatos de dados, dashboard e documentação publicada.
 
 ## Objetivo
 
 - garantir que a branch principal esteja íntegra antes de promover o deploy
-- evitar divergência entre camada publicada, evidências e narrativa do case
+- evitar divergência entre camada publicada, evidências e narrativa do projeto
 - deixar rollback e revalidação explícitos
 - tornar o ambiente de destino explícito na promoção (`dev`, `stage`, `prod`)
 
@@ -22,13 +22,13 @@ Este runbook resume o fluxo mínimo de release do case para manter consistência
 ```bash
 python -m ruff check src streamlit_app tests
 python -m pytest tests
-python src/run_case_pipeline.py --list-steps
+python src/run_platform_pipeline.py --list-steps
 ```
 
 5. Se a mudança impactar dados publicados, regenerar os artefatos críticos:
 
 ```bash
-python src/run_case_pipeline.py --steps build publish semantic quality contracts monitor catalog queries bi
+python src/run_platform_pipeline.py --steps build publish semantic quality contracts monitor catalog queries bi
 ```
 
 6. Revisar se os arquivos abaixo refletem a mudança:
@@ -59,7 +59,7 @@ python src/run_case_pipeline.py --steps build publish semantic quality contracts
 2. Confirmar `CI` verde na branch fonte compatível com o ambiente.
 3. Executar ou validar o workflow `Deploy Streamlit` com o `target_environment` correto.
 4. Confirmar execução do workflow `Operate Published Layer` quando a release impactar a camada publicada ou a operação recorrente.
-5. Validar o app Streamlit e os principais links públicos do case no ambiente promovido.
+5. Validar o app Streamlit e os principais links públicos do projeto no ambiente promovido.
 6. Se houver incidente, manter o ambiente anterior intacto e promover rollback apenas no ambiente afetado.
 
 ## Pós-release
@@ -68,4 +68,4 @@ python src/run_case_pipeline.py --steps build publish semantic quality contracts
 - validar os filtros principais e a navegação executiva
 - validar se a camada publicada segue pseudonimizada e minimizada
 - validar se o monitoramento da camada publicada ficou sem alertas críticos
-- validar se os marts `logistics_slice`, `seller_slice` e `cohort_slice` foram materializados
+- validar se os marts `logistics_slice`, `seller_slice`, `cohort_slice`, `category_slice` e `state_performance_slice` foram materializados

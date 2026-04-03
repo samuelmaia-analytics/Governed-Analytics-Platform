@@ -2,14 +2,14 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 - Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
 
-Projeto: `samuelmaia_DDF_032026`  
+Projeto: `olist_governed_analytics_platform`  
 Dataset: `Brazilian E-Commerce Public Dataset by Olist`  
 Data da auditoria consolidada: `2026-03-29`
 
@@ -17,7 +17,7 @@ Data da auditoria consolidada: `2026-03-29`
 
 - Nota geral atual: `8.8/10`
 - Classificação atual: `avançado`
-- Atende o mínimo do case: `sim`
+- Atende o mínimo esperado do projeto: `sim`
 - Está competitivo: `sim`
 - Se destacaria: `sim`
 - Maior risco atual: vender integração com a plataforma como execução nativa comprovada
@@ -74,7 +74,7 @@ Data da auditoria consolidada: `2026-03-29`
 O projeto está defensável em entrevista se o discurso for preciso:
 
 - forte para analytics engineering, data product e dashboard
-- forte para governança e privacidade por design em contexto de case
+- forte para governança e privacidade por design em contexto de projeto
 - bom para integração com plataforma
 - parcial para plataforma corporativa plenamente absorvida por execução nativa
 
@@ -87,11 +87,12 @@ O projeto está defensável em entrevista se o discurso for preciso:
 
 ## 8. Validações Executadas
 
-- `python src/run_case_pipeline.py --steps build publish semantic monitor`
+- `python src/run_platform_pipeline.py --steps build publish semantic monitor`
 - `python src/published_monitoring.py --fail-on-alert`
 - `python -m pytest tests` -> `124 passed`
 - `ruff check .`
 
 ## 9. Veredito Final
 
-Hoje, o projeto já se apresenta como uma entrega madura de case técnico. Ele não tenta parecer uma plataforma completa, mas mostra domínio real de modelagem, publicação, governança, operação da camada publicada e consumo executivo com evidência suficiente para revisão técnica séria.
+Hoje, o projeto já se apresenta como uma entrega madura de engenharia analítica. Ele não tenta parecer uma plataforma completa, mas mostra domínio real de modelagem, publicação, governança, operação da camada publicada e consumo executivo com evidência suficiente para revisão técnica séria.
+

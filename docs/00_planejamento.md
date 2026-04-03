@@ -2,15 +2,15 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 
-Este documento registra o plano do case já reconciliado com o estado atual do repositório, distinguindo entregas concluídas, itens parcialmente preparados e pontos que ainda dependem de evidência final na plataforma.
+Este documento registra o plano do projeto já reconciliado com o estado atual do repositório, distinguindo itens concluídos, pontos parcialmente preparados e dependências de evidência final na plataforma.
 
 ## Objetivo do Planejamento
 
-Garantir uma entrega organizada que cobrisse:
+Garantir uma solução organizada que cobrisse:
 
 - base de dados
 - integração
@@ -26,7 +26,7 @@ Garantir uma entrega organizada que cobrisse:
 ## Visão Geral das Etapas
 
 ```text
-1. Definir base e objetivo do case
+1. Definir base e objetivo do projeto
 2. Ingerir os dados e organizar em camadas
 3. Padronizar e modelar os dados
 4. Validar qualidade e contratos
@@ -42,7 +42,7 @@ Garantir uma entrega organizada que cobrisse:
 
 ### Fase 1 - Concepção
 
-- [x] definir o domínio do case
+- [x] definir o domínio do projeto
 - [x] selecionar uma base com mais de 100 mil registros
 - [x] definir narrativa de e-commerce e plataforma de dados
 - [x] estruturar o repositório base
@@ -103,7 +103,7 @@ Garantir uma entrega organizada que cobrisse:
 
 ### Fase 9 - Encerramento
 
-- [x] organizar o README e a estrutura do case
+- [x] organizar o README e a estrutura do projeto
 - [x] preparar deck e talk track
 - [x] gravar vídeo final
 - [x] inserir links reais dos ativos na Dadosfera
@@ -128,7 +128,7 @@ Garantir uma entrega organizada que cobrisse:
 
 ## Pontos Críticos do Projeto
 
-Os pontos mais sensíveis do case são:
+Os pontos mais sensíveis do projeto são:
 
 1. publicar de fato os ativos na Dadosfera
 2. gerar evidências reais da plataforma
@@ -142,7 +142,7 @@ Os pontos mais sensíveis do case são:
 | não publicar os dados na Dadosfera | alto | alta | priorizar a subida da camada `published/dashboard` |
 | faltar print da plataforma | alto | alta | seguir o runbook `docs/dadosfera_capture_runbook.md` |
 | vender integração não executada como pipeline nativo | alto | média | manter documentação honesta sobre status real |
-| falha no app ou em ativos gerados | médio | baixa | reexecutar `src/run_case_pipeline.py` e monitoramento antes da entrega |
+| falha no app ou em ativos gerados | médio | baixa | reexecutar `src/run_platform_pipeline.py` e monitoramento antes da publicação |
 | falta de vídeo final | médio | baixa | manter vídeo e links já publicados como evidência consolidada |
 
 ## Estimativa Simplificada de Esforço
@@ -163,3 +163,4 @@ Os pontos mais sensíveis do case são:
 2. manter docs alinhadas ao estado real do repositório
 3. acompanhar os workflows de CI, lint e operação publicada
 4. só promover pipeline nativo como “feito” quando houver evidência final de execução
+

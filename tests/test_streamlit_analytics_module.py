@@ -75,6 +75,9 @@ def test_build_metrics_returns_expected_kpis() -> None:
     assert metrics[0]["label"] == "Receita total"
     assert metrics[4]["value"].endswith("dias")
     assert metrics[5]["value"].endswith("%")
+    assert metrics[4]["delta_color"] == "inverse"
+    assert metrics[5]["delta_color"] == "inverse"
+    assert metrics[7]["label"] == "Frete médio por item"
 
 
 def test_safe_mean_and_build_metrics_handle_nan_bases_without_rendering_nan() -> None:
@@ -155,3 +158,19 @@ def test_build_executive_insights_returns_four_cards() -> None:
         "Gargalo regional",
         "Dependência de pagamento",
     ]
+
+
+def test_summaries_and_insights_ignore_placeholder_dimensions() -> None:
+    df = build_analytics_frame().copy()
+    df["category_label"] = "unknown"
+    df["selected_state"] = "NA"
+    df["payment_type_mode"] = "unknown"
+
+    summary = build_smart_summary(df)
+    cards = build_executive_insights(df)
+
+    assert "Sem categoria líder disponível." in summary["summary"]
+    assert "Sem destaque geográfico disponível." in summary["summary"]
+    assert cards[1]["text"].startswith("Não houve categoria")
+    assert cards[2]["text"].startswith("Não houve concentração regional")
+    assert cards[3]["text"].startswith("Não foi possível identificar")

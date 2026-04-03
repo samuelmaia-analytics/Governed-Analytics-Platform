@@ -3,12 +3,14 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
+import requests
 
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -47,6 +49,7 @@ CRITICAL_COLUMNS = ["order_id", "order_item_id", "seller_key", "order_purchase_t
 DEFAULT_MAX_FRESHNESS_HOURS = 36
 MIN_ROWS = 100_001
 MAX_MISSING_SELLER_DELAY_RATE_PCT = 1.0
+DEFAULT_ALERT_SOURCE = "published_layer_monitoring"
 
 
 @dataclass
@@ -57,6 +60,13 @@ class MonitoringCheckResult:
     threshold: float | str
     severity: str
     details: str
+
+
+@dataclass
+class AlertDispatchResult:
+    delivered: bool
+    status_code: int | None
+    destination: str
 
 
 def build_result(
@@ -212,6 +222,50 @@ def run_monitoring(*, max_freshness_hours: int = DEFAULT_MAX_FRESHNESS_HOURS) ->
     return results
 
 
+def build_alert_payload(
+    results: list[MonitoringCheckResult],
+    *,
+    source: str = DEFAULT_ALERT_SOURCE,
+    environment: str = "prod",
+) -> dict[str, object]:
+    failed_results = [result for result in results if result.status == "FAIL"]
+    severity_order = {"high": 3, "medium": 2, "low": 1}
+    max_severity = "low"
+    if failed_results:
+        max_severity = max(failed_results, key=lambda result: severity_order.get(result.severity, 0)).severity
+    return {
+        "source": source,
+        "environment": environment,
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "status": "FAIL" if failed_results else "PASS",
+        "failed_checks": len(failed_results),
+        "max_severity": max_severity,
+        "results": [asdict(result) for result in failed_results],
+    }
+
+
+def send_external_alert(
+    results: list[MonitoringCheckResult],
+    *,
+    webhook_url: str,
+    token: str | None = None,
+    environment: str = "prod",
+    source: str = DEFAULT_ALERT_SOURCE,
+    timeout_seconds: int = 15,
+) -> AlertDispatchResult:
+    payload = build_alert_payload(results, source=source, environment=environment)
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = token
+    response = requests.post(webhook_url, json=payload, headers=headers, timeout=timeout_seconds)
+    response.raise_for_status()
+    return AlertDispatchResult(
+        delivered=True,
+        status_code=response.status_code,
+        destination=webhook_url,
+    )
+
+
 def save_results(results: list[MonitoringCheckResult]) -> tuple[Path, Path]:
     ensure_directory(PUBLISHED_MONITORING_DIR)
     results_df = pd.DataFrame(asdict(result) for result in results)
@@ -274,6 +328,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Monitora freshness e qualidade da camada published.")
     parser.add_argument("--max-freshness-hours", type=int, default=DEFAULT_MAX_FRESHNESS_HOURS)
     parser.add_argument("--fail-on-alert", action="store_true")
+    parser.add_argument("--alert-webhook-url", default=os.getenv("EXTERNAL_ALERT_WEBHOOK_URL", ""))
+    parser.add_argument("--alert-webhook-token", default=os.getenv("EXTERNAL_ALERT_WEBHOOK_TOKEN", ""))
+    parser.add_argument("--alert-environment", default=os.getenv("APP_ENV", "prod"))
     return parser.parse_args()
 
 
@@ -285,6 +342,18 @@ def main() -> None:
     save_report(results)
     failed_count = sum(result.status == "FAIL" for result in results)
     LOGGER.info("Monitoramento da camada publicada concluido | falhas=%s", failed_count)
+    if failed_count and args.alert_webhook_url:
+        dispatch = send_external_alert(
+            results,
+            webhook_url=args.alert_webhook_url,
+            token=args.alert_webhook_token or None,
+            environment=args.alert_environment,
+        )
+        LOGGER.info(
+            "Alerta externo enviado | destino=%s status_code=%s",
+            dispatch.destination,
+            dispatch.status_code,
+        )
     if args.fail_on_alert and failed_count:
         raise SystemExit(1)
 

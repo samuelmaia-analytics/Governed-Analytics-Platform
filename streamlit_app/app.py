@@ -30,13 +30,12 @@ from streamlit_app.sections import (
     render_operations_section,
     render_semantic_section,
     render_smart_summary,
-    render_support_tables,
     render_temporal_section,
 )
 from streamlit_app.theme import apply_theme, render_story_nav
 
 st.set_page_config(
-    page_title="Produto Analítico Olist | Dashboard Executivo",
+    page_title="Olist | Dashboard Executivo",
     page_icon=":material/monitoring:",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -47,7 +46,7 @@ def main() -> None:
     apply_theme()
     try:
         df = load_data()
-    except FileNotFoundError as exc:
+    except (FileNotFoundError, ValueError) as exc:
         st.error(str(exc))
         st.stop()
     semantic_assets = load_semantic_assets()
@@ -66,7 +65,7 @@ def main() -> None:
 
     if presentation_mode:
         st.markdown(
-            "<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>Modo apresentação</div><p class='section-copy' style='margin-bottom:0;'>A leitura foi reduzida ao fluxo executivo principal: KPIs, tendência, categorias, performance regional e síntese final.</p></div>",
+            "<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>Modo apresentação</div><p class='section-copy' style='margin-bottom:0;'>A navegação foi reduzida ao fluxo principal: indicadores, tendência, categorias, performance regional e síntese final.</p></div>",
             unsafe_allow_html=True,
         )
         render_kpi_row(build_metrics(filtered_df, previous_df))
@@ -103,16 +102,14 @@ def main() -> None:
     elif selected_section == "Insights":
         render_executive_insights(filtered_df)
     elif selected_section == "Visão completa":
+        st.markdown(
+            "<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>Leitura guiada</div><p class='section-copy' style='margin-bottom:0;'>Esta visão concentra os blocos principais para leitura executiva. Operação detalhada, saúde da base, recortes semânticos e tabelas de apoio continuam disponíveis pela navegação acima.</p></div>",
+            unsafe_allow_html=True,
+        )
         render_temporal_section(filtered_df)
         render_category_section(filtered_df)
         render_geography_section(filtered_df, filters.geography_mode)
-        render_operations_section(filtered_df)
-        render_health_section(monitoring_status)
-        render_semantic_section(semantic_assets)
         render_executive_insights(filtered_df)
-
-    if selected_section == "Visão completa":
-        render_support_tables(filtered_df)
 
 
 if __name__ == "__main__":

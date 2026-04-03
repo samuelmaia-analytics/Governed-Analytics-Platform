@@ -1,6 +1,6 @@
 # Rollback Runbook
 
-Este runbook define a resposta mínima para rollback do case quando uma alteração afeta dashboard, camada publicada ou artefatos de evidência.
+Este runbook define a resposta mínima para rollback do projeto quando uma alteração afeta dashboard, camada publicada ou artefatos de evidência.
 
 ## Gatilhos de rollback
 
@@ -26,7 +26,7 @@ python -m pytest tests
 4. Se necessário, regenerar a camada publicada:
 
 ```bash
-python src/run_case_pipeline.py --steps build publish semantic quality contracts monitor
+python src/run_platform_pipeline.py --steps build publish semantic quality contracts monitor
 ```
 
 5. Revalidar o workflow de promoção para o branch de deploy do ambiente afetado (`streamlit-dev`, `streamlit-stage` ou `streamlit-prod`).

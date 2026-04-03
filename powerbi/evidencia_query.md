@@ -3,16 +3,13 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- App Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Dashboard Power BI: `https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare`
 
 ## Objetivo da query
 
-Este documento registra a query principal utilizada para sustentar os indicadores e recortes analíticos do dashboard Power BI do case.
+Este documento registra a query principal utilizada para sustentar os indicadores e recortes analíticos do dashboard Power BI do projeto.
 
 Ela foi estruturada para cobrir, de forma rastreável e defensável:
 

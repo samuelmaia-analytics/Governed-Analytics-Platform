@@ -1,14 +1,18 @@
-# Respostas do Case
+# Narrativa Técnica
+
+## Tese
+
+O valor técnico do projeto não está em ter apenas um dashboard funcional. Está em transformar um dataset transacional fragmentado em um ativo analítico defensável, governado e reaproveitável, com uma camada publicada explícita entre engenharia e consumo.
 
 ## Resumo Executivo
 
 Este projeto transforma o dataset Olist em um produto analítico utilizável, com separação clara entre camada interna de engenharia e camada publicada para consumo executivo. O núcleo técnico da entrega é `fact_orders_enriched`, uma tabela fato com granularidade de item de pedido e `112.650` registros, construída para responder perguntas de negócio sem sacrificar rastreabilidade técnica.
 
-A camada derivada `fact_orders_dashboard` reduz risco de exposição, preserva utilidade analítica e serve como fonte oficial do Streamlit e do ativo publicado. Isso dá ao case um desenho mais maduro do que uma entrega centrada apenas em visualização.
+A camada derivada `fact_orders_dashboard` reduz risco de exposição, preserva utilidade analítica e serve como fonte oficial do Streamlit e do ativo publicado. Isso dá ao projeto um desenho mais maduro do que uma entrega centrada apenas em visualização.
 
 ## Tese da Entrega
 
-O valor desta entrega está em combinar quatro frentes que normalmente aparecem desconectadas em cases:
+O valor desta entrega está em combinar quatro frentes que normalmente aparecem desconectadas em projetos de portfólio:
 
 - modelagem com granularidade defensável
 - qualidade e governança explícitas
@@ -16,6 +20,23 @@ O valor desta entrega está em combinar quatro frentes que normalmente aparecem 
 - documentação suficiente para auditoria e defesa técnica
 
 O projeto não depende de narrativa inflada. Ele sustenta avaliação porque conecta decisão de modelagem, produto analítico, evidência operacional e automação mínima de engenharia em um mesmo fluxo.
+
+## Mapa da Defesa Técnica
+
+```mermaid
+flowchart LR
+    A[Business Problem] --> B[Modeling Decision]
+    B --> C[Curated Fact Table]
+    C --> D[Published Layer]
+    D --> E[Executive Consumption]
+    C --> F[Quality SQL Catalog]
+    D --> G[Monitoring and Governance]
+```
+
+- o problema de negócio orienta a modelagem
+- a modelagem sustenta tanto exploração quanto consumo
+- a camada publicada cria a fronteira de exposição
+- governança e monitoramento aparecem como parte do fluxo, não como apêndice
 
 ## Estado Real da Solução
 
@@ -35,6 +56,16 @@ Leitura correta:
 - a autenticação MFA do Maestro foi parcialmente validada, mas os endpoints protegidos ainda dependem do fluxo oficial indicado pelo suporte
 - o que segue sem comprovação final é pipeline nativo executando dentro da plataforma
 
+## O Que Está Comprovado
+
+| Pilar | Situação | Evidência |
+| --- | --- | --- |
+| modelagem analítica | comprovada | `fact_orders_enriched`, SQL e dashboard |
+| publicação segura | comprovada | `fact_orders_dashboard` e docs de governança |
+| consumo executivo | comprovado | Streamlit e Power BI |
+| operação recorrente | comprovada localmente | monitoramento, runbooks e workflows |
+| integração externa avançada | parcial | evidências e limites documentados |
+
 ## Problema de Negócio
 
 O dataset Olist é relacional, fragmentado e operacional. Sozinho, ele não responde bem perguntas de negócio sobre receita, atraso, categoria, pagamento, geografia e experiência do cliente. O problema real não é apenas juntar tabelas; é transformar eventos transacionais em uma camada confiável e reutilizável para análise, sem perder coerência entre dado, consumo e governança.
@@ -50,6 +81,13 @@ Essa escolha sustenta duas qualidades que importam em avaliação senior:
 - integridade analítica: a granularidade é estável e defensável
 - flexibilidade de consumo: a mesma base atende SQL, qualidade, dashboard e export BI
 
+## Por Que a Modelagem se Sustenta
+
+- a fato nasce no nível em que preço, frete e seller coexistem sem distorção
+- joins sensíveis como pagamento e review são agregados antes da composição final
+- a granularidade final permite recortes executivos sem perder coerência operacional
+- a mesma modelagem sustenta exploração, publicação e consumo
+
 ## Arquitetura de Publicação
 
 O projeto separa explicitamente:
@@ -58,6 +96,15 @@ O projeto separa explicitamente:
 - `fact_orders_dashboard`: camada publicada para consumo executivo
 
 Essa separação não é cosmética. Ela reduz acoplamento, melhora governança e impede que o dashboard dependa de atributos desnecessários ou sensíveis. Na publicada, identificadores são pseudonimizados e campos como cidade, CEP e IDs operacionais deixam de ser expostos quando não agregam valor ao caso de uso.
+
+## O Que a Publicação Resolve
+
+| Risco sem camada publicada | Resposta adotada no projeto |
+| --- | --- |
+| dashboard acoplado à base interna | criação de `fact_orders_dashboard` |
+| exposição de atributos desnecessários | minimização de colunas |
+| uso inconsistente entre canais de consumo | camada oficial única para exposição |
+| baixa observabilidade do ativo exposto | monitoramento e contratos sobre a publicada |
 
 ## Perguntas de Negócio Respondidas
 
@@ -99,7 +146,7 @@ Essa combinação é importante porque demonstra que a entrega não termina na g
 
 ## Status Real da API da Dadosfera
 
-Durante o fechamento do case, a integração com a API do Maestro foi testada com credenciais reais do tenant. O cenário validado foi o seguinte:
+Durante o fechamento do projeto, a integração com a API do Maestro foi testada com credenciais reais do tenant. O cenário validado foi o seguinte:
 
 - `POST /auth/sign-in` respondeu `200` quando o MFA foi enviado no campo `code`
 - o mesmo fluxo não retornou `accessToken`
@@ -123,7 +170,14 @@ Alguns limites permanecem intencionais e precisam ser mantidos claros:
 - a plataforma ainda não substitui o motor local de transformação
 - o bônus de GenAI existe como enriquecimento e prova de capacidade, não como eixo central da solução
 
-Essa postura é parte da qualidade da entrega. Um case senior não infla maturidade operacional onde não há evidência.
+Essa postura é parte da qualidade da entrega. Um projeto maduro não infla maturidade operacional onde não há evidência.
+
+## Limites Assumidos de Forma Explícita
+
+- o motor principal continua local e versionado
+- integrações externas não redefinem o núcleo da solução
+- ausência de evidência final em plataforma externa é tratada como limite, não como marketing
+- extensões como GenAI e API sync permanecem complementares ao fluxo principal
 
 ## Por Que Esta Entrega É Forte
 
@@ -133,7 +187,7 @@ Em termos de avaliação, isso sinaliza:
 
 - domínio de analytics engineering
 - noção de data product
-- maturidade de governança acima da média para case técnico
+- maturidade de governança acima da média para projetos de portfólio técnico
 - capacidade de transformar output analítico em ativo defendível
 
 ## Próximos Passos Naturais
@@ -148,6 +202,6 @@ Em termos de avaliação, isso sinaliza:
 
 ## Conclusão
 
-O projeto atende ao case porque entrega uma solução de dados ponta a ponta com coerência entre engenharia, governança, consumo e evidência. Ele sai do dado bruto, constrói uma camada analítica defensável, publica uma versão segura para consumo executivo e prova o valor da solução em canais diferentes sem perder consistência.
+O projeto entrega uma solução de dados ponta a ponta com coerência entre engenharia, governança, consumo e evidência. Ele sai do dado bruto, constrói uma camada analítica defensável, publica uma versão segura para consumo executivo e prova o valor da solução em canais diferentes sem perder consistência.
 
 A síntese correta é simples: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe, a preparação para pipeline nativo via API foi implementada, e os limites estruturais remanescentes são a ausência de execução nativa comprovada dentro da plataforma e a falta de um artefato de sessão reutilizável exposto pelo tenant para `catalog` e `pipelines`.

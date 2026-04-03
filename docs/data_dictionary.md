@@ -2,8 +2,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -11,7 +11,7 @@
 
 ## Visão Geral
 
-Este documento consolida o dicionário de dados do projeto `samuelmaia_DDF_032026`, descrevendo os principais ativos raw e processed, com foco especial na tabela analítica `fact_orders_enriched`, na camada publicada `fact_orders_dashboard` e nos novos ativos semânticos e operacionais. A fonte pública utilizada é o `Brazilian E-Commerce Public Dataset by Olist`, disponibilizado no Kaggle em `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`.
+Este documento consolida o dicionário de dados do projeto `olist_governed_analytics_platform`, descrevendo os principais ativos raw e processed, com foco especial na tabela analítica `fact_orders_enriched`, na camada publicada `fact_orders_dashboard` e nos novos ativos semânticos e operacionais. A fonte pública utilizada é o `Brazilian E-Commerce Public Dataset by Olist`, disponibilizado no Kaggle em `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`.
 
 O objetivo deste material é documentar:
 
@@ -52,12 +52,14 @@ Os ativos processed representam as saídas geradas pelo pipeline analítico do p
 | `logistics_slice.parquet` | `data/published/semantic/logistics_slice.parquet` | Mart agregado para leitura logística por período e UF origem/destino. | 1 linha por combinação agregada |
 | `seller_slice.parquet` | `data/published/semantic/seller_slice.parquet` | Mart agregado para desempenho por seller pseudonimizado. | 1 linha por seller |
 | `cohort_slice.parquet` | `data/published/semantic/cohort_slice.parquet` | Mart agregado para cohort e maturação de compra. | 1 linha por cohort e mês relativo |
+| `category_slice.parquet` | `data/published/semantic/category_slice.parquet` | Mart agregado para receita, atraso, review e pagamento por categoria e mês. | 1 linha por categoria, mês e meio de pagamento |
+| `state_performance_slice.parquet` | `data/published/semantic/state_performance_slice.parquet` | Mart agregado para leitura executiva de receita, sellers ativos, atraso e satisfação por UF e mês. | 1 linha por UF e mês |
 | `published_layer_monitoring.csv` | `data/published/monitoring/published_layer_monitoring.csv` | Resultado estruturado do monitoramento recorrente da camada publicada. | 1 linha por check |
 | `published_layer_monitoring.json` | `data/published/monitoring/published_layer_monitoring.json` | Resumo serializado da execução de monitoramento. | 1 documento por execução |
 | `operational_job_results.json` | `data/curated/ops/operational_job_results.json` | Resultado do runner operacional por etapa. | 1 documento por execução |
 | `fact_orders_enriched_quality_checks.csv` | `data/curated/quality/fact_orders_enriched_quality_checks.csv` | Resultado estruturado dos checks de qualidade da tabela analítica. | 1 linha por check |
 | `query_results/*.csv` | `data/curated/query_results/` | Resultados das queries analíticas executadas em DuckDB. | Variável por consulta |
-| `dadosfera_collection.json` | `data/curated/catalog/dadosfera_collection.json` | Manifesto versionável da coleção do case. | 1 documento por coleção |
+| `dadosfera_collection.json` | `data/curated/catalog/dadosfera_collection.json` | Manifesto versionável da coleção do projeto. | 1 documento por coleção |
 | `collection_assets_inventory.csv` | `data/curated/catalog/collection_assets_inventory.csv` | Inventário tabular dos ativos do projeto. | 1 linha por ativo |
 | `bi_exports/*.csv` | `data/processed/bi_exports/` | Exportações auxiliares para consumo em Power BI. | Variável por dataset |
 
@@ -169,6 +171,8 @@ Os marts publicados ampliam consumo sem expor a granularidade inteira da camada 
 | `logistics_slice` | leitura logística agregada | atraso, tempo médio de entrega, despacho, transporte, peso relativo do frete |
 | `seller_slice` | leitura de desempenho por seller pseudonimizado | ticket médio, atraso, tempo médio, review, tier de volume |
 | `cohort_slice` | leitura de retenção e maturação | clientes, pedidos, itens, ticket médio, atraso |
+| `category_slice` | leitura de categoria e monetização | receita, ticket, review, atraso, meio de pagamento |
+| `state_performance_slice` | leitura executiva por UF | receita, sellers ativos, atraso, satisfação, tempo médio |
 
 ## 7. Monitoramento da Camada Publicada
 
@@ -180,6 +184,7 @@ O monitoramento recorrente da `published` registra:
 - volume mínimo
 - nulos críticos
 - cobertura semântica de cohort e seller
+- disparo opcional de alertas externos via webhook quando há falhas
 
 Ativos relevantes:
 
@@ -189,7 +194,7 @@ Ativos relevantes:
 
 ## 8. Observações Gerais de Qualidade
 
-- a base final possui mais de `100.000` registros e atende ao volume mínimo esperado do case
+- a base final possui mais de `100.000` registros e atende ao volume mínimo esperado do projeto
 - a granularidade escolhida não apresentou duplicidade na validação atual
 - há uma anomalia residual da fonte em poucos registros de coerência temporal, tratada como alerta e não mascarada
 - a camada publicada e os marts semânticos passam por materialização controlada antes do consumo
@@ -200,5 +205,6 @@ Use preferencialmente:
 
 - `fact_orders_enriched` para engenharia, SQL, qualidade e auditoria
 - `fact_orders_dashboard` para consumo executivo e publicação externa
-- `logistics_slice`, `seller_slice` e `cohort_slice` para recortes agregados adicionais
+- `logistics_slice`, `seller_slice`, `cohort_slice`, `category_slice` e `state_performance_slice` para recortes agregados adicionais
 - `published_layer_monitoring` para observabilidade operacional da camada publicada
+

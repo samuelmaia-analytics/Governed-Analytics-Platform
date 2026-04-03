@@ -4,7 +4,7 @@ Esta pasta reúne a trilha complementar de BI externo do projeto.
 
 ## Papel do bônus
 
-O material de Power BI amplia o consumo analítico do case. Ele não substitui o dashboard principal em Streamlit, mas demonstra reutilização da mesma base em um modelo estrela simples.
+O material de Power BI amplia o consumo analítico do projeto. Ele não substitui o dashboard principal em Streamlit, mas demonstra reutilização da mesma base em um modelo estrela simples.
 
 ## Conteúdo
 

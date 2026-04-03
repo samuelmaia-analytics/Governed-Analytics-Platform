@@ -36,7 +36,7 @@ jobs:
         run: python -m ruff check src streamlit_app tests
 
       - name: Smoke check pipeline entrypoint
-        run: python src/run_case_pipeline.py --list-steps
+        run: python src/run_platform_pipeline.py --list-steps
 
       - name: Validate release governance contract
         run: python src/governance_validation.py

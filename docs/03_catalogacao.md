@@ -2,8 +2,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -85,7 +85,7 @@ As evidências visuais continuam organizadas em `images/dadosfera/`, com consoli
 
 - importação do ativo publicado: [images/dadosfera/01_importacao_dataset.png](../images/dadosfera/01_importacao_dataset.png)
 - documentação e metadados do ativo: [images/dadosfera/02_catalogo_metadados.png](../images/dadosfera/02_catalogo_metadados.png)
-- ativo publicado dentro da coleção do case: [images/dadosfera/03_colecao_case.png](../images/dadosfera/03_colecao_case.png)
+- ativo publicado dentro da coleção do projeto: [images/dadosfera/03_colecao_publicada.png](../images/dadosfera/03_colecao_publicada.png)
 - prova de volume acima de 100k registros: [images/dadosfera/04_volume_100k.png](../images/dadosfera/04_volume_100k.png)
 
 ## Status atual
@@ -103,9 +103,10 @@ Para execução manual na plataforma, o ativo mais adequado do projeto é:
 
 Motivo:
 
-- já representa a camada publicada do case
+- já representa a camada publicada do projeto
 - evita expor a base analítica interna completa
 - está alinhado ao dashboard e aos principais indicadores executivos
 - é o formato mais simples para upload manual e compartilhamento tabular
+
 
 

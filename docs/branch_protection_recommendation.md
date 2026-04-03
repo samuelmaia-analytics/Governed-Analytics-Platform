@@ -50,4 +50,4 @@ Este documento registra a configuração recomendada no GitHub para aproximar o 
 
 - reduzir regressão em branch principal
 - reforçar accountability
-- alinhar a automação do repositório com a narrativa de governança do case
+- alinhar a automação do repositório com a narrativa de governança do projeto

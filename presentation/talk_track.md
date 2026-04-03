@@ -2,15 +2,15 @@
 
 ## Mensagem Central
 
-Este case não foi desenhado como exercício de visualização. Ele foi estruturado como um produto analítico operacionalizado: uma base transacional fragmentada foi convertida em um ativo confiável, governado e consumível por múltiplos canais, com publicação comprovada e operação recorrente da camada publicada.
+Este projeto não foi desenhado como exercício de visualização. Ele foi estruturado como um produto analítico operacionalizado: uma base transacional fragmentada foi convertida em um ativo confiável, governado e consumível por múltiplos canais, com operação recorrente da camada publicada.
 
 ## Abertura
 
-“Esta entrega foi organizada para responder a uma pergunta simples: como transformar um conjunto relacional bruto de e-commerce em um ativo analítico que suporte decisão de negócio sem perder rastreabilidade técnica. A resposta foi construir uma camada factual defensável, separar a exposição executiva da base interna, publicar o ativo externamente e empacotar sua operação recorrente.”
+“Este projeto foi organizado para responder a uma pergunta simples: como transformar um conjunto relacional bruto de e-commerce em um ativo analítico que suporte decisão de negócio sem perder rastreabilidade técnica. A resposta foi construir uma camada factual defensável, separar a exposição executiva da base interna e empacotar sua operação recorrente.”
 
 ## Problema
 
-“O dataset Olist é rico, mas nasce fragmentado. Pedidos, itens, produtos, clientes, sellers, pagamentos e reviews não chegam prontos para leitura executiva. O problema real não era fazer joins; era criar uma camada estável o suficiente para responder perguntas de negócio com consistência, governança e possibilidade de publicação.”
+“O dataset Olist é rico, mas nasce fragmentado. Pedidos, itens, produtos, clientes, sellers, pagamentos e reviews não chegam prontos para leitura executiva. O problema real não era fazer joins; era criar uma camada estável o suficiente para responder perguntas de negócio com consistência, governança e possibilidade de consumo controlado.”
 
 ## Decisão Arquitetural
 
@@ -34,24 +34,20 @@ Este case não foi desenhado como exercício de visualização. Ele foi estrutur
 
 ## Robustez Técnica
 
-“No estado atual, o repositório sustenta `124` testes passando, cobertura total acima de `83%` e gate mínimo de `80%` em CI. Isso transforma o case em algo revisável por engenharia com muito menos risco de regressão silenciosa.”
+“No estado atual, o repositório sustenta `124` testes passando, cobertura total acima de `83%` e gate mínimo de `80%` em CI. Isso transforma o projeto em algo revisável por engenharia com muito menos risco de regressão silenciosa.”
 
 ## Operação da Camada Publicada
 
-“Além da modelagem e da publicação, a camada publicada já conta com monitoramento recorrente de freshness e qualidade, além de um job agendado que gera artefatos operacionais. Isso eleva o case porque mostra preocupação com operação, e não apenas com geração manual do ativo.”
+“Além da modelagem e da publicação, a camada publicada já conta com monitoramento recorrente de freshness e qualidade, além de um job agendado que gera artefatos operacionais. Isso eleva o projeto porque mostra preocupação com operação, e não apenas com geração manual do ativo.”
 
-## Dadosfera
+## Escopo Principal e Extensões
 
-“Além do ambiente local, o ativo principal foi publicado na Dadosfera/Metabase e está documentado com evidências visuais de importação, catálogo, coleção e volume. O repositório também inclui sincronização complementar de catálogo via API do Maestro e preparação operacional para pipeline nativo. O que não se afirma é pipeline nativo rodando dentro da plataforma, porque isso ainda não está comprovado.”
-
-## Escopo Core vs Extensões
-
-“O escopo core do case está em ingestão, padronização, modelagem, governança, publicação e dashboard. Power BI, GenAI e exportações complementares entram como extensões. Isso foi mantido explícito para não inflar o escopo além do que realmente sustenta o produto principal.”
+“O núcleo do projeto está em ingestão, padronização, modelagem, governança, publicação e dashboard. Power BI, GenAI e exportações complementares entram como extensões. Isso foi mantido explícito para não inflar o escopo além do que realmente sustenta o produto principal.”
 
 ## Fechamento
 
-“A leitura correta desta entrega é: o produto analítico está pronto, a publicação está comprovada, a automação relevante já existe, a robustez de engenharia foi demonstrada e o único limite estrutural remanescente é a ausência de pipeline nativo comprovado dentro da plataforma. Para um case técnico, isso mostra capacidade real de construir ativo, governar exposição e fechar a jornada entre engenharia e consumo.”
+“A leitura correta deste projeto é: o produto analítico está pronto, a automação relevante já existe, a robustez de engenharia foi demonstrada e os próximos passos estão claramente separados do núcleo já implementado. Para um projeto técnico, isso mostra capacidade real de construir ativo, governar exposição e fechar a jornada entre engenharia e consumo.”
 
 ## Encerramento Sugerido
 
-“Se eu resumir em uma frase: esta entrega mostra menos um dashboard e mais um ativo analítico operacionalizado com critério.”
+“Se eu resumir em uma frase: este projeto mostra menos um dashboard e mais um ativo analítico operacionalizado com critério.”

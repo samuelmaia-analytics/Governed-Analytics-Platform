@@ -1,14 +1,13 @@
 # Arquitetura
 
-
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+
+## Tese Arquitetural
+
+O projeto separa explicitamente o que é base interna de engenharia do que pode ser exposto como produto analítico. Essa decisão reduz acoplamento, melhora governança e torna consumo, monitoramento e evolução mais previsíveis.
 
 ## Visão geral
 
@@ -20,7 +19,14 @@ Este projeto foi estruturado como uma arquitetura simples de Data Lake em camada
 - camada analítica interna
 - camada publicada para consumo controlado
 
-A intenção foi manter o case simples o suficiente para ser reproduzível, mas maduro o bastante para demonstrar rastreabilidade, governança e clareza de uso por camada.
+A intenção foi manter o projeto simples o suficiente para ser reproduzível, mas maduro o bastante para demonstrar rastreabilidade, governança e clareza de uso por camada.
+
+## Princípios de Arquitetura
+
+- a camada analítica central não é exposta diretamente ao consumo executivo
+- publicação é etapa explícita do pipeline
+- consumo, monitoramento e semântica reutilizam a mesma base publicada
+- documentação e catálogo fazem parte da solução, não do acabamento
 
 ## Diagrama de arquitetura
 
@@ -37,7 +43,6 @@ flowchart LR
     D --> H[SQL]
     D --> I[Power BI Exports]
     G --> J[Streamlit]
-    G --> K[Dadosfera / Metabase]
 ```
 
 Leitura arquitetural:
@@ -87,9 +92,9 @@ data/
 | `curated/ops` | registrar execução operacional | relatórios e resultados do runner |
 | `curated/quality` | registrar checks e contratos | relatórios e resultados de qualidade |
 | `curated/query_results` | persistir resultados SQL | saídas das queries em DuckDB |
-| `curated/genai` | guardar artefatos do bônus de GenAI | features extraídas de texto |
+| `curated/genai` | guardar artefatos da extensão de GenAI | features extraídas de texto |
 | `published/dashboard` | expor camada minimizada para consumo | `fact_orders_dashboard` |
-| `published/semantic` | expor marts agregados para recortes operacionais | `logistics_slice`, `seller_slice`, `cohort_slice` |
+| `published/semantic` | expor marts agregados para recortes operacionais e executivos | `logistics_slice`, `seller_slice`, `cohort_slice`, `category_slice`, `state_performance_slice` |
 | `published/monitoring` | persistir monitoramento recorrente | checks de freshness e qualidade |
 | `external/genai` | entrada auxiliar externa ao fluxo principal | amostra textual para GenAI |
 
@@ -162,7 +167,7 @@ Concentrar os ativos já tratados e prontos para consumo técnico, auditoria, qu
 - manifesto da coleção e inventário de ativos
 - checks de qualidade e contratos simples de schema
 - resultados SQL executados sobre a camada analítica
-- saídas estruturadas do bônus de GenAI
+- saídas estruturadas da extensão de GenAI
 
 ### 5. Published
 
@@ -183,7 +188,7 @@ Separar a camada de exposição do produto analítico da camada analítica inter
 - marts de logística, seller e cohort
 - relatórios recorrentes de freshness e qualidade da camada publicada
 - fonte do Streamlit
-- ativo usado para publicação e evidência na Dadosfera
+- ativo usado para consumo executivo e reaproveitamento controlado
 
 ## Fluxo do pipeline
 
@@ -200,7 +205,6 @@ flowchart TD
     G --> H[export_query_result_images.py]
     C --> I[export_power_bi.py]
     E --> J[Streamlit]
-    E --> K[Dadosfera Publish]
     F --> L[Catalog Sync API]
 ```
 
@@ -209,6 +213,15 @@ Leitura operacional:
 - o runner local coordena a transformação principal
 - a publicação é um passo explícito, não efeito colateral da modelagem
 - o catálogo existe em duas camadas: manifesto local e sync por API
+
+## Impacto da Separação Curated x Published
+
+| Decisão | Efeito técnico | Efeito no produto |
+| --- | --- | --- |
+| manter `fact_orders_enriched` como ativo interno | preserva flexibilidade analítica | evita expor a base completa |
+| publicar `fact_orders_dashboard` como camada dedicada | reduz acoplamento e simplifica consumo | melhora clareza do que o dashboard pode usar |
+| derivar marts semânticos da camada publicada | reaproveita a mesma fronteira de exposição | facilita recortes executivos adicionais |
+| monitorar a camada publicada | torna a exposição observável | aproxima o ativo de um produto operacional |
 
 ## Etapas técnicas da solução
 
@@ -231,7 +244,7 @@ Leitura operacional:
    Materializa a classificação de dados com foco em sensibilidade e publicação.
 
 7. `src/semantic_layer.py`
-   Materializa marts agregados para logística, seller e cohort a partir da camada publicada.
+   Materializa marts agregados para logística, seller, cohort, categoria e geografia executiva a partir da camada publicada.
 
 8. `src/published_monitoring.py`
    Monitora freshness, schema e cobertura semântica da camada publicada.
@@ -255,15 +268,15 @@ Leitura operacional:
    Consome exclusivamente a camada publicada do dashboard.
 
 15. `src/genai_feature_extraction.py`
-   Materializa o bônus de extração de features em texto desestruturado.
+   Materializa a extração adicional de features em texto desestruturado.
 
 ## Decisões de arquitetura que importam na avaliação
 
 - a camada analítica interna (`fact_orders_enriched`) foi mantida separada da camada publicada
 - o dashboard não consome a camada interna completa
-- a publicação na Dadosfera foi feita sobre o ativo publicado, e não sobre a base analítica completa
+- a camada publicada foi definida como fronteira oficial de exposição
 - catálogo, qualidade, SQL e dashboard foram tratados como partes da mesma jornada de dados
-- automação de catálogo e automação de deploy foram tratadas como extensões naturais da engenharia, não como tarefa manual de pós-entrega
+- automação de catálogo e automação de deploy foram tratadas como extensões naturais da engenharia, não como tarefa manual posterior
 
 ## O que está implementado versus o que é evolução
 
@@ -275,14 +288,14 @@ Leitura operacional:
 - camada semântica publicada para logística, seller e cohort
 - monitoramento recorrente com artefatos operacionais
 - catálogo local materializado
-- publicação do ativo principal na Dadosfera com evidência visual
+- documentação e evidências versionadas do ativo principal
 
 **Evolução futura**
 
 - pipeline nativo recorrente na plataforma
 - alerta externo para falhas de monitoramento e execução
-- maior absorção da arquitetura local pela Dadosfera
+- maior integração com canais externos, se necessário
 
 ## Resumo executivo
 
-Na prática, essa arquitetura permitiu organizar o case de forma defensável: o dado entra bruto, passa por padronização e validação, vira ativo analítico interno e só depois é publicado em uma camada segura para consumo. Isso melhora rastreabilidade, reduz ambiguidade de uso e mostra uma distinção madura entre construção do ativo e exposição do ativo.
+Na prática, essa arquitetura permitiu organizar o projeto de forma defensável: o dado entra bruto, passa por padronização e validação, vira ativo analítico interno e só depois é publicado em uma camada segura para consumo. Isso melhora rastreabilidade, reduz ambiguidade de uso e mostra uma distinção madura entre construção do ativo e exposição do ativo.

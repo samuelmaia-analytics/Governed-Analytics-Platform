@@ -86,6 +86,41 @@ def test_load_data_reads_csv_and_derives_dashboard_columns(tmp_path: Path, monke
     assert "quarter_label" in df.columns
 
 
+def test_load_data_uses_order_date_as_fallback_for_purchase_timestamp(tmp_path: Path, monkeypatch) -> None:
+    csv_path = tmp_path / "fact_orders_dashboard.csv"
+    df = build_dashboard_frame()
+    df["order_purchase_timestamp"] = [None, None, None]
+    df["order_date"] = ["2018-01-10", "2018-02-11", "2018-01-05"]
+    df.to_csv(csv_path, index=False)
+
+    monkeypatch.setattr(data_module, "FACT_PARQUET_PATH", tmp_path / "missing.parquet")
+    monkeypatch.setattr(data_module, "FACT_CSV_PATH", csv_path)
+    data_module.load_data.clear()
+
+    loaded = data_module.load_data()
+
+    assert loaded["order_purchase_timestamp"].notna().all()
+
+
+def test_load_data_raises_when_no_valid_purchase_dates_exist(tmp_path: Path, monkeypatch) -> None:
+    csv_path = tmp_path / "fact_orders_dashboard.csv"
+    df = build_dashboard_frame()
+    df["order_purchase_timestamp"] = [None, None, None]
+    df["order_date"] = [None, None, None]
+    df.to_csv(csv_path, index=False)
+
+    monkeypatch.setattr(data_module, "FACT_PARQUET_PATH", tmp_path / "missing.parquet")
+    monkeypatch.setattr(data_module, "FACT_CSV_PATH", csv_path)
+    data_module.load_data.clear()
+
+    try:
+        data_module.load_data()
+    except ValueError as exc:
+        assert "order_purchase_timestamp" in str(exc)
+    else:
+        raise AssertionError("Esperava ValueError para base sem datas válidas.")
+
+
 def test_build_default_filter_state_sets_expected_defaults(monkeypatch) -> None:
     fake_st = type("FakeSt", (), {"session_state": {}})()
     monkeypatch.setattr(data_module, "st", fake_st)
@@ -138,6 +173,33 @@ def test_build_select_filter_returns_all_options_in_all_mode(monkeypatch) -> Non
 
     assert selected == ["A", "B"]
     assert fake_st.session_state["flt_category_value"] == "Todas"
+
+
+def test_build_select_filter_returns_empty_list_when_no_options_exist(monkeypatch) -> None:
+    sidebar = FakeSidebar()
+    fake_st = type("FakeSt", (), {"sidebar": sidebar, "session_state": {}})()
+    monkeypatch.setattr(data_module, "st", fake_st)
+
+    selected = data_module.build_select_filter(
+        label="Categoria",
+        mode_key="flt_category_mode",
+        value_key="flt_category_value",
+        all_label="Todas",
+        focus_label="Específica",
+        options=[],
+    )
+
+    assert selected == []
+    assert fake_st.session_state["flt_category_value"] == "Todas"
+    assert sidebar.captions[-1] == "Sem opções disponíveis para categoria no recorte atual."
+
+
+def test_clean_dimension_options_removes_placeholders_and_duplicates() -> None:
+    values = pd.Series(["SP", "NA", "unknown", "SP", None, "RJ"])
+
+    result = data_module.clean_dimension_options(values)
+
+    assert result == ["RJ", "SP"]
 
 
 def test_build_sidebar_filters_returns_structured_filter_state(monkeypatch) -> None:

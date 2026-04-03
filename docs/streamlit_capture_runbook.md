@@ -3,14 +3,14 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/SAMUEL_MAIA_DDF_TECH_032026`
-- Dashboard Streamlit: `https://samuelmaia-032026.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
+- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 - Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
 
-Este documento define exatamente quais capturas finais devem ser feitas no dashboard para fechar a entrega do case.
+Este documento define exatamente quais capturas finais devem ser feitas no dashboard para fechar a entrega do projeto.
 
 ## Pre-condições
 
@@ -67,7 +67,7 @@ Mostrar a tela principal completa, com identidade visual, filtros e KPIs.
 
 **Objetivo**
 
-Destacar os indicadores principais do case.
+Destacar os indicadores principais do projeto.
 
 **Como configurar**
 
@@ -177,6 +177,7 @@ Mostrar que o app suporta exploração orientada por filtro.
 ## Observação importante
 
 Essas capturas devem ser feitas manualmente na interface. Este repositório agora já está preparado para receber os arquivos nos caminhos corretos.
+
 
 
 

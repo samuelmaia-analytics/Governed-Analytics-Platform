@@ -37,6 +37,6 @@ def test_build_collection_payload_counts_publishable_assets() -> None:
 
     payload = build_collection_payload(assets)
 
-    assert payload["collection_id"] == "olist_analytics_case_collection"
+    assert payload["collection_id"] == "olist_analytics_platform_collection"
     assert payload["publication_summary"]["total_assets"] == 2
     assert payload["publication_summary"]["publishable_assets"] == 1

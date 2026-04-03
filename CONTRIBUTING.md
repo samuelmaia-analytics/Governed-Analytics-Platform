@@ -1,10 +1,10 @@
 # Contributing
 
-Este repositório foi estruturado como case técnico, mas segue um fluxo mínimo de contribuição para manter consistência entre código, dados publicados e evidências.
+Este repositório segue um fluxo mínimo de contribuição para manter consistência entre código, dados publicados e evidências.
 
 ## Escopo
 
-- Preserve o objetivo do case: transformar o dataset Olist em um ativo analítico governado, testado e consumível.
+- Preserve o objetivo do projeto: transformar o dataset Olist em um ativo analítico governado, testado e consumível.
 - Evite ampliar escopo com componentes de plataforma não comprovados no repositório.
 - Mudanças em modelagem, publicação ou catálogo devem manter a separação entre `curated` e `published`.
 
@@ -20,7 +20,7 @@ Este repositório foi estruturado como case técnico, mas segue um fluxo mínimo
 ```bash
 python -m ruff check src streamlit_app tests
 python -m pytest tests
-python src/run_case_pipeline.py --list-steps
+python src/run_platform_pipeline.py --list-steps
 ```
 
 ## Regras de mudança
