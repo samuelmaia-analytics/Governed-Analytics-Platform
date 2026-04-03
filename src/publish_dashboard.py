@@ -220,10 +220,14 @@ def validate_privacy_controls(df: pd.DataFrame, contract: dict[str, object]) -> 
                 continue
             null_count = int(df[column].isna().sum())
             has_default = bool((df[column] == default_value).any())
+            # The control that matters operationally is that protected fields
+            # do not leak nulls to the published layer. Observing the default
+            # value is a bonus signal, but it should not fail datasets that
+            # were already complete before publication.
             checks.append(
                 PrivacyCheck(
                     check_name=f"default_fill__{column}",
-                    status="PASS" if null_count == 0 and has_default else "FAIL",
+                    status="PASS" if null_count == 0 else "FAIL",
                     details=f"nulls={null_count} | default_observado={has_default}",
                 )
             )

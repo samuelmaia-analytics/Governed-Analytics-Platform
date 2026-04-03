@@ -2,26 +2,13 @@
 
 Este documento registra as decisões de privacidade por design e governança aplicadas ao projeto.
 
-## Enforcement no Pipeline
+## Controles Alinhados à LGPD
 
-As decisões deste documento não ficam apenas na narrativa. A etapa `publish` do pipeline valida a camada publicada contra o contrato versionado `contracts/governance/privacy_governance.json` antes de salvar os artefatos finais.
-
-Os controles automatizados verificam:
-
-- presença exata das colunas permitidas na camada publicada
-- ausência de colunas proibidas e quase-identificadores removidos
-- prefixos esperados nas chaves pseudonimizadas
-- preenchimento default dos campos protegidos usados pelo app
-- ausência de vazamento de colunas classificadas como não publicáveis no inventário de classificação
-
-Evidências geradas:
-
-- `data/curated/quality/privacy_governance_results.csv`
-- `docs/privacy_governance.md`
-
-## Tese de Exposição
-
-O projeto não trata publicação como cópia da base analítica. A camada exposta é derivada, minimizada e pseudonimizada para que consumo executivo e governança convivam sem depender de controles externos para tudo.
+O projeto usa o dataset público da Olist como caso analítico, mas aplica controles inspirados em privacidade por design para reduzir exposição desnecessária na camada publicada.
+- `necessidade`: A camada publicada mantém apenas os atributos necessários para leitura executiva e remove identificadores transacionais e quase-identificadores.
+- `adequacao`: O uso publicado é restrito a indicadores executivos, sem expor granularidade operacional desnecessária para esse propósito.
+- `seguranca`: Chaves publicadas são pseudonimizadas antes do consumo e a camada interna permanece separada da camada exposta.
+- `prevencao`: O pipeline falha quando detecta colunas proibidas, pseudonimização ausente ou vazamento de campos classificados como não publicáveis.
 
 ## Camadas de Exposição
 
@@ -29,19 +16,6 @@ O projeto não trata publicação como cópia da base analítica. A camada expos
 - `data/standardized/`: dados padronizados para reuso técnico.
 - `data/curated/analytics/`: tabela analítica interna com granularidade por item, usada para processamento, SQL e qualidade.
 - `data/published/dashboard/`: camada publicada e minimizada para consumo do Streamlit.
-
-## Fronteira de Exposição
-
-```mermaid
-flowchart LR
-    A[Curated Analytics<br/>fact_orders_enriched] --> B[Minimization and Pseudonymization]
-    B --> C[Published Layer<br/>fact_orders_dashboard]
-    C --> D[Executive Consumption]
-```
-
-- `curated` continua como camada interna de engenharia
-- a passagem para `published` é o ponto de aplicação das decisões de exposição
-- o consumo executivo acontece depois da minimização, não antes
 
 ## Medidas Aplicadas na Camada Publicada
 
@@ -51,16 +25,6 @@ flowchart LR
 - remoção de quase-identificadores mais sensíveis na camada publicada, como cidade e prefixo de CEP.
 - manutenção apenas de atributos necessários para responder às perguntas do projeto: tempo, categoria, UF, pagamento, valor, atraso, seller, logística e cohort.
 - preservação da camada analítica interna para engenharia e auditoria, separada da camada publicada.
-
-## Princípios Aplicados
-
-| Princípio | Implementação no projeto |
-| --- | --- |
-| minimização | remoção de colunas sem valor para leitura executiva |
-| pseudonimização | substituição de identificadores por chaves derivadas |
-| separação de camadas | consumo do app restrito à publicada |
-| auditabilidade | documentação explícita da fronteira de exposição |
-| prevenção | falha automática do pipeline quando a camada publicada viola o contrato de exposição |
 
 ## Colunas Removidas da Camada Publicada
 
@@ -92,13 +56,25 @@ flowchart LR
 - Arquivo publicado para upload manual: `data/published/dashboard/fact_orders_dashboard.csv`
 - Registros publicados: **112,650**
 - Colunas publicadas: **34**
+- Resultado da validação LGPD/governança: **PASS**
+- Evidência tabular dos checks: `data/curated/quality/privacy_governance_results.csv`
 
-## O Que Esta Abordagem Evita
+## Validação Aplicada
 
-- exposição desnecessária de identificadores operacionais
-- dependência do dashboard na tabela interna completa
-- divergência entre o que é explorado internamente e o que é publicado
-- uso informal de atributos detalhados sem justificativa de negócio
+| Check | Status | Detalhes |
+| --- | --- | --- |
+| `required_columns` | **PASS** | Ausentes: nenhuma |
+| `forbidden_columns_absent` | **PASS** | Presentes indevidas: nenhuma |
+| `unexpected_columns` | **PASS** | Inesperadas: nenhuma |
+| `pseudonymized__order_id` | **PASS** | Prefixo esperado: `order_id_` |
+| `pseudonymized__customer_unique_id` | **PASS** | Prefixo esperado: `customer_unique_id_` |
+| `pseudonymized__seller_key` | **PASS** | Prefixo esperado: `seller_id_` |
+| `default_fill__customer_state` | **PASS** | nulls=0 | default_observado=False |
+| `default_fill__seller_state` | **PASS** | nulls=0 | default_observado=False |
+| `default_fill__order_status` | **PASS** | nulls=0 | default_observado=False |
+| `default_fill__payment_type_mode` | **PASS** | nulls=0 | default_observado=True |
+| `default_fill__seller_volume_tier` | **PASS** | nulls=0 | default_observado=True |
+| `classification_leakage` | **PASS** | Colunas sensíveis expostas: nenhuma |
 
 ## Política de Uso
 
@@ -106,12 +82,6 @@ flowchart LR
 - a camada `curated/analytics` permanece interna ao pipeline e não deve ser tratada como camada de exposição.
 - tabelas detalhadas do app devem exibir apenas chaves pseudonimizadas e dimensões agregadas necessárias ao projeto.
 - uploads manuais em plataforma devem usar preferencialmente o CSV da camada publicada.
-
-## Contratos Relacionados
-
-- `contracts/governance/privacy_governance.json`: contrato de exposição LGPD/governança da camada publicada
-- `contracts/published/fact_orders_dashboard.contract.json`: contrato estrutural da tabela publicada
-- `data/curated/catalog/data_classification_inventory.csv`: inventário de classificação usado como apoio para verificar vazamento de campos não publicáveis
 
 ## Limitações e Escopo
 

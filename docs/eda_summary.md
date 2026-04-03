@@ -1,15 +1,5 @@
 # Resumo de EDA
 
-
-## Acesso Rápido
-
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
-- Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
-- Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
-- Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
-- Tabela pública na Dadosfera: `https://app.dadosfera.ai/pt-BR/catalog/data-assets/2d044685-b897-4cfb-8010-b8c19c1e669d`
-
 Resumo exploratório inicial dos CSVs em `data/raw/landing/olist/`, com tabelas padronizadas promovidas para `data/standardized/olist/`.
 
 ## Visão Geral
@@ -208,6 +198,3 @@ Resumo exploratório inicial dos CSVs em `data/raw/landing/olist/`, com tabelas 
 - `data/staging/profiling/all_nulls_profile.csv`
 - `data/staging/profiling/all_possible_keys.csv`
 - `data/staging/profiling/all_duplicate_profile.csv`
-
-
-
