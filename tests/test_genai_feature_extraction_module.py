@@ -95,3 +95,59 @@ def test_main_rejects_missing_required_columns(tmp_path: Path, monkeypatch) -> N
 
     with pytest.raises(ValueError):
         genai.main()
+
+
+def test_call_openai_handles_http_error(monkeypatch) -> None:
+    class DummySettings:
+        class OpenAISettings:
+            api_key = "token"
+
+            @staticmethod
+            def validate_credentials() -> None:
+                return None
+
+        openai = OpenAISettings()
+
+    class DummyHttpError(genai.error.HTTPError):
+        def __init__(self) -> None:
+            super().__init__(
+                url=genai.OPENAI_API_URL,
+                code=401,
+                msg="Unauthorized",
+                hdrs=None,
+                fp=None,
+            )
+
+        @staticmethod
+        def read() -> bytes:
+            return b'{"error":"unauthorized"}'
+
+    def fake_urlopen(req, timeout: int = 60):  # type: ignore[override]
+        raise DummyHttpError()
+
+    monkeypatch.setattr(genai, "load_app_settings", lambda: DummySettings())
+    monkeypatch.setattr(genai.request, "urlopen", fake_urlopen)
+
+    with pytest.raises(RuntimeError, match="Erro ao chamar OpenAI API: 401"):
+        genai.call_openai("prompt", model="gpt-4.1-mini")
+
+
+def test_call_openai_handles_network_error(monkeypatch) -> None:
+    class DummySettings:
+        class OpenAISettings:
+            api_key = "token"
+
+            @staticmethod
+            def validate_credentials() -> None:
+                return None
+
+        openai = OpenAISettings()
+
+    def fake_urlopen(req, timeout: int = 60):  # type: ignore[override]
+        raise genai.error.URLError("network down")
+
+    monkeypatch.setattr(genai, "load_app_settings", lambda: DummySettings())
+    monkeypatch.setattr(genai.request, "urlopen", fake_urlopen)
+
+    with pytest.raises(RuntimeError, match="Falha de rede ao chamar OpenAI API"):
+        genai.call_openai("prompt", model="gpt-4.1-mini")

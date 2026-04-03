@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from src.dadosfera_pipeline_ops import (
     DadosferaPipelineClient,
     PipelineApiConfig,
@@ -182,3 +184,25 @@ def test_pipeline_client_raises_actionable_message_on_missing_endpoint() -> None
         assert "DADOSFERA_PIPELINE_LIST_ENDPOINT" in str(exc)
     else:
         raise AssertionError("Expected actionable RuntimeError for missing pipeline endpoint")
+
+
+def test_extract_pipeline_items_supports_single_pipeline_payload() -> None:
+    payload = {"pipeline": {"id": "pipe-123", "name": "olist"}}
+
+    assert extract_pipeline_items(payload) == [{"id": "pipe-123", "name": "olist"}]
+
+
+def test_resolve_pipeline_id_raises_when_identifier_is_missing() -> None:
+    with pytest.raises(RuntimeError, match="sem identificador utilizavel"):
+        resolve_pipeline_id({"name": "olist"})
+
+
+def test_find_pipeline_by_name_matches_display_name() -> None:
+    class DummyClient:
+        @staticmethod
+        def list_pipelines() -> dict[str, object]:
+            return {"items": [{"id": "2", "display_name": "pipe-b"}]}
+
+    matched = find_pipeline_by_name(DummyClient(), "pipe-b")  # type: ignore[arg-type]
+
+    assert matched == {"id": "2", "display_name": "pipe-b"}

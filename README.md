@@ -76,6 +76,12 @@ Opcionalmente, para instalar como projeto Python com dependências de desenvolvi
 pip install -e .[dev]
 ```
 
+Para reproduzir exatamente o conjunto validado neste repositório, use o lockfile:
+
+```bash
+pip install -r requirements.lock
+```
+
 ### 2. Configurar variáveis de ambiente
 
 Os fluxos principais rodam sem segredos obrigatórios. Para habilitar integrações opcionais, copie `.env.example` para `.env` e ajuste os valores necessários.
