@@ -25,6 +25,8 @@ Este documento consolida os guardrails operacionais do repositório para elevar 
 - `src/release_management.py` resolve o plano de promoção entre `dev`, `stage` e `prod`.
 - `src/governance_validation.py` valida a coerência do contrato de release.
 - `src/workflow_policy_validation.py` valida os gatilhos e branches dos workflows contra o contrato.
+- `main` exige `test` e `ruff` como checks obrigatórios na proteção real da branch.
+- `develop` e `release` ficam cobertas por ruleset para branches futuras.
 - `develop`, `release` e `main` representam, respectivamente, os estágios `dev`, `stage` e `prod`.
 - `streamlit-dev`, `streamlit-stage` e `streamlit-prod` são branches de deploy, não branches de desenvolvimento.
 

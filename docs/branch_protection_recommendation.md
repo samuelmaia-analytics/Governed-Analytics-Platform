@@ -8,7 +8,7 @@ Este documento registra a configuração recomendada no GitHub para aproximar o 
 
 - exigir pull request antes de merge
 - exigir pelo menos 1 review
-- exigir `CI` e `Lint` verdes
+- exigir os checks obrigatórios equivalentes ao workflow de testes e lint do repositório
 - bloquear merge com conversas não resolvidas
 - bloquear force push
 - bloquear delete da branch
@@ -17,7 +17,7 @@ Este documento registra a configuração recomendada no GitHub para aproximar o 
 
 - exigir pull request antes de merge
 - exigir pelo menos 1 review
-- exigir `CI` e `Lint` verdes
+- exigir os checks obrigatórios equivalentes ao workflow de testes e lint do repositório
 - bloquear merge com conversas não resolvidas
 - bloquear force push
 - bloquear delete da branch
@@ -26,10 +26,16 @@ Este documento registra a configuração recomendada no GitHub para aproximar o 
 
 - exigir pull request antes de merge
 - exigir pelo menos 1 review
-- exigir `CI` e `Lint` verdes
+- exigir `test` e `ruff` como checks obrigatórios
 - bloquear merge com conversas não resolvidas
 - bloquear force push
 - bloquear delete da branch
+
+## Estado aplicado no repositório
+
+- `main` está protegida com branch protection clássica
+- `main` exige `1` review, resolução de conversa e checks obrigatórios `test` e `ruff`
+- `develop` e `release` estão cobertas por ruleset para branches futuras, evitando depender da existência prévia da branch
 
 ## Recomendação para deploy
 

@@ -76,7 +76,8 @@ Leitura correta:
 
 ## Guardrails de release
 
-- `CI` e `Lint` executam em `develop`, `release` e `main`
+- os workflows de teste e lint executam em `develop`, `release` e `main`
+- na proteção real de `main`, os checks obrigatórios são `test` e `ruff`
 - `Policy Check` valida o contrato versionado de governança e os gatilhos reais dos workflows
 - `CI` valida também `python src/governance_validation.py`
 - `publish` valida `contracts/governance/privacy_governance.json` antes de salvar a camada publicada
