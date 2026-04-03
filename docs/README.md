@@ -18,6 +18,7 @@ flowchart LR
 - `operating_model.md` conecta pipeline, publicação, governança e consumo
 - `technical_narrative.md` consolida a defesa técnica do projeto
 - `platform_publication.md` registra a automação de publicação em ambiente de plataforma
+- `privacy_governance.md` registra a fronteira de exposição e os checks LGPD/governança aplicados na camada publicada
 - runbooks e relatórios sustentam a operação e a auditabilidade
 
 ## Comece Por Objetivo
@@ -47,6 +48,7 @@ flowchart LR
 - [collection_catalog.md](collection_catalog.md): coleção local e inventário catalogável
 - [platform_publication.md](platform_publication.md): sync de catálogo e publicação idempotente de pipeline em ambiente de plataforma
 - [privacy_governance.md](privacy_governance.md): decisões de minimização e publicação
+- `contracts/governance/privacy_governance.json`: contrato versionado de privacidade e LGPD aplicado na etapa `publish`
 - [governance_policy.md](governance_policy.md): governança, retenção e responsabilidades
 - [engineering_governance.md](engineering_governance.md): guardrails de CI, ownership e contribuição
 - [branch_protection_recommendation.md](branch_protection_recommendation.md): configuração recomendada no GitHub para merge e deploy
@@ -78,6 +80,7 @@ flowchart LR
 - [schema_contract_report.md](schema_contract_report.md)
 - [data_classification.md](data_classification.md)
 - [published_layer_monitoring.md](published_layer_monitoring.md)
+- [privacy_governance.md](privacy_governance.md)
 - [semantic_layer.md](semantic_layer.md)
 - [operational_job_report.md](operational_job_report.md)
 - [platform_publication.md](platform_publication.md)

@@ -28,6 +28,7 @@ flowchart TD
 - `quality`, `contracts` e `catalog` sustentam confiança e auditabilidade
 - promoção de branch e deploy são fluxos separados da geração dos dados
 - o app publicado só deve consumir a camada já minimizada
+- a etapa `publish` falha se a camada exposta violar o contrato LGPD/governança
 
 ## Fluxo operacional
 
@@ -46,7 +47,7 @@ flowchart TD
 | ingestão e padronização | garantir base reprodutível | tabelas raw e standardized |
 | build analítico | consolidar o ativo central | `fact_orders_enriched` |
 | qualidade e contratos | validar integridade e schema | relatórios e resultados de checks |
-| publicação | delimitar a camada exposta | `fact_orders_dashboard` |
+| publicação | delimitar e validar a camada exposta | `fact_orders_dashboard` + evidência LGPD/governança |
 | semântica e monitoramento | ampliar reuso e observabilidade | marts e checks da camada publicada |
 | consumo | materializar valor analítico | Streamlit, Power BI e SQL |
 
@@ -78,6 +79,7 @@ Leitura correta:
 - `CI` e `Lint` executam em `develop`, `release` e `main`
 - `Policy Check` valida o contrato versionado de governança e os gatilhos reais dos workflows
 - `CI` valida também `python src/governance_validation.py`
+- `publish` valida `contracts/governance/privacy_governance.json` antes de salvar a camada publicada
 - `ruff` e `pytest` são reaplicados no workflow de promoção
 - o branch de deploy é atualizado com `git push origin HEAD:<deployment_branch> --force`
 - mudanças que afetam a camada publicada exigem revalidação de artefatos, contratos e qualidade
@@ -87,6 +89,7 @@ Leitura correta:
 
 - `src/run_platform_pipeline.py`: geração ponta a ponta dos ativos analíticos
 - `src/publish_dashboard.py`: construção da camada publicada minimizada
+- `contracts/governance/privacy_governance.json`: contrato versionado de exposição LGPD/governança
 - `src/semantic_layer.py`: marts publicados para logística, seller e cohort
 - `src/published_monitoring.py`: freshness e qualidade recorrente da camada publicada
 - `src/platform_publication.py`: orquestra sync de catálogo e publicação idempotente de pipeline em ambiente de plataforma
@@ -105,6 +108,7 @@ Leitura correta:
 - contratos de schema em `src/schema_contracts.py`
 - catálogo local versionado em `src/catalog.py`
 - publicação minimizada em `src/publish_dashboard.py`
+- contrato LGPD/governança aplicado automaticamente na camada publicada
 - CI, lint e deploy versionados em `.github/workflows/`
 - integrações externas permanecem opcionais e desacopladas do fluxo principal
 - alertas externos podem ser disparados via webhook quando o monitoramento detecta falhas
