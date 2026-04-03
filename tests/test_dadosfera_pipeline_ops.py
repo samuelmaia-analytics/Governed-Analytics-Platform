@@ -1,17 +1,22 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
 import pytest
 
+import src.dadosfera_pipeline_ops as pipeline_ops
 from src.dadosfera_pipeline_ops import (
     DadosferaPipelineClient,
     PipelineApiConfig,
+    build_client_from_args,
     extract_pipeline_items,
     find_pipeline_by_name,
     load_json_file,
     normalize_endpoint_path,
+    parse_args,
+    raise_runtime_for_pipeline_http_error,
     resolve_pipeline_id,
 )
 from src.resilient_http import RetryPolicy
@@ -206,3 +211,148 @@ def test_find_pipeline_by_name_matches_display_name() -> None:
     matched = find_pipeline_by_name(DummyClient(), "pipe-b")  # type: ignore[arg-type]
 
     assert matched == {"id": "2", "display_name": "pipe-b"}
+
+
+def test_raise_runtime_for_pipeline_http_error_reports_unauthorized_without_token() -> None:
+    import requests
+
+    response = requests.Response()
+    response.status_code = 401
+    error = requests.HTTPError("401", response=response)
+
+    with pytest.raises(RuntimeError, match="DADOSFERA_ACCESS_TOKEN/DADOSFERA_API_TOKEN"):
+        raise_runtime_for_pipeline_http_error(
+            error,
+            path="/platform/pipelines",
+            operation="dadosfera_list_pipelines",
+            has_authorization=False,
+            auth_diagnostics=None,
+        )
+
+
+def test_parse_args_for_run_command(monkeypatch) -> None:
+    class DummySettings:
+        class DadosferaSettings:
+            base_url = "https://maestro.example.com"
+            list_endpoint = "/list"
+            create_endpoint = "/create"
+            get_endpoint_template = "/get/{pipeline_id}"
+            run_endpoint = "/run"
+            runs_endpoint_template = "/runs/{pipeline_id}"
+
+        dadosfera = DadosferaSettings()
+
+    monkeypatch.setattr(pipeline_ops, "load_app_settings", lambda: DummySettings())
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "dadosfera_pipeline_ops.py",
+            "--base-url",
+            "https://custom.example.com",
+            "run",
+            "--pipeline-id",
+            "pipe-1",
+        ],
+    )
+
+    args = parse_args()
+
+    assert args.base_url == "https://custom.example.com"
+    assert args.command == "run"
+    assert args.pipeline_id == "pipe-1"
+
+
+def test_build_client_from_args_uses_settings(monkeypatch) -> None:
+    calls: list[str] = []
+
+    class DummyDadosferaSettings:
+        username = "user"
+        password = "secret"
+        totp = "123456"
+        effective_access_token = "token"
+
+        @staticmethod
+        def validate_credentials(*, operation: str) -> None:
+            calls.append(operation)
+
+    class DummySettings:
+        dadosfera = DummyDadosferaSettings()
+
+    monkeypatch.setattr(pipeline_ops, "load_app_settings", lambda: DummySettings())
+    monkeypatch.setattr(pipeline_ops, "DadosferaPipelineClient", lambda **kwargs: kwargs)
+
+    args = argparse.Namespace(
+        base_url="https://maestro.example.com",
+        list_endpoint="/list",
+        create_endpoint="/create",
+        get_endpoint_template="/get/{pipeline_id}",
+        run_endpoint="/run",
+        runs_endpoint_template="/runs/{pipeline_id}",
+    )
+
+    client_kwargs = build_client_from_args(args)
+
+    assert calls == ["pipeline_ops"]
+    assert client_kwargs["username"] == "user"
+    assert client_kwargs["config"].run_endpoint == "/run"
+
+
+def test_main_list_command_prints_response(monkeypatch, capsys) -> None:
+    class DummyClient:
+        @staticmethod
+        def sign_in() -> None:
+            return None
+
+        @staticmethod
+        def list_pipelines() -> dict[str, object]:
+            return {"items": [{"id": "1"}]}
+
+    monkeypatch.setattr(pipeline_ops, "configure_logging", lambda: None)
+    monkeypatch.setattr(
+        pipeline_ops,
+        "parse_args",
+        lambda: argparse.Namespace(command="list"),
+    )
+    monkeypatch.setattr(pipeline_ops, "build_client_from_args", lambda args: DummyClient())
+
+    pipeline_ops.main()
+
+    assert '"id": "1"' in capsys.readouterr().out
+
+
+def test_main_deploy_command_reuses_existing_pipeline(monkeypatch, tmp_path: Path, capsys) -> None:
+    definition_path = tmp_path / "pipeline.json"
+    definition_path.write_text(json.dumps({"name": "olist-pipeline"}), encoding="utf-8")
+
+    class DummyClient:
+        @staticmethod
+        def sign_in() -> None:
+            return None
+
+        @staticmethod
+        def create_pipeline(definition: dict[str, object]) -> dict[str, object]:
+            raise AssertionError("create_pipeline should not be called when pipeline already exists")
+
+        @staticmethod
+        def run_pipeline(pipeline_id: str, payload: dict[str, object]) -> dict[str, object]:
+            return {"run_id": "run-1"}
+
+    monkeypatch.setattr(pipeline_ops, "configure_logging", lambda: None)
+    monkeypatch.setattr(
+        pipeline_ops,
+        "parse_args",
+        lambda: argparse.Namespace(
+            command="deploy",
+            definition=definition_path,
+            execute=True,
+            run_payload=None,
+        ),
+    )
+    monkeypatch.setattr(pipeline_ops, "build_client_from_args", lambda args: DummyClient())
+    monkeypatch.setattr(pipeline_ops, "find_pipeline_by_name", lambda client, pipeline_name: {"id": "pipe-9", "name": pipeline_name})
+
+    pipeline_ops.main()
+
+    stdout = capsys.readouterr().out
+    assert '"id": "pipe-9"' in stdout
+    assert '"run_id": "run-1"' in stdout

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -155,3 +156,107 @@ def test_run_pipeline_publication_creates_and_executes_pipeline(monkeypatch, tmp
     assert "run-456" in result.details
     assert client.created_definition == {"name": "olist-pipeline"}
     assert client.run_calls == [("pipe-123", {})]
+
+
+def test_build_clients_validate_settings_and_forward_credentials(monkeypatch) -> None:
+    calls: list[tuple[str, object]] = []
+
+    class DummyDadosferaSettings:
+        base_url = "https://maestro.example.com"
+        username = "user"
+        password = "secret"
+        totp = "123456"
+        effective_access_token = "token"
+
+        @staticmethod
+        def validate_credentials(*, operation: str) -> None:
+            calls.append(("validate", operation))
+
+    class DummySettings:
+        dadosfera = DummyDadosferaSettings()
+
+    monkeypatch.setattr(platform_publication, "load_app_settings", lambda: DummySettings())
+    monkeypatch.setattr(platform_publication, "DadosferaMaestroClient", lambda **kwargs: ("catalog", kwargs))
+    monkeypatch.setattr(platform_publication, "DadosferaPipelineClient", lambda **kwargs: ("pipeline", kwargs))
+
+    catalog_client = platform_publication.build_catalog_client("https://maestro.example.com")
+    pipeline_client = platform_publication.build_pipeline_client("https://maestro.example.com")
+
+    assert calls == [
+        ("validate", "platform_publication_catalog"),
+        ("validate", "platform_publication_pipeline"),
+    ]
+    assert catalog_client[1]["username"] == "user"
+    assert pipeline_client[1]["access_token"] == "token"
+
+
+def test_parse_args_reads_flags(monkeypatch, tmp_path: Path) -> None:
+    class DummySettings:
+        class DadosferaSettings:
+            base_url = "https://maestro.example.com"
+
+        dadosfera = DadosferaSettings()
+
+    report_path = tmp_path / "report.md"
+    monkeypatch.setattr(platform_publication, "load_app_settings", lambda: DummySettings())
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "platform_publication.py",
+            "--target-environment",
+            "stage",
+            "--report",
+            str(report_path),
+            "--dry-run",
+            "--skip-catalog-sync",
+        ],
+    )
+
+    args = platform_publication.parse_args()
+
+    assert args.base_url == "https://maestro.example.com"
+    assert args.target_environment == "stage"
+    assert args.report == report_path
+    assert args.dry_run is True
+    assert args.skip_catalog_sync is True
+
+
+def test_main_generates_report_with_selected_steps(monkeypatch, tmp_path: Path, capsys) -> None:
+    report_path = tmp_path / "platform_publication.md"
+    manifest_path = tmp_path / "manifest.json"
+    definition_path = tmp_path / "pipeline.json"
+    manifest_path.write_text("[]", encoding="utf-8")
+    definition_path.write_text("{}", encoding="utf-8")
+
+    args = argparse.Namespace(
+        base_url="https://maestro.example.com",
+        target_environment="prod",
+        manifest=manifest_path,
+        pipeline_definition=definition_path,
+        report=report_path,
+        dry_run=True,
+        skip_catalog_sync=False,
+        skip_pipeline_publication=False,
+        execute_pipeline=False,
+    )
+
+    monkeypatch.setattr(platform_publication, "configure_logging", lambda: None)
+    monkeypatch.setattr(platform_publication, "parse_args", lambda: args)
+    monkeypatch.setattr(
+        platform_publication,
+        "run_catalog_publication",
+        lambda **kwargs: ([], platform_publication.PlatformPublicationResult("catalog_sync", "DRY_RUN", "ok")),
+    )
+    monkeypatch.setattr(
+        platform_publication,
+        "run_pipeline_publication",
+        lambda **kwargs: platform_publication.PlatformPublicationResult("pipeline_publication", "DRY_RUN", "ok"),
+    )
+
+    platform_publication.main()
+
+    saved_report = report_path.read_text(encoding="utf-8")
+    stdout = capsys.readouterr().out
+    assert "`catalog_sync`" in saved_report
+    assert "`pipeline_publication`" in saved_report
+    assert stdout == saved_report + "\n" or stdout == saved_report
