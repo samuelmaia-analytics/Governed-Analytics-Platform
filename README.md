@@ -4,189 +4,63 @@
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/actions/workflows/lint.yml)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://olist-governed-analytics-platform.streamlit.app/)
 
-Pipeline de Analytics Engineering construído sobre o dataset público da Olist para transformar dados brutos em um ativo analítico governado, reutilizável e pronto para consumo executivo em múltiplos canais.
+Pipeline de Analytics Engineering construído sobre o dataset público da Olist para transformar dados brutos em um ativo analítico governado, com separação explícita entre camada analítica interna e camada publicada para consumo executivo.
 
-O diferencial do projeto é tratar publicação como parte do pipeline, e não como detalhe do dashboard. Em vez de conectar a visualização diretamente à camada analítica completa, a solução cria uma camada publicada, minimizada e observável para exposição executiva.
+## Em uma frase
 
-Isso cria uma fronteira clara entre:
+O projeto mostra como sair de CSVs relacionais brutos para um produto analítico com qualidade, contratos, monitoramento, catálogo, publicação controlada e consumo em `Streamlit` e `Power BI`.
 
-- engenharia analítica e consumo executivo
-- exploração interna e exposição controlada
-- evolução do dado e operação do produto analítico
+## O que o projeto entrega
 
-Fonte de dados: `Brazilian E-Commerce Public Dataset by Olist` no Kaggle.
+- pipeline ponta a ponta em Python para ingestão, profiling, modelagem, publicação e exportação
+- tabela analítica interna `fact_orders_enriched`
+- camada publicada `fact_orders_dashboard` com minimização para consumo recorrente
+- marts semânticos publicados para recortes executivos e operacionais
+- dashboard Streamlit consumindo somente a camada publicada
+- exportações auxiliares para Power BI
+- contratos, testes, lint, cobertura e CI
+- catálogo local, relatórios técnicos e evidências operacionais
+- monitoramento da camada publicada
+- integrações opcionais com webhook externo, OpenAI e Dadosfera Maestro
 
-## Em Uma Frase
-
-O projeto demonstra como transformar um dataset relacional bruto em um produto analítico utilizável, com separação explícita entre engenharia, governança e consumo.
-
-## Visão Rápida
-
-- `112.650` registros publicados na camada final
-- `34` colunas na tabela exposta ao dashboard
-- consumo em `Streamlit` e `Power BI`
-- `5` marts semânticos publicados para recortes operacionais e executivos
-- contratos, testes, lint e CI na mesma base
-
-## Por Que Este Projeto É Relevante
-
-- materializa uma separação prática entre `curated` e `published`
-- reduz acoplamento entre pipeline, semântica e visualização
-- reaproveita a mesma camada publicada em mais de um canal de consumo
-- combina governança, entrega analítica e evidência operacional no mesmo repositório
-
-## Acessos
-
-- App Streamlit: [olist-governed-analytics-platform.streamlit.app](https://olist-governed-analytics-platform.streamlit.app/)
-- Dashboard Power BI: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
-- Repositório: `github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Vídeo: [YouTube](https://youtu.be/SqJ0UF1Em9k)
-
-## Leitura Recomendada
-
-```mermaid
-flowchart TD
-    A[README] --> B[docs/executive_summary.md]
-    B --> C[docs/architecture.md]
-    C --> D[docs/operating_model.md]
-    D --> E[docs/privacy_governance.md]
-```
-
-- comece por este `README` para entender a proposta e os ativos publicados
-- siga para `docs/executive_summary.md` para a leitura executiva
-- use `docs/architecture.md` e `docs/operating_model.md` para a visão técnica e operacional
-
-## Produto Em Uso
-
-![Visão geral do dashboard Streamlit](images/dashboard/01_overview.png)
-
-<p align="center">
-  <img src="powerbi/dashboard_overview.png" alt="Visão geral do dashboard Power BI" width="78%">
-</p>
-
-## Fluxo Operacional
+## Fluxo operacional
 
 ```mermaid
 flowchart LR
-    A[Raw Olist CSV] --> B[Standardize]
-    B --> C[Curated Analytics]
-    C --> D[Published Dashboard Table]
-    D --> E[Streamlit]
-    D --> F[Power BI]
-    D --> G[Monitoring]
-    G --> H[External Alerts]
-    D --> I[Platform Publication]
-    C --> J[Exploration and SQL]
-```
-
-Leitura operacional:
-
-- `curated` concentra transformação, qualidade e exploração analítica
-- `published` delimita o que pode ser exposto para consumo recorrente
-- `monitoring` acompanha a camada publicada como ativo operacional
-- alertas externos podem ser disparados quando há falhas operacionais
-- a publicação em plataforma pode sincronizar catálogo e pipeline de forma idempotente
-- aplicações e dashboards reutilizam a mesma base preparada para exposição
-
-## O Que Este Projeto Entrega
-
-- pipeline reproduzível em Python para ingestão, padronização, modelagem e publicação
-- ativo analítico interno `fact_orders_enriched`
-- camada publicada `fact_orders_dashboard` com minimização e pseudonimização
-- marts semânticos publicados para logística, seller, cohort, categoria e performance por UF
-- dashboard em Streamlit consumindo somente a camada publicada
-- SQL analítico versionado e exportações para Power BI
-- contratos, testes, lint e automações de CI
-- catálogo, documentação técnica e evidências operacionais
-- monitoramento recorrente da camada publicada
-- alertas externos via webhook para falhas de monitoramento
-- automação de publicação em ambiente de plataforma para catálogo e pipeline
-
-## Decisões Que Elevam o Projeto
-
-- a camada publicada é tratada como produto operacional, não como export casual
-- o dashboard consome exclusivamente a base minimizada
-- SQL, catálogo, monitoramento e BI reutilizam o mesmo ativo central
-- governança aparece como implementação concreta, não só como texto de apoio
-
-## Arquitetura
-
-```mermaid
-flowchart LR
-    A[Raw CSV Olist] --> B[Standardized]
-    B --> C[Staging Profiling]
+    A[Raw CSV Olist] --> B[Inventory and Standardization]
+    B --> C[Profiling]
     C --> D[Curated Analytics<br/>fact_orders_enriched]
     D --> E[Published Dashboard<br/>fact_orders_dashboard]
-    E --> F[Published Semantic<br/>logistics seller cohort]
+    E --> F[Published Semantic Assets]
     E --> G[Published Monitoring]
     E --> H[Streamlit]
-    D --> I[SQL]
-    D --> J[Power BI]
+    E --> I[Power BI exports]
+    D --> J[SQL and catalog]
 ```
 
-Leitura arquitetural:
+## Stack principal
 
-- `curated` concentra transformação, qualidade, exploração e ativos internos
-- `published` desacopla consumo executivo da base analítica completa
-- Streamlit e Power BI reutilizam ativos preparados para exposição
-
-## Resultado
-
-| Item | Valor |
-| --- | --- |
-| Ativo analítico central | `fact_orders_enriched` |
-| Granularidade | `1 linha por item de pedido` |
-| Volume final | `112.650` registros |
-| Camada publicada | `fact_orders_dashboard` |
-| Colunas publicadas | `34` |
-| Marts semânticos | `5` |
-| Consumo | Streamlit + Power BI |
-
-## Por Que A Arquitetura Importa
-
-Em muitos projetos, o dashboard é conectado diretamente à base tratada. Aqui, a publicação é tratada como etapa explícita do pipeline. Isso reduz acoplamento, melhora governança e cria uma fronteira clara entre desenvolvimento analítico e consumo executivo.
-
-Na prática, isso permitiu:
-
-- aplicar minimização e pseudonimização antes do consumo executivo
-- manter a camada analítica interna livre para exploração e evolução
-- publicar o mesmo ativo em múltiplos canais sem duplicar lógica
-- monitorar a camada publicada como produto operacional
-
-## Stack
-
-- Python
-- DuckDB
-- Pandas
-- Pytest
-- Ruff
+- Python 3.11+
+- Pandas, NumPy e DuckDB
+- Streamlit, Altair e Plotly
+- Pytest, pytest-cov e Ruff
+- SQL versionado
 - GitHub Actions
-- Streamlit
-- SQL
-- Power BI
 
-## Evidências
-
-- Dashboard Streamlit: [olist-governed-analytics-platform.streamlit.app](https://olist-governed-analytics-platform.streamlit.app/)
-- Dashboard Power BI: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
-- Artefatos Power BI: [powerbi/](powerbi)
-- Consultas analíticas versionadas: [sql/](sql)
-- Relatório da camada semântica: [docs/semantic_layer.md](docs/semantic_layer.md)
-- Relatório de publicação em plataforma: [docs/platform_publication.md](docs/platform_publication.md)
-
-## Estrutura
+## Estrutura do repositório
 
 | Caminho | Papel |
 | --- | --- |
-| `src/` | pipeline, publicação, catálogo, monitoramento e utilitários |
-| `streamlit_app/` | aplicação analítica |
-| `sql/` | consultas analíticas e exploratórias |
-| `contracts/` | contratos de schema e governança |
-| `docs/` | arquitetura, documentação técnica e evidências |
-| `powerbi/` | artefatos de consumo complementar |
-| `data/` | camadas do lake e outputs gerados |
+| `src/` | pipeline, publicação, catálogo, governança, exportações e integrações |
+| `streamlit_app/` | dashboard executivo em Streamlit |
+| `tests/` | suíte automatizada |
+| `sql/` | consultas analíticas versionadas |
+| `contracts/` | contratos de schema e regras de exposição |
+| `docs/` | documentação principal, relatórios e runbooks |
+| `powerbi/` | artefatos para consumo complementar |
+| `data/` | lake local e outputs gerados pelo pipeline |
 
-## Como Executar
+## Como executar localmente
 
 ### 1. Preparar ambiente
 
@@ -196,44 +70,115 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 2. Gerar os ativos principais
+Opcionalmente, para instalar como projeto Python com dependências de desenvolvimento:
+
+```bash
+pip install -e .[dev]
+```
+
+### 2. Configurar variáveis de ambiente
+
+Os fluxos principais rodam sem segredos obrigatórios. Para habilitar integrações opcionais, copie `.env.example` para `.env` e ajuste os valores necessários.
+
+Principais grupos:
+
+- `DADOSFERA_*`: publicação e operações em ambiente Dadosfera Maestro
+- `OPENAI_*`: recursos opcionais de GenAI
+- `LOG_FORMAT`: formato de logging
+
+### 3. Inspecionar as etapas disponíveis
+
+```bash
+python src/run_platform_pipeline.py --list-steps
+```
+
+### 4. Executar o pipeline principal
 
 ```bash
 python src/run_platform_pipeline.py
 ```
 
-### 3. Rodar qualidade
+O runner pode executar etapas específicas com `--steps` e consolidar falhas com `--continue-on-error`.
+
+### 5. Rodar qualidade local
 
 ```bash
-python -m pytest tests
+pytest
 ruff check .
 ```
 
-### 4. Subir a aplicação
+### 6. Subir a aplicação
 
 ```bash
 streamlit run streamlit_app/app.py
 ```
 
-## O Que Vale Ver Primeiro
+## Etapas do pipeline
 
-1. `src/run_platform_pipeline.py`
-2. `src/build_analytics.py`
-3. `src/publish_dashboard.py`
-4. `streamlit_app/app.py`
-5. `docs/architecture.md`
+O runner principal executa, nesta ordem:
 
-## Navegação do Repositório
+1. `inventory`
+2. `profiling`
+3. `build`
+4. `publish`
+5. `semantic`
+6. `classify`
+7. `contracts`
+8. `quality`
+9. `monitor`
+10. `catalog`
+11. `queries`
+12. `screenshots`
+13. `bi`
 
-| Se você quer | Comece por |
-| --- | --- |
-| entender o valor entregue | `README.md` e `docs/executive_summary.md` |
-| revisar a arquitetura | `docs/architecture.md` |
-| revisar operação e governança | `docs/operating_model.md` e `docs/privacy_governance.md` |
-| inspecionar implementação | `src/run_platform_pipeline.py` e `streamlit_app/app.py` |
+## Evidências e acessos
 
-## Evoluções Recentes
+- App Streamlit: [olist-governed-analytics-platform.streamlit.app](https://olist-governed-analytics-platform.streamlit.app/)
+- Dashboard Power BI: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
+- Vídeo: [YouTube](https://youtu.be/SqJ0UF1Em9k)
 
-- marts semânticos ampliados com `category_slice` e `state_performance_slice`
-- webhook opcional para alertas externos de falha operacional
-- orquestração de publicação em plataforma com catálogo e pipeline idempotentes
+## Navegação recomendada
+
+Leitura rápida:
+
+1. `README.md`
+2. `docs/README.md`
+3. `docs/executive_summary.md`
+4. `docs/architecture.md`
+5. `docs/operating_model.md`
+
+Trilhas por objetivo:
+
+- visão executiva: `docs/executive_summary.md`, `docs/05_dashboard.md`, `docs/architecture.md`
+- revisão técnica: `docs/technical_narrative.md`, `docs/02_carga_e_modelagem.md`, `docs/schema_contract_report.md`
+- operação e governança: `docs/operating_model.md`, `docs/privacy_governance.md`, `docs/engineering_governance.md`, `docs/release_runbook.md`
+
+## Arquivos para começar
+
+- `src/run_platform_pipeline.py`
+- `src/build_analytics.py`
+- `src/publish_dashboard.py`
+- `src/semantic_layer.py`
+- `streamlit_app/app.py`
+- `docs/README.md`
+
+## Saídas importantes geradas pelo pipeline
+
+- `data/curated/analytics/`
+- `data/published/dashboard/`
+- `data/published/semantic/`
+- `data/published/monitoring/`
+- `data/curated/catalog/`
+- `data/curated/ops/`
+- `docs/data_quality_report.md`
+- `docs/published_layer_monitoring.md`
+- `docs/semantic_layer.md`
+- `docs/operational_job_report.md`
+
+## Diferencial arquitetural
+
+O ponto central do projeto é não conectar o dashboard diretamente na camada analítica completa. A publicação é tratada como etapa formal do pipeline, criando uma fronteira explícita entre:
+
+- exploração interna e exposição recorrente
+- evolução da modelagem e estabilidade do consumo
+- dado analítico e produto analítico publicado
