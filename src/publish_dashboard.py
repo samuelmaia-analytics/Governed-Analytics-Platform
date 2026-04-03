@@ -167,7 +167,11 @@ def _validate_prefixed_tokens(series: pd.Series, prefix: str) -> bool:
     return all(isinstance(value, str) and value.startswith(prefix) for value in sample)
 
 
-def validate_privacy_controls(df: pd.DataFrame, contract: dict[str, object]) -> list[PrivacyCheck]:
+def validate_privacy_controls(
+    df: pd.DataFrame,
+    contract: dict[str, object],
+    source_df: pd.DataFrame | None = None,
+) -> list[PrivacyCheck]:
     checks: list[PrivacyCheck] = []
     actual_columns = set(df.columns)
     required_columns = set(contract.get("required_columns", []))
@@ -220,15 +224,16 @@ def validate_privacy_controls(df: pd.DataFrame, contract: dict[str, object]) -> 
                 continue
             null_count = int(df[column].isna().sum())
             has_default = bool((df[column] == default_value).any())
-            # The control that matters operationally is that protected fields
-            # do not leak nulls to the published layer. Observing the default
-            # value is a bonus signal, but it should not fail datasets that
-            # were already complete before publication.
+            if source_df is not None and column in source_df.columns:
+                source_null_mask = source_df[column].isna()
+                default_applied = bool(df.loc[source_null_mask, column].eq(default_value).all()) if bool(source_null_mask.any()) else True
+            else:
+                default_applied = has_default or null_count == 0
             checks.append(
                 PrivacyCheck(
                     check_name=f"default_fill__{column}",
-                    status="PASS" if null_count == 0 else "FAIL",
-                    details=f"nulls={null_count} | default_observado={has_default}",
+                    status="PASS" if null_count == 0 and default_applied else "FAIL",
+                    details=f"nulls={null_count} | default_observado={has_default} | default_aplicado={default_applied}",
                 )
             )
 
@@ -368,7 +373,7 @@ def run_publish_dashboard() -> PublishedArtifacts:
     internal_df = load_internal_fact()
     published_df = build_published_dashboard_table(internal_df)
     contract = load_privacy_contract()
-    checks = validate_privacy_controls(published_df, contract)
+    checks = validate_privacy_controls(published_df, contract, source_df=internal_df)
     save_privacy_results(checks)
     failures = [check for check in checks if check.status == "FAIL"]
     if failures:
