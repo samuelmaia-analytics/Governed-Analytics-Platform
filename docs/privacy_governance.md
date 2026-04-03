@@ -2,6 +2,23 @@
 
 Este documento registra as decisões de privacidade por design e governança aplicadas ao projeto.
 
+## Enforcement no Pipeline
+
+As decisões deste documento não ficam apenas na narrativa. A etapa `publish` do pipeline valida a camada publicada contra o contrato versionado `contracts/governance/privacy_governance.json` antes de salvar os artefatos finais.
+
+Os controles automatizados verificam:
+
+- presença exata das colunas permitidas na camada publicada
+- ausência de colunas proibidas e quase-identificadores removidos
+- prefixos esperados nas chaves pseudonimizadas
+- preenchimento default dos campos protegidos usados pelo app
+- ausência de vazamento de colunas classificadas como não publicáveis no inventário de classificação
+
+Evidências geradas:
+
+- `data/curated/quality/privacy_governance_results.csv`
+- `docs/privacy_governance.md`
+
 ## Tese de Exposição
 
 O projeto não trata publicação como cópia da base analítica. A camada exposta é derivada, minimizada e pseudonimizada para que consumo executivo e governança convivam sem depender de controles externos para tudo.
@@ -43,6 +60,7 @@ flowchart LR
 | pseudonimização | substituição de identificadores por chaves derivadas |
 | separação de camadas | consumo do app restrito à publicada |
 | auditabilidade | documentação explícita da fronteira de exposição |
+| prevenção | falha automática do pipeline quando a camada publicada viola o contrato de exposição |
 
 ## Colunas Removidas da Camada Publicada
 
@@ -88,6 +106,12 @@ flowchart LR
 - a camada `curated/analytics` permanece interna ao pipeline e não deve ser tratada como camada de exposição.
 - tabelas detalhadas do app devem exibir apenas chaves pseudonimizadas e dimensões agregadas necessárias ao projeto.
 - uploads manuais em plataforma devem usar preferencialmente o CSV da camada publicada.
+
+## Contratos Relacionados
+
+- `contracts/governance/privacy_governance.json`: contrato de exposição LGPD/governança da camada publicada
+- `contracts/published/fact_orders_dashboard.contract.json`: contrato estrutural da tabela publicada
+- `data/curated/catalog/data_classification_inventory.csv`: inventário de classificação usado como apoio para verificar vazamento de campos não publicáveis
 
 ## Limitações e Escopo
 

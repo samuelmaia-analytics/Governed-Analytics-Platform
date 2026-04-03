@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 import src.publish_dashboard as publish_dashboard
 
@@ -68,19 +69,70 @@ def test_build_published_dashboard_table_applies_defaults() -> None:
     assert str(published.loc[0, "seller_key"]).startswith("seller_id_")
 
 
+def test_validate_privacy_controls_passes_for_compliant_published_table() -> None:
+    published = publish_dashboard.build_published_dashboard_table(build_source_df())
+    contract = publish_dashboard.load_privacy_contract()
+
+    checks = publish_dashboard.validate_privacy_controls(published, contract)
+
+    assert checks
+    assert all(check.status == "PASS" for check in checks)
+
+
+def test_validate_privacy_controls_detects_forbidden_column_exposure() -> None:
+    published = publish_dashboard.build_published_dashboard_table(build_source_df())
+    published["customer_city"] = "sao paulo"
+    contract = publish_dashboard.load_privacy_contract()
+
+    checks = publish_dashboard.validate_privacy_controls(published, contract)
+
+    failed = {check.check_name for check in checks if check.status == "FAIL"}
+    assert "forbidden_columns_absent" in failed
+    assert "classification_leakage" in failed
+
+
 def test_save_outputs_save_report_and_run_publish_dashboard(tmp_path: Path, monkeypatch) -> None:
     output_dir = tmp_path / "published"
     docs_dir = tmp_path / "docs"
+    quality_dir = tmp_path / "quality"
+    contract_path = tmp_path / "privacy_governance.json"
+    contract_path.write_text(Path(publish_dashboard.PRIVACY_CONTRACT_PATH).read_text(encoding="utf-8"), encoding="utf-8")
     monkeypatch.setattr(publish_dashboard, "PUBLISHED_DASHBOARD_DIR", output_dir)
     monkeypatch.setattr(publish_dashboard, "DOCS_DIR", docs_dir)
+    monkeypatch.setattr(publish_dashboard, "QUALITY_DIR", quality_dir)
     monkeypatch.setattr(publish_dashboard, "PUBLISHED_PARQUET_PATH", output_dir / "fact_orders_dashboard.parquet")
     monkeypatch.setattr(publish_dashboard, "PUBLISHED_CSV_PATH", output_dir / "fact_orders_dashboard.csv")
     monkeypatch.setattr(publish_dashboard, "REPORT_PATH", docs_dir / "privacy_governance.md")
+    monkeypatch.setattr(publish_dashboard, "PRIVACY_RESULTS_PATH", quality_dir / "privacy_governance_results.csv")
+    monkeypatch.setattr(publish_dashboard, "PRIVACY_CONTRACT_PATH", contract_path)
     monkeypatch.setattr(publish_dashboard, "load_internal_fact", build_source_df)
 
     artifacts = publish_dashboard.run_publish_dashboard()
     report_text = docs_dir.joinpath("privacy_governance.md").read_text(encoding="utf-8")
+    results_df = pd.read_csv(quality_dir / "privacy_governance_results.csv")
 
     assert artifacts.parquet_path.exists()
     assert artifacts.csv_path.exists()
     assert "Arquivo publicado para upload manual" in report_text
+    assert "Controles Alinhados à LGPD" in report_text
+    assert "necessidade" in report_text
+    assert not results_df.empty
+    assert set(results_df["status"]) == {"PASS"}
+
+
+def test_run_publish_dashboard_fails_when_privacy_validation_breaks(tmp_path: Path, monkeypatch) -> None:
+    contract_path = tmp_path / "privacy_governance.json"
+    contract_path.write_text(Path(publish_dashboard.PRIVACY_CONTRACT_PATH).read_text(encoding="utf-8"), encoding="utf-8")
+    broken_df = build_source_df()
+    broken_df["customer_city"] = ["sao paulo"]
+
+    monkeypatch.setattr(publish_dashboard, "PRIVACY_CONTRACT_PATH", contract_path)
+    monkeypatch.setattr(publish_dashboard, "load_internal_fact", lambda: broken_df)
+    monkeypatch.setattr(
+        publish_dashboard,
+        "build_published_dashboard_table",
+        lambda df: df,
+    )
+
+    with pytest.raises(RuntimeError, match="Validação LGPD/governança falhou"):
+        publish_dashboard.run_publish_dashboard()

@@ -15,6 +15,7 @@ O projeto mostra como sair de CSVs relacionais brutos para um produto analítico
 - pipeline ponta a ponta em Python para ingestão, profiling, modelagem, publicação e exportação
 - tabela analítica interna `fact_orders_enriched`
 - camada publicada `fact_orders_dashboard` com minimização para consumo recorrente
+- contrato LGPD/governança validado automaticamente na publicação da camada exposta
 - marts semânticos publicados para recortes executivos e operacionais
 - dashboard Streamlit consumindo somente a camada publicada
 - exportações auxiliares para Power BI
@@ -76,6 +77,12 @@ Opcionalmente, para instalar como projeto Python com dependências de desenvolvi
 pip install -e .[dev]
 ```
 
+Para reproduzir exatamente o conjunto validado neste repositório, use o lockfile:
+
+```bash
+pip install -r requirements.lock
+```
+
 ### 2. Configurar variáveis de ambiente
 
 Os fluxos principais rodam sem segredos obrigatórios. Para habilitar integrações opcionais, copie `.env.example` para `.env` e ajuste os valores necessários.
@@ -131,6 +138,8 @@ O runner principal executa, nesta ordem:
 12. `screenshots`
 13. `bi`
 
+Na etapa `publish`, a camada exposta passa por validações de privacidade e governança antes de ser salva. O contrato versionado fica em `contracts/governance/privacy_governance.json` e a evidência tabular é salva em `data/curated/quality/privacy_governance_results.csv`.
+
 ## Evidências e acessos
 
 - App Streamlit: [olist-governed-analytics-platform.streamlit.app](https://olist-governed-analytics-platform.streamlit.app/)
@@ -170,10 +179,12 @@ Trilhas por objetivo:
 - `data/published/monitoring/`
 - `data/curated/catalog/`
 - `data/curated/ops/`
+- `data/curated/quality/privacy_governance_results.csv`
 - `docs/data_quality_report.md`
 - `docs/published_layer_monitoring.md`
 - `docs/semantic_layer.md`
 - `docs/operational_job_report.md`
+- `docs/privacy_governance.md`
 
 ## Diferencial arquitetural
 

@@ -11,6 +11,14 @@ Este documento consolida os guardrails operacionais do repositório para elevar 
 - `Operate Published Layer`: executa build, publicação, expansão semântica, monitoramento e upload de artefatos operacionais.
 - `Dependabot`: monitora dependências Python e GitHub Actions.
 
+## Governança de Dados e LGPD
+
+- `contracts/governance/privacy_governance.json` define o contrato canônico de exposição da camada publicada.
+- `src/publish_dashboard.py` aplica pseudonimização, minimização e validação automática desse contrato.
+- o pipeline falha quando detecta coluna proibida, ausência de pseudonimização, defaults de proteção não aplicados ou vazamento de campo classificado como não publicável.
+- `data/curated/quality/privacy_governance_results.csv` materializa a evidência tabular desses checks.
+- `docs/privacy_governance.md` consolida a fronteira de exposição e a evidência textual da validação aplicada.
+
 ## Governança de Release
 
 - `contracts/governance/release_governance.json` define a política canônica de branches, ambientes e workflows.

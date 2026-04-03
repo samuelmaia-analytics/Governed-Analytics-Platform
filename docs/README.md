@@ -1,75 +1,26 @@
-# Documentação do Projeto
+# Documentação
 
-Este diretório concentra a documentação principal do projeto. A navegação abaixo foi reorganizada para leitura rápida, revisão técnica e manutenção operacional.
+Este arquivo existe só como índice da pasta `docs/`. O contexto geral do projeto, execução local e navegação inicial ficam no `README.md` da raiz.
 
-## Como Ler Esta Pasta
-
-```mermaid
-flowchart LR
-    A[Executive Summary] --> B[Architecture]
-    B --> C[Operating Model]
-    C --> D[Governance and Privacy]
-    B --> E[Technical Narrative]
-    C --> F[Runbooks]
-```
-
-- `executive_summary.md` responde o que foi entregue e por que isso importa
-- `architecture.md` explica a estrutura da solução e a separação entre camadas
-- `operating_model.md` conecta pipeline, publicação, governança e consumo
-- `technical_narrative.md` consolida a defesa técnica do projeto
-- `platform_publication.md` registra a automação de publicação em ambiente de plataforma
-- runbooks e relatórios sustentam a operação e a auditabilidade
-
-## Comece Por Objetivo
-
-- leitura executiva: [executive_summary.md](executive_summary.md)
-- defesa técnica: [technical_narrative.md](technical_narrative.md)
-- operação e governança: [operating_model.md](operating_model.md)
-- apresentação final: [10_apresentacao_final.md](10_apresentacao_final.md)
-
-## Ordem recomendada
+## Comece por aqui
 
 1. [executive_summary.md](executive_summary.md)
 2. [architecture.md](architecture.md)
-3. [05_dashboard.md](05_dashboard.md)
-4. [operating_model.md](operating_model.md)
-5. [privacy_governance.md](privacy_governance.md)
-6. [engineering_governance.md](engineering_governance.md)
-7. [schema_contract_report.md](schema_contract_report.md)
-8. [10_apresentacao_final.md](10_apresentacao_final.md)
+3. [operating_model.md](operating_model.md)
+4. [privacy_governance.md](privacy_governance.md)
+5. [technical_narrative.md](technical_narrative.md)
 
-## Guias centrais
+## Guias principais
 
-- [executive_summary.md](executive_summary.md): visão executiva única para revisão rápida
-- [technical_narrative.md](technical_narrative.md): narrativa técnica principal do projeto
+- [executive_summary.md](executive_summary.md): visão executiva
 - [architecture.md](architecture.md): arquitetura implementada
-- [operating_model.md](operating_model.md): visão única de pipeline, governança, publicação e consumo
-- [collection_catalog.md](collection_catalog.md): coleção local e inventário catalogável
-- [platform_publication.md](platform_publication.md): sync de catálogo e publicação idempotente de pipeline em ambiente de plataforma
-- [privacy_governance.md](privacy_governance.md): decisões de minimização e publicação
-- [governance_policy.md](governance_policy.md): governança, retenção e responsabilidades
-- [engineering_governance.md](engineering_governance.md): guardrails de CI, ownership e contribuição
-- [branch_protection_recommendation.md](branch_protection_recommendation.md): configuração recomendada no GitHub para merge e deploy
+- [operating_model.md](operating_model.md): pipeline, publicação, deploy e operação
+- [privacy_governance.md](privacy_governance.md): fronteira de exposição, LGPD e checks da camada publicada
+- [engineering_governance.md](engineering_governance.md): guardrails do repositório e workflows
+- [platform_publication.md](platform_publication.md): publicação em ambiente de plataforma
+- [technical_narrative.md](technical_narrative.md): defesa técnica consolidada
 
-## Trilhas por Perfil
-
-- visão executiva: [executive_summary.md](executive_summary.md), [05_dashboard.md](05_dashboard.md), [architecture.md](architecture.md)
-- avaliador técnico: [technical_narrative.md](technical_narrative.md), [02_carga_e_modelagem.md](02_carga_e_modelagem.md), [architecture.md](architecture.md), [schema_contract_report.md](schema_contract_report.md)
-- operação e governança: [operating_model.md](operating_model.md), [release_runbook.md](release_runbook.md), [rollback_runbook.md](rollback_runbook.md), [engineering_governance.md](engineering_governance.md)
-
-## Papéis dos Documentos
-
-| Documento | Papel |
-| --- | --- |
-| `executive_summary.md` | síntese executiva do projeto |
-| `technical_narrative.md` | defesa técnica consolidada |
-| `architecture.md` | visão estrutural das camadas e fluxos |
-| `operating_model.md` | leitura ponta a ponta de operação e publicação |
-| `platform_publication.md` | automação de publicação em ambiente de plataforma |
-| `privacy_governance.md` | fronteira de exposição e minimização |
-| `collection_catalog.md` | visão catalogável dos ativos |
-
-## Relatórios gerados pelo pipeline
+## Relatórios gerados
 
 - [raw_data_inventory.md](raw_data_inventory.md)
 - [eda_summary.md](eda_summary.md)
@@ -80,25 +31,22 @@ flowchart LR
 - [published_layer_monitoring.md](published_layer_monitoring.md)
 - [semantic_layer.md](semantic_layer.md)
 - [operational_job_report.md](operational_job_report.md)
-- [platform_publication.md](platform_publication.md)
 
-## Operação e evidências
+## Runbooks e operação
 
-- [streamlit_capture_runbook.md](streamlit_capture_runbook.md)
 - [release_runbook.md](release_runbook.md)
 - [rollback_runbook.md](rollback_runbook.md)
-- [final_pre_delivery_audit.md](final_pre_delivery_audit.md)
 - [publication_checklist.md](publication_checklist.md)
+- [streamlit_capture_runbook.md](streamlit_capture_runbook.md)
 
-## Complementos
+## Materiais complementares
 
+- [collection_catalog.md](collection_catalog.md)
+- [governance_policy.md](governance_policy.md)
+- [branch_protection_recommendation.md](branch_protection_recommendation.md)
 - [bi_bonus.md](bi_bonus.md)
 - [genai_bonus.md](genai_bonus.md)
 
-## Arquivos históricos
+## Histórico
 
-Os documentos numerados `00` a `10` e materiais auxiliares históricos foram preservados como trilha de evolução do projeto. Eles não são a rota principal de leitura.
-
-## Critério de Navegação
-
-Se o objetivo for entender rapidamente o valor entregue, comece pelos guias centrais e pelas trilhas por perfil. A documentação cronológica foi mantida como histórico, não como ponto de entrada.
+Os arquivos numerados `00` a `10` foram mantidos como trilha histórica do projeto, não como rota principal de leitura.

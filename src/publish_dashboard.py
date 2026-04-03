@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import sys
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import pandas as pd
@@ -11,7 +12,14 @@ import pandas as pd
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from src.config import ANALYTICS_DIR, DOCS_DIR, PUBLISHED_DASHBOARD_DIR
+from src.config import (
+    ANALYTICS_DIR,
+    DOCS_DIR,
+    PUBLISHED_DASHBOARD_DIR,
+    QUALITY_DIR,
+    ROOT_DIR,
+)
+from src.data_classification import CLASSIFICATION_ROWS
 from src.ingest import configure_logging
 from src.utils import ensure_directory
 
@@ -20,6 +28,8 @@ SOURCE_FACT_PATH = ANALYTICS_DIR / "fact_orders_enriched.parquet"
 PUBLISHED_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
 PUBLISHED_CSV_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.csv"
 REPORT_PATH = DOCS_DIR / "privacy_governance.md"
+PRIVACY_RESULTS_PATH = QUALITY_DIR / "privacy_governance_results.csv"
+PRIVACY_CONTRACT_PATH = ROOT_DIR / "contracts" / "governance" / "privacy_governance.json"
 
 PSEUDONYMIZED_COLUMNS = {
     "order_id": "order_id",
@@ -94,6 +104,13 @@ class PublishedArtifacts:
     columns: int
 
 
+@dataclass(frozen=True)
+class PrivacyCheck:
+    check_name: str
+    status: str
+    details: str
+
+
 def to_project_relative_path(path: Path) -> str:
     project_root = Path(__file__).resolve().parent.parent
     try:
@@ -117,6 +134,10 @@ def load_internal_fact() -> pd.DataFrame:
     return df
 
 
+def load_privacy_contract(path: Path = PRIVACY_CONTRACT_PATH) -> dict[str, object]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def build_published_dashboard_table(df: pd.DataFrame) -> pd.DataFrame:
     published = df.copy()
 
@@ -138,6 +159,101 @@ def build_published_dashboard_table(df: pd.DataFrame) -> pd.DataFrame:
     return published
 
 
+def _validate_prefixed_tokens(series: pd.Series, prefix: str) -> bool:
+    non_null = series.dropna()
+    if non_null.empty:
+        return True
+    sample = non_null.head(100)
+    return all(isinstance(value, str) and value.startswith(prefix) for value in sample)
+
+
+def validate_privacy_controls(df: pd.DataFrame, contract: dict[str, object]) -> list[PrivacyCheck]:
+    checks: list[PrivacyCheck] = []
+    actual_columns = set(df.columns)
+    required_columns = set(contract.get("required_columns", []))
+    forbidden_columns = set(contract.get("forbidden_columns", []))
+    unexpected_columns = sorted(actual_columns - required_columns)
+    missing_columns = sorted(required_columns - actual_columns)
+    forbidden_exposed = sorted(actual_columns & forbidden_columns)
+
+    checks.append(
+        PrivacyCheck(
+            check_name="required_columns",
+            status="PASS" if not missing_columns else "FAIL",
+            details=f"Ausentes: {missing_columns if missing_columns else 'nenhuma'}",
+        )
+    )
+    checks.append(
+        PrivacyCheck(
+            check_name="forbidden_columns_absent",
+            status="PASS" if not forbidden_exposed else "FAIL",
+            details=f"Presentes indevidas: {forbidden_exposed if forbidden_exposed else 'nenhuma'}",
+        )
+    )
+    checks.append(
+        PrivacyCheck(
+            check_name="unexpected_columns",
+            status="PASS" if not unexpected_columns else "FAIL",
+            details=f"Inesperadas: {unexpected_columns if unexpected_columns else 'nenhuma'}",
+        )
+    )
+
+    pseudonymized_columns = contract.get("pseudonymized_columns", {})
+    if isinstance(pseudonymized_columns, dict):
+        for column, prefix in pseudonymized_columns.items():
+            if column not in df.columns:
+                checks.append(PrivacyCheck(f"pseudonymized__{column}", "FAIL", "Coluna obrigatória ausente."))
+                continue
+            checks.append(
+                PrivacyCheck(
+                    check_name=f"pseudonymized__{column}",
+                    status="PASS" if _validate_prefixed_tokens(df[column], str(prefix)) else "FAIL",
+                    details=f"Prefixo esperado: `{prefix}`",
+                )
+            )
+
+    default_fill_values = contract.get("default_fill_values", {})
+    if isinstance(default_fill_values, dict):
+        for column, default_value in default_fill_values.items():
+            if column not in df.columns:
+                checks.append(PrivacyCheck(f"default_fill__{column}", "FAIL", "Coluna obrigatória ausente."))
+                continue
+            null_count = int(df[column].isna().sum())
+            has_default = bool((df[column] == default_value).any())
+            checks.append(
+                PrivacyCheck(
+                    check_name=f"default_fill__{column}",
+                    status="PASS" if null_count == 0 and has_default else "FAIL",
+                    details=f"nulls={null_count} | default_observado={has_default}",
+                )
+            )
+
+    protected_source_columns = sorted(
+        row["column"]
+        for row in CLASSIFICATION_ROWS
+        if row.get("asset") == "fact_orders_enriched"
+        and row.get("publication_allowed") is False
+        and row.get("published_action") in {"remove", "aggregate_or_remove"}
+    )
+    leaked_columns = [column for column in protected_source_columns if column in actual_columns]
+    checks.append(
+        PrivacyCheck(
+            check_name="classification_leakage",
+            status="PASS" if not leaked_columns else "FAIL",
+            details=f"Colunas sensíveis expostas: {leaked_columns if leaked_columns else 'nenhuma'}",
+        )
+    )
+
+    return checks
+
+
+def save_privacy_results(checks: list[PrivacyCheck]) -> Path:
+    ensure_directory(QUALITY_DIR)
+    pd.DataFrame(asdict(check) for check in checks).to_csv(PRIVACY_RESULTS_PATH, index=False)
+    LOGGER.info("Resultados de privacidade salvos em %s", PRIVACY_RESULTS_PATH)
+    return PRIVACY_RESULTS_PATH
+
+
 def save_outputs(df: pd.DataFrame) -> PublishedArtifacts:
     ensure_directory(PUBLISHED_DASHBOARD_DIR)
     df.to_parquet(PUBLISHED_PARQUET_PATH, index=False)
@@ -151,33 +267,48 @@ def save_outputs(df: pd.DataFrame) -> PublishedArtifacts:
     )
 
 
-def render_report(artifacts: PublishedArtifacts) -> str:
+def render_report(artifacts: PublishedArtifacts, contract: dict[str, object], checks: list[PrivacyCheck]) -> str:
+    principles = contract.get("lgpd_principles", [])
+    validation_summary = "PASS" if all(check.status == "PASS" for check in checks) else "FAIL"
     lines = [
         "# Privacidade, LGPD e Governança",
         "",
         "Este documento registra as decisões de privacidade por design e governança aplicadas ao projeto.",
         "",
-        "## Camadas de Exposição",
+        "## Controles Alinhados à LGPD",
         "",
-        "- `data/raw/landing/`: dados brutos recebidos sem transformação.",
-        "- `data/standardized/`: dados padronizados para reuso técnico.",
-        "- `data/curated/analytics/`: tabela analítica interna com granularidade por item, usada para processamento, SQL e qualidade.",
-        "- `data/published/dashboard/`: camada publicada e minimizada para consumo do Streamlit.",
-        "",
-        "## Medidas Aplicadas na Camada Publicada",
-        "",
-        "- pseudonimização não reversível de `order_id` e `customer_unique_id` antes do consumo pelo dashboard.",
-        "- pseudonimização não reversível de `seller_id` em `seller_key` para permitir recortes por seller sem expor o identificador bruto.",
-        "- remoção de identificadores desnecessários para apresentação, como `customer_id`, `seller_id` e `product_id`.",
-        "- remoção de quase-identificadores mais sensíveis na camada publicada, como cidade e prefixo de CEP.",
-        "- manutenção apenas de atributos necessários para responder às perguntas do projeto: tempo, categoria, UF, pagamento, valor, atraso, seller, logística e cohort.",
-        "- preservação da camada analítica interna para engenharia e auditoria, separada da camada publicada.",
-        "",
-        "## Colunas Removidas da Camada Publicada",
-        "",
-        "| Coluna removida | Motivo principal |",
-        "| --- | --- |",
+        "O projeto usa o dataset público da Olist como caso analítico, mas aplica controles inspirados em privacidade por design para reduzir exposição desnecessária na camada publicada.",
     ]
+    if isinstance(principles, list):
+        for principle in principles:
+            if isinstance(principle, dict):
+                lines.append(f"- `{principle.get('principle')}`: {principle.get('control')}")
+
+    lines.extend(
+        [
+            "",
+            "## Camadas de Exposição",
+            "",
+            "- `data/raw/landing/`: dados brutos recebidos sem transformação.",
+            "- `data/standardized/`: dados padronizados para reuso técnico.",
+            "- `data/curated/analytics/`: tabela analítica interna com granularidade por item, usada para processamento, SQL e qualidade.",
+            "- `data/published/dashboard/`: camada publicada e minimizada para consumo do Streamlit.",
+            "",
+            "## Medidas Aplicadas na Camada Publicada",
+            "",
+            "- pseudonimização não reversível de `order_id` e `customer_unique_id` antes do consumo pelo dashboard.",
+            "- pseudonimização não reversível de `seller_id` em `seller_key` para permitir recortes por seller sem expor o identificador bruto.",
+            "- remoção de identificadores desnecessários para apresentação, como `customer_id`, `seller_id` e `product_id`.",
+            "- remoção de quase-identificadores mais sensíveis na camada publicada, como cidade e prefixo de CEP.",
+            "- manutenção apenas de atributos necessários para responder às perguntas do projeto: tempo, categoria, UF, pagamento, valor, atraso, seller, logística e cohort.",
+            "- preservação da camada analítica interna para engenharia e auditoria, separada da camada publicada.",
+            "",
+            "## Colunas Removidas da Camada Publicada",
+            "",
+            "| Coluna removida | Motivo principal |",
+            "| --- | --- |",
+        ]
+    )
     for column in REMOVED_SENSITIVE_COLUMNS:
         lines.append(f"| `{column}` | Minimização e redução de risco de reidentificação sem perda do objetivo analítico do dashboard. |")
 
@@ -190,6 +321,20 @@ def render_report(artifacts: PublishedArtifacts) -> str:
             f"- Arquivo publicado para upload manual: `{to_project_relative_path(PUBLISHED_CSV_PATH)}`",
             f"- Registros publicados: **{artifacts.rows:,}**",
             f"- Colunas publicadas: **{artifacts.columns}**",
+            f"- Resultado da validação LGPD/governança: **{validation_summary}**",
+            f"- Evidência tabular dos checks: `{to_project_relative_path(PRIVACY_RESULTS_PATH)}`",
+            "",
+            "## Validação Aplicada",
+            "",
+            "| Check | Status | Detalhes |",
+            "| --- | --- | --- |",
+        ]
+    )
+    for check in checks:
+        lines.append(f"| `{check.check_name}` | **{check.status}** | {check.details} |")
+
+    lines.extend(
+        [
             "",
             "## Política de Uso",
             "",
@@ -208,9 +353,9 @@ def render_report(artifacts: PublishedArtifacts) -> str:
     return "\n".join(lines)
 
 
-def save_report(artifacts: PublishedArtifacts) -> Path:
+def save_report(artifacts: PublishedArtifacts, contract: dict[str, object], checks: list[PrivacyCheck]) -> Path:
     ensure_directory(DOCS_DIR)
-    REPORT_PATH.write_text(render_report(artifacts), encoding="utf-8")
+    REPORT_PATH.write_text(render_report(artifacts, contract, checks), encoding="utf-8")
     LOGGER.info("Documentação de privacidade salva em %s", REPORT_PATH)
     return REPORT_PATH
 
@@ -218,8 +363,15 @@ def save_report(artifacts: PublishedArtifacts) -> Path:
 def run_publish_dashboard() -> PublishedArtifacts:
     internal_df = load_internal_fact()
     published_df = build_published_dashboard_table(internal_df)
+    contract = load_privacy_contract()
+    checks = validate_privacy_controls(published_df, contract)
+    save_privacy_results(checks)
+    failures = [check for check in checks if check.status == "FAIL"]
+    if failures:
+        failed_names = ", ".join(check.check_name for check in failures)
+        raise RuntimeError(f"Validação LGPD/governança falhou na camada publicada: {failed_names}")
     artifacts = save_outputs(published_df)
-    save_report(artifacts)
+    save_report(artifacts, contract, checks)
     return artifacts
 
 
