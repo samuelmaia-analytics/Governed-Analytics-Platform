@@ -2,8 +2,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -11,7 +11,7 @@
 
 ## Visão Geral
 
-Este documento consolida o dicionário de dados do projeto `olist_governed_analytics_platform`, descrevendo os principais ativos raw e processed, com foco especial na tabela analítica `fact_orders_enriched`, na camada publicada `fact_orders_dashboard` e nos novos ativos semânticos e operacionais. A fonte pública utilizada é o `Brazilian E-Commerce Public Dataset by Olist`, disponibilizado no Kaggle em `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`.
+Este documento consolida o dicionário de dados do projeto `governed_analytics_platform`, descrevendo os principais ativos raw e processed, com foco especial na tabela analítica `fact_orders_enriched`, na camada publicada `fact_orders_dashboard` e nos novos ativos semânticos e operacionais. A fonte pública utilizada é o `Brazilian E-Commerce Public Dataset by Olist`, disponibilizado no Kaggle em `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`.
 
 O objetivo deste material é documentar:
 

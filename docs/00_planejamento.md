@@ -2,8 +2,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 
 Este documento registra o plano do projeto já reconciliado com o estado atual do repositório, distinguindo itens concluídos, pontos parcialmente preparados e dependências de evidência final na plataforma.

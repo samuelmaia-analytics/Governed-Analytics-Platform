@@ -1,15 +1,15 @@
 [
   {
-    "display_name": "Samuel Maia | Olist Executive Commerce Analytics",
+    "display_name": "Samuel Maia | Governed Analytics Platform",
     "description": "Aplicacao Streamlit publicada com KPIs, analise temporal, categorias, geografia e insights executivos do case Olist.",
     "data_asset_type": "dashboard",
-    "external_url": "https://olist-governed-analytics-platform.streamlit.app/",
+    "external_url": "https://governed-analytics-platform.streamlit.app/",
     "location": "streamlit_cloud",
     "tags": ["streamlit", "dashboard", "olist", "analytics", "case-tecnico"],
     "share_type": "public"
   },
   {
-    "display_name": "Samuel Maia | Video Case Olist",
+    "display_name": "Samuel Maia | Video | Governed Analytics Platform",
     "description": "Video de apresentacao final do case tecnico com demonstracao dos ativos, arquitetura, dashboard, Dadosfera e bonus de GenAI.",
     "data_asset_type": "link",
     "external_url": "https://youtu.be/SqJ0UF1Em9k",
@@ -18,19 +18,19 @@
     "share_type": "public"
   },
   {
-    "display_name": "Samuel Maia | Repositorio Olist Analytics Case",
+    "display_name": "Samuel Maia | Repositorio Governed Analytics Platform",
     "description": "Repositorio GitHub com pipeline, dados publicados, SQL, documentacao, testes, workflows e materiais da entrega.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/olist-governed-analytics-platform",
+    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform",
     "location": "github",
     "tags": ["github", "documentacao", "pipeline", "olist", "case-tecnico"],
     "share_type": "public"
   },
   {
-    "display_name": "Samuel Maia | Bônus GenAI Olist",
+    "display_name": "Samuel Maia | Bonus GenAI | Governed Analytics Platform",
     "description": "Documentacao do bonus de GenAI com extração estruturada de features de texto desestruturado usando prompt controlado e saida auditavel.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/blob/main/docs/genai_bonus.md",
+    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform/blob/main/docs/genai_bonus.md",
     "location": "github_docs",
     "tags": ["genai", "llm", "documentacao", "olist", "case-tecnico"],
     "share_type": "public"
@@ -39,7 +39,7 @@
     "display_name": "Samuel Maia | Monitoramento da Camada Published",
     "description": "Documentacao da rotina recorrente de freshness e qualidade da camada publicada, com checks estruturados e observabilidade operacional.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/blob/main/docs/published_layer_monitoring.md",
+    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform/blob/main/docs/published_layer_monitoring.md",
     "location": "github_docs",
     "tags": ["monitoring", "quality", "freshness", "documentacao", "olist", "case-tecnico"],
     "share_type": "public"
@@ -48,7 +48,7 @@
     "display_name": "Samuel Maia | Camada Semantica Expandida",
     "description": "Documentacao dos marts publicados de logistica, seller e cohort derivados da camada published do case Olist.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/blob/main/docs/semantic_layer.md",
+    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform/blob/main/docs/semantic_layer.md",
     "location": "github_docs",
     "tags": ["semantic-layer", "logistica", "seller", "cohort", "documentacao", "olist", "case-tecnico"],
     "share_type": "public"

@@ -1,8 +1,8 @@
-# Olist Governed Analytics Platform
+# Governed Analytics Platform
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/actions/workflows/ci.yml)
-[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/actions/workflows/lint.yml)
-[![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://olist-governed-analytics-platform.streamlit.app/)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/governed-analytics-platform/actions/workflows/ci.yml)
+[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/governed-analytics-platform/actions/workflows/lint.yml)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 
 Pipeline de Analytics Engineering construído sobre o dataset público da Olist para transformar dados brutos em um ativo analítico governado, com separação explícita entre camada analítica interna e camada publicada para consumo executivo.
 
@@ -142,7 +142,7 @@ Na etapa `publish`, a camada exposta passa por validações de privacidade e gov
 
 ## Evidências e acessos
 
-- App Streamlit: [olist-governed-analytics-platform.streamlit.app](https://olist-governed-analytics-platform.streamlit.app/)
+- App Streamlit: [governed-analytics-platform.streamlit.app](https://governed-analytics-platform.streamlit.app/)
 - Dashboard Power BI: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
 - Vídeo: [YouTube](https://youtu.be/SqJ0UF1Em9k)
 

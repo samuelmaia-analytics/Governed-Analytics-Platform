@@ -117,7 +117,7 @@ O principal risco remanescente não está em modelagem ou consumo, mas em evolu�
 
 ## Links principais
 
-- app: `https://olist-governed-analytics-platform.streamlit.app/`
+- app: `https://governed-analytics-platform.streamlit.app/`
 - vídeo: `https://youtu.be/SqJ0UF1Em9k`
 - operating model: [operating_model.md](operating_model.md)
 - apresentação final: [10_apresentacao_final.md](10_apresentacao_final.md)

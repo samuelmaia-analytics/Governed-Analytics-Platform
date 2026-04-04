@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "olist-governed-analytics-platform"
+name = "governed-analytics-platform"
 version = "0.1.0"
 description = "Projeto de analise de dados com pipeline Python e dashboard Streamlit."
 readme = "README.md"

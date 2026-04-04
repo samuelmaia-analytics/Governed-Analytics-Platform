@@ -71,7 +71,7 @@ Se perguntarem por que a transformação ainda roda majoritariamente fora da pla
 - deck: `presentation/project_deck.md`
 - roteiro: `presentation/talk_track.md`
 - vídeo: `https://youtu.be/SqJ0UF1Em9k`
-- app: `https://olist-governed-analytics-platform.streamlit.app/`
+- app: `https://governed-analytics-platform.streamlit.app/`
 - coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`

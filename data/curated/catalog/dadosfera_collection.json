@@ -1,8 +1,8 @@
 {
-  "collection_id": "olist_analytics_platform_collection",
-  "collection_name": "Olist Analytics Platform Collection",
-  "project_name": "olist_governed_analytics_platform",
-  "description": "Coleção de ativos analíticos com dados do Olist, organizada em zonas de Data Lake e pronta para catalogação/publicação.",
+  "collection_id": "governed_analytics_platform_collection",
+  "collection_name": "Governed Analytics Platform Collection",
+  "project_name": "governed_analytics_platform",
+  "description": "Coleção de ativos analíticos da Governed Analytics Platform, construída sobre dados do Olist e organizada em zonas de Data Lake para catalogação/publicação.",
   "owner": "samuelmaia-analytics",
   "domains": [
     "e-commerce",

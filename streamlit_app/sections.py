@@ -48,7 +48,7 @@ def render_header(filters: FilterState, total_rows: int, filtered_rows: int) -> 
         <div class="hero-shell">
             <div class="hero-top">
                 <div>
-                    <span class="hero-badge">Produto Analítico Olist</span>
+                    <span class="hero-badge">Governed Analytics Platform</span>
                     <h1 class="hero-title">Dashboard Executivo de Receita, Operação e Experiência</h1>
                     <p class="hero-subtitle">
                         Painel executivo para leitura rápida de receita, categorias, operação e experiência do cliente,

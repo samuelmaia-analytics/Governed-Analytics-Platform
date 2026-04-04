@@ -2,8 +2,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 
 ## Tese Arquitetural
 

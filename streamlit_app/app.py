@@ -35,7 +35,7 @@ from streamlit_app.sections import (
 from streamlit_app.theme import apply_theme, render_story_nav
 
 st.set_page_config(
-    page_title="Olist | Dashboard Executivo",
+    page_title="Governed Analytics Platform | Dashboard Executivo",
     page_icon=":material/monitoring:",
     layout="wide",
     initial_sidebar_state="expanded",

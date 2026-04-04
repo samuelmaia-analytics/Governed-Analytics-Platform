@@ -127,7 +127,7 @@ STEP_HANDLERS: dict[str, StepHandler] = {
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Runner principal do pipeline analítico Olist.")
+    parser = argparse.ArgumentParser(description="Runner principal do projeto Governed Analytics Platform.")
     parser.add_argument(
         "--steps",
         nargs="*",

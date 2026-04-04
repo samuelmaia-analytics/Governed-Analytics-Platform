@@ -31,8 +31,8 @@ from src.ingest import configure_logging
 from src.utils import ensure_directory
 
 LOGGER = logging.getLogger(__name__)
-PROJECT_NAME = "olist_governed_analytics_platform"
-COLLECTION_ID = "olist_analytics_platform_collection"
+PROJECT_NAME = "governed_analytics_platform"
+COLLECTION_ID = "governed_analytics_platform_collection"
 COLLECTION_PATH = CATALOG_DIR / "dadosfera_collection.json"
 ASSET_INVENTORY_PATH = CATALOG_DIR / "collection_assets_inventory.csv"
 REPORT_PATH = DOCS_DIR / "collection_catalog.md"
@@ -426,11 +426,11 @@ def build_collection_payload(assets: list[CatalogAsset]) -> dict[str, object]:
     publishable_assets = [asset for asset in assets if asset.publication_ready]
     return {
         "collection_id": COLLECTION_ID,
-        "collection_name": "Olist Analytics Platform Collection",
+        "collection_name": "Governed Analytics Platform Collection",
         "project_name": PROJECT_NAME,
         "description": (
-            "Coleção de ativos analíticos com dados do Olist, "
-            "organizada em zonas de Data Lake e pronta para catalogação/publicação."
+            "Coleção de ativos analíticos da Governed Analytics Platform, "
+            "construída sobre dados do Olist e organizada em zonas de Data Lake para catalogação/publicação."
         ),
         "owner": "samuelmaia-analytics",
         "domains": ["e-commerce", "analytics-engineering", "data-apps"],
