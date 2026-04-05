@@ -50,8 +50,6 @@ jobs:
       target_environment: ${{ steps.plan.outputs.target_environment }}
       resolved_ref: ${{ steps.refs.outputs.resolved_ref }}
       resolved_branch: ${{ steps.refs.outputs.resolved_branch }}
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
@@ -74,7 +72,7 @@ jobs:
           echo "resolved_branch=$RESOLVED_BRANCH" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
@@ -92,8 +90,6 @@ jobs:
     needs: resolve-plan
     runs-on: ubuntu-latest
     environment: ${{ needs.resolve-plan.outputs.github_environment }}
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout source commit
@@ -108,7 +104,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
