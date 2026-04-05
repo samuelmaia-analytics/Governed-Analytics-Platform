@@ -22,6 +22,7 @@ SELLER_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "seller_slice.parquet"
 COHORT_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "cohort_slice.parquet"
 EXECUTIVE_KPI_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "executive_kpis_slice.parquet"
 MONITORING_SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
+MONITORING_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring_history.csv"
 PLACEHOLDER_DIMENSION_VALUES = {"unknown", "Unknown", "NA", "nan", "NaN", ""}
 
 
@@ -115,7 +116,11 @@ def load_semantic_assets() -> dict[str, pd.DataFrame]:
 def load_monitoring_status() -> dict[str, object] | None:
     if not MONITORING_SUMMARY_PATH.exists():
         return None
-    return json.loads(MONITORING_SUMMARY_PATH.read_text(encoding="utf-8"))
+    status = json.loads(MONITORING_SUMMARY_PATH.read_text(encoding="utf-8"))
+    if MONITORING_HISTORY_PATH.exists():
+        history_df = pd.read_csv(MONITORING_HISTORY_PATH)
+        status["history"] = history_df.to_dict(orient="records")
+    return status
 
 
 def build_dashboard_locale() -> str:

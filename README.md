@@ -29,7 +29,7 @@ This repository shows how to move from raw relational CSVs to a governed analyti
 - published semantic assets for logistics, seller, category, cohort, geography and executive KPIs
 - Streamlit executive app consuming only the published layer and prioritizing semantic assets for its main KPI layer
 - Power BI exports aligned with the published executive boundary
-- schema contracts, data-quality checks, monitoring artifacts and CI
+- schema contracts, data-quality checks, monitoring artifacts, anomaly checks and CI
 - local catalog, executive documentation, operational runbooks and evidence
 - optional integrations with webhooks, OpenAI and Dadosfera Maestro
 - initial `dbt-duckdb` foundation for modular SQL modeling and documentation
@@ -146,6 +146,8 @@ The repository now includes an initial `dbt/` layer to support:
 This is intentionally additive. Python remains the operational backbone of the project.
 
 The current Streamlit app already demonstrates the target operating pattern: the main KPI cards preferentially consume `executive_kpis_slice`, while the detailed analytical exploration continues to read from the governed published fact table.
+
+The monitoring layer now also persists a simple health-score history and latest-month anomaly checks for revenue, order volume and delay rate, making operational drift more visible in the executive app.
 
 ## Main pipeline steps
 

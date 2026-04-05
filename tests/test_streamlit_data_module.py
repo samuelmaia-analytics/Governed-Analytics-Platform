@@ -290,10 +290,15 @@ def test_load_semantic_assets_reads_available_parquets(tmp_path: Path, monkeypat
 def test_load_monitoring_status_reads_json_summary(tmp_path: Path, monkeypatch) -> None:
     summary_path = tmp_path / "published_layer_monitoring.json"
     summary_path.write_text(json.dumps({"failed_checks": 1, "total_checks": 3}), encoding="utf-8")
+    history_path = tmp_path / "published_layer_monitoring_history.csv"
+    pd.DataFrame([{"generated_at_utc": "2026-04-05T10:00:00+00:00", "health_score": 92}]).to_csv(history_path, index=False)
 
     monkeypatch.setattr(data_module, "MONITORING_SUMMARY_PATH", summary_path)
+    monkeypatch.setattr(data_module, "MONITORING_HISTORY_PATH", history_path)
     data_module.load_monitoring_status.clear()
 
     status = data_module.load_monitoring_status()
 
-    assert status == {"failed_checks": 1, "total_checks": 3}
+    assert status["failed_checks"] == 1
+    assert status["total_checks"] == 3
+    assert status["history"] == [{"generated_at_utc": "2026-04-05T10:00:00+00:00", "health_score": 92}]

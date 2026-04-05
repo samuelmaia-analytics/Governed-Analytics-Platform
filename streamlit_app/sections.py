@@ -304,6 +304,7 @@ def render_health_section(monitoring_status: dict[str, object] | None) -> None:
     main_risk = str(health_score.get("main_risk") or "none")
     status_label = "Saudável" if failed_checks == 0 else "Em alerta"
     results = pd.DataFrame(monitoring_status.get("results") or [])
+    history_df = pd.DataFrame(monitoring_status.get("history") or [])
 
     col1, col2, col3, col4 = st.columns(4, gap="large")
     with col1:
@@ -319,6 +320,31 @@ def render_health_section(monitoring_status: dict[str, object] | None) -> None:
         preview = results[["check_name", "status", "severity", "metric_value"]].copy()
         st.dataframe(preview, width="stretch", height=260)
         st.caption("Resumo das verificações mais recentes da base oficial.")
+    if not history_df.empty:
+        history_df["generated_at_utc"] = pd.to_datetime(history_df["generated_at_utc"], errors="coerce")
+        trend = history_df.dropna(subset=["generated_at_utc"]).sort_values("generated_at_utc").tail(12)
+        if not trend.empty:
+            fig = go.Figure()
+            fig.add_trace(
+                go.Scatter(
+                    x=trend["generated_at_utc"],
+                    y=trend["health_score"],
+                    mode="lines+markers",
+                    name="Health score",
+                    line={"color": COLORS["accent"], "width": 3},
+                )
+            )
+            fig.update_layout(
+                height=280,
+                margin={"l": 24, "r": 24, "t": 24, "b": 24},
+                xaxis_title="Execução",
+                yaxis_title="Score",
+                yaxis_range=[0, 100],
+                template="plotly_white",
+                showlegend=False,
+            )
+            st.plotly_chart(fig, width="stretch")
+            st.caption("Tendência recente do health score da camada publicada.")
     close_section()
 
 

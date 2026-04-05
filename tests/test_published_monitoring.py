@@ -45,6 +45,7 @@ def test_run_monitoring_and_save_outputs(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(monitoring, "PUBLISHED_MONITORING_DIR", monitoring_dir)
     monkeypatch.setattr(monitoring, "RESULTS_PATH", monitoring_dir / "published_layer_monitoring.csv")
     monkeypatch.setattr(monitoring, "SUMMARY_PATH", monitoring_dir / "published_layer_monitoring.json")
+    monkeypatch.setattr(monitoring, "HISTORY_PATH", monitoring_dir / "published_layer_monitoring_history.csv")
     monkeypatch.setattr(monitoring, "DOCS_DIR", docs_dir)
     monkeypatch.setattr(monitoring, "REPORT_PATH", docs_dir / "published_layer_monitoring.md")
 
@@ -55,10 +56,47 @@ def test_run_monitoring_and_save_outputs(tmp_path: Path, monkeypatch) -> None:
     assert all(result.status == "PASS" for result in results)
     assert (monitoring_dir / "published_layer_monitoring.csv").exists()
     assert (monitoring_dir / "published_layer_monitoring.json").exists()
+    assert (monitoring_dir / "published_layer_monitoring_history.csv").exists()
     assert (docs_dir / "published_layer_monitoring.md").exists()
     summary = json.loads((monitoring_dir / "published_layer_monitoring.json").read_text(encoding="utf-8"))
     assert summary["health_score"]["score"] == 100
     assert summary["health_score"]["status"] == "healthy"
+
+
+def test_check_recent_anomalies_flags_latest_month_drift() -> None:
+    rows: list[dict[str, object]] = []
+    month_revenue = [100.0, 102.0, 98.0, 220.0]
+    month_delay = [False, False, False, True]
+    for month_index, revenue in enumerate(month_revenue, start=1):
+        for order_index in range(40):
+            rows.append(
+                {
+                    "order_id": f"o-{month_index}-{order_index}",
+                    "order_item_id": 1,
+                    "customer_unique_id": f"c-{month_index}-{order_index}",
+                    "order_purchase_timestamp": pd.Timestamp(2018, month_index, 10),
+                    "purchase_cohort_month": f"2018-0{month_index}",
+                    "customer_order_sequence": 1,
+                    "is_first_order": True,
+                    "seller_key": "s1",
+                    "seller_volume_tier": "core",
+                    "seller_delay_rate": 0.1,
+                    "delivery_time_days": 3.0,
+                    "seller_dispatch_time_days": 1.0,
+                    "carrier_delivery_time_days": 2.0,
+                    "estimated_delay_days": 0.0,
+                    "is_delayed": month_delay[month_index - 1],
+                    "price": revenue,
+                    "freight_value": 10.0,
+                    "freight_to_price_ratio": 0.1,
+                    "total_item_value": revenue + 10.0,
+                }
+            )
+    anomaly_results = monitoring.check_recent_anomalies(pd.DataFrame(rows))
+    by_check = {result.check_name: result for result in anomaly_results}
+
+    assert by_check["published_anomaly__revenue_gross_latest_month_delta_pct"].status == "FAIL"
+    assert by_check["published_anomaly__delay_rate_latest_month_delta_pct_points"].status == "FAIL"
 
 
 def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(tmp_path: Path, monkeypatch) -> None:

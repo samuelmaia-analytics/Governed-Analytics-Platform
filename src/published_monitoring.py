@@ -23,6 +23,7 @@ LOGGER = logging.getLogger(__name__)
 PUBLISHED_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
 RESULTS_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv"
 SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
+HISTORY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring_history.csv"
 REPORT_PATH = DOCS_DIR / "published_layer_monitoring.md"
 EXPECTED_COLUMNS = {
     "order_id",
@@ -50,6 +51,10 @@ DEFAULT_MAX_FRESHNESS_HOURS = 36
 MIN_ROWS = 100_001
 MAX_MISSING_SELLER_DELAY_RATE_PCT = 1.0
 DEFAULT_ALERT_SOURCE = "published_layer_monitoring"
+MIN_PERIODS_FOR_ANOMALY_CHECK = 4
+REVENUE_ANOMALY_MAX_DELTA_PCT = 35.0
+ORDERS_ANOMALY_MAX_DELTA_PCT = 30.0
+DELAY_RATE_MAX_DELTA_PCT_POINTS = 5.0
 
 
 @dataclass
@@ -220,6 +225,90 @@ def check_semantic_coverage(df: pd.DataFrame) -> list[MonitoringCheckResult]:
     ]
 
 
+def build_monthly_operational_metrics(df: pd.DataFrame) -> pd.DataFrame:
+    required_columns = {"order_purchase_timestamp", "order_id", "total_item_value", "is_delayed"}
+    if not required_columns.issubset(df.columns):
+        return pd.DataFrame()
+    monthly = df.copy()
+    monthly["month_start"] = pd.to_datetime(monthly["order_purchase_timestamp"], errors="coerce").dt.to_period("M").dt.to_timestamp()
+    monthly = monthly.dropna(subset=["month_start"])
+    metrics = (
+        monthly.groupby("month_start", as_index=False)
+        .agg(
+            revenue_gross=("total_item_value", "sum"),
+            orders=("order_id", "nunique"),
+            delayed_orders_pct=("is_delayed", "mean"),
+        )
+        .sort_values("month_start")
+    )
+    metrics["avg_ticket"] = metrics["revenue_gross"] / metrics["orders"].replace(0, pd.NA)
+    metrics["delayed_orders_pct"] = pd.to_numeric(metrics["delayed_orders_pct"], errors="coerce").mul(100)
+    return metrics
+
+
+def check_recent_anomalies(df: pd.DataFrame) -> list[MonitoringCheckResult]:
+    monthly = build_monthly_operational_metrics(df)
+    if monthly.empty or len(monthly) < MIN_PERIODS_FOR_ANOMALY_CHECK:
+        return []
+
+    latest = monthly.iloc[-1]
+    history = monthly.iloc[:-1]
+    results: list[MonitoringCheckResult] = []
+
+    def relative_check(
+        *,
+        check_name: str,
+        current_value: float,
+        baseline_value: float,
+        threshold: float,
+        details: str,
+    ) -> MonitoringCheckResult:
+        delta_pct = 0.0 if baseline_value == 0 else abs(((current_value / baseline_value) - 1) * 100)
+        return build_result(
+            check_name,
+            delta_pct <= threshold,
+            round(delta_pct, 2),
+            threshold,
+            "medium",
+            details,
+        )
+
+    revenue_baseline = float(history["revenue_gross"].median())
+    results.append(
+        relative_check(
+            check_name="published_anomaly__revenue_gross_latest_month_delta_pct",
+            current_value=float(latest["revenue_gross"]),
+            baseline_value=revenue_baseline,
+            threshold=REVENUE_ANOMALY_MAX_DELTA_PCT,
+            details="Variação da receita do mês mais recente contra a mediana histórica anterior.",
+        )
+    )
+
+    orders_baseline = float(history["orders"].median())
+    results.append(
+        relative_check(
+            check_name="published_anomaly__orders_latest_month_delta_pct",
+            current_value=float(latest["orders"]),
+            baseline_value=orders_baseline,
+            threshold=ORDERS_ANOMALY_MAX_DELTA_PCT,
+            details="Variação do volume de pedidos do mês mais recente contra a mediana histórica anterior.",
+        )
+    )
+
+    delay_baseline = float(history["delayed_orders_pct"].median())
+    delay_current = float(latest["delayed_orders_pct"])
+    delay_delta = max(0.0, round(delay_current - delay_baseline, 2))
+    results.append(
+        build_result(
+            "published_anomaly__delay_rate_latest_month_delta_pct_points",
+            delay_delta <= DELAY_RATE_MAX_DELTA_PCT_POINTS,
+            delay_delta,
+            DELAY_RATE_MAX_DELTA_PCT_POINTS,
+            "medium",
+            "Aumento da taxa de atraso do mês mais recente contra a mediana histórica anterior.",
+        )
+    )
+    return results
 def run_monitoring(*, max_freshness_hours: int = DEFAULT_MAX_FRESHNESS_HOURS) -> list[MonitoringCheckResult]:
     df = load_published_table()
     results = [check_file_freshness(PUBLISHED_PARQUET_PATH, max_freshness_hours=max_freshness_hours)]
@@ -228,6 +317,7 @@ def run_monitoring(*, max_freshness_hours: int = DEFAULT_MAX_FRESHNESS_HOURS) ->
     results.append(check_row_volume(df))
     results.extend(check_critical_nulls(df))
     results.extend(check_semantic_coverage(df))
+    results.extend(check_recent_anomalies(df))
     return results
 
 
@@ -307,15 +397,48 @@ def send_external_alert(
     )
 
 
+def save_health_history(
+    *,
+    generated_at_utc: str,
+    results: list[MonitoringCheckResult],
+    health_score: PublishedHealthScore,
+) -> Path:
+    ensure_directory(PUBLISHED_MONITORING_DIR)
+    history_entry = pd.DataFrame(
+        [
+            {
+                "generated_at_utc": generated_at_utc,
+                "health_score": health_score.score,
+                "health_status": health_score.status,
+                "failed_checks": health_score.failed_checks,
+                "total_checks": len(results),
+                "max_severity": health_score.max_severity,
+                "main_risk": health_score.main_risk,
+            }
+        ]
+    )
+    if HISTORY_PATH.exists():
+        history_df = pd.read_csv(HISTORY_PATH)
+        history_df = pd.concat([history_df, history_entry], ignore_index=True)
+        history_df = history_df.drop_duplicates(subset=["generated_at_utc"], keep="last")
+    else:
+        history_df = history_entry
+    history_df = history_df.sort_values("generated_at_utc")
+    history_df.to_csv(HISTORY_PATH, index=False)
+    return HISTORY_PATH
+
+
 def save_results(results: list[MonitoringCheckResult]) -> tuple[Path, Path]:
     ensure_directory(PUBLISHED_MONITORING_DIR)
     results_df = pd.DataFrame(asdict(result) for result in results)
     health_score = build_health_score(results)
+    generated_at_utc = datetime.now(timezone.utc).isoformat()
     results_df.to_csv(RESULTS_PATH, index=False)
+    save_health_history(generated_at_utc=generated_at_utc, results=results, health_score=health_score)
     SUMMARY_PATH.write_text(
         json.dumps(
             {
-                "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+                "generated_at_utc": generated_at_utc,
                 "total_checks": len(results),
                 "failed_checks": int((results_df["status"] == "FAIL").sum()),
                 "health_score": asdict(health_score),
@@ -362,6 +485,13 @@ def render_report(results: list[MonitoringCheckResult]) -> str:
     else:
         for row in failed_df.itertuples(index=False):
             lines.append(f"- `{row.check_name}`: {row.details} Valor observado={row.metric_value}.")
+    if HISTORY_PATH.exists():
+        history_df = pd.read_csv(HISTORY_PATH).tail(5)
+        lines.extend(["", "## Tendência recente de saúde", "", "| Data UTC | Score | Status | Falhas | Risco principal |", "| --- | ---: | --- | ---: | --- |"])
+        for row in history_df.itertuples(index=False):
+            lines.append(
+                f"| `{row.generated_at_utc}` | {row.health_score} | {row.health_status} | {row.failed_checks} | `{row.main_risk}` |"
+            )
     return "\n".join(lines) + "\n"
 
 

@@ -2,6 +2,8 @@
 
 Relatorio recorrente de freshness e qualidade da camada `fact_orders_dashboard`.
 
+O monitoramento agora tambem suporta checks simples de anomalia no periodo mais recente e historico persistido do `health_score`, usados para leitura executiva da estabilidade da camada publicada.
+
 ## Resumo
 
 - Checks executados: **12**
