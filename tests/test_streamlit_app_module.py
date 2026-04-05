@@ -81,6 +81,8 @@ def test_main_stops_with_error_when_data_file_is_missing(monkeypatch) -> None:
     fake_st = FakeStreamlit()
     monkeypatch.setattr(app_module, "st", fake_st)
     monkeypatch.setattr(app_module, "apply_theme", lambda: None)
+    monkeypatch.setattr(app_module, "build_dashboard_locale", lambda: "pt-BR")
+    monkeypatch.setattr(app_module, "set_format_locale", lambda _locale: None)
     monkeypatch.setattr(app_module, "load_data", lambda: (_ for _ in ()).throw(FileNotFoundError("missing file")))
 
     with pytest.raises(StopCalled):
@@ -93,6 +95,8 @@ def test_main_stops_with_warning_when_filters_return_no_rows(monkeypatch) -> Non
     fake_st = FakeStreamlit()
     monkeypatch.setattr(app_module, "st", fake_st)
     monkeypatch.setattr(app_module, "apply_theme", lambda: None)
+    monkeypatch.setattr(app_module, "build_dashboard_locale", lambda: "pt-BR")
+    monkeypatch.setattr(app_module, "set_format_locale", lambda _locale: None)
     monkeypatch.setattr(app_module, "load_data", build_app_frame)
     monkeypatch.setattr(app_module, "build_sidebar_filters", lambda _df: build_filters())
     monkeypatch.setattr(app_module, "build_app_mode", lambda: False)
@@ -110,6 +114,8 @@ def test_main_runs_presentation_mode_flow(monkeypatch) -> None:
     calls: list[str] = []
     monkeypatch.setattr(app_module, "st", fake_st)
     monkeypatch.setattr(app_module, "apply_theme", lambda: calls.append("theme"))
+    monkeypatch.setattr(app_module, "build_dashboard_locale", lambda: "pt-BR")
+    monkeypatch.setattr(app_module, "set_format_locale", lambda _locale: calls.append("locale"))
     monkeypatch.setattr(app_module, "load_data", build_app_frame)
     monkeypatch.setattr(app_module, "load_semantic_assets", lambda: {})
     monkeypatch.setattr(app_module, "load_monitoring_status", lambda: None)
@@ -127,7 +133,7 @@ def test_main_runs_presentation_mode_flow(monkeypatch) -> None:
 
     app_module.main()
 
-    assert calls == ["theme", "header", "kpi", "tempo", "categoria", "geo", "insights"]
+    assert calls == ["theme", "locale", "header", "kpi", "tempo", "categoria", "geo", "insights"]
     assert fake_st.sidebar.captions[-1] == "Registros filtrados: 1"
 
 
@@ -136,6 +142,8 @@ def test_main_runs_full_view_flow(monkeypatch) -> None:
     calls: list[str] = []
     monkeypatch.setattr(app_module, "st", fake_st)
     monkeypatch.setattr(app_module, "apply_theme", lambda: calls.append("theme"))
+    monkeypatch.setattr(app_module, "build_dashboard_locale", lambda: "pt-BR")
+    monkeypatch.setattr(app_module, "set_format_locale", lambda _locale: calls.append("locale"))
     monkeypatch.setattr(app_module, "load_data", build_app_frame)
     monkeypatch.setattr(app_module, "load_semantic_assets", lambda: {})
     monkeypatch.setattr(app_module, "load_monitoring_status", lambda: None)
@@ -159,4 +167,4 @@ def test_main_runs_full_view_flow(monkeypatch) -> None:
 
     app_module.main()
 
-    assert calls == ["theme", "header", "context", "smart", "kpi", "tempo", "categoria", "geo", "insights"]
+    assert calls == ["theme", "locale", "header", "context", "smart", "kpi", "tempo", "categoria", "geo", "insights"]

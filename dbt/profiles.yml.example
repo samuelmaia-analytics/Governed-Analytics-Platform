@@ -1,0 +1,7 @@
+governed_analytics_platform:
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/platform.duckdb
+      threads: 4
+  target: dev

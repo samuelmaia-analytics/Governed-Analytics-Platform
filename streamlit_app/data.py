@@ -116,6 +116,20 @@ def load_monitoring_status() -> dict[str, object] | None:
     return json.loads(MONITORING_SUMMARY_PATH.read_text(encoding="utf-8"))
 
 
+def build_dashboard_locale() -> str:
+    st.sidebar.markdown("### Formato Regional")
+    locale_label = st.sidebar.selectbox(
+        "Idioma e formatação",
+        options=["Português (Brasil)", "International"],
+        key="dashboard_locale",
+    )
+    if locale_label == "International":
+        st.sidebar.caption("Os números seguem padrão internacional; a narrativa do app permanece priorizando PT-BR.")
+        return "en-US"
+    st.sidebar.caption("O dashboard está configurado para Português (Brasil).")
+    return "pt-BR"
+
+
 def build_default_filter_state(df: pd.DataFrame) -> None:
     min_date = df["order_purchase_timestamp"].min().date()
     max_date = df["order_purchase_timestamp"].max().date()

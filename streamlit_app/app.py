@@ -11,6 +11,7 @@ if __package__ is None or __package__ == "":
 from streamlit_app.analytics import build_metrics
 from streamlit_app.data import (
     build_app_mode,
+    build_dashboard_locale,
     build_sidebar_filters,
     filter_dataframe,
     get_previous_period_df,
@@ -18,7 +19,7 @@ from streamlit_app.data import (
     load_monitoring_status,
     load_semantic_assets,
 )
-from streamlit_app.formatting import format_number
+from streamlit_app.formatting import format_number, set_format_locale
 from streamlit_app.sections import (
     render_category_section,
     render_context_bar,
@@ -44,6 +45,8 @@ st.set_page_config(
 
 def main() -> None:
     apply_theme()
+    locale = build_dashboard_locale()
+    set_format_locale(locale)
     try:
         df = load_data()
     except (FileNotFoundError, ValueError) as exc:

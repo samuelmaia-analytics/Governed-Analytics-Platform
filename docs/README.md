@@ -14,11 +14,17 @@ Este arquivo existe só como índice da pasta `docs/`. O contexto geral do proje
 
 - [executive_summary.md](executive_summary.md): visão executiva
 - [architecture.md](architecture.md): arquitetura implementada
+- [target_architecture_and_roadmap.md](target_architecture_and_roadmap.md): arquitetura alvo e roadmap priorizado
+- [dbt_adoption.md](dbt_adoption.md): introdução inicial de dbt-duckdb no repositório
+- [product_brief.md](product_brief.md): posicionamento do projeto como produto analítico
 - [operating_model.md](operating_model.md): pipeline, publicação, deploy e operação
 - [privacy_governance.md](privacy_governance.md): fronteira de exposição, LGPD e checks da camada publicada
 - [engineering_governance.md](engineering_governance.md): guardrails do repositório e workflows
 - [platform_publication.md](platform_publication.md): publicação em ambiente de plataforma
 - [technical_narrative.md](technical_narrative.md): defesa técnica consolidada
+- [metric_catalog.md](metric_catalog.md): catálogo canônico de métricas de negócio
+- [business_glossary.md](business_glossary.md): glossário de negócio e definições analíticas
+- [executive_scorecard.md](executive_scorecard.md): leitura executiva da maturidade atual
 
 ## Relatórios gerados
 

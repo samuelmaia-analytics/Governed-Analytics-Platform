@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: fct_orders_dashboard
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: order_item_id
+        tests: [not_null]
+  - name: mart_category_performance
+    columns:
+      - name: product_category_name_english
+        tests: [not_null]
+  - name: mart_state_performance
+    columns:
+      - name: customer_state
+        tests: [not_null]

@@ -24,7 +24,7 @@ Os arquivos para Power BI ficam em:
 
 - `data/processed/bi_exports/fact_sales_power_bi.csv`
 - `data/processed/bi_exports/dim_date.csv`
-- `data/processed/bi_exports/dim_product.csv`
+- `data/processed/bi_exports/dim_category.csv`
 - `data/processed/bi_exports/dim_payment.csv`
 - `data/processed/bi_exports/dim_order_status.csv`
 - `data/processed/bi_exports/dim_customer.csv`
@@ -51,7 +51,7 @@ A fato exportada em `fact_sales_power_bi.csv` possui:
 ### Dimensões
 
 - `dim_date[date_key]`
-- `dim_product[product_key]`
+- `dim_category[category_key]`
 - `dim_payment[payment_key]`
 - `dim_order_status[order_status_key]`
 - `dim_customer[customer_key]`
@@ -60,7 +60,7 @@ A fato exportada em `fact_sales_power_bi.csv` possui:
 ### Foreign keys na fato
 
 - `fact_sales_power_bi[date_key]`
-- `fact_sales_power_bi[product_key]`
+- `fact_sales_power_bi[category_key]`
 - `fact_sales_power_bi[payment_key]`
 - `fact_sales_power_bi[order_status_key]`
 - `fact_sales_power_bi[customer_key]`
@@ -78,7 +78,7 @@ As dimensões `payment` e `order_status` passaram a usar chaves explícitas, evi
 4. Se o Power BI já tiver tabelas antigas importadas, remova as tabelas anteriores e reimporte os arquivos atualizados.
 5. No modelo, configure os relacionamentos:
    - `fact_sales_power_bi[date_key]` -> `dim_date[date_key]`
-   - `fact_sales_power_bi[product_key]` -> `dim_product[product_key]`
+   - `fact_sales_power_bi[category_key]` -> `dim_category[category_key]`
    - `fact_sales_power_bi[customer_key]` -> `dim_customer[customer_key]`
    - `fact_sales_power_bi[seller_key]` -> `dim_seller[seller_key]`
    - `fact_sales_power_bi[payment_key]` -> `dim_payment[payment_key]`
@@ -116,15 +116,14 @@ Colunas:
 - `day`
 - `weekday_name`
 
-### `dim_product`
+### `dim_category`
 
 Colunas principais:
 
-- `product_key`
+- `category_key`
 - categoria em português
 - categoria em inglês
 - `category_label`
-- atributos físicos do produto
 
 ### `dim_payment`
 

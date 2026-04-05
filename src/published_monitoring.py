@@ -69,6 +69,15 @@ class AlertDispatchResult:
     destination: str
 
 
+@dataclass(frozen=True)
+class PublishedHealthScore:
+    score: int
+    status: str
+    failed_checks: int
+    max_severity: str
+    main_risk: str
+
+
 def build_result(
     check_name: str,
     passed: bool,
@@ -222,6 +231,38 @@ def run_monitoring(*, max_freshness_hours: int = DEFAULT_MAX_FRESHNESS_HOURS) ->
     return results
 
 
+def build_health_score(results: list[MonitoringCheckResult]) -> PublishedHealthScore:
+    failed_results = [result for result in results if result.status == "FAIL"]
+    if not failed_results:
+        return PublishedHealthScore(
+            score=100,
+            status="healthy",
+            failed_checks=0,
+            max_severity="low",
+            main_risk="none",
+        )
+
+    severity_penalty = {"high": 15, "medium": 7, "low": 3}
+    severity_order = {"high": 3, "medium": 2, "low": 1}
+    penalty = sum(severity_penalty.get(result.severity, 5) for result in failed_results)
+    score = max(0, 100 - penalty)
+    if score >= 90:
+        status = "healthy_with_warnings"
+    elif score >= 70:
+        status = "attention_required"
+    else:
+        status = "critical"
+    max_severity = max(failed_results, key=lambda result: severity_order.get(result.severity, 0)).severity
+    main_risk = failed_results[0].check_name
+    return PublishedHealthScore(
+        score=score,
+        status=status,
+        failed_checks=len(failed_results),
+        max_severity=max_severity,
+        main_risk=main_risk,
+    )
+
+
 def build_alert_payload(
     results: list[MonitoringCheckResult],
     *,
@@ -269,6 +310,7 @@ def send_external_alert(
 def save_results(results: list[MonitoringCheckResult]) -> tuple[Path, Path]:
     ensure_directory(PUBLISHED_MONITORING_DIR)
     results_df = pd.DataFrame(asdict(result) for result in results)
+    health_score = build_health_score(results)
     results_df.to_csv(RESULTS_PATH, index=False)
     SUMMARY_PATH.write_text(
         json.dumps(
@@ -276,6 +318,7 @@ def save_results(results: list[MonitoringCheckResult]) -> tuple[Path, Path]:
                 "generated_at_utc": datetime.now(timezone.utc).isoformat(),
                 "total_checks": len(results),
                 "failed_checks": int((results_df["status"] == "FAIL").sum()),
+                "health_score": asdict(health_score),
                 "results": [asdict(result) for result in results],
             },
             indent=2,
@@ -289,6 +332,7 @@ def save_results(results: list[MonitoringCheckResult]) -> tuple[Path, Path]:
 def render_report(results: list[MonitoringCheckResult]) -> str:
     results_df = pd.DataFrame(asdict(result) for result in results)
     failed_df = results_df[results_df["status"] == "FAIL"]
+    health_score = build_health_score(results)
     lines = [
         "# Monitoramento da Camada Published",
         "",
@@ -299,6 +343,9 @@ def render_report(results: list[MonitoringCheckResult]) -> str:
         f"- Checks executados: **{len(results)}**",
         f"- Checks aprovados: **{int((results_df['status'] == 'PASS').sum())}**",
         f"- Checks reprovados: **{int((results_df['status'] == 'FAIL').sum())}**",
+        f"- Health score da camada publicada: **{health_score.score}/100**",
+        f"- Status de saúde: **{health_score.status}**",
+        f"- Risco principal: **{health_score.main_risk}**",
         "",
         "## Resultado dos Checks",
         "",

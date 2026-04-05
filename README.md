@@ -4,66 +4,78 @@
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/governed-analytics-platform/actions/workflows/lint.yml)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 
-Pipeline de Analytics Engineering construído sobre o dataset público da Olist para transformar dados brutos em um ativo analítico governado, com separação explícita entre camada analítica interna e camada publicada para consumo executivo.
+**Language:** `EN` | [PT-BR](docs/README.md)
 
-## Em uma frase
+Governed Analytics Platform is a portfolio-grade analytics product built on top of the public Olist dataset to show how raw transactional data can be transformed into a governed analytical asset with an explicit publication boundary for executive consumption.
 
-O projeto mostra como sair de CSVs relacionais brutos para um produto analítico com qualidade, contratos, monitoramento, catálogo, publicação controlada e consumo em `Streamlit` e `Power BI`.
+## In one sentence
 
-## O que o projeto entrega
+This repository shows how to move from raw relational CSVs to a governed analytics product with quality checks, privacy-aware publication, semantic assets, operational monitoring, executive consumption and a realistic evolution path toward dbt and auditable GenAI.
 
-- pipeline ponta a ponta em Python para ingestão, profiling, modelagem, publicação e exportação
-- tabela analítica interna `fact_orders_enriched`
-- camada publicada `fact_orders_dashboard` com minimização para consumo recorrente
-- contrato LGPD/governança validado automaticamente na publicação da camada exposta
-- marts semânticos publicados para recortes executivos e operacionais
-- dashboard Streamlit consumindo somente a camada publicada
-- exportações auxiliares para Power BI
-- contratos, testes, lint, cobertura e CI
-- catálogo local, relatórios técnicos e evidências operacionais
-- monitoramento da camada publicada
-- integrações opcionais com webhook externo, OpenAI e Dadosfera Maestro
+## Why this project is different
 
-## Fluxo operacional
+- it separates internal analytical modeling from published executive consumption
+- it treats publication as a formal pipeline step
+- it applies privacy-by-design controls before exposure
+- it reuses the same published layer across Streamlit, Power BI and monitoring
+- it keeps governance, runbooks, evidence and code in the same repository
+
+## What the repository delivers
+
+- end-to-end Python pipeline for inventory, profiling, modeling, publication and exports
+- internal analytical fact table: `fact_orders_enriched`
+- governed published layer: `fact_orders_dashboard`
+- published semantic assets for logistics, seller, category, cohort and geography
+- Streamlit executive app consuming only the published layer
+- Power BI exports aligned with the published executive boundary
+- schema contracts, data-quality checks, monitoring artifacts and CI
+- local catalog, executive documentation, operational runbooks and evidence
+- optional integrations with webhooks, OpenAI and Dadosfera Maestro
+- initial `dbt-duckdb` foundation for modular SQL modeling and documentation
+
+## Architecture at a glance
 
 ```mermaid
 flowchart LR
-    A[Raw CSV Olist] --> B[Inventory and Standardization]
+    A[Raw Olist CSVs] --> B[Inventory and Standardization]
     B --> C[Profiling]
     C --> D[Curated Analytics<br/>fact_orders_enriched]
-    D --> E[Published Dashboard<br/>fact_orders_dashboard]
+    D --> E[Governed Publication<br/>fact_orders_dashboard]
     E --> F[Published Semantic Assets]
     E --> G[Published Monitoring]
     E --> H[Streamlit]
-    E --> I[Power BI exports]
-    D --> J[SQL and catalog]
+    E --> I[Power BI]
+    B --> J[dbt Staging and Intermediate]
+    J --> K[dbt Published Marts]
+    D --> L[SQL and Catalog]
 ```
 
-## Stack principal
+## Core stack
 
 - Python 3.11+
-- Pandas, NumPy e DuckDB
-- Streamlit, Altair e Plotly
-- Pytest, pytest-cov e Ruff
-- SQL versionado
-- GitHub Actions
+- Pandas, NumPy and DuckDB
+- Streamlit, Altair and Plotly
+- versioned SQL
+- Pytest, Ruff and GitHub Actions
+- optional `dbt-duckdb` extra for modular SQL modeling
 
-## Estrutura do repositório
+## Repository structure
 
-| Caminho | Papel |
+| Path | Role |
 | --- | --- |
-| `src/` | pipeline, publicação, catálogo, governança, exportações e integrações |
-| `streamlit_app/` | dashboard executivo em Streamlit |
-| `tests/` | suíte automatizada |
-| `sql/` | consultas analíticas versionadas |
-| `contracts/` | contratos de schema e regras de exposição |
-| `docs/` | documentação principal, relatórios e runbooks |
-| `powerbi/` | artefatos para consumo complementar |
-| `data/` | lake local e outputs gerados pelo pipeline |
+| `src/` | pipeline, publication, governance, monitoring, catalog and exports |
+| `streamlit_app/` | executive application in Streamlit |
+| `dbt/` | initial dbt layer for staged and published SQL models |
+| `tests/` | automated validation suite |
+| `sql/` | versioned analytical queries |
+| `contracts/` | schema and governance contracts |
+| `docs/` | executive, technical and operational documentation |
+| `powerbi/` | complementary BI artifacts |
+| `data/` | local lake layout and generated outputs |
 
-## Como executar localmente
+## Quick start
 
-### 1. Preparar ambiente
+### 1. Set up the environment
 
 ```bash
 python -m venv .venv
@@ -71,58 +83,68 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Opcionalmente, para instalar como projeto Python com dependências de desenvolvimento:
+Optional extras:
 
 ```bash
 pip install -e .[dev]
+pip install -e .[dbt]
 ```
 
-Para reproduzir exatamente o conjunto validado neste repositório, use o lockfile:
+For the validated locked set:
 
 ```bash
 pip install -r requirements.lock
 ```
 
-### 2. Configurar variáveis de ambiente
+### 2. Configure environment variables
 
-Os fluxos principais rodam sem segredos obrigatórios. Para habilitar integrações opcionais, copie `.env.example` para `.env` e ajuste os valores necessários.
+The main flow runs without mandatory secrets. Optional integrations can be enabled through `.env`.
 
-Principais grupos:
+Main groups:
 
-- `DADOSFERA_*`: publicação e operações em ambiente Dadosfera Maestro
-- `OPENAI_*`: recursos opcionais de GenAI
-- `LOG_FORMAT`: formato de logging
+- `DADOSFERA_*`
+- `OPENAI_*`
+- `LOG_FORMAT`
 
-### 3. Inspecionar as etapas disponíveis
+### 3. Inspect available pipeline steps
 
 ```bash
 python src/run_platform_pipeline.py --list-steps
 ```
 
-### 4. Executar o pipeline principal
+### 4. Run the main pipeline
 
 ```bash
 python src/run_platform_pipeline.py
 ```
 
-O runner pode executar etapas específicas com `--steps` e consolidar falhas com `--continue-on-error`.
-
-### 5. Rodar qualidade local
+### 5. Run local quality gates
 
 ```bash
 pytest
 ruff check .
 ```
 
-### 6. Subir a aplicação
+### 6. Launch the executive app
 
 ```bash
 streamlit run streamlit_app/app.py
 ```
 
-## Etapas do pipeline
+The app now exposes a regional selector in the sidebar and defaults to `Português (Brasil)`.
 
-O runner principal executa, nesta ordem:
+## dbt foundation
+
+The repository now includes an initial `dbt/` layer to support:
+
+- staged SQL models
+- intermediate aggregations
+- published marts
+- exposures for Streamlit and Power BI
+
+This is intentionally additive. Python remains the operational backbone of the project.
+
+## Main pipeline steps
 
 1. `inventory`
 2. `profiling`
@@ -138,40 +160,7 @@ O runner principal executa, nesta ordem:
 12. `screenshots`
 13. `bi`
 
-Na etapa `publish`, a camada exposta passa por validações de privacidade e governança antes de ser salva. O contrato versionado fica em `contracts/governance/privacy_governance.json` e a evidência tabular é salva em `data/curated/quality/privacy_governance_results.csv`.
-
-## Evidências e acessos
-
-- App Streamlit: [governed-analytics-platform.streamlit.app](https://governed-analytics-platform.streamlit.app/)
-- Dashboard Power BI: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
-- Vídeo: [YouTube](https://youtu.be/SqJ0UF1Em9k)
-
-## Navegação recomendada
-
-Leitura rápida:
-
-1. `README.md`
-2. `docs/README.md`
-3. `docs/executive_summary.md`
-4. `docs/architecture.md`
-5. `docs/operating_model.md`
-
-Trilhas por objetivo:
-
-- visão executiva: `docs/executive_summary.md`, `docs/05_dashboard.md`, `docs/architecture.md`
-- revisão técnica: `docs/technical_narrative.md`, `docs/02_carga_e_modelagem.md`, `docs/schema_contract_report.md`
-- operação e governança: `docs/operating_model.md`, `docs/privacy_governance.md`, `docs/engineering_governance.md`, `docs/release_runbook.md`
-
-## Arquivos para começar
-
-- `src/run_platform_pipeline.py`
-- `src/build_analytics.py`
-- `src/publish_dashboard.py`
-- `src/semantic_layer.py`
-- `streamlit_app/app.py`
-- `docs/README.md`
-
-## Saídas importantes geradas pelo pipeline
+## Key outputs
 
 - `data/curated/analytics/`
 - `data/published/dashboard/`
@@ -179,17 +168,42 @@ Trilhas por objetivo:
 - `data/published/monitoring/`
 - `data/curated/catalog/`
 - `data/curated/ops/`
-- `data/curated/quality/privacy_governance_results.csv`
-- `docs/data_quality_report.md`
 - `docs/published_layer_monitoring.md`
-- `docs/semantic_layer.md`
-- `docs/operational_job_report.md`
-- `docs/privacy_governance.md`
+- `docs/metric_catalog.md`
+- `docs/business_glossary.md`
+- `docs/product_brief.md`
+- `docs/target_architecture_and_roadmap.md`
 
-## Diferencial arquitetural
+## Public links
 
-O ponto central do projeto é não conectar o dashboard diretamente na camada analítica completa. A publicação é tratada como etapa formal do pipeline, criando uma fronteira explícita entre:
+- Streamlit app: [governed-analytics-platform.streamlit.app](https://governed-analytics-platform.streamlit.app/)
+- Power BI dashboard: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
+- Presentation video: [YouTube](https://youtu.be/SqJ0UF1Em9k)
 
-- exploração interna e exposição recorrente
-- evolução da modelagem e estabilidade do consumo
-- dado analítico e produto analítico publicado
+## Recommended reading
+
+### Start here
+
+1. [docs/executive_summary.md](docs/executive_summary.md)
+2. [docs/product_brief.md](docs/product_brief.md)
+3. [docs/architecture.md](docs/architecture.md)
+4. [docs/target_architecture_and_roadmap.md](docs/target_architecture_and_roadmap.md)
+5. [docs/operating_model.md](docs/operating_model.md)
+
+### Documentation language
+
+The repository README is written in English for international positioning.
+
+The documentation under `docs/` remains primarily in Portuguese because:
+
+- the project targets a Brazilian business dataset and operating context
+- the Streamlit executive app is intentionally optimized for `Português (Brasil)`
+- the repository preserves the original presentation and business-defense materials
+
+## Architectural thesis
+
+The key idea behind this project is simple: executive consumers should not depend directly on the full internal analytical layer. Publication is treated as an explicit product boundary between:
+
+- internal exploration and recurring exposure
+- model evolution and consumer stability
+- analytical data and governed analytical product

@@ -256,6 +256,18 @@ def test_build_app_mode_reads_sidebar_toggle(monkeypatch) -> None:
     assert data_module.build_app_mode() is True
 
 
+def test_build_dashboard_locale_defaults_to_portuguese_brazil(monkeypatch) -> None:
+    sidebar = FakeSidebar()
+    sidebar.selectbox_values = ["Português (Brasil)"]
+    fake_st = type("FakeSt", (), {"sidebar": sidebar})()
+    monkeypatch.setattr(data_module, "st", fake_st)
+
+    locale = data_module.build_dashboard_locale()
+
+    assert locale == "pt-BR"
+    assert sidebar.captions[-1] == "O dashboard está configurado para Português (Brasil)."
+
+
 def test_load_semantic_assets_reads_available_parquets(tmp_path: Path, monkeypatch) -> None:
     logistics_path = tmp_path / "logistics.parquet"
     seller_path = tmp_path / "seller.parquet"

@@ -20,7 +20,7 @@ O material de Power BI amplia o consumo analítico do projeto. Ele não substitu
 
 - `fact_sales_power_bi.csv`
 - `dim_date.csv`
-- `dim_product.csv`
+- `dim_category.csv`
 - `dim_customer.csv`
 - `dim_seller.csv`
 - `dim_payment.csv`

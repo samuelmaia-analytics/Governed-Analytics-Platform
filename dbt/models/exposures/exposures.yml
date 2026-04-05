@@ -1,0 +1,21 @@
+version: 2
+
+exposures:
+  - name: streamlit_executive_dashboard
+    type: dashboard
+    owner:
+      name: Samuel Maia
+      email: samuelmaia.analytics@gmail.com
+    depends_on:
+      - ref('fct_orders_dashboard')
+      - ref('mart_category_performance')
+      - ref('mart_state_performance')
+
+  - name: power_bi_executive_dashboard
+    type: dashboard
+    owner:
+      name: Samuel Maia
+      email: samuelmaia.analytics@gmail.com
+    depends_on:
+      - ref('mart_category_performance')
+      - ref('mart_state_performance')

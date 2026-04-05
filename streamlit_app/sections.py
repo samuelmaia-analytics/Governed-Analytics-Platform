@@ -30,6 +30,7 @@ from streamlit_app.charts import (
 from streamlit_app.data import FilterState
 from streamlit_app.formatting import (
     format_currency,
+    format_date_label,
     format_number,
     format_pct,
     to_csv_bytes,
@@ -42,7 +43,7 @@ def metric_card(label: str, value: str, delta: str, help_text: str, delta_color:
 
 
 def render_header(filters: FilterState, total_rows: int, filtered_rows: int) -> None:
-    period_text = f"{filters.start_date:%d/%m/%Y} a {filters.end_date:%d/%m/%Y}"
+    period_text = f"{format_date_label(filters.start_date)} a {format_date_label(filters.end_date)}"
     st.markdown(
         f"""
         <div class="hero-shell">
@@ -297,16 +298,22 @@ def render_health_section(monitoring_status: dict[str, object] | None) -> None:
     generated_at = str(monitoring_status.get("generated_at_utc") or "N/A")
     total_checks = int(monitoring_status.get("total_checks") or 0)
     failed_checks = int(monitoring_status.get("failed_checks") or 0)
+    health_score = monitoring_status.get("health_score") or {}
+    score_value = int(health_score.get("score") or 0)
+    score_status = str(health_score.get("status") or "unknown")
+    main_risk = str(health_score.get("main_risk") or "none")
     status_label = "Saudável" if failed_checks == 0 else "Em alerta"
     results = pd.DataFrame(monitoring_status.get("results") or [])
 
-    col1, col2, col3 = st.columns(3, gap="large")
+    col1, col2, col3, col4 = st.columns(4, gap="large")
     with col1:
         render_regional_kpi("Status atual", status_label, f"Última geração UTC: {generated_at}.")
     with col2:
         render_regional_kpi("Checks executados", format_number(total_checks), "Cobertura total do monitoramento recorrente.")
     with col3:
         render_regional_kpi("Falhas abertas", format_number(failed_checks), "Quantidade de checks em FAIL na última execução.")
+    with col4:
+        render_regional_kpi("Health score", f"{score_value}/100", f"Status: {score_status} | risco principal: {main_risk}.")
 
     if not results.empty:
         preview = results[["check_name", "status", "severity", "metric_value"]].copy()

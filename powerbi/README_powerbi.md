@@ -15,9 +15,9 @@ O dashboard foi desenhado para sustentar uma conversa de negócio com base técn
 
 ## Contexto do dataset
 
-O projeto utiliza a base Olist e consolida os dados em uma camada analítica principal derivada de `fact_orders_enriched`.
+O projeto utiliza a base Olist e consolida os dados em uma camada publicada governada em `fact_orders_dashboard`.
 
-Para consumo no Power BI, essa camada foi exportada para um modelo estrela simples, com uma fato de vendas e dimensões auxiliares de data, produto, pagamento, status, cliente e seller.
+Para consumo no Power BI, essa camada publicada foi exportada para um modelo estrela simples, com uma fato de vendas e dimensões auxiliares compatíveis com a fronteira de exposição executiva: data, categoria, pagamento, status, cliente pseudonimizado e seller pseudonimizado.
 
 ## Modelo de dados
 
@@ -28,7 +28,7 @@ Estrutura principal:
 
 - dimensões:
   - `dim_date.csv`
-  - `dim_product.csv`
+  - `dim_category.csv`
   - `dim_payment.csv`
   - `dim_order_status.csv`
   - `dim_customer.csv`
@@ -37,7 +37,7 @@ Estrutura principal:
 Relacionamentos esperados:
 
 - `fact_sales_power_bi[date_key]` -> `dim_date[date_key]`
-- `fact_sales_power_bi[product_key]` -> `dim_product[product_key]`
+- `fact_sales_power_bi[category_key]` -> `dim_category[category_key]`
 - `fact_sales_power_bi[payment_key]` -> `dim_payment[payment_key]`
 - `fact_sales_power_bi[order_status_key]` -> `dim_order_status[order_status_key]`
 - `fact_sales_power_bi[customer_key]` -> `dim_customer[customer_key]`
@@ -47,7 +47,8 @@ Observações de importação:
 
 - separador CSV: `;`
 - encoding: `utf-8-sig`
-- fato e dimensões são derivados da camada interna `fact_orders_enriched`
+- fato e dimensões são derivados da camada publicada `fact_orders_dashboard`
+- o modelo evita reintroduzir chaves brutas ou atributos detalhados removidos na publicação governada
 
 ## Principais KPIs
 
@@ -92,7 +93,7 @@ Arquivos-base do modelo:
 
 - [fact_sales_power_bi.csv](../data/processed/bi_exports/fact_sales_power_bi.csv)
 - [dim_date.csv](../data/processed/bi_exports/dim_date.csv)
-- [dim_product.csv](../data/processed/bi_exports/dim_product.csv)
+- [dim_category.csv](../data/processed/bi_exports/dim_category.csv)
 - [dim_payment.csv](../data/processed/bi_exports/dim_payment.csv)
 - [dim_order_status.csv](../data/processed/bi_exports/dim_order_status.csv)
 - [dim_customer.csv](../data/processed/bi_exports/dim_customer.csv)

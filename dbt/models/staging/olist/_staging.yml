@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_olist__orders
+    columns:
+      - name: order_id
+        tests: [not_null]
+  - name: stg_olist__order_items
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: order_item_id
+        tests: [not_null]

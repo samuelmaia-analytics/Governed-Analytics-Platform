@@ -13,7 +13,7 @@ O projeto já possui os datasets necessários para montar o bônus em Power BI:
 
 - `data/processed/bi_exports/fact_sales_power_bi.csv`
 - `data/processed/bi_exports/dim_date.csv`
-- `data/processed/bi_exports/dim_product.csv`
+- `data/processed/bi_exports/dim_category.csv`
 - `data/processed/bi_exports/dim_customer.csv`
 - `data/processed/bi_exports/dim_seller.csv`
 - `data/processed/bi_exports/dim_payment.csv`

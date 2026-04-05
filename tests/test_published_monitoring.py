@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -55,6 +56,9 @@ def test_run_monitoring_and_save_outputs(tmp_path: Path, monkeypatch) -> None:
     assert (monitoring_dir / "published_layer_monitoring.csv").exists()
     assert (monitoring_dir / "published_layer_monitoring.json").exists()
     assert (docs_dir / "published_layer_monitoring.md").exists()
+    summary = json.loads((monitoring_dir / "published_layer_monitoring.json").read_text(encoding="utf-8"))
+    assert summary["health_score"]["score"] == 100
+    assert summary["health_score"]["status"] == "healthy"
 
 
 def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(tmp_path: Path, monkeypatch) -> None:
@@ -95,6 +99,21 @@ def test_build_alert_payload_contains_failed_checks_only() -> None:
             "details": "broken",
         }
     ]
+
+
+def test_build_health_score_penalizes_failed_checks() -> None:
+    health = monitoring.build_health_score(
+        [
+            monitoring.MonitoringCheckResult("check_fail_high", "FAIL", 2, 0, "high", "broken"),
+            monitoring.MonitoringCheckResult("check_fail_medium", "FAIL", 1, 0, "medium", "drift"),
+        ]
+    )
+
+    assert health.score == 78
+    assert health.status == "attention_required"
+    assert health.failed_checks == 2
+    assert health.max_severity == "high"
+    assert health.main_risk == "check_fail_high"
 
 
 def test_send_external_alert_posts_json_payload(monkeypatch) -> None:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 import sys
 from dataclasses import dataclass
@@ -10,14 +11,13 @@ import pandas as pd
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from src.config import DATA_DIR
+from src.config import PUBLISHED_DASHBOARD_DIR
 from src.ingest import configure_logging
-from src.publish_dashboard import pseudonymize
 from src.utils import ensure_directory
 
 LOGGER = logging.getLogger(__name__)
-FACT_SOURCE_PATH = DATA_DIR / "curated" / "analytics" / "fact_orders_enriched.parquet"
-BI_EXPORT_DIR = DATA_DIR / "processed" / "bi_exports"
+FACT_SOURCE_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
+BI_EXPORT_DIR = PUBLISHED_DASHBOARD_DIR.parent.parent / "processed" / "bi_exports"
 CSV_SEPARATOR = ";"
 CSV_ENCODING = "utf-8-sig"
 
@@ -25,27 +25,20 @@ REQUIRED_SOURCE_COLUMNS = {
     "order_id",
     "order_item_id",
     "order_date",
-    "customer_id",
     "customer_unique_id",
     "customer_state",
-    "product_id",
     "product_category_name",
     "product_category_name_english",
-    "seller_id",
+    "seller_key",
     "seller_state",
     "payment_type_mode",
     "order_status",
     "order_purchase_timestamp",
-    "order_approved_at",
     "order_delivered_customer_date",
     "order_estimated_delivery_date",
     "price",
     "freight_value",
     "total_item_value",
-    "payment_count",
-    "total_payment_value",
-    "max_payment_installments",
-    "review_count",
     "review_score_mean",
     "delivery_time_days",
     "estimated_delay_days",
@@ -54,12 +47,8 @@ REQUIRED_SOURCE_COLUMNS = {
 
 DATE_COLUMNS = [
     "order_purchase_timestamp",
-    "order_approved_at",
-    "order_delivered_carrier_date",
     "order_delivered_customer_date",
     "order_estimated_delivery_date",
-    "latest_review_creation_date",
-    "latest_review_answer_timestamp",
     "order_date",
 ]
 
@@ -77,11 +66,17 @@ class ExportArtifact:
 class ExportBundle:
     fact_sales: pd.DataFrame
     dim_date: pd.DataFrame
-    dim_product: pd.DataFrame
+    dim_category: pd.DataFrame
     dim_payment: pd.DataFrame
     dim_order_status: pd.DataFrame
     dim_customer: pd.DataFrame
     dim_seller: pd.DataFrame
+
+
+def stable_key(value: object, prefix: str) -> str:
+    normalized = "" if pd.isna(value) else str(value).strip()
+    digest = hashlib.sha256(f"{prefix}:{normalized}".encode("utf-8")).hexdigest()[:16]
+    return f"{prefix}_{digest}"
 
 
 def load_fact() -> pd.DataFrame:
@@ -108,6 +103,8 @@ def load_fact() -> pd.DataFrame:
     df["order_status"] = df["order_status"].fillna("unknown").astype(str).str.strip()
     df["customer_state"] = df["customer_state"].fillna("NA").astype(str).str.strip()
     df["seller_state"] = df["seller_state"].fillna("NA").astype(str).str.strip()
+    df["seller_key"] = df["seller_key"].fillna("seller_id_unknown").astype(str).str.strip()
+    df["customer_unique_id"] = df["customer_unique_id"].fillna("customer_unique_id_unknown").astype(str).str.strip()
     df["is_delayed"] = df["is_delayed"].fillna(False).astype(bool)
     return df
 
@@ -129,25 +126,18 @@ def build_dim_date(df: pd.DataFrame) -> pd.DataFrame:
     ].reset_index(drop=True)
 
 
-def build_dim_product(df: pd.DataFrame) -> pd.DataFrame:
+def build_dim_category(df: pd.DataFrame) -> pd.DataFrame:
     dim = df.copy()
-    dim["product_key"] = dim["product_id"].map(lambda value: pseudonymize(value, "product_id"))
-    dim_product = dim[
+    dim["category_key"] = dim["category_label"].map(lambda value: stable_key(value, "category"))
+    dim_category = dim[
         [
-            "product_key",
+            "category_key",
             "product_category_name",
             "product_category_name_english",
             "category_label",
-            "product_name_lenght",
-            "product_description_lenght",
-            "product_photos_qty",
-            "product_weight_g",
-            "product_length_cm",
-            "product_height_cm",
-            "product_width_cm",
         ]
-    ].drop_duplicates(subset=["product_key"])
-    return dim_product.sort_values("product_key").reset_index(drop=True)
+    ].drop_duplicates(subset=["category_key"])
+    return dim_category.sort_values("category_key").reset_index(drop=True)
 
 
 def build_dim_payment(df: pd.DataFrame) -> pd.DataFrame:
@@ -183,41 +173,41 @@ def build_dim_order_status(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_dim_customer(df: pd.DataFrame) -> pd.DataFrame:
     dim = df.copy()
-    dim["customer_key"] = dim["customer_id"].map(lambda value: pseudonymize(value, "customer_id"))
-    dim["customer_master_key"] = dim["customer_unique_id"].map(lambda value: pseudonymize(value, "customer_unique_id"))
+    dim["customer_key"] = dim["customer_unique_id"]
+    dim["customer_master_key"] = dim["customer_unique_id"]
     dim_customer = dim[["customer_key", "customer_master_key", "customer_state"]].drop_duplicates(subset=["customer_key"])
     return dim_customer.sort_values("customer_key").reset_index(drop=True)
 
 
 def build_dim_seller(df: pd.DataFrame) -> pd.DataFrame:
     dim = df.copy()
-    dim["seller_key"] = dim["seller_id"].map(lambda value: pseudonymize(value, "seller_id"))
     dim_seller = dim[["seller_key", "seller_state"]].drop_duplicates(subset=["seller_key"])
     return dim_seller.sort_values("seller_key").reset_index(drop=True)
 
 
 def build_fact_sales(
     df: pd.DataFrame,
+    dim_category: pd.DataFrame,
     dim_payment: pd.DataFrame,
     dim_order_status: pd.DataFrame,
 ) -> pd.DataFrame:
     fact = df.copy()
-    fact["order_key"] = fact["order_id"].map(lambda value: pseudonymize(value, "order_id"))
-    fact["customer_key"] = fact["customer_id"].map(lambda value: pseudonymize(value, "customer_id"))
-    fact["product_key"] = fact["product_id"].map(lambda value: pseudonymize(value, "product_id"))
-    fact["seller_key"] = fact["seller_id"].map(lambda value: pseudonymize(value, "seller_id"))
+    fact["order_key"] = fact["order_id"]
+    fact["customer_key"] = fact["customer_unique_id"]
+    fact["category_key"] = fact["category_label"].map(lambda value: stable_key(value, "category"))
     fact["date_key"] = fact["order_date"].dt.strftime("%Y%m%d").astype("Int64")
     fact["order_item_key"] = (
         fact["order_key"].astype(str)
         + "_"
         + fact["order_item_id"].astype(str)
         + "_"
-        + fact["product_key"].astype(str)
+        + fact["category_key"].astype(str)
         + "_"
         + fact["seller_key"].astype(str)
     )
     fact["review_available"] = fact["review_score_mean"].notna().astype(int)
     fact["delivered_flag"] = fact["order_delivered_customer_date"].notna().astype(int)
+    fact["customer_count"] = 1
 
     payment_map = dim_payment.set_index("payment_type")["payment_key"]
     status_map = dim_order_status.set_index("order_status")["order_status_key"]
@@ -230,28 +220,24 @@ def build_fact_sales(
             "order_key",
             "order_item_id",
             "date_key",
-            "product_key",
+            "category_key",
             "payment_key",
             "order_status_key",
             "customer_key",
             "seller_key",
             "order_purchase_timestamp",
-            "order_approved_at",
             "order_delivered_customer_date",
             "order_estimated_delivery_date",
             "price",
             "freight_value",
             "total_item_value",
-            "payment_count",
-            "total_payment_value",
-            "max_payment_installments",
-            "review_count",
             "review_score_mean",
             "review_available",
             "delivery_time_days",
             "estimated_delay_days",
             "is_delayed",
             "delivered_flag",
+            "customer_count",
         ]
     ].copy()
 
@@ -279,7 +265,7 @@ def validate_export_bundle(bundle: ExportBundle) -> None:
     artifacts_with_pk = [
         (bundle.fact_sales, "order_item_key", "fact_sales_power_bi.csv"),
         (bundle.dim_date, "date_key", "dim_date.csv"),
-        (bundle.dim_product, "product_key", "dim_product.csv"),
+        (bundle.dim_category, "category_key", "dim_category.csv"),
         (bundle.dim_payment, "payment_key", "dim_payment.csv"),
         (bundle.dim_order_status, "order_status_key", "dim_order_status.csv"),
         (bundle.dim_customer, "customer_key", "dim_customer.csv"),
@@ -292,7 +278,7 @@ def validate_export_bundle(bundle: ExportBundle) -> None:
 
     required_fact_columns = {
         "date_key",
-        "product_key",
+        "category_key",
         "payment_key",
         "order_status_key",
         "customer_key",
@@ -303,7 +289,7 @@ def validate_export_bundle(bundle: ExportBundle) -> None:
         raise ValueError(f"fact_sales_power_bi.csv nao contem as foreign keys esperadas: {', '.join(missing_fact_columns)}")
 
     validate_foreign_keys(bundle.fact_sales, "date_key", bundle.dim_date, "date_key")
-    validate_foreign_keys(bundle.fact_sales, "product_key", bundle.dim_product, "product_key")
+    validate_foreign_keys(bundle.fact_sales, "category_key", bundle.dim_category, "category_key")
     validate_foreign_keys(bundle.fact_sales, "payment_key", bundle.dim_payment, "payment_key")
     validate_foreign_keys(bundle.fact_sales, "order_status_key", bundle.dim_order_status, "order_status_key")
     validate_foreign_keys(bundle.fact_sales, "customer_key", bundle.dim_customer, "customer_key")
@@ -331,16 +317,16 @@ def export_csv(df: pd.DataFrame, file_name: str) -> ExportArtifact:
 
 def build_export_bundle(df: pd.DataFrame) -> ExportBundle:
     dim_date = build_dim_date(df)
-    dim_product = build_dim_product(df)
+    dim_category = build_dim_category(df)
     dim_payment = build_dim_payment(df)
     dim_order_status = build_dim_order_status(df)
     dim_customer = build_dim_customer(df)
     dim_seller = build_dim_seller(df)
-    fact_sales = build_fact_sales(df, dim_payment, dim_order_status)
+    fact_sales = build_fact_sales(df, dim_category, dim_payment, dim_order_status)
     return ExportBundle(
         fact_sales=fact_sales,
         dim_date=dim_date,
-        dim_product=dim_product,
+        dim_category=dim_category,
         dim_payment=dim_payment,
         dim_order_status=dim_order_status,
         dim_customer=dim_customer,
@@ -351,13 +337,13 @@ def build_export_bundle(df: pd.DataFrame) -> ExportBundle:
 def print_manifest(artifacts: list[ExportArtifact]) -> None:
     primary_keys = {
         "dim_date.csv": "date_key",
-        "dim_product.csv": "product_key",
+        "dim_category.csv": "category_key",
         "dim_payment.csv": "payment_key",
         "dim_order_status.csv": "order_status_key",
         "dim_customer.csv": "customer_key",
         "dim_seller.csv": "seller_key",
     }
-    foreign_keys = ["date_key", "product_key", "payment_key", "order_status_key", "customer_key", "seller_key"]
+    foreign_keys = ["date_key", "category_key", "payment_key", "order_status_key", "customer_key", "seller_key"]
 
     print("")
     print("Manifesto de saida Power BI")
@@ -381,7 +367,7 @@ def run_export() -> list[ExportArtifact]:
     exports = [
         ("fact_sales_power_bi.csv", bundle.fact_sales),
         ("dim_date.csv", bundle.dim_date),
-        ("dim_product.csv", bundle.dim_product),
+        ("dim_category.csv", bundle.dim_category),
         ("dim_payment.csv", bundle.dim_payment),
         ("dim_order_status.csv", bundle.dim_order_status),
         ("dim_customer.csv", bundle.dim_customer),

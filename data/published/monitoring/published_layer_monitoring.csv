@@ -1,5 +1,5 @@
 check_name,status,metric_value,threshold,severity,details
-published_file_freshness_hours,PASS,0.0,36.0,high,Ultima modificacao UTC: 2026-04-03T02:18:19.007156+00:00
+published_file_freshness_hours,FAIL,46.33,36.0,high,Ultima modificacao UTC: 2026-04-03T02:18:19.007156+00:00
 published_expected_schema,PASS,0.0,0.0,high,Colunas ausentes: nenhuma
 published_primary_key_duplicates,PASS,0.0,0.0,high,Duplicidades na granularidade publicada `order_id + order_item_id`.
 published_min_rows,PASS,112650.0,100001.0,high,Volume minimo esperado para a camada publicada.
