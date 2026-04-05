@@ -99,6 +99,40 @@ def test_check_recent_anomalies_flags_latest_month_drift() -> None:
     assert by_check["published_anomaly__delay_rate_latest_month_delta_pct_points"].status == "FAIL"
 
 
+def test_build_monthly_operational_metrics_uses_order_level_delay_rate() -> None:
+    df = pd.DataFrame(
+        [
+            {
+                "order_id": "o-1",
+                "order_item_id": 1,
+                "order_purchase_timestamp": pd.Timestamp("2018-01-10"),
+                "total_item_value": 100.0,
+                "is_delayed": False,
+            },
+            {
+                "order_id": "o-1",
+                "order_item_id": 2,
+                "order_purchase_timestamp": pd.Timestamp("2018-01-10"),
+                "total_item_value": 50.0,
+                "is_delayed": False,
+            },
+            {
+                "order_id": "o-2",
+                "order_item_id": 1,
+                "order_purchase_timestamp": pd.Timestamp("2018-01-11"),
+                "total_item_value": 80.0,
+                "is_delayed": True,
+            },
+        ]
+    )
+
+    monthly = monitoring.build_monthly_operational_metrics(df)
+
+    assert len(monthly) == 1
+    assert monthly.iloc[0]["orders"] == 2
+    assert monthly.iloc[0]["delayed_orders_pct"] == 50.0
+
+
 def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(tmp_path: Path, monkeypatch) -> None:
     parquet_path = tmp_path / "fact_orders_dashboard.parquet"
     incomplete_df = build_published_df().drop(columns=["seller_delay_rate", "order_purchase_timestamp"])

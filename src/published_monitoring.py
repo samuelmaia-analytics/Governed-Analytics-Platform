@@ -230,13 +230,15 @@ def build_monthly_operational_metrics(df: pd.DataFrame) -> pd.DataFrame:
     if not required_columns.issubset(df.columns):
         return pd.DataFrame()
     monthly = df.copy()
-    monthly["month_start"] = pd.to_datetime(monthly["order_purchase_timestamp"], errors="coerce").dt.to_period("M").dt.to_timestamp()
+    monthly["order_purchase_timestamp"] = pd.to_datetime(monthly["order_purchase_timestamp"], errors="coerce")
+    monthly = monthly.sort_values("order_purchase_timestamp").drop_duplicates(subset=["order_id"], keep="last")
+    monthly["month_start"] = monthly["order_purchase_timestamp"].dt.to_period("M").dt.to_timestamp()
     monthly = monthly.dropna(subset=["month_start"])
     metrics = (
         monthly.groupby("month_start", as_index=False)
         .agg(
             revenue_gross=("total_item_value", "sum"),
-            orders=("order_id", "nunique"),
+            orders=("order_id", "count"),
             delayed_orders_pct=("is_delayed", "mean"),
         )
         .sort_values("month_start")
