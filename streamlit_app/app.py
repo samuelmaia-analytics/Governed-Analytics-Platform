@@ -27,6 +27,7 @@ from streamlit_app.sections import (
     render_geography_section,
     render_header,
     render_health_section,
+    render_health_summary_compact,
     render_kpi_row,
     render_operations_section,
     render_semantic_section,
@@ -60,7 +61,7 @@ def main() -> None:
     filtered_df = filter_dataframe(df, filters)
     previous_df = get_previous_period_df(df, filters)
     if filtered_df.empty:
-        st.warning("Nenhum registro encontrado para os filtros selecionados.")
+        st.warning("No records found for the selected filters." if locale == "en-US" else "Nenhum registro encontrado para os filtros selecionados.")
         st.stop()
 
     st.sidebar.caption(f"Registros filtrados: {format_number(len(filtered_df))}")
@@ -76,6 +77,7 @@ def main() -> None:
         render_temporal_section(filtered_df)
         render_category_section(filtered_df)
         render_geography_section(filtered_df, filters.geography_mode)
+        render_health_summary_compact(monitoring_status)
         render_executive_insights(filtered_df)
         return
 

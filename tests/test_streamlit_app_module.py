@@ -129,11 +129,12 @@ def test_main_runs_presentation_mode_flow(monkeypatch) -> None:
     monkeypatch.setattr(app_module, "render_temporal_section", lambda _df: calls.append("tempo"))
     monkeypatch.setattr(app_module, "render_category_section", lambda _df: calls.append("categoria"))
     monkeypatch.setattr(app_module, "render_geography_section", lambda _df, _mode: calls.append("geo"))
+    monkeypatch.setattr(app_module, "render_health_summary_compact", lambda _status: calls.append("health_compact"))
     monkeypatch.setattr(app_module, "render_executive_insights", lambda _df: calls.append("insights"))
 
     app_module.main()
 
-    assert calls == ["theme", "locale", "header", "kpi", "tempo", "categoria", "geo", "insights"]
+    assert calls == ["theme", "locale", "header", "kpi", "tempo", "categoria", "geo", "health_compact", "insights"]
     assert fake_st.sidebar.captions[-1] == "Registros filtrados: 1"
 
 

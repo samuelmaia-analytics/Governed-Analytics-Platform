@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from src.config import PUBLISHED_DASHBOARD_DIR
+from streamlit_app.formatting import get_format_locale
 from streamlit_app.theme import MONTH_NAME_MAP, WEEKDAY_MAP
 
 try:
@@ -24,6 +25,12 @@ EXECUTIVE_KPI_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "executive_kpis_slice.parq
 MONITORING_SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
 MONITORING_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring_history.csv"
 PLACEHOLDER_DIMENSION_VALUES = {"unknown", "Unknown", "NA", "nan", "NaN", ""}
+
+
+def localize_text(pt_br: str, en_us: str) -> str:
+    if get_format_locale() == "en-US":
+        return en_us
+    return pt_br
 
 
 @dataclass(frozen=True)
@@ -124,14 +131,14 @@ def load_monitoring_status() -> dict[str, object] | None:
 
 
 def build_dashboard_locale() -> str:
-    st.sidebar.markdown("### Formato Regional")
+    st.sidebar.markdown("### Regional Format")
     locale_label = st.sidebar.selectbox(
-        "Idioma e formatação",
-        options=["Português (Brasil)", "International"],
+        "Language and formatting",
+        options=["Português (Brasil)", "English (US)"],
         key="dashboard_locale",
     )
-    if locale_label == "International":
-        st.sidebar.caption("Os números seguem padrão internacional; a narrativa do app permanece priorizando PT-BR.")
+    if locale_label == "English (US)":
+        st.sidebar.caption("Numbers follow international formatting and the app interface switches to English.")
         return "en-US"
     st.sidebar.caption("O dashboard está configurado para Português (Brasil).")
     return "pt-BR"
@@ -194,7 +201,12 @@ def build_select_filter(
     options: list[str],
 ) -> list[str]:
     if not options:
-        st.sidebar.caption(f"Sem opções disponíveis para {label.lower()} no recorte atual.")
+        st.sidebar.caption(
+            localize_text(
+                f"Sem opções disponíveis para {label.lower()} no recorte atual.",
+                f"No options available for {label.lower()} in the current selection.",
+            )
+        )
         st.session_state[value_key] = all_label
         return []
 
@@ -204,7 +216,12 @@ def build_select_filter(
         key=mode_key,
     )
     if mode == all_label:
-        st.sidebar.caption(f"{len(options)} opções consideradas neste filtro.")
+        st.sidebar.caption(
+            localize_text(
+                f"{len(options)} opções consideradas neste filtro.",
+                f"{len(options)} options considered in this filter.",
+            )
+        )
         st.session_state[value_key] = all_label
         return options
 
@@ -213,7 +230,12 @@ def build_select_filter(
         options=options,
         key=value_key,
     )
-    st.sidebar.caption(f"Filtro aplicado em {label.lower()}: {selected}.")
+    st.sidebar.caption(
+        localize_text(
+            f"Filtro aplicado em {label.lower()}: {selected}.",
+            f"Active filter for {label.lower()}: {selected}.",
+        )
+    )
     return [selected]
 
 

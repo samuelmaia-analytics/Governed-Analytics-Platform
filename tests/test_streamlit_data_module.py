@@ -268,6 +268,18 @@ def test_build_dashboard_locale_defaults_to_portuguese_brazil(monkeypatch) -> No
     assert sidebar.captions[-1] == "O dashboard está configurado para Português (Brasil)."
 
 
+def test_build_dashboard_locale_supports_english_us(monkeypatch) -> None:
+    sidebar = FakeSidebar()
+    sidebar.selectbox_values = ["English (US)"]
+    fake_st = type("FakeSt", (), {"sidebar": sidebar})()
+    monkeypatch.setattr(data_module, "st", fake_st)
+
+    locale = data_module.build_dashboard_locale()
+
+    assert locale == "en-US"
+    assert sidebar.captions[-1] == "Numbers follow international formatting and the app interface switches to English."
+
+
 def test_load_semantic_assets_reads_available_parquets(tmp_path: Path, monkeypatch) -> None:
     logistics_path = tmp_path / "logistics.parquet"
     seller_path = tmp_path / "seller.parquet"
