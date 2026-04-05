@@ -3,11 +3,9 @@ name: Lint
 on:
   push:
     branches:
-      - develop
-      - release
-      - main
-      - master
+      - "**"
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: lint-${{ github.ref }}
