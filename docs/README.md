@@ -42,6 +42,7 @@ Este arquivo existe só como índice da pasta `docs/`. O contexto geral do proje
 
 - [release_runbook.md](release_runbook.md)
 - [rollback_runbook.md](rollback_runbook.md)
+- [incident_runbook.md](incident_runbook.md)
 - [publication_checklist.md](publication_checklist.md)
 - [streamlit_capture_runbook.md](streamlit_capture_runbook.md)
 

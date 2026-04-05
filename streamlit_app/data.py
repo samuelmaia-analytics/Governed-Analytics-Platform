@@ -20,6 +20,7 @@ FACT_CSV_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.csv"
 LOGISTICS_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "logistics_slice.parquet"
 SELLER_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "seller_slice.parquet"
 COHORT_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "cohort_slice.parquet"
+EXECUTIVE_KPI_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "executive_kpis_slice.parquet"
 MONITORING_SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
 PLACEHOLDER_DIMENSION_VALUES = {"unknown", "Unknown", "NA", "nan", "NaN", ""}
 
@@ -103,6 +104,7 @@ def load_semantic_assets() -> dict[str, pd.DataFrame]:
         ("logistics", LOGISTICS_PARQUET_PATH),
         ("seller", SELLER_PARQUET_PATH),
         ("cohort", COHORT_PARQUET_PATH),
+        ("executive_kpis", EXECUTIVE_KPI_PARQUET_PATH),
     ):
         if path.exists():
             assets[asset_name] = pd.read_parquet(path)

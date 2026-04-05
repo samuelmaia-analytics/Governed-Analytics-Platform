@@ -7,9 +7,69 @@ from streamlit_app.formatting import (
     calc_delta,
     format_currency,
     format_currency_compact,
+    format_date_label,
     format_number,
     format_pct,
 )
+
+METRIC_DEFINITIONS = [
+    {
+        "metric_id": "revenue_gross",
+        "label": "Receita total",
+        "delta_color": "normal",
+        "help": "Soma de item e frete no recorte filtrado.",
+        "formatter": format_currency_compact,
+    },
+    {
+        "metric_id": "orders",
+        "label": "Total de pedidos",
+        "delta_color": "normal",
+        "help": "Quantidade única de pedidos no período.",
+        "formatter": format_number,
+    },
+    {
+        "metric_id": "avg_ticket",
+        "label": "Ticket médio",
+        "delta_color": "normal",
+        "help": "Receita total dividida pelo número de pedidos.",
+        "formatter": format_currency,
+    },
+    {
+        "metric_id": "customers",
+        "label": "Total de clientes",
+        "delta_color": "normal",
+        "help": "Clientes únicos no recorte filtrado.",
+        "formatter": format_number,
+    },
+    {
+        "metric_id": "avg_delivery_time_days",
+        "label": "Prazo médio",
+        "delta_color": "inverse",
+        "help": "Tempo médio entre compra e entrega para pedidos entregues.",
+        "formatter": lambda value: f"{value:.1f} dias" if value is not None else "N/A",
+    },
+    {
+        "metric_id": "delay_rate",
+        "label": "Taxa de atraso",
+        "delta_color": "inverse",
+        "help": "Percentual de pedidos entregues após a data estimada.",
+        "formatter": lambda value: format_pct(value) if value is not None else "N/A",
+    },
+    {
+        "metric_id": "avg_review_score",
+        "label": "Nota média",
+        "delta_color": "normal",
+        "help": "Média de review em nível de pedido.",
+        "formatter": lambda value: f"{value:.2f}" if value is not None else "N/A",
+    },
+    {
+        "metric_id": "avg_freight_per_item",
+        "label": "Frete médio por item",
+        "delta_color": "inverse",
+        "help": "Valor médio de frete por item vendido.",
+        "formatter": lambda value: format_currency(value) if value is not None else "N/A",
+    },
+]
 
 
 def to_order_level(df: pd.DataFrame) -> pd.DataFrame:
@@ -30,40 +90,64 @@ def non_placeholder_mask(series: pd.Series) -> pd.Series:
     return ~normalized.isin({"", "NA", "unknown", "Unknown", "nan", "NaN"})
 
 
-def build_metrics(current_df: pd.DataFrame, previous_df: pd.DataFrame) -> list[dict[str, str]]:
-    current_orders = to_order_level(current_df)
-    previous_orders = to_order_level(previous_df)
-    current_delivered = current_orders[current_orders["order_delivered_customer_date"].notna()].copy()
-    previous_delivered = previous_orders[previous_orders["order_delivered_customer_date"].notna()].copy()
+def compute_metric_snapshot(df: pd.DataFrame) -> dict[str, float | None]:
+    order_level = to_order_level(df)
+    delivered = order_level[order_level["order_delivered_customer_date"].notna()].copy()
+    revenue = float(df["total_item_value"].sum())
+    total_orders = float(order_level["order_id"].nunique())
+    delay_rate_base = safe_mean(delivered["is_delayed"])
 
-    revenue = float(current_df["total_item_value"].sum())
-    revenue_prev = float(previous_df["total_item_value"].sum())
-    total_orders = float(current_orders["order_id"].nunique())
-    total_orders_prev = float(previous_orders["order_id"].nunique())
-    avg_ticket = revenue / total_orders if total_orders else 0.0
-    avg_ticket_prev = revenue_prev / total_orders_prev if total_orders_prev else 0.0
-    customers = float(current_orders["customer_unique_id"].nunique())
-    customers_prev = float(previous_orders["customer_unique_id"].nunique())
-    avg_delivery = safe_mean(current_delivered["delivery_time_days"])
-    avg_delivery_prev = safe_mean(previous_delivered["delivery_time_days"])
-    delay_rate_base = safe_mean(current_delivered["is_delayed"])
-    delay_rate_prev_base = safe_mean(previous_delivered["is_delayed"])
-    delay_rate = delay_rate_base * 100 if delay_rate_base is not None else None
-    delay_rate_prev = delay_rate_prev_base * 100 if delay_rate_prev_base is not None else None
-    avg_review = safe_mean(current_orders["review_score_mean"])
-    avg_review_prev = safe_mean(previous_orders["review_score_mean"])
-    avg_freight = safe_mean(current_df["freight_value"])
-    avg_freight_prev = safe_mean(previous_df["freight_value"])
+    return {
+        "revenue_gross": revenue,
+        "orders": total_orders,
+        "avg_ticket": revenue / total_orders if total_orders else 0.0,
+        "customers": float(order_level["customer_unique_id"].nunique()),
+        "avg_delivery_time_days": safe_mean(delivered["delivery_time_days"]),
+        "delay_rate": delay_rate_base * 100 if delay_rate_base is not None else None,
+        "avg_review_score": safe_mean(order_level["review_score_mean"]),
+        "avg_freight_per_item": safe_mean(df["freight_value"]),
+    }
+
+
+def build_semantic_metric_snapshot(executive_kpis_df: pd.DataFrame) -> dict[str, float | None]:
+    snapshot: dict[str, float | None] = {}
+    normalized = executive_kpis_df.copy()
+    normalized["metric_value"] = pd.to_numeric(normalized["metric_value"], errors="coerce")
+    if "metric_unit" not in normalized.columns:
+        normalized["metric_unit"] = None
+
+    for _, row in normalized.dropna(subset=["metric_id"]).iterrows():
+        metric_id = str(row["metric_id"])
+        metric_value = row["metric_value"]
+        metric_unit = row["metric_unit"]
+        if pd.isna(metric_value):
+            snapshot[metric_id] = None
+        elif metric_id == "delay_rate" and metric_unit == "ratio":
+            snapshot[metric_id] = float(metric_value) * 100
+        else:
+            snapshot[metric_id] = float(metric_value)
+    return snapshot
+
+
+def build_metrics(
+    current_df: pd.DataFrame,
+    previous_df: pd.DataFrame,
+    executive_kpis_df: pd.DataFrame | None = None,
+) -> list[dict[str, str]]:
+    current_snapshot = compute_metric_snapshot(current_df)
+    previous_snapshot = compute_metric_snapshot(previous_df)
+    if executive_kpis_df is not None and not executive_kpis_df.empty:
+        current_snapshot.update(build_semantic_metric_snapshot(executive_kpis_df))
 
     return [
-        {"label": "Receita total", "value": format_currency_compact(revenue), "delta": calc_delta(revenue, revenue_prev), "delta_color": "normal", "help": "Soma de item e frete no recorte filtrado."},
-        {"label": "Total de pedidos", "value": format_number(total_orders), "delta": calc_delta(total_orders, total_orders_prev), "delta_color": "normal", "help": "Quantidade única de pedidos no período."},
-        {"label": "Ticket médio", "value": format_currency(avg_ticket), "delta": calc_delta(avg_ticket, avg_ticket_prev), "delta_color": "normal", "help": "Receita total dividida pelo número de pedidos."},
-        {"label": "Total de clientes", "value": format_number(customers), "delta": calc_delta(customers, customers_prev), "delta_color": "normal", "help": "Clientes únicos no recorte filtrado."},
-        {"label": "Prazo médio", "value": f"{avg_delivery:.1f} dias" if avg_delivery is not None else "N/A", "delta": calc_delta(avg_delivery, avg_delivery_prev), "delta_color": "inverse", "help": "Tempo médio entre compra e entrega para pedidos entregues."},
-        {"label": "Taxa de atraso", "value": format_pct(delay_rate) if delay_rate is not None else "N/A", "delta": calc_delta(delay_rate, delay_rate_prev), "delta_color": "inverse", "help": "Percentual de pedidos entregues após a data estimada."},
-        {"label": "Nota média", "value": f"{avg_review:.2f}" if avg_review is not None else "N/A", "delta": calc_delta(avg_review, avg_review_prev), "delta_color": "normal", "help": "Média de review em nível de pedido."},
-        {"label": "Frete médio por item", "value": format_currency(avg_freight) if avg_freight is not None else "N/A", "delta": calc_delta(avg_freight, avg_freight_prev), "delta_color": "inverse", "help": "Valor médio de frete por item vendido."},
+        {
+            "label": metric["label"],
+            "value": metric["formatter"](current_snapshot[metric["metric_id"]]),
+            "delta": calc_delta(current_snapshot[metric["metric_id"]], previous_snapshot[metric["metric_id"]]),
+            "delta_color": metric["delta_color"],
+            "help": metric["help"],
+        }
+        for metric in METRIC_DEFINITIONS
     ]
 
 
@@ -152,7 +236,7 @@ def build_smart_summary(df: pd.DataFrame) -> dict[str, object]:
 def build_filter_context_summary(df: pd.DataFrame, filters: FilterState) -> list[tuple[str, str]]:
     orders = to_order_level(df)
     return [
-        ("Período", f"{filters.start_date:%d/%m/%Y} a {filters.end_date:%d/%m/%Y}"),
+        ("Período", f"{format_date_label(filters.start_date)} a {format_date_label(filters.end_date)}"),
         ("Categorias", format_number(len(filters.categories))),
         ("Estados", format_number(len(filters.states))),
         ("Pedidos no recorte", format_number(orders["order_id"].nunique())),

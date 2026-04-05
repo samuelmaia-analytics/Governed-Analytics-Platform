@@ -336,20 +336,23 @@ def render_semantic_section(semantic_assets: dict[str, pd.DataFrame]) -> None:
     logistics_df = semantic_assets.get("logistics", pd.DataFrame())
     seller_df = semantic_assets.get("seller", pd.DataFrame())
     cohort_df = semantic_assets.get("cohort", pd.DataFrame())
+    executive_kpi_df = semantic_assets.get("executive_kpis", pd.DataFrame())
 
     top_logistics = logistics_df.sort_values("delayed_rate", ascending=False).head(10) if not logistics_df.empty else pd.DataFrame()
     top_sellers = seller_df.sort_values("delay_rate", ascending=False).head(10) if not seller_df.empty else pd.DataFrame()
     top_cohorts = cohort_df.sort_values(["purchase_cohort_month", "cohort_order_month_number"]).head(12) if not cohort_df.empty else pd.DataFrame()
 
-    col1, col2, col3 = st.columns(3, gap="large")
+    col1, col2, col3, col4 = st.columns(4, gap="large")
     with col1:
         render_regional_kpi("Slices logísticos", format_number(float(len(logistics_df))), "Recortes agregados por mês e UF origem/destino.")
     with col2:
         render_regional_kpi("Sellers analisáveis", format_number(float(len(seller_df))), "Base comparável por seller pseudonimizado.")
     with col3:
         render_regional_kpi("Linhas de cohort", format_number(float(len(cohort_df))), "Evolução de cohorts por janela de maturação.")
+    with col4:
+        render_regional_kpi("KPIs executivos", format_number(float(len(executive_kpi_df))), "Ativo resumido com métricas-chave prontas para reuso.")
 
-    tabs = st.tabs(["Logística", "Seller", "Cohort"])
+    tabs = st.tabs(["Logística", "Seller", "Cohort", "KPIs"])
     with tabs[0]:
         if top_logistics.empty:
             st.info("Sem dados logísticos materializados.")
@@ -370,6 +373,11 @@ def render_semantic_section(semantic_assets: dict[str, pd.DataFrame]) -> None:
             st.info("Sem dados de cohort materializados.")
         else:
             st.dataframe(top_cohorts, width="stretch", height=320)
+    with tabs[3]:
+        if executive_kpi_df.empty:
+            st.info("Sem KPIs executivos materializados.")
+        else:
+            st.dataframe(executive_kpi_df, width="stretch", height=320)
     close_section()
 
 

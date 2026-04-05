@@ -271,17 +271,20 @@ def test_build_dashboard_locale_defaults_to_portuguese_brazil(monkeypatch) -> No
 def test_load_semantic_assets_reads_available_parquets(tmp_path: Path, monkeypatch) -> None:
     logistics_path = tmp_path / "logistics.parquet"
     seller_path = tmp_path / "seller.parquet"
+    executive_kpi_path = tmp_path / "executive_kpis.parquet"
     pd.DataFrame({"a": [1]}).to_parquet(logistics_path, index=False)
     pd.DataFrame({"b": [2]}).to_parquet(seller_path, index=False)
+    pd.DataFrame({"metric_id": ["revenue_gross"]}).to_parquet(executive_kpi_path, index=False)
 
     monkeypatch.setattr(data_module, "LOGISTICS_PARQUET_PATH", logistics_path)
     monkeypatch.setattr(data_module, "SELLER_PARQUET_PATH", seller_path)
     monkeypatch.setattr(data_module, "COHORT_PARQUET_PATH", tmp_path / "missing.parquet")
+    monkeypatch.setattr(data_module, "EXECUTIVE_KPI_PARQUET_PATH", executive_kpi_path)
     data_module.load_semantic_assets.clear()
 
     assets = data_module.load_semantic_assets()
 
-    assert set(assets) == {"logistics", "seller"}
+    assert set(assets) == {"logistics", "seller", "executive_kpis"}
 
 
 def test_load_monitoring_status_reads_json_summary(tmp_path: Path, monkeypatch) -> None:

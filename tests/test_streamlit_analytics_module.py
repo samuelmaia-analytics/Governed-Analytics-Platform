@@ -106,6 +106,33 @@ def test_safe_mean_and_build_metrics_handle_nan_bases_without_rendering_nan() ->
     assert all("nan" not in metric["delta"].lower() for metric in metrics)
 
 
+def test_build_metrics_prefers_semantic_kpi_values_when_available() -> None:
+    current_df = build_analytics_frame()
+    previous_df = current_df[current_df["month_start"] == pd.Timestamp(2018, 1, 1)].copy()
+    executive_kpis_df = pd.DataFrame(
+        [
+            {"metric_id": "revenue_gross", "metric_value": 999999.0, "metric_unit": "currency"},
+            {"metric_id": "orders", "metric_value": 321.0, "metric_unit": "count"},
+            {"metric_id": "customers", "metric_value": 210.0, "metric_unit": "count"},
+            {"metric_id": "avg_ticket", "metric_value": 456.0, "metric_unit": "currency"},
+            {"metric_id": "avg_delivery_time_days", "metric_value": 7.2, "metric_unit": "days"},
+            {"metric_id": "delay_rate", "metric_value": 0.125, "metric_unit": "ratio"},
+            {"metric_id": "avg_review_score", "metric_value": 4.77, "metric_unit": "score"},
+            {"metric_id": "avg_freight_per_item", "metric_value": 17.0, "metric_unit": "currency"},
+        ]
+    )
+
+    metrics = build_metrics(current_df, previous_df, executive_kpis_df)
+
+    assert metrics[0]["value"] == "R$ 1000.0K"
+    assert metrics[1]["value"] == "321"
+    assert metrics[2]["value"] == "R$ 456"
+    assert metrics[4]["value"] == "7.2 dias"
+    assert metrics[5]["value"] == "12.5%"
+    assert metrics[6]["value"] == "4.77"
+    assert metrics[7]["value"] == "R$ 17"
+
+
 def test_build_smart_summary_returns_summary_chips_and_recommendations() -> None:
     summary = build_smart_summary(build_analytics_frame())
 

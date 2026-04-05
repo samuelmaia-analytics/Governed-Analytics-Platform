@@ -42,13 +42,15 @@ flowchart LR
     G --> G3[Published Monitoring]
     D --> H[SQL]
     D --> I[Power BI Exports]
-    G --> J[Streamlit]
+    G2 --> J[Streamlit KPI Layer]
+    G --> J2[Streamlit Detailed Exploration]
 ```
 
 Leitura arquitetural:
 
 - `curated/analytics` é o núcleo técnico do projeto
 - `published/dashboard` existe para desacoplar engenharia de consumo
+- `published/semantic` consolida recortes e KPIs reutilizaveis para consumo executivo
 - qualidade, catálogo e SQL orbitam o mesmo ativo central
 - publicação e consumo acontecem sobre a camada publicada, não sobre a base interna
 
@@ -94,7 +96,7 @@ data/
 | `curated/query_results` | persistir resultados SQL | saídas das queries em DuckDB |
 | `curated/genai` | guardar artefatos da extensão de GenAI | features extraídas de texto |
 | `published/dashboard` | expor camada minimizada para consumo | `fact_orders_dashboard` |
-| `published/semantic` | expor marts agregados para recortes operacionais e executivos | `logistics_slice`, `seller_slice`, `cohort_slice`, `category_slice`, `state_performance_slice` |
+| `published/semantic` | expor marts agregados para recortes operacionais e executivos | `logistics_slice`, `seller_slice`, `cohort_slice`, `category_slice`, `state_performance_slice`, `executive_kpis_slice` |
 | `published/monitoring` | persistir monitoramento recorrente | checks de freshness e qualidade |
 | `external/genai` | entrada auxiliar externa ao fluxo principal | amostra textual para GenAI |
 
@@ -186,6 +188,7 @@ Separar a camada de exposição do produto analítico da camada analítica inter
 - `fact_orders_dashboard.parquet`
 - `fact_orders_dashboard.csv`
 - marts de logística, seller e cohort
+- ativo semântico executivo canônico para os KPIs principais do dashboard
 - relatórios recorrentes de freshness e qualidade da camada publicada
 - fonte do Streamlit
 - ativo usado para consumo executivo e reaproveitamento controlado
@@ -212,6 +215,7 @@ Leitura operacional:
 
 - o runner local coordena a transformação principal
 - a publicação é um passo explícito, não efeito colateral da modelagem
+- o Streamlit já usa a camada semântica publicada para os KPIs executivos principais
 - o catálogo existe em duas camadas: manifesto local e sync por API
 
 ## Impacto da Separação Curated x Published
@@ -244,7 +248,7 @@ Leitura operacional:
    Materializa a classificação de dados com foco em sensibilidade e publicação.
 
 7. `src/semantic_layer.py`
-   Materializa marts agregados para logística, seller, cohort, categoria e geografia executiva a partir da camada publicada.
+   Materializa marts agregados para logística, seller, cohort, categoria, geografia executiva e KPIs executivos a partir da camada publicada.
 
 8. `src/published_monitoring.py`
    Monitora freshness, schema e cobertura semântica da camada publicada.
@@ -265,7 +269,7 @@ Leitura operacional:
    Gera os exports do modelo complementar para Power BI.
 
 14. `streamlit_app/app.py`
-   Consome exclusivamente a camada publicada do dashboard.
+   Consome exclusivamente a camada publicada do dashboard e prioriza ativos semânticos publicados para a leitura executiva principal.
 
 15. `src/genai_feature_extraction.py`
    Materializa a extração adicional de features em texto desestruturado.
@@ -285,7 +289,7 @@ Leitura operacional:
 - arquitetura local em camadas
 - camada analítica interna
 - camada publicada para dashboard
-- camada semântica publicada para logística, seller e cohort
+- camada semântica publicada para logística, seller, cohort, categoria, geografia e KPIs executivos
 - monitoramento recorrente com artefatos operacionais
 - catálogo local materializado
 - documentação e evidências versionadas do ativo principal

@@ -15,3 +15,7 @@ models:
     columns:
       - name: customer_state
         tests: [not_null]
+  - name: mart_executive_kpis
+    columns:
+      - name: metric_id
+        tests: [not_null, unique]

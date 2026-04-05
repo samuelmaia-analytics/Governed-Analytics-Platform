@@ -71,7 +71,7 @@ def main() -> None:
             "<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>Modo apresentação</div><p class='section-copy' style='margin-bottom:0;'>A navegação foi reduzida ao fluxo principal: indicadores, tendência, categorias, performance regional e síntese final.</p></div>",
             unsafe_allow_html=True,
         )
-        render_kpi_row(build_metrics(filtered_df, previous_df))
+        render_kpi_row(build_metrics(filtered_df, previous_df, semantic_assets.get("executive_kpis")))
         st.markdown("<div style='height:0.95rem;'></div>", unsafe_allow_html=True)
         render_temporal_section(filtered_df)
         render_category_section(filtered_df)
@@ -87,7 +87,7 @@ def main() -> None:
         render_smart_summary(filtered_df)
 
     if selected_section in {"Visão completa", "KPIs"}:
-        render_kpi_row(build_metrics(filtered_df, previous_df))
+        render_kpi_row(build_metrics(filtered_df, previous_df, semantic_assets.get("executive_kpis")))
         st.markdown("<div style='height:0.95rem;'></div>", unsafe_allow_html=True)
 
     if selected_section == "Tempo":

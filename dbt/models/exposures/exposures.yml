@@ -8,6 +8,7 @@ exposures:
       email: samuelmaia.analytics@gmail.com
     depends_on:
       - ref('fct_orders_dashboard')
+      - ref('mart_executive_kpis')
       - ref('mart_category_performance')
       - ref('mart_state_performance')
 
@@ -17,5 +18,6 @@ exposures:
       name: Samuel Maia
       email: samuelmaia.analytics@gmail.com
     depends_on:
+      - ref('mart_executive_kpis')
       - ref('mart_category_performance')
       - ref('mart_state_performance')

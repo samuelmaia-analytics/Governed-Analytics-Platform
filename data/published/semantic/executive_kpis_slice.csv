@@ -1,0 +1,9 @@
+metric_id,metric_label,metric_group,metric_value,metric_unit
+avg_ticket,Ticket Médio,commercial,160.57763809214927,currency
+customers,Total de Clientes,commercial,95420.0,count
+orders,Total de Pedidos,commercial,98666.0,count
+revenue_gross,Receita Total,commercial,15843553.24,currency
+avg_review_score,Nota Média,experience,4.105054961515024,score
+avg_delivery_time_days,Prazo Médio,operations,12.558702304032053,days
+avg_freight_per_item,Frete Médio por Item,operations,19.990319928983578,currency
+delay_rate,Taxa de Atraso,operations,0.08112898544715784,ratio

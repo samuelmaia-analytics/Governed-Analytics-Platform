@@ -18,6 +18,7 @@ This repository shows how to move from raw relational CSVs to a governed analyti
 - it treats publication as a formal pipeline step
 - it applies privacy-by-design controls before exposure
 - it reuses the same published layer across Streamlit, Power BI and monitoring
+- it already uses published semantic assets to power the main executive KPI cards in Streamlit
 - it keeps governance, runbooks, evidence and code in the same repository
 
 ## What the repository delivers
@@ -25,8 +26,8 @@ This repository shows how to move from raw relational CSVs to a governed analyti
 - end-to-end Python pipeline for inventory, profiling, modeling, publication and exports
 - internal analytical fact table: `fact_orders_enriched`
 - governed published layer: `fact_orders_dashboard`
-- published semantic assets for logistics, seller, category, cohort and geography
-- Streamlit executive app consuming only the published layer
+- published semantic assets for logistics, seller, category, cohort, geography and executive KPIs
+- Streamlit executive app consuming only the published layer and prioritizing semantic assets for its main KPI layer
 - Power BI exports aligned with the published executive boundary
 - schema contracts, data-quality checks, monitoring artifacts and CI
 - local catalog, executive documentation, operational runbooks and evidence
@@ -144,6 +145,8 @@ The repository now includes an initial `dbt/` layer to support:
 
 This is intentionally additive. Python remains the operational backbone of the project.
 
+The current Streamlit app already demonstrates the target operating pattern: the main KPI cards preferentially consume `executive_kpis_slice`, while the detailed analytical exploration continues to read from the governed published fact table.
+
 ## Main pipeline steps
 
 1. `inventory`
@@ -173,6 +176,7 @@ This is intentionally additive. Python remains the operational backbone of the p
 - `docs/business_glossary.md`
 - `docs/product_brief.md`
 - `docs/target_architecture_and_roadmap.md`
+- `docs/semantic_layer.md`
 
 ## Public links
 
@@ -207,3 +211,5 @@ The key idea behind this project is simple: executive consumers should not depen
 - internal exploration and recurring exposure
 - model evolution and consumer stability
 - analytical data and governed analytical product
+
+That boundary is now reinforced inside the app itself: the main executive KPI cards are backed by a published semantic asset instead of relying only on ad hoc app-side calculations.
