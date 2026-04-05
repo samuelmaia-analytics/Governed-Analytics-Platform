@@ -3,7 +3,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - App Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Dashboard Power BI: `https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare`
 
@@ -57,3 +57,4 @@ Como o `.pbix` já existe no repositório, o bônus deve ser descrito como:
 
 - `bônus de Power BI materializado com arquivo e screenshots`
 - `validação final dependente de revisão manual no Power BI Desktop`
+

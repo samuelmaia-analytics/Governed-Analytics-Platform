@@ -2,7 +2,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
@@ -42,6 +42,7 @@ Este documento aponta para os artefatos SQL principais do projeto e conecta a mo
 
 - narrativa analítica: [docs/technical_narrative.md](./technical_narrative.md)
 - screenshots tabulares: [docs/imagens/README.md](./imagens/README.md)
+
 
 
 

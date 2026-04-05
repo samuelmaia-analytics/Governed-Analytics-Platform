@@ -2,7 +2,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
@@ -107,6 +107,7 @@ Motivo:
 - evita expor a base analítica interna completa
 - está alinhado ao dashboard e aos principais indicadores executivos
 - é o formato mais simples para upload manual e compartilhamento tabular
+
 
 
 

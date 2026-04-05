@@ -2,7 +2,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
@@ -207,4 +207,5 @@ Use preferencialmente:
 - `fact_orders_dashboard` para consumo executivo e publicação externa
 - `logistics_slice`, `seller_slice`, `cohort_slice`, `category_slice` e `state_performance_slice` para recortes agregados adicionais
 - `published_layer_monitoring` para observabilidade operacional da camada publicada
+
 

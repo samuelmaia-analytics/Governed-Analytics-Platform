@@ -1,9 +1,13 @@
 # Dashboard Power BI | Governed Analytics Platform
 
+[![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
+[![Power BI](https://img.shields.io/badge/Power_BI-Dashboard-F2C811?logo=powerbi&logoColor=black)](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
+
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - App Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Dashboard Power BI: `https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare`
 
@@ -117,3 +121,4 @@ Status atual:
 
 - `dashboard_overview.png`: disponível
 - `dashboard_drilldown.png`: disponível
+

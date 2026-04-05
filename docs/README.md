@@ -1,5 +1,9 @@
 # Documentação
 
+[![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
+[![Language](https://img.shields.io/badge/Language-PT--BR-0A66C2)](../README.md)
+
 Este arquivo existe só como índice da pasta `docs/`. O contexto geral do projeto, execução local e navegação inicial ficam no `README.md` da raiz.
 
 ## Comece por aqui
@@ -25,6 +29,7 @@ Este arquivo existe só como índice da pasta `docs/`. O contexto geral do proje
 - [metric_catalog.md](metric_catalog.md): catálogo canônico de métricas de negócio
 - [business_glossary.md](business_glossary.md): glossário de negócio e definições analíticas
 - [executive_scorecard.md](executive_scorecard.md): leitura executiva da maturidade atual
+- [demo_mode.md](demo_mode.md): modo de demonstração reproduzível e roteiro executivo
 
 ## Relatórios gerados
 

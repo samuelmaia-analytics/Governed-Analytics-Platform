@@ -3,7 +3,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
@@ -212,6 +212,7 @@ Este bônus aumenta o valor do projeto por quatro motivos principais:
 - reforça a maturidade do projeto ao separar camada factual e dimensões auxiliares
 
 Na prática, isso mostra que a solução não termina no código ou no dashboard customizado: ela também pode ser consumida em um fluxo analítico mais corporativo, com potencial de uso em ambiente executivo.
+
 
 
 

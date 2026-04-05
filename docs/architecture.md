@@ -2,7 +2,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 
 ## Tese Arquitetural
@@ -303,3 +303,4 @@ Leitura operacional:
 ## Resumo executivo
 
 Na prática, essa arquitetura permitiu organizar o projeto de forma defensável: o dado entra bruto, passa por padronização e validação, vira ativo analítico interno e só depois é publicado em uma camada segura para consumo. Isso melhora rastreabilidade, reduz ambiguidade de uso e mostra uma distinção madura entre construção do ativo e exposição do ativo.
+

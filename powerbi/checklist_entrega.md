@@ -3,7 +3,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - App Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Dashboard Power BI: `https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare`
 
@@ -69,3 +69,4 @@
 
 - Os itens marcados como concluídos nesta checklist possuem evidência no repositório por meio de arquivos, prints ou documentação.
 - Os itens ainda em aberto dependem de validação manual no Power BI Desktop e não foram marcados sem prova objetiva.
+

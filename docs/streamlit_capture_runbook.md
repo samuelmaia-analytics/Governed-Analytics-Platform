@@ -3,7 +3,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
@@ -177,6 +177,7 @@ Mostrar que o app suporta exploração orientada por filtro.
 ## Observação importante
 
 Essas capturas devem ser feitas manualmente na interface. Este repositório agora já está preparado para receber os arquivos nos caminhos corretos.
+
 
 
 

@@ -21,7 +21,7 @@
     "display_name": "Samuel Maia | Repositorio Governed Analytics Platform",
     "description": "Repositorio GitHub com pipeline, dados publicados, SQL, documentacao, testes, workflows e materiais da entrega.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform",
+    "external_url": "https://github.com/samuelmaia-analytics/Governed-Analytics-Platform",
     "location": "github",
     "tags": ["github", "documentacao", "pipeline", "olist", "case-tecnico"],
     "share_type": "public"
@@ -30,7 +30,7 @@
     "display_name": "Samuel Maia | Bonus GenAI | Governed Analytics Platform",
     "description": "Documentacao do bonus de GenAI com extração estruturada de features de texto desestruturado usando prompt controlado e saida auditavel.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform/blob/main/docs/genai_bonus.md",
+    "external_url": "https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/blob/main/docs/genai_bonus.md",
     "location": "github_docs",
     "tags": ["genai", "llm", "documentacao", "olist", "case-tecnico"],
     "share_type": "public"
@@ -39,7 +39,7 @@
     "display_name": "Samuel Maia | Monitoramento da Camada Published",
     "description": "Documentacao da rotina recorrente de freshness e qualidade da camada publicada, com checks estruturados e observabilidade operacional.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform/blob/main/docs/published_layer_monitoring.md",
+    "external_url": "https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/blob/main/docs/published_layer_monitoring.md",
     "location": "github_docs",
     "tags": ["monitoring", "quality", "freshness", "documentacao", "olist", "case-tecnico"],
     "share_type": "public"
@@ -48,10 +48,11 @@
     "display_name": "Samuel Maia | Camada Semantica Expandida",
     "description": "Documentacao dos marts publicados de logistica, seller e cohort derivados da camada published do case Olist.",
     "data_asset_type": "documentation",
-    "external_url": "https://github.com/samuelmaia-analytics/governed-analytics-platform/blob/main/docs/semantic_layer.md",
+    "external_url": "https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/blob/main/docs/semantic_layer.md",
     "location": "github_docs",
     "tags": ["semantic-layer", "logistica", "seller", "cohort", "documentacao", "olist", "case-tecnico"],
     "share_type": "public"
   }
 ]
+
 

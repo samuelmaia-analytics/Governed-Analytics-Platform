@@ -1,8 +1,9 @@
 # Governed Analytics Platform
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/governed-analytics-platform/actions/workflows/ci.yml)
-[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/governed-analytics-platform/actions/workflows/lint.yml)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
+[![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
 
 **Language:** `EN` | [PT-BR](docs/README.md)
 
@@ -186,6 +187,14 @@ The monitoring layer now also persists a simple health-score history and latest-
 - Power BI dashboard: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
 - Presentation video: [YouTube](https://youtu.be/SqJ0UF1Em9k)
 
+## Portfolio evidence
+
+- Streamlit executive views already captured in `images/dashboard/`
+- governance and publication evidence available in `docs/privacy_governance.md` and `docs/platform_publication.md`
+- monitoring and health evidence available in `docs/published_layer_monitoring.md`
+- semantic asset evidence available in `docs/semantic_layer.md`
+- a reproducible walkthrough is documented in `docs/demo_mode.md`
+
 ## Recommended reading
 
 ### Start here
@@ -195,6 +204,7 @@ The monitoring layer now also persists a simple health-score history and latest-
 3. [docs/architecture.md](docs/architecture.md)
 4. [docs/target_architecture_and_roadmap.md](docs/target_architecture_and_roadmap.md)
 5. [docs/operating_model.md](docs/operating_model.md)
+6. [docs/demo_mode.md](docs/demo_mode.md)
 
 ### Documentation language
 
@@ -215,3 +225,4 @@ The key idea behind this project is simple: executive consumers should not depen
 - analytical data and governed analytical product
 
 That boundary is now reinforced inside the app itself: the main executive KPI cards are backed by a published semantic asset instead of relying only on ad hoc app-side calculations.
+

@@ -2,7 +2,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
@@ -134,4 +134,5 @@ Isso significa:
 - dicionário de dados: [docs/data_dictionary.md](./data_dictionary.md)
 - qualidade: [docs/data_quality_report.md](./data_quality_report.md)
 - publicação segura: [docs/privacy_governance.md](./privacy_governance.md)
+
 

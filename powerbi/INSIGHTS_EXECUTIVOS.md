@@ -3,7 +3,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - App Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Dashboard Power BI: `https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare`
 
@@ -32,3 +32,4 @@ Os pontos abaixo foram preparados para apoiar a apresentação final do projeto.
 9. O modelo estrela preparado para Power BI demonstra que a camada analítica do projeto é reutilizável em ambiente corporativo, sem retrabalho estrutural.
 
 10. A combinação entre indicadores comerciais, operacionais e de experiência torna o projeto mais defensável do ponto de vista de negócio e engenharia.
+

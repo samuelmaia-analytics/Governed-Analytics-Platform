@@ -3,7 +3,7 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/governed-analytics-platform`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
 - Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
@@ -109,6 +109,7 @@ Fala simples e honesta:
 ## Valor adicional para o projeto
 
 Este bônus mostra que a solução não se limita a tabelas prontas. Ela também consegue transformar texto bruto em atributos analíticos utilizáveis, o que aproxima o projeto de cenários reais de enrichment de catálogo, product intelligence e preparação de dados para busca semântica ou recomendação.
+
 
 
 
