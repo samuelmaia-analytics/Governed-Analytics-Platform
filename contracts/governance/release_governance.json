@@ -58,12 +58,12 @@
     {
       "name": "CI",
       "path": ".github/workflows/ci.yml",
-      "push_branches": ["develop", "release", "main", "master"]
+      "push_branches": ["**"]
     },
     {
       "name": "Lint",
       "path": ".github/workflows/lint.yml",
-      "push_branches": ["develop", "release", "main", "master"]
+      "push_branches": ["**"]
     },
     {
       "name": "Sync Dadosfera Catalog",

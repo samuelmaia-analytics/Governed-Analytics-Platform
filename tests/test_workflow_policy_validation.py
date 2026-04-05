@@ -13,7 +13,7 @@ def test_validate_workflow_contract_accepts_aligned_workflows(tmp_path: Path) ->
     workflow_dir = tmp_path / ".github" / "workflows"
     workflow_dir.mkdir(parents=True, exist_ok=True)
     (workflow_dir / "ci.yml").write_text(
-        "name: CI\non:\n  push:\n    branches:\n      - develop\n      - release\n      - main\n      - master\n",
+        "name: CI\non:\n  push:\n    branches:\n      - \"**\"\n",
         encoding="utf-8",
     )
 
@@ -22,7 +22,7 @@ def test_validate_workflow_contract_accepts_aligned_workflows(tmp_path: Path) ->
             {
                 "name": "CI",
                 "path": ".github/workflows/ci.yml",
-                "push_branches": ["develop", "release", "main", "master"],
+                "push_branches": ["**"],
             }
         ]
     }
