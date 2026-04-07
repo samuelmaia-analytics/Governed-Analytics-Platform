@@ -11,8 +11,8 @@ Esta pasta concentra os artefatos da apresentação final do projeto.
 
 1. contexto e objetivo do projeto
 2. arquitetura e pipeline
-3. modelagem e qualidade
-4. publicação e governança
+3. modelagem, camada publicada e dbt semantic layer
+4. qualidade, testes e lineage
 5. dashboard e insights
 6. evidências de execução e consumo
 7. extensões de BI e GenAI
@@ -24,8 +24,10 @@ Esta pasta concentra os artefatos da apresentação final do projeto.
 - usar links e screenshots reais do repositório
 - manter consistência entre narrativa executiva e evidência técnica
 - não vender integrações opcionais como parte central da solução
+- mostrar dbt como camada semântica complementar ao pipeline Python, não como substituição do backbone operacional
 
 ## Referências
 
 - preparação final: [../docs/10_apresentacao_final.md](../docs/10_apresentacao_final.md)
 - arquitetura: [../docs/architecture.md](../docs/architecture.md)
+- lineage dbt: [../docs/dbt_lineage.md](../docs/dbt_lineage.md)

@@ -4,7 +4,7 @@ Esta pasta reúne a trilha complementar de BI externo do projeto.
 
 ## Papel do bônus
 
-O material de Power BI amplia o consumo analítico do projeto. Ele não substitui o dashboard principal em Streamlit, mas demonstra reutilização da mesma base em um modelo estrela simples.
+O material de Power BI amplia o consumo analítico do projeto. Ele não substitui o dashboard principal em Streamlit, mas demonstra reutilização da mesma fronteira publicada em um modelo complementar de BI.
 
 ## Conteúdo
 
@@ -30,8 +30,15 @@ O material de Power BI amplia o consumo analítico do projeto. Ele não substitu
 
 Os CSVs exportados para Power BI usam separador `;` e encoding `utf-8-sig`.
 
+## Diretriz arquitetural
+
+- Power BI deve permanecer alinhado à camada publicada e aos marts semânticos do projeto
+- a lógica de negócio não deve nascer no relatório; ela deve vir da camada governada já definida no pipeline Python e reforçada no dbt
+- quando houver evolução do modelo BI, o alvo preferencial é reaproveitar `fact_orders_dashboard` e os ativos semânticos publicados
+
 ## Referências
 
 - documentação do bônus: [../docs/bi_bonus.md](../docs/bi_bonus.md)
 - guia do dashboard: [README_powerbi.md](README_powerbi.md)
 - evidência SQL: [evidencia_query.md](evidencia_query.md)
+- camada dbt: [../docs/dbt_adoption.md](../docs/dbt_adoption.md)

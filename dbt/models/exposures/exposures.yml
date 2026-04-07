@@ -2,7 +2,13 @@ version: 2
 
 exposures:
   - name: streamlit_executive_dashboard
-    type: dashboard
+    type: application
+    label: Streamlit Executive Dashboard
+    description: >
+      Streamlit is the primary executive-facing application. Its KPI cards consume the semantic KPI mart,
+      and its detailed exploration remains aligned to the governed published fact and supporting marts.
+    url: https://governed-analytics-platform.streamlit.app/
+    maturity: high
     owner:
       name: Samuel Maia
       email: samuelmaia.analytics@gmail.com
@@ -11,13 +17,40 @@ exposures:
       - ref('mart_executive_kpis')
       - ref('mart_category_performance')
       - ref('mart_state_performance')
+      - ref('mart_logistics_performance')
+      - ref('mart_seller_performance')
+      - ref('mart_customer_cohorts')
 
   - name: power_bi_executive_dashboard
+    label: Power BI Executive Dashboard
     type: dashboard
+    description: >
+      Complementary Power BI delivery for executive consumers. It should rely on the same governed semantic
+      marts exposed through dbt rather than recomputing business logic in the BI layer.
+    url: https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare
+    maturity: medium
     owner:
       name: Samuel Maia
       email: samuelmaia.analytics@gmail.com
     depends_on:
+      - ref('fct_orders_dashboard')
       - ref('mart_executive_kpis')
       - ref('mart_category_performance')
       - ref('mart_state_performance')
+      - ref('mart_logistics_performance')
+
+  - name: analyst_sql_workflows
+    type: analysis
+    label: Analyst SQL Workflows
+    description: >
+      Versioned SQL analyses and ad hoc reviewer workflows should read from the governed published fact and
+      semantic marts to preserve a single business definition layer.
+    maturity: medium
+    owner:
+      name: Samuel Maia
+      email: samuelmaia.analytics@gmail.com
+    depends_on:
+      - ref('fct_orders_dashboard')
+      - ref('mart_category_performance')
+      - ref('mart_state_performance')
+      - ref('mart_customer_cohorts')

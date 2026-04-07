@@ -1,12 +1,6 @@
 with order_level as (
     select *
-    from (
-        select
-            *,
-            row_number() over (partition by order_id order by order_purchase_timestamp desc) as row_num
-        from {{ ref('fct_orders_dashboard') }}
-    )
-    where row_num = 1
+    from {{ ref('int_revenue__order_level_dashboard') }}
 ),
 delivered as (
     select *
@@ -28,7 +22,7 @@ union all
 select 'avg_delivery_time_days', 'Prazo Médio', 'operations', avg(delivery_time_days), 'days'
 from delivered
 union all
-select 'delay_rate', 'Taxa de Atraso', 'operations', avg(case when is_delayed then 1 else 0 end), 'ratio'
+select 'delay_rate', 'Taxa de Atraso', 'operations', avg(case when is_delayed then 1.0 else 0.0 end), 'ratio'
 from delivered
 union all
 select 'avg_review_score', 'Nota Média', 'experience', avg(review_score_mean), 'score'

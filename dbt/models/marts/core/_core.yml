@@ -2,12 +2,34 @@ version: 2
 
 models:
   - name: fct_orders_enriched
+    description: >
+      Canonical curated fact at order-item grain. It remains Python-owned; this dbt model exposes the
+      trusted asset in lineage so downstream semantic marts, tests, and docs reflect the real system boundary.
     columns:
       - name: order_id
+        description: Internal order identifier.
         tests: [not_null]
       - name: order_item_id
+        description: Item sequence inside the order.
+        tests: [not_null]
+      - name: product_id
+        description: Internal product identifier.
+        tests: [not_null]
+      - name: seller_id
+        description: Internal seller identifier.
         tests: [not_null]
       - name: order_status
+        description: Operational lifecycle status from the transaction source.
         tests:
           - accepted_values:
-              values: ['approved', 'canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
+              arguments:
+                values: ['approved', 'canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
+      - name: order_purchase_timestamp
+        description: Purchase timestamp defining the temporal grain for the fact.
+        tests: [not_null]
+      - name: total_item_value
+        description: Item-level gross value calculated upstream in Python.
+        tests: [not_null]
+      - name: customer_unique_id
+        description: Customer key used to derive retention and cohort behavior upstream.
+        tests: [not_null]

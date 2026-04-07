@@ -11,7 +11,9 @@ target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
 vars:
-  standardized_olist_path: "../data/standardized/olist"
+  curated_analytics_path: "../data/curated/analytics"
+  published_dashboard_path: "../data/published/dashboard"
+  published_semantic_path: "../data/published/semantic"
 
 models:
   governed_analytics_platform:

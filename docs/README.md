@@ -19,7 +19,8 @@ Este arquivo existe só como índice da pasta `docs/`. O contexto geral do proje
 - [executive_summary.md](executive_summary.md): visão executiva
 - [architecture.md](architecture.md): arquitetura implementada
 - [target_architecture_and_roadmap.md](target_architecture_and_roadmap.md): arquitetura alvo e roadmap priorizado
-- [dbt_adoption.md](dbt_adoption.md): introdução inicial de dbt-duckdb no repositório
+- [dbt_adoption.md](dbt_adoption.md): posicionamento atual do dbt como camada semântica e de governança
+- [dbt_lineage.md](dbt_lineage.md): leitura rápida do lineage entre ativos Python, marts dbt e consumidores
 - [product_brief.md](product_brief.md): posicionamento do projeto como produto analítico
 - [operating_model.md](operating_model.md): pipeline, publicação, deploy e operação
 - [privacy_governance.md](privacy_governance.md): fronteira de exposição, LGPD e checks da camada publicada
@@ -42,6 +43,12 @@ Este arquivo existe só como índice da pasta `docs/`. O contexto geral do proje
 - [published_layer_monitoring.md](published_layer_monitoring.md)
 - [semantic_layer.md](semantic_layer.md)
 - [operational_job_report.md](operational_job_report.md)
+
+## Camada semântica e lineage
+
+- o pipeline Python continua produzindo `fact_orders_enriched` e `fact_orders_dashboard`
+- o dbt entra depois desses ativos para documentação, testes, lineage e marts reutilizáveis
+- Streamlit, Power BI e workflows SQL devem ser lidos a partir da camada publicada e dos marts semânticos
 
 ## Runbooks e operação
 

@@ -2,20 +2,156 @@ version: 2
 
 models:
   - name: fct_orders_dashboard
+    description: >
+      Canonical published fact at order-item grain. This model is the official semantic entry point for
+      executive marts and downstream consumers because it sits after the Python privacy/governance boundary.
     columns:
       - name: order_id
+        description: Pseudonymized order token.
         tests: [not_null]
       - name: order_item_id
+        description: Item sequence within the published order grain.
+        tests: [not_null]
+      - name: customer_unique_id
+        description: Pseudonymized customer token used for retention and customer counts.
+        tests: [not_null]
+      - name: seller_key
+        description: Pseudonymized seller token used in published seller analytics.
+        tests: [not_null]
+      - name: order_purchase_timestamp
+        description: Purchase timestamp preserved for time-series reporting.
+        tests: [not_null]
+      - name: payment_type_mode
+        description: Dominant payment method for the order.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['boleto', 'credit_card', 'debit_card', 'voucher', 'unknown']
+      - name: seller_volume_tier
+        description: Published seller segmentation generated upstream in Python.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['long_tail', 'scaled', 'core', 'strategic']
+      - name: customer_state
+        description: Published customer state with nulls normalized to `NA`.
+        tests: [not_null]
+      - name: seller_state
+        description: Published seller state with nulls normalized to `NA`.
+        tests: [not_null]
+      - name: total_item_value
+        description: Gross item revenue including freight.
         tests: [not_null]
   - name: mart_category_performance
+    description: >
+      Executive-ready monthly category mart showing revenue, ticket, delay, payment mix, and freight burden by category.
     columns:
+      - name: order_year
+        description: Purchase year of the category aggregate.
+        tests: [not_null]
+      - name: order_month
+        description: Purchase month of the category aggregate.
+        tests: [not_null]
       - name: product_category_name_english
+        description: English category label used in executive reporting.
+        tests: [not_null]
+      - name: payment_type_mode
+        description: Dominant order payment method segment.
+        tests: [not_null]
+      - name: revenue_gross
+        description: Gross revenue for the month/category/payment segment.
         tests: [not_null]
   - name: mart_state_performance
+    description: >
+      Executive geographic mart at month and customer-state grain with revenue, customer reach, seller coverage,
+      delivery performance, and review quality.
     columns:
+      - name: order_year
+        description: Purchase year of the state aggregate.
+        tests: [not_null]
+      - name: order_month
+        description: Purchase month of the state aggregate.
+        tests: [not_null]
       - name: customer_state
+        description: Published customer state at the mart grain.
+        tests: [not_null]
+      - name: active_sellers
+        description: Count of distinct published sellers serving the state in the month.
         tests: [not_null]
   - name: mart_executive_kpis
+    description: >
+      Small canonical KPI table for executive scorecards and application KPI cards. Each row represents one reusable metric.
     columns:
       - name: metric_id
+        description: Stable metric identifier.
+        tests:
+          - not_null
+          - unique
+          - accepted_values:
+              arguments:
+                values: ['avg_delivery_time_days', 'avg_freight_per_item', 'avg_review_score', 'avg_ticket', 'customers', 'delay_rate', 'orders', 'revenue_gross']
+      - name: metric_group
+        description: Business domain grouping for the KPI.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['commercial', 'experience', 'operations']
+      - name: metric_value
+        description: Numeric KPI value ready for dashboard consumption.
+        tests: [not_null]
+      - name: metric_unit
+        description: Display unit for the KPI.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['count', 'currency', 'days', 'ratio', 'score']
+  - name: mart_customer_cohorts
+    description: >
+      Published retention mart at purchase cohort month and cohort age grain, used to analyze repeat behavior without exposing the internal fact.
+    columns:
+      - name: purchase_cohort_month
+        description: Cohort month based on each customer's first purchase month.
+        tests: [not_null]
+      - name: cohort_order_month_number
+        description: Month offset between the order and the customer's first purchase month.
+        tests: [not_null]
+      - name: customers
+        description: Distinct customers active in the cohort and maturity month.
+        tests: [not_null]
+  - name: mart_logistics_performance
+    description: >
+      Logistics mart at month, customer-state, and seller-state grain showing service performance across the published supply chain footprint.
+    columns:
+      - name: order_year
+        description: Purchase year of the logistics aggregate.
+        tests: [not_null]
+      - name: order_month
+        description: Purchase month of the logistics aggregate.
+        tests: [not_null]
+      - name: customer_state
+        description: Destination state in the published logistics slice.
+        tests: [not_null]
+      - name: seller_state
+        description: Origin seller state in the published logistics slice.
+        tests: [not_null]
+  - name: mart_seller_performance
+    description: >
+      Published seller-performance mart with revenue, order volume, service quality, and experience metrics by pseudonymized seller.
+    columns:
+      - name: seller_key
+        description: Pseudonymized seller identifier.
         tests: [not_null, unique]
+      - name: seller_state
+        description: Seller state at the published grain.
+        tests: [not_null]
+      - name: seller_volume_tier
+        description: Published seller tier.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['long_tail', 'scaled', 'core', 'strategic']

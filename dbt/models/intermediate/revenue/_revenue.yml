@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: int_revenue__order_level_dashboard
+    description: >
+      One row per published order, created by deduplicating the item-level published fact. This model
+      exists to support order-level KPIs without overstating order and customer counts.
+    columns:
+      - name: order_id
+        description: Pseudonymized published order key at one-row-per-order grain.
+        tests: [not_null, unique]
+      - name: customer_unique_id
+        description: Pseudonymized customer key carried at order grain for executive customer metrics.
+        tests: [not_null]
+      - name: order_purchase_timestamp
+        description: Order purchase timestamp used for deduplication and period analysis.
+        tests: [not_null]

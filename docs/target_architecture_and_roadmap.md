@@ -130,7 +130,7 @@ data/
 
 ### Intermediate improvements
 
-- Introduce `dbt-duckdb` for semantic and published marts first.
+- Expand the current `dbt-duckdb` layer with more lineage evidence and consumer adoption.
 - Add dbt tests for keys, nullability, accepted values and relationships.
 - Generate dbt docs and include screenshots/evidence in the repository narrative.
 - Reduce semantic logic in the Streamlit application by moving recurring calculations upstream.
@@ -171,50 +171,35 @@ Python should remain responsible for:
 - Streamlit app delivery
 - GenAI integrations and audit logging
 
-## Recommended dbt structure
+## Implemented dbt structure
 
 ```text
 dbt/
   dbt_project.yml
   profiles.yml.example
   models/
-    sources/
-      olist_sources.yml
-    staging/olist/
-      stg_olist__orders.sql
-      stg_olist__order_items.sql
-      stg_olist__customers.sql
-      stg_olist__products.sql
-      stg_olist__sellers.sql
-      stg_olist__payments.sql
-      stg_olist__reviews.sql
-      stg_olist__translation.sql
-      _staging.yml
-    intermediate/commerce/
-      int_orders__payments_agg.sql
-      int_orders__reviews_agg.sql
-      int_orders__base_join.sql
-      int_orders__customer_features.sql
-      int_orders__seller_features.sql
-      _intermediate.yml
+    staging/platform/
+      stg_platform__fact_orders_enriched.sql
+      stg_platform__fact_orders_dashboard.sql
+      _platform.yml
+    intermediate/revenue/
+      int_revenue__order_level_dashboard.sql
+      _revenue.yml
     marts/core/
       fct_orders_enriched.sql
       _core.yml
     marts/published/
       fct_orders_dashboard.sql
-      mart_logistics_slice.sql
-      mart_seller_scorecard.sql
-      mart_customer_cohort.sql
+      mart_logistics_performance.sql
+      mart_seller_performance.sql
+      mart_customer_cohorts.sql
       mart_category_performance.sql
       mart_state_performance.sql
       mart_executive_kpis.sql
       _published.yml
     exposures/
       exposures.yml
-  macros/
-    pseudonymize.sql
-  seeds/
-    metric_catalog.csv
+  tests/
 ```
 
 ## Where dbt enters the current flow
@@ -230,11 +215,12 @@ Recommended sequence:
 7. dbt semantic marts
 8. monitoring, catalog, exports and app consumption
 
-Initial implementation without breakage:
+Current implementation without breakage:
 
-- Phase 1: use dbt only for semantic marts and published marts
-- Phase 2: migrate `fact_orders_enriched` into dbt
-- Phase 3: simplify redundant Python transformations
+- dbt starts from trusted Python outputs instead of re-implementing ingestion or heavy transformation
+- `fact_orders_enriched` remains Python-owned and is represented in dbt for lineage
+- `fact_orders_dashboard` remains the published exposure contract
+- semantic marts are built in dbt for executive and analyst consumption
 
 ## Staging / intermediate / marts guidance
 
@@ -247,6 +233,8 @@ Role:
 - preserve source-level traceability
 - avoid business-heavy logic
 
+In the implemented version, staging is intentionally limited to typed wrappers over Python-owned curated and published assets.
+
 ### Intermediate
 
 Role:
@@ -254,6 +242,8 @@ Role:
 - aggregate payments and reviews
 - prepare reusable joins
 - derive reusable business building blocks
+
+In the implemented version, the intermediate layer is minimal and focused on one real need: deduplicating the published item fact to order grain for executive KPI logic.
 
 ### Marts
 
@@ -311,35 +301,50 @@ Use `dbt docs generate` to provide:
 - owners
 - tags by domain
 
-Recommended exposures:
+Implemented exposures:
 
 ```yaml
 exposures:
   - name: streamlit_executive_dashboard
-    type: dashboard
+    type: application
     owner:
       name: Samuel Maia
     depends_on:
       - ref('fct_orders_dashboard')
       - ref('mart_executive_kpis')
       - ref('mart_state_performance')
+      - ref('mart_category_performance')
+      - ref('mart_logistics_performance')
+      - ref('mart_seller_performance')
+      - ref('mart_customer_cohorts')
 
   - name: power_bi_executive_dashboard
     type: dashboard
     owner:
       name: Samuel Maia
     depends_on:
+      - ref('fct_orders_dashboard')
       - ref('mart_executive_kpis')
       - ref('mart_category_performance')
       - ref('mart_state_performance')
+
+  - name: analyst_sql_workflows
+    type: analysis
+    owner:
+      name: Samuel Maia
+    depends_on:
+      - ref('fct_orders_dashboard')
+      - ref('mart_category_performance')
+      - ref('mart_state_performance')
+      - ref('mart_customer_cohorts')
 ```
 
 ## DuckDB local integration
 
-Recommended profile concept:
+Implemented local profile concept:
 
 - DuckDB database file inside `data/`
-- sources pointing to Parquet files in `data/standardized/`
+- sources pointing to trusted Parquet files in `data/curated/analytics/` and `data/published/dashboard/`
 - materializations as tables or views depending on portability needs
 
 Suggested local target:

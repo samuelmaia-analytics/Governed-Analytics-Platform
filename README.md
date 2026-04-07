@@ -135,16 +135,57 @@ streamlit run streamlit_app/app.py
 
 The app now exposes a regional selector in the sidebar and defaults to `Português (Brasil)`.
 
-## dbt foundation
+## dbt semantic layer
 
-The repository now includes an initial `dbt/` layer to support:
+The repository includes a production-minded `dbt/` layer, but it is intentionally positioned above the Python pipeline rather than as a replacement for it.
 
-- staged SQL models
-- intermediate aggregations
-- published marts
-- exposures for Streamlit and Power BI
+Python remains the system of record for:
 
-This is intentionally additive. Python remains the operational backbone of the project.
+- ingestion and standardization
+- analytical fact construction
+- governed publication
+- semantic asset export
+- monitoring, contracts, catalog, and operational automation
+
+dbt is used for the right analytics engineering concerns:
+
+- staging trusted Python outputs into a documented SQL graph
+- representing the curated and published facts in lineage
+- building reusable semantic marts for executive consumption
+- adding schema tests, grain tests, exposures, and business-friendly documentation
+
+This separation keeps the architecture honest: operational transformation and privacy controls stay in Python, while dbt strengthens semantic consistency, governance, trust, and maintainability for downstream consumers.
+
+Current semantic lineage:
+
+```mermaid
+flowchart LR
+    A[Python Curated Fact] --> B[dbt Staging]
+    C[Python Published Fact] --> D[dbt Staging]
+    B --> E[dbt Core Fact]
+    D --> F[dbt Published Fact]
+    F --> G[Executive KPI Mart]
+    F --> H[Category Mart]
+    F --> I[State Mart]
+    F --> J[Logistics Mart]
+    F --> K[Seller Mart]
+    F --> L[Cohort Mart]
+    G --> M[Streamlit]
+    H --> N[Power BI]
+    I --> M
+    L --> O[Analyst SQL]
+```
+
+You can generate local dbt documentation and inspect the graph with:
+
+```bash
+cd dbt
+copy profiles.yml.example profiles.yml
+dbt docs generate --profiles-dir .
+dbt docs serve --profiles-dir .
+```
+
+See [docs/dbt_lineage.md](docs/dbt_lineage.md) for the repository-specific lineage reading guide.
 
 The current Streamlit app already demonstrates the target operating pattern: the main KPI cards preferentially consume `executive_kpis_slice`, while the detailed analytical exploration continues to read from the governed published fact table.
 
