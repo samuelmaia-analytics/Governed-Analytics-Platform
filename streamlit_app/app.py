@@ -28,7 +28,6 @@ from streamlit_app.sections import (
     render_geography_section,
     render_header,
     render_health_section,
-    render_health_summary_compact,
     render_kpi_row,
     render_operations_section,
     render_semantic_section,
@@ -79,12 +78,11 @@ def main() -> None:
             f"<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>{tr('presentation_mode_title')}</div><p class='section-copy' style='margin-bottom:0;'>{tr('presentation_mode_copy')}</p></div>",
             unsafe_allow_html=True,
         )
-        render_kpi_row(build_metrics(filtered_df, previous_df, semantic_assets.get("executive_kpis")))
+        render_kpi_row(build_metrics(filtered_df, previous_df))
         st.markdown("<div style='height:0.95rem;'></div>", unsafe_allow_html=True)
         render_temporal_section(filtered_df)
         render_category_section(filtered_df)
         render_geography_section(filtered_df, filters.geography_mode)
-        render_health_summary_compact(monitoring_status)
         render_executive_insights(filtered_df)
         return
 
@@ -96,7 +94,7 @@ def main() -> None:
         render_smart_summary(filtered_df)
 
     if selected_section in {"Visão completa", "KPIs"}:
-        render_kpi_row(build_metrics(filtered_df, previous_df, semantic_assets.get("executive_kpis")))
+        render_kpi_row(build_metrics(filtered_df, previous_df))
         st.markdown("<div style='height:0.95rem;'></div>", unsafe_allow_html=True)
 
     if selected_section == "Tempo":
