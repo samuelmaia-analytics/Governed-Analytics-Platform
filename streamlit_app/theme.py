@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import streamlit as st
 
+from streamlit_app.formatting import get_format_locale
+from streamlit_app.i18n import NAVIGATION_OPTIONS, tr
+
 APP_FONT = "IBM Plex Sans"
 
 COLORS = {
@@ -44,35 +47,24 @@ WEEKDAY_MAP = {
     6: "Dom",
 }
 
-NAVIGATION_OPTIONS = [
-    ("Visão completa", "Visão"),
-    ("Contexto", "Contexto"),
-    ("KPIs", "KPIs"),
-    ("Tempo", "Tempo"),
-    ("Categorias", "Categorias"),
-    ("Regional", "Regional"),
-    ("Operação", "Operação"),
-    ("Saúde", "Saúde"),
-    ("Semântica", "Semântica"),
-    ("Insights", "Insights"),
-]
-
-
 def set_navigation(target: str) -> None:
     st.session_state["dashboard_section_nav"] = target
 
 
 def render_story_nav() -> str:
     current = st.session_state.get("dashboard_section_nav", "Visão completa")
+    locale = get_format_locale()
     st.markdown("<div class='section-shell' style='padding:0.75rem 1rem 0.9rem 1rem;'>", unsafe_allow_html=True)
-    st.markdown("<div class='section-eyebrow'>Navegação</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='section-eyebrow'>{tr('nav_header')}</div>", unsafe_allow_html=True)
     st.markdown(
-        "<p class='section-copy' style='margin:0.15rem 0 0.7rem 0;'>Use a barra abaixo para navegar entre os blocos principais da leitura executiva.</p>",
+        f"<p class='section-copy' style='margin:0.15rem 0 0.7rem 0;'>{tr('nav_help')}</p>",
         unsafe_allow_html=True,
     )
 
     nav_columns = st.columns(len(NAVIGATION_OPTIONS), gap="small")
-    for idx, (value, label) in enumerate(NAVIGATION_OPTIONS):
+    for idx, option in enumerate(NAVIGATION_OPTIONS):
+        value = option["id"]
+        label = option["en-US"] if locale == "en-US" else option["pt-BR"]
         with nav_columns[idx]:
             st.button(
                 label,
@@ -458,7 +450,21 @@ def apply_theme() -> None:
             box-shadow: none;
         }}
         [data-testid="stCaptionContainer"] {{
-            padding: 0.15rem 0.2rem 0.4rem 0.2rem;
+            padding: 0.4rem 0.55rem;
+            margin-top: 0.3rem;
+            border-radius: 10px;
+            border: 1px solid #E2E8F0;
+            background: #F8FAFC;
+            color: {COLORS["text"]} !important;
+            line-height: 1.45;
+        }}
+        [data-testid="stCaptionContainer"] p,
+        [data-testid="stCaptionContainer"] span,
+        [data-testid="stCaptionContainer"] small {{
+            color: {COLORS["text"]} !important;
+            font-size: 0.9rem !important;
+            font-weight: 500;
+            line-height: 1.45;
         }}
         .regional-kpi {{
             background: {COLORS["surface"]};

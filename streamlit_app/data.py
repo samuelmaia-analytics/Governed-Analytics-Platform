@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from src.config import PUBLISHED_DASHBOARD_DIR
+from streamlit_app.formatting import get_format_locale
 from streamlit_app.theme import MONTH_NAME_MAP, WEEKDAY_MAP
 
 try:
@@ -20,8 +21,16 @@ FACT_CSV_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.csv"
 LOGISTICS_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "logistics_slice.parquet"
 SELLER_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "seller_slice.parquet"
 COHORT_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "cohort_slice.parquet"
+EXECUTIVE_KPI_PARQUET_PATH = PUBLISHED_SEMANTIC_DIR / "executive_kpis_slice.parquet"
 MONITORING_SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
+MONITORING_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring_history.csv"
 PLACEHOLDER_DIMENSION_VALUES = {"unknown", "Unknown", "NA", "nan", "NaN", ""}
+
+
+def localize_text(pt_br: str, en_us: str) -> str:
+    if get_format_locale() == "en-US":
+        return en_us
+    return pt_br
 
 
 @dataclass(frozen=True)
@@ -103,6 +112,7 @@ def load_semantic_assets() -> dict[str, pd.DataFrame]:
         ("logistics", LOGISTICS_PARQUET_PATH),
         ("seller", SELLER_PARQUET_PATH),
         ("cohort", COHORT_PARQUET_PATH),
+        ("executive_kpis", EXECUTIVE_KPI_PARQUET_PATH),
     ):
         if path.exists():
             assets[asset_name] = pd.read_parquet(path)
@@ -113,7 +123,25 @@ def load_semantic_assets() -> dict[str, pd.DataFrame]:
 def load_monitoring_status() -> dict[str, object] | None:
     if not MONITORING_SUMMARY_PATH.exists():
         return None
-    return json.loads(MONITORING_SUMMARY_PATH.read_text(encoding="utf-8"))
+    status = json.loads(MONITORING_SUMMARY_PATH.read_text(encoding="utf-8"))
+    if MONITORING_HISTORY_PATH.exists():
+        history_df = pd.read_csv(MONITORING_HISTORY_PATH)
+        status["history"] = history_df.to_dict(orient="records")
+    return status
+
+
+def build_dashboard_locale() -> str:
+    st.sidebar.markdown(localize_text("### Formato Regional", "### Regional Format"))
+    locale_label = st.sidebar.selectbox(
+        localize_text("Idioma e formatação", "Language and formatting"),
+        options=["🇧🇷 Português (Brasil)", "🇺🇸 English (US)"],
+        key="dashboard_locale",
+    )
+    if "English (US)" in locale_label:
+        st.sidebar.caption("Numbers follow international formatting and the app interface switches to English.")
+        return "en-US"
+    st.sidebar.caption("O dashboard está configurado para Português (Brasil).")
+    return "pt-BR"
 
 
 def build_default_filter_state(df: pd.DataFrame) -> None:
@@ -173,7 +201,12 @@ def build_select_filter(
     options: list[str],
 ) -> list[str]:
     if not options:
-        st.sidebar.caption(f"Sem opções disponíveis para {label.lower()} no recorte atual.")
+        st.sidebar.caption(
+            localize_text(
+                f"Sem opções disponíveis para {label.lower()} no recorte atual.",
+                f"No options available for {label.lower()} in the current selection.",
+            )
+        )
         st.session_state[value_key] = all_label
         return []
 
@@ -183,16 +216,26 @@ def build_select_filter(
         key=mode_key,
     )
     if mode == all_label:
-        st.sidebar.caption(f"{len(options)} opções consideradas neste filtro.")
+        st.sidebar.caption(
+            localize_text(
+                f"{len(options)} opções consideradas neste filtro.",
+                f"{len(options)} options considered in this filter.",
+            )
+        )
         st.session_state[value_key] = all_label
         return options
 
     selected = st.sidebar.selectbox(
-        f"Selecionar {label.lower()}",
+        localize_text(f"Selecionar {label.lower()}", f"Select {label.lower()}"),
         options=options,
         key=value_key,
     )
-    st.sidebar.caption(f"Filtro aplicado em {label.lower()}: {selected}.")
+    st.sidebar.caption(
+        localize_text(
+            f"Filtro aplicado em {label.lower()}: {selected}.",
+            f"Active filter for {label.lower()}: {selected}.",
+        )
+    )
     return [selected]
 
 
@@ -206,18 +249,21 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
     status_options = clean_dimension_options(df["order_status"])
     payment_options = clean_dimension_options(df["payment_type_mode"])
 
-    st.sidebar.markdown("### Filtros Globais")
+    st.sidebar.markdown(localize_text("### Filtros Globais", "### Global Filters"))
     st.sidebar.markdown(
-        "<div class='filter-note'>Os filtros afetam todo o dashboard, incluindo KPIs, gráficos, tabelas e insights.</div>",
+        localize_text(
+            "<div class='filter-note'>Os filtros afetam todo o dashboard, incluindo KPIs, gráficos, tabelas e insights.</div>",
+            "<div class='filter-note'>Filters affect the full dashboard, including KPIs, charts, tables and insights.</div>",
+        ),
         unsafe_allow_html=True,
     )
-    if st.sidebar.button("Resetar filtros", width="stretch"):
+    if st.sidebar.button(localize_text("Resetar filtros", "Reset filters"), width="stretch"):
         reset_filters()
 
     min_date = df["order_purchase_timestamp"].min().date()
     max_date = df["order_purchase_timestamp"].max().date()
     date_value = st.sidebar.date_input(
-        "Intervalo de datas",
+        localize_text("Intervalo de datas", "Date range"),
         value=st.session_state["flt_date_range"],
         min_value=min_date,
         max_value=max_date,
@@ -233,56 +279,56 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
         start_date = end_date = min_date
 
     categories = build_select_filter(
-        label="Categoria de produto",
+        label=localize_text("Categoria de produto", "Product category"),
         mode_key="flt_category_mode",
         value_key="flt_category_value",
-        all_label="Todas as categorias",
-        focus_label="Categoria específica",
+        all_label=localize_text("Todas as categorias", "All categories"),
+        focus_label=localize_text("Categoria específica", "Specific category"),
         options=category_options,
     )
     states = build_select_filter(
-        label="Estado do cliente ou seller",
+        label=localize_text("Estado do cliente ou seller", "Customer or seller state"),
         mode_key="flt_state_mode",
         value_key="flt_state_value",
-        all_label="Todos os estados",
-        focus_label="UF específica",
+        all_label=localize_text("Todos os estados", "All states"),
+        focus_label=localize_text("UF específica", "Specific state"),
         options=state_options,
     )
 
     geography_mode = st.sidebar.radio(
-        "Dimensão geográfica",
-        options=["Cliente", "Seller"],
+        localize_text("Dimensão geográfica", "Geographic dimension"),
+        options=[localize_text("Cliente", "Customer"), "Seller"],
         horizontal=True,
         key="flt_geography_mode",
     )
     price_range = st.sidebar.slider(
-        "Faixa de preço",
+        localize_text("Faixa de preço", "Price range"),
         min_value=float(df["price"].fillna(0).min()),
         max_value=float(df["price"].fillna(0).max()),
         value=st.session_state["flt_price_range"],
         key="flt_price_range",
     )
     freight_range = st.sidebar.slider(
-        "Faixa de frete",
+        localize_text("Faixa de frete", "Freight range"),
         min_value=float(df["freight_value"].fillna(0).min()),
         max_value=float(df["freight_value"].fillna(0).max()),
         value=st.session_state["flt_freight_range"],
         key="flt_freight_range",
     )
     order_status = build_select_filter(
-        label="Status do pedido",
+        label=localize_text("Status do pedido", "Order status"),
         mode_key="flt_status_mode",
         value_key="flt_status_value",
-        all_label="Todos os status",
-        focus_label="Status específico",
+        all_label=localize_text("Todos os status", "All statuses"),
+        focus_label=localize_text("Status específico", "Specific status"),
         options=status_options,
     )
     payment_types = build_select_filter(
-        label="Tipo de pagamento",
+        label=localize_text("Tipo de pagamento", "Payment type"),
         mode_key="flt_payment_mode",
         value_key="flt_payment_value",
-        all_label="Todos os meios",
-        focus_label="Meio específico",
+        all_label=localize_text("Todos os meios", "All methods"),
+        focus_label=localize_text("Meio específico", "Specific method"),
         options=payment_options,
     )
 
@@ -300,16 +346,19 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
 
 
 def build_app_mode() -> bool:
-    st.sidebar.markdown("### Modo de Uso")
+    st.sidebar.markdown(localize_text("### Modo de Uso", "### Usage Mode"))
     return st.sidebar.toggle(
-        "Modo apresentação",
+        localize_text("Modo apresentação", "Presentation mode"),
         value=False,
-        help="Simplifica a tela para leitura executiva, ocultando contexto detalhado, navegação secundária e tabelas auxiliares.",
+        help=localize_text(
+            "Simplifica a tela para leitura executiva, ocultando contexto detalhado, navegação secundária e tabelas auxiliares.",
+            "Simplifies the screen for executive reading by hiding detailed context, secondary navigation and support tables.",
+        ),
     )
 
 
 def filter_dataframe(df: pd.DataFrame, filters: FilterState) -> pd.DataFrame:
-    geography_col = "customer_state" if filters.geography_mode == "Cliente" else "seller_state"
+    geography_col = "customer_state" if filters.geography_mode in {"Cliente", "Customer"} else "seller_state"
     end_exclusive = filters.end_date + pd.Timedelta(days=1)
     mask = (
         (df["order_purchase_timestamp"] >= filters.start_date)

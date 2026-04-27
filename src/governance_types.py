@@ -1,0 +1,33 @@
+from __future__ import annotations
+
+from typing import TypedDict
+
+
+class DataQualityCheck(TypedDict):
+    check_name: str
+    status: str
+    severity: str
+    affected_columns: str
+    affected_rows: int
+    recommendation: str
+
+
+class DataQualityResult(TypedDict):
+    total_rows: int
+    total_columns: int
+    null_pct_by_column: dict[str, float]
+    columns_over_30pct_null: list[str]
+    duplicate_rows: int
+    dtypes: dict[str, str]
+    cardinality: dict[str, int]
+    possible_unique_keys: list[str]
+    constant_columns: list[str]
+    checks: list[DataQualityCheck]
+    failed_checks_count: int
+
+
+class PrivacyRiskResult(TypedDict):
+    score: int
+    risk_level: str
+    summary: str
+    recommendations: list[str]

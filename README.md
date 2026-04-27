@@ -1,69 +1,77 @@
-# Olist Governed Analytics Platform
+# Governed Analytics Platform
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/actions/workflows/ci.yml)
-[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/olist-governed-analytics-platform/actions/workflows/lint.yml)
-[![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://olist-governed-analytics-platform.streamlit.app/)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
+[![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
 
-Pipeline de Analytics Engineering construído sobre o dataset público da Olist para transformar dados brutos em um ativo analítico governado, com separação explícita entre camada analítica interna e camada publicada para consumo executivo.
+**Language:** `PT-BR` | [EN](README.en.md)
 
-## Em uma frase
+Uma plataforma analítica em Streamlit para demonstrar governança de dados, classificação LGPD, data quality, EDA automatizada e geração de relatórios executivos.
 
-O projeto mostra como sair de CSVs relacionais brutos para um produto analítico com qualidade, contratos, monitoramento, catálogo, publicação controlada e consumo em `Streamlit` e `Power BI`.
+## Problema de negócio
 
-## O que o projeto entrega
+Times analíticos frequentemente aceleram entregas sem formalizar controles de qualidade, privacidade e rastreabilidade. O resultado é risco regulatório, baixa confiança nos dados e decisões executivas com pouca governança.
 
-- pipeline ponta a ponta em Python para ingestão, profiling, modelagem, publicação e exportação
-- tabela analítica interna `fact_orders_enriched`
-- camada publicada `fact_orders_dashboard` com minimização para consumo recorrente
-- contrato LGPD/governança validado automaticamente na publicação da camada exposta
-- marts semânticos publicados para recortes executivos e operacionais
-- dashboard Streamlit consumindo somente a camada publicada
-- exportações auxiliares para Power BI
-- contratos, testes, lint, cobertura e CI
-- catálogo local, relatórios técnicos e evidências operacionais
-- monitoramento da camada publicada
-- integrações opcionais com webhook externo, OpenAI e Dadosfera Maestro
+## Solução
 
-## Fluxo operacional
+O projeto implementa uma abordagem de produto analítico governado:
+
+- pipeline Python com fronteira explícita entre camada interna e camada publicada;
+- classificação LGPD por coluna com score de risco de privacidade;
+- checks de qualidade de dados reutilizáveis;
+- EDA automatizada para suporte analítico rápido;
+- geração de relatórios Markdown para documentação executiva e técnica.
+
+## Funcionalidades
+
+- Executive Overview com KPIs de governança e risco.
+- Data Catalog com dicionário e metadados de colunas.
+- LGPD & Privacy Risk com classificação e recomendações.
+- Data Quality com checks e severidade por regra.
+- EDA com estatísticas descritivas, nulos, outliers e correlação.
+- Governance Report com relatórios em `docs/`.
+
+## Arquitetura
 
 ```mermaid
 flowchart LR
-    A[Raw CSV Olist] --> B[Inventory and Standardization]
-    B --> C[Profiling]
-    C --> D[Curated Analytics<br/>fact_orders_enriched]
-    D --> E[Published Dashboard<br/>fact_orders_dashboard]
-    E --> F[Published Semantic Assets]
-    E --> G[Published Monitoring]
-    E --> H[Streamlit]
-    E --> I[Power BI exports]
-    D --> J[SQL and catalog]
+    A[Data Sources] --> B[src/data_loader.py]
+    B --> C[src/lgpd_classifier.py]
+    B --> D[src/data_quality.py]
+    B --> E[src/eda.py]
+    C --> F[src/risk_scoring.py]
+    C --> G[src/report_generator.py]
+    D --> G
+    E --> G
+    B --> H[app/main.py]
+    C --> H
+    D --> H
+    E --> H
+    F --> H
+    G --> I[docs/*.md]
 ```
 
-## Stack principal
+## Stack técnica
 
 - Python 3.11+
-- Pandas, NumPy e DuckDB
-- Streamlit, Altair e Plotly
-- Pytest, pytest-cov e Ruff
-- SQL versionado
-- GitHub Actions
+- Pandas e NumPy
+- Streamlit e Plotly
+- Pytest, Pytest-Cov e Ruff
+- GitHub Actions (CI)
 
-## Estrutura do repositório
+## Estrutura principal
 
-| Caminho | Papel |
+| Caminho | Finalidade |
 | --- | --- |
-| `src/` | pipeline, publicação, catálogo, governança, exportações e integrações |
-| `streamlit_app/` | dashboard executivo em Streamlit |
-| `tests/` | suíte automatizada |
-| `sql/` | consultas analíticas versionadas |
-| `contracts/` | contratos de schema e regras de exposição |
-| `docs/` | documentação principal, relatórios e runbooks |
-| `powerbi/` | artefatos para consumo complementar |
-| `data/` | lake local e outputs gerados pelo pipeline |
+| `app/` | nova interface executiva Streamlit por abas |
+| `streamlit_app/` | app legado preservado (compatibilidade) |
+| `src/` | módulos de Analytics Engineering, LGPD e qualidade |
+| `data/samples/` | datasets sintéticos para demonstração |
+| `docs/` | relatórios e documentação de governança |
+| `tests/` | suíte automatizada de testes |
 
 ## Como executar localmente
-
-### 1. Preparar ambiente
 
 ```bash
 python -m venv .venv
@@ -71,125 +79,55 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Opcionalmente, para instalar como projeto Python com dependências de desenvolvimento:
+Executar app novo (governança executiva):
 
 ```bash
-pip install -e .[dev]
+streamlit run app/main.py
 ```
 
-Para reproduzir exatamente o conjunto validado neste repositório, use o lockfile:
-
-```bash
-pip install -r requirements.lock
-```
-
-### 2. Configurar variáveis de ambiente
-
-Os fluxos principais rodam sem segredos obrigatórios. Para habilitar integrações opcionais, copie `.env.example` para `.env` e ajuste os valores necessários.
-
-Principais grupos:
-
-- `DADOSFERA_*`: publicação e operações em ambiente Dadosfera Maestro
-- `OPENAI_*`: recursos opcionais de GenAI
-- `LOG_FORMAT`: formato de logging
-
-### 3. Inspecionar as etapas disponíveis
-
-```bash
-python src/run_platform_pipeline.py --list-steps
-```
-
-### 4. Executar o pipeline principal
-
-```bash
-python src/run_platform_pipeline.py
-```
-
-O runner pode executar etapas específicas com `--steps` e consolidar falhas com `--continue-on-error`.
-
-### 5. Rodar qualidade local
-
-```bash
-pytest
-ruff check .
-```
-
-### 6. Subir a aplicação
+Executar app legado (compatibilidade):
 
 ```bash
 streamlit run streamlit_app/app.py
 ```
 
-## Etapas do pipeline
+## Exemplos de uso
 
-O runner principal executa, nesta ordem:
+1. Carregar `data/samples/sample_governance_dataset.csv` no app.
+2. Validar classificação LGPD por coluna.
+3. Revisar score de risco e recomendações.
+4. Avaliar checks de qualidade com status/severidade.
+5. Gerar relatórios automáticos em `docs/`.
 
-1. `inventory`
-2. `profiling`
-3. `build`
-4. `publish`
-5. `semantic`
-6. `classify`
-7. `contracts`
-8. `quality`
-9. `monitor`
-10. `catalog`
-11. `queries`
-12. `screenshots`
-13. `bi`
+## Governança e LGPD
 
-Na etapa `publish`, a camada exposta passa por validações de privacidade e governança antes de ser salva. O contrato versionado fica em `contracts/governance/privacy_governance.json` e a evidência tabular é salva em `data/curated/quality/privacy_governance_results.csv`.
+- Classificação de colunas: `non_personal`, `personal_data`, `sensitive_personal_data`, `indirect_identifier`.
+- Níveis de risco: `low`, `medium`, `high`.
+- Ações sugeridas: `keep`, `mask`, `anonymize`, `remove`, `review`.
+- Relatório de controles: `docs/lgpd_controls.md`.
 
-## Evidências e acessos
+## Testes
 
-- App Streamlit: [olist-governed-analytics-platform.streamlit.app](https://olist-governed-analytics-platform.streamlit.app/)
-- Dashboard Power BI: [app.powerbi.com](https://app.powerbi.com/links/Xto6lIUiRF?ctid=b1b9d429-7862-4440-a25b-6ca19f868f47&pbi_source=linkShare)
-- Vídeo: [YouTube](https://youtu.be/SqJ0UF1Em9k)
+```bash
+ruff check src streamlit_app app tests
+pytest --cov=src --cov=streamlit_app --cov-report=term-missing
+```
 
-## Navegação recomendada
+Testes novos incluídos:
 
-Leitura rápida:
+- `tests/test_lgpd_classifier.py`
+- `tests/test_risk_scoring.py`
+- `tests/test_data_quality.py`
 
-1. `README.md`
-2. `docs/README.md`
-3. `docs/executive_summary.md`
-4. `docs/architecture.md`
-5. `docs/operating_model.md`
+## Próximos passos
 
-Trilhas por objetivo:
+- Adicionar versionamento de políticas LGPD por domínio de dados.
+- Expandir checks para regras de negócio por contrato.
+- Integrar catálogo técnico com data lineage automatizado.
+- Publicar scorecards de governança por dataset em rotina agendada.
 
-- visão executiva: `docs/executive_summary.md`, `docs/05_dashboard.md`, `docs/architecture.md`
-- revisão técnica: `docs/technical_narrative.md`, `docs/02_carga_e_modelagem.md`, `docs/schema_contract_report.md`
-- operação e governança: `docs/operating_model.md`, `docs/privacy_governance.md`, `docs/engineering_governance.md`, `docs/release_runbook.md`
+## Links
 
-## Arquivos para começar
+- Streamlit app: [governed-analytics-platform.streamlit.app](https://governed-analytics-platform.streamlit.app/)
+- GitHub: [samuelmaia-analytics/Governed-Analytics-Platform](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
 
-- `src/run_platform_pipeline.py`
-- `src/build_analytics.py`
-- `src/publish_dashboard.py`
-- `src/semantic_layer.py`
-- `streamlit_app/app.py`
-- `docs/README.md`
-
-## Saídas importantes geradas pelo pipeline
-
-- `data/curated/analytics/`
-- `data/published/dashboard/`
-- `data/published/semantic/`
-- `data/published/monitoring/`
-- `data/curated/catalog/`
-- `data/curated/ops/`
-- `data/curated/quality/privacy_governance_results.csv`
-- `docs/data_quality_report.md`
-- `docs/published_layer_monitoring.md`
-- `docs/semantic_layer.md`
-- `docs/operational_job_report.md`
-- `docs/privacy_governance.md`
-
-## Diferencial arquitetural
-
-O ponto central do projeto é não conectar o dashboard diretamente na camada analítica completa. A publicação é tratada como etapa formal do pipeline, criando uma fronteira explícita entre:
-
-- exploração interna e exposição recorrente
-- evolução da modelagem e estabilidade do consumo
-- dado analítico e produto analítico publicado

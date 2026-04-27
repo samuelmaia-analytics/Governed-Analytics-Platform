@@ -1,0 +1,11 @@
+customer_id,customer_name,customer_email,customer_phone,state,city,birth_date,order_id,order_date,revenue,payment_method,status,marketing_consent,last_login_ip,cpf,saude_score
+CUST-0001,Ana Souza,ana.souza@example.com,+55 11 91234-1001,SP,Sao Paulo,1990-04-12,ORD-1001,2026-01-10,320.50,credit_card,completed,true,177.21.10.1,123.456.789-09,85
+CUST-0002,Bruno Lima,bruno.lima@example.com,+55 21 99876-1002,RJ,Rio de Janeiro,1988-09-03,ORD-1002,2026-01-11,89.90,pix,completed,false,189.44.22.7,987.654.321-00,70
+CUST-0003,Carla Mendes,carla.mendes@example.com,+55 31 97777-1003,MG,Belo Horizonte,1995-12-20,ORD-1003,2026-01-12,560.00,boleto,processing,true,201.15.99.8,456.789.123-11,90
+CUST-0004,Diego Alves,diego.alves@example.com,+55 41 98888-1004,PR,Curitiba,1992-07-01,ORD-1004,2026-01-13,42.10,debit_card,cancelled,false,170.110.18.4,741.852.963-22,60
+CUST-0005,Elaine Rocha,elaine.rocha@example.com,+55 51 96666-1005,RS,Porto Alegre,1985-03-17,ORD-1005,2026-01-14,999.99,credit_card,completed,true,155.88.1.9,369.258.147-33,95
+CUST-0006,Felipe Prado,felipe.prado@example.com,+55 62 95555-1006,GO,Goiania,1998-11-05,ORD-1006,2026-01-15,120.30,pix,completed,true,177.130.45.11,111.222.333-44,72
+CUST-0007,Gabriela Nunes,gabriela.nunes@example.com,+55 71 94444-1007,BA,Salvador,1991-02-24,ORD-1007,2026-01-16,310.00,credit_card,processing,false,191.200.77.5,222.333.444-55,77
+CUST-0008,Henrique Costa,henrique.costa@example.com,+55 81 93333-1008,PE,Recife,1987-08-30,ORD-1008,2026-01-17,75.00,boleto,completed,true,201.99.18.12,333.444.555-66,68
+CUST-0009,Isabela Freitas,isabela.freitas@example.com,+55 85 92222-1009,CE,Fortaleza,1993-06-14,ORD-1009,2026-01-18,450.75,pix,completed,true,179.35.12.18,444.555.666-77,88
+CUST-0010,Joao Martins,joao.martins@example.com,+55 48 91111-1010,SC,Florianopolis,1989-10-09,ORD-1010,2026-01-19,230.40,credit_card,completed,false,165.12.200.30,555.666.777-88,74

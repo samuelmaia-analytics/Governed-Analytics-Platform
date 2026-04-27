@@ -1,0 +1,34 @@
+{
+  "contract_name": "privacy_risk_score_schema",
+  "version": "1.0.0",
+  "description": "Expected schema for dataset-level privacy risk scoring output.",
+  "required_fields": [
+    "score",
+    "risk_level",
+    "summary",
+    "recommendations"
+  ],
+  "field_constraints": {
+    "score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "risk_level": {
+      "type": "string",
+      "allowed": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "recommendations": {
+      "type": "array",
+      "items_type": "string",
+      "min_items": 1
+    }
+  }
+}

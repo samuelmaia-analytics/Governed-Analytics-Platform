@@ -11,6 +11,7 @@ if __package__ is None or __package__ == "":
 from streamlit_app.analytics import build_metrics
 from streamlit_app.data import (
     build_app_mode,
+    build_dashboard_locale,
     build_sidebar_filters,
     filter_dataframe,
     get_previous_period_df,
@@ -18,7 +19,8 @@ from streamlit_app.data import (
     load_monitoring_status,
     load_semantic_assets,
 )
-from streamlit_app.formatting import format_number
+from streamlit_app.formatting import format_number, set_format_locale
+from streamlit_app.i18n import tr
 from streamlit_app.sections import (
     render_category_section,
     render_context_bar,
@@ -26,6 +28,7 @@ from streamlit_app.sections import (
     render_geography_section,
     render_header,
     render_health_section,
+    render_health_summary_compact,
     render_kpi_row,
     render_operations_section,
     render_semantic_section,
@@ -35,7 +38,7 @@ from streamlit_app.sections import (
 from streamlit_app.theme import apply_theme, render_story_nav
 
 st.set_page_config(
-    page_title="Olist | Dashboard Executivo",
+    page_title="Governed Analytics Platform | Executive Dashboard",
     page_icon=":material/monitoring:",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -44,6 +47,14 @@ st.set_page_config(
 
 def main() -> None:
     apply_theme()
+    locale = build_dashboard_locale()
+    set_format_locale(locale)
+    st.markdown(
+        "<div class='filter-note' style='margin-bottom:0.45rem;'><strong>Language:</strong> English (US)</div>"
+        if locale == "en-US"
+        else "<div class='filter-note' style='margin-bottom:0.45rem;'><strong>Idioma:</strong> Português (Brasil)</div>",
+        unsafe_allow_html=True,
+    )
     try:
         df = load_data()
     except (FileNotFoundError, ValueError) as exc:
@@ -57,22 +68,23 @@ def main() -> None:
     filtered_df = filter_dataframe(df, filters)
     previous_df = get_previous_period_df(df, filters)
     if filtered_df.empty:
-        st.warning("Nenhum registro encontrado para os filtros selecionados.")
+        st.warning("No records found for the selected filters." if locale == "en-US" else "Nenhum registro encontrado para os filtros selecionados.")
         st.stop()
 
-    st.sidebar.caption(f"Registros filtrados: {format_number(len(filtered_df))}")
+    st.sidebar.caption(f"{tr('filtered_rows_caption')}: {format_number(len(filtered_df))}")
     render_header(filters, total_rows=len(df), filtered_rows=len(filtered_df))
 
     if presentation_mode:
         st.markdown(
-            "<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>Modo apresentação</div><p class='section-copy' style='margin-bottom:0;'>A navegação foi reduzida ao fluxo principal: indicadores, tendência, categorias, performance regional e síntese final.</p></div>",
+            f"<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>{tr('presentation_mode_title')}</div><p class='section-copy' style='margin-bottom:0;'>{tr('presentation_mode_copy')}</p></div>",
             unsafe_allow_html=True,
         )
-        render_kpi_row(build_metrics(filtered_df, previous_df))
+        render_kpi_row(build_metrics(filtered_df, previous_df, semantic_assets.get("executive_kpis")))
         st.markdown("<div style='height:0.95rem;'></div>", unsafe_allow_html=True)
         render_temporal_section(filtered_df)
         render_category_section(filtered_df)
         render_geography_section(filtered_df, filters.geography_mode)
+        render_health_summary_compact(monitoring_status)
         render_executive_insights(filtered_df)
         return
 
@@ -84,7 +96,7 @@ def main() -> None:
         render_smart_summary(filtered_df)
 
     if selected_section in {"Visão completa", "KPIs"}:
-        render_kpi_row(build_metrics(filtered_df, previous_df))
+        render_kpi_row(build_metrics(filtered_df, previous_df, semantic_assets.get("executive_kpis")))
         st.markdown("<div style='height:0.95rem;'></div>", unsafe_allow_html=True)
 
     if selected_section == "Tempo":
@@ -103,7 +115,7 @@ def main() -> None:
         render_executive_insights(filtered_df)
     elif selected_section == "Visão completa":
         st.markdown(
-            "<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>Leitura guiada</div><p class='section-copy' style='margin-bottom:0;'>Esta visão concentra os blocos principais para leitura executiva. Operação detalhada, saúde da base, recortes semânticos e tabelas de apoio continuam disponíveis pela navegação acima.</p></div>",
+            f"<div class='section-shell' style='padding:0.8rem 1rem;'><div class='section-eyebrow'>{tr('guided_read_title')}</div><p class='section-copy' style='margin-bottom:0;'>{tr('guided_read_copy')}</p></div>",
             unsafe_allow_html=True,
         )
         render_temporal_section(filtered_df)

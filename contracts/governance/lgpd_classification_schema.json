@@ -1,0 +1,33 @@
+{
+  "contract_name": "lgpd_classification_schema",
+  "version": "1.0.0",
+  "description": "Expected schema for column-level LGPD classification output.",
+  "required_columns": [
+    "column_name",
+    "dtype",
+    "lgpd_classification",
+    "risk_level",
+    "recommended_action",
+    "reason"
+  ],
+  "enum_constraints": {
+    "lgpd_classification": [
+      "non_personal",
+      "personal_data",
+      "sensitive_personal_data",
+      "indirect_identifier"
+    ],
+    "risk_level": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "recommended_action": [
+      "keep",
+      "mask",
+      "anonymize",
+      "remove",
+      "review"
+    ]
+  }
+}
