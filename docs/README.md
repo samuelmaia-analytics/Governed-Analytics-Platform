@@ -4,6 +4,8 @@
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 [![Language](https://img.shields.io/badge/Language-PT--BR-0A66C2)](../README.md)
 
+**Language:** `PT-BR` | [EN](README.en.md)
+
 Este arquivo existe só como índice da pasta `docs/`. O contexto geral do projeto, execução local e navegação inicial ficam no `README.md` da raiz.
 
 ## Comece por aqui

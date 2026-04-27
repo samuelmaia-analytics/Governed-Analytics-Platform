@@ -1,0 +1,30 @@
+{
+  "contract_name": "data_quality_checks_schema",
+  "version": "1.0.0",
+  "description": "Expected schema for reusable data quality check table output.",
+  "required_columns": [
+    "check_name",
+    "status",
+    "severity",
+    "affected_columns",
+    "affected_rows",
+    "recommendation"
+  ],
+  "enum_constraints": {
+    "status": [
+      "PASS",
+      "FAIL"
+    ],
+    "severity": [
+      "low",
+      "medium",
+      "high"
+    ]
+  },
+  "field_constraints": {
+    "affected_rows": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

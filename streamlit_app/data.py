@@ -131,13 +131,13 @@ def load_monitoring_status() -> dict[str, object] | None:
 
 
 def build_dashboard_locale() -> str:
-    st.sidebar.markdown("### Regional Format")
+    st.sidebar.markdown(localize_text("### Formato Regional", "### Regional Format"))
     locale_label = st.sidebar.selectbox(
-        "Language and formatting",
-        options=["Português (Brasil)", "English (US)"],
+        localize_text("Idioma e formatação", "Language and formatting"),
+        options=["🇧🇷 Português (Brasil)", "🇺🇸 English (US)"],
         key="dashboard_locale",
     )
-    if locale_label == "English (US)":
+    if "English (US)" in locale_label:
         st.sidebar.caption("Numbers follow international formatting and the app interface switches to English.")
         return "en-US"
     st.sidebar.caption("O dashboard está configurado para Português (Brasil).")
@@ -226,7 +226,7 @@ def build_select_filter(
         return options
 
     selected = st.sidebar.selectbox(
-        f"Selecionar {label.lower()}",
+        localize_text(f"Selecionar {label.lower()}", f"Select {label.lower()}"),
         options=options,
         key=value_key,
     )
@@ -249,18 +249,21 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
     status_options = clean_dimension_options(df["order_status"])
     payment_options = clean_dimension_options(df["payment_type_mode"])
 
-    st.sidebar.markdown("### Filtros Globais")
+    st.sidebar.markdown(localize_text("### Filtros Globais", "### Global Filters"))
     st.sidebar.markdown(
-        "<div class='filter-note'>Os filtros afetam todo o dashboard, incluindo KPIs, gráficos, tabelas e insights.</div>",
+        localize_text(
+            "<div class='filter-note'>Os filtros afetam todo o dashboard, incluindo KPIs, gráficos, tabelas e insights.</div>",
+            "<div class='filter-note'>Filters affect the full dashboard, including KPIs, charts, tables and insights.</div>",
+        ),
         unsafe_allow_html=True,
     )
-    if st.sidebar.button("Resetar filtros", width="stretch"):
+    if st.sidebar.button(localize_text("Resetar filtros", "Reset filters"), width="stretch"):
         reset_filters()
 
     min_date = df["order_purchase_timestamp"].min().date()
     max_date = df["order_purchase_timestamp"].max().date()
     date_value = st.sidebar.date_input(
-        "Intervalo de datas",
+        localize_text("Intervalo de datas", "Date range"),
         value=st.session_state["flt_date_range"],
         min_value=min_date,
         max_value=max_date,
@@ -276,56 +279,56 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
         start_date = end_date = min_date
 
     categories = build_select_filter(
-        label="Categoria de produto",
+        label=localize_text("Categoria de produto", "Product category"),
         mode_key="flt_category_mode",
         value_key="flt_category_value",
-        all_label="Todas as categorias",
-        focus_label="Categoria específica",
+        all_label=localize_text("Todas as categorias", "All categories"),
+        focus_label=localize_text("Categoria específica", "Specific category"),
         options=category_options,
     )
     states = build_select_filter(
-        label="Estado do cliente ou seller",
+        label=localize_text("Estado do cliente ou seller", "Customer or seller state"),
         mode_key="flt_state_mode",
         value_key="flt_state_value",
-        all_label="Todos os estados",
-        focus_label="UF específica",
+        all_label=localize_text("Todos os estados", "All states"),
+        focus_label=localize_text("UF específica", "Specific state"),
         options=state_options,
     )
 
     geography_mode = st.sidebar.radio(
-        "Dimensão geográfica",
-        options=["Cliente", "Seller"],
+        localize_text("Dimensão geográfica", "Geographic dimension"),
+        options=[localize_text("Cliente", "Customer"), "Seller"],
         horizontal=True,
         key="flt_geography_mode",
     )
     price_range = st.sidebar.slider(
-        "Faixa de preço",
+        localize_text("Faixa de preço", "Price range"),
         min_value=float(df["price"].fillna(0).min()),
         max_value=float(df["price"].fillna(0).max()),
         value=st.session_state["flt_price_range"],
         key="flt_price_range",
     )
     freight_range = st.sidebar.slider(
-        "Faixa de frete",
+        localize_text("Faixa de frete", "Freight range"),
         min_value=float(df["freight_value"].fillna(0).min()),
         max_value=float(df["freight_value"].fillna(0).max()),
         value=st.session_state["flt_freight_range"],
         key="flt_freight_range",
     )
     order_status = build_select_filter(
-        label="Status do pedido",
+        label=localize_text("Status do pedido", "Order status"),
         mode_key="flt_status_mode",
         value_key="flt_status_value",
-        all_label="Todos os status",
-        focus_label="Status específico",
+        all_label=localize_text("Todos os status", "All statuses"),
+        focus_label=localize_text("Status específico", "Specific status"),
         options=status_options,
     )
     payment_types = build_select_filter(
-        label="Tipo de pagamento",
+        label=localize_text("Tipo de pagamento", "Payment type"),
         mode_key="flt_payment_mode",
         value_key="flt_payment_value",
-        all_label="Todos os meios",
-        focus_label="Meio específico",
+        all_label=localize_text("Todos os meios", "All methods"),
+        focus_label=localize_text("Meio específico", "Specific method"),
         options=payment_options,
     )
 
@@ -343,16 +346,19 @@ def build_sidebar_filters(df: pd.DataFrame) -> FilterState:
 
 
 def build_app_mode() -> bool:
-    st.sidebar.markdown("### Modo de Uso")
+    st.sidebar.markdown(localize_text("### Modo de Uso", "### Usage Mode"))
     return st.sidebar.toggle(
-        "Modo apresentação",
+        localize_text("Modo apresentação", "Presentation mode"),
         value=False,
-        help="Simplifica a tela para leitura executiva, ocultando contexto detalhado, navegação secundária e tabelas auxiliares.",
+        help=localize_text(
+            "Simplifica a tela para leitura executiva, ocultando contexto detalhado, navegação secundária e tabelas auxiliares.",
+            "Simplifies the screen for executive reading by hiding detailed context, secondary navigation and support tables.",
+        ),
     )
 
 
 def filter_dataframe(df: pd.DataFrame, filters: FilterState) -> pd.DataFrame:
-    geography_col = "customer_state" if filters.geography_mode == "Cliente" else "seller_state"
+    geography_col = "customer_state" if filters.geography_mode in {"Cliente", "Customer"} else "seller_state"
     end_exclusive = filters.end_date + pd.Timedelta(days=1)
     mask = (
         (df["order_purchase_timestamp"] >= filters.start_date)

@@ -31,11 +31,31 @@ jobs:
       - name: Run Ruff
         run: python -m ruff check src streamlit_app tests
 
+      - name: Run MyPy (governance modules and app shell)
+        run: >
+          python -m mypy
+          src/data_loader.py
+          src/data_quality.py
+          src/eda.py
+          src/lgpd_classifier.py
+          src/risk_scoring.py
+          src/report_generator.py
+          src/governance_types.py
+          app/main.py
+          app/context.py
+          app/components/cards.py
+          app/pages/data_catalog.py
+          app/pages/data_quality.py
+          app/pages/eda.py
+          app/pages/executive_overview.py
+          app/pages/governance_report.py
+          app/pages/lgpd_privacy_risk.py
+
       - name: Smoke check pipeline entrypoint
         run: python src/run_platform_pipeline.py --list-steps
 
       - name: Validate release governance contract
         run: python src/governance_validation.py
 
-      - name: Run tests
-        run: python -m pytest tests
+      - name: Run tests with coverage
+        run: python -m pytest --cov=src --cov=streamlit_app --cov-report=term-missing tests
