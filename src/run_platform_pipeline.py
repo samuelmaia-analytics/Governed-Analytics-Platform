@@ -22,9 +22,9 @@ from src.config import DOCS_DIR, OPS_DIR, PATHS
 from src.data_classification import main as classification_main
 from src.export_power_bi import run_export
 from src.export_query_result_images import export_all_query_result_images
+from src.governance_scorecards import main as governance_scorecards_main
 from src.ingest import configure_logging, run_inventory
 from src.lineage import main as lineage_main
-from src.governance_scorecards import main as governance_scorecards_main
 from src.preprocess import run_profiling
 from src.publish_dashboard import run_publish_dashboard
 from src.published_monitoring import (
