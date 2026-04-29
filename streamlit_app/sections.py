@@ -255,20 +255,21 @@ def render_geography_section(df: pd.DataFrame, geography_mode: str) -> None:
         st.caption("Tabela analítica por UF com foco em escala comercial, custo logístico e percepção de experiência.")
     with col4:
         render_chart(chart_state_delay_rate(df), "A taxa de atraso por UF ajuda a localizar gargalos operacionais persistentes e orientar revisão de SLA regional.")
-        regional_insights_html = "".join(f"<li>{item}</li>" for item in build_regional_insights(df))
-        st.markdown(
-            f"""
-            <div class="regional-kpi" style="margin-top:0.8rem;">
-                <strong>Insights regionais</strong>
-                <div class="footer-note" style="margin-top:0.35rem;">
-                    <ul style="margin:0 0 0 1rem; padding:0; line-height:1.65;">
-                        {regional_insights_html}
-                    </ul>
-                </div>
+
+    regional_insights_html = "".join(f"<li>{item}</li>" for item in build_regional_insights(df))
+    st.markdown(
+        f"""
+        <div class="regional-kpi" style="margin-top:0.8rem;">
+            <strong>Insights regionais</strong>
+            <div class="footer-note" style="margin-top:0.35rem;">
+                <ul style="margin:0 0 0 1rem; padding:0; line-height:1.65;">
+                    {regional_insights_html}
+                </ul>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     close_section()
 
 
