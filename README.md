@@ -7,7 +7,13 @@
 
 **Language:** `PT-BR` | [EN](README.en.md)
 
-Uma plataforma analítica em Streamlit para demonstrar governança de dados, classificação LGPD, data quality, EDA automatizada e geração de relatórios executivos.
+Plataforma analítica governada em Streamlit para demonstrar governança de dados, classificação LGPD, qualidade, EDA automatizada e geração de relatórios executivos.
+
+## TL;DR
+
+- foco: Analytics Engineering com controles de governança desde a ingestão até a camada publicada;
+- entrega: app Streamlit, pipeline Python, contratos e documentação operacional;
+- público: engenharia de dados, analytics e liderança técnica.
 
 ## Problema de negócio
 
@@ -31,8 +37,12 @@ O projeto implementa uma abordagem de produto analítico governado:
 - Data Quality com checks e severidade por regra.
 - EDA com estatísticas descritivas, nulos, outliers e correlação.
 - Governance Report com relatórios em `docs/`.
+- Políticas LGPD versionadas por domínio em `contracts/governance/policies/`.
+- Regras de negócio declarativas por contrato em `contracts/governance/business_rules/`.
+- Lineage técnico automatizado em `data/curated/catalog/technical_lineage.json`.
+- Scorecards de governança por dataset em `data/published/monitoring/governance_scorecards.csv`.
 
-## Arquitetura
+## Fluxo de dados
 
 ```mermaid
 flowchart LR
@@ -71,21 +81,24 @@ flowchart LR
 | `docs/` | relatórios e documentação de governança |
 | `tests/` | suíte automatizada de testes |
 
-## Como executar localmente
+## Setup rápido
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+cp .env.example .env
 ```
 
-Executar app novo (governança executiva):
+## Como executar
+
+App executivo:
 
 ```bash
 streamlit run app/main.py
 ```
 
-Executar app legado (compatibilidade):
+App legado:
 
 ```bash
 streamlit run streamlit_app/app.py
@@ -106,7 +119,7 @@ streamlit run streamlit_app/app.py
 - Ações sugeridas: `keep`, `mask`, `anonymize`, `remove`, `review`.
 - Relatório de controles: `docs/lgpd_controls.md`.
 
-## Testes
+## Qualidade e testes
 
 ```bash
 ruff check src streamlit_app app tests
@@ -119,15 +132,16 @@ Testes novos incluídos:
 - `tests/test_risk_scoring.py`
 - `tests/test_data_quality.py`
 
-## Próximos passos
+## Governança operacional (implementado)
 
-- Adicionar versionamento de políticas LGPD por domínio de dados.
-- Expandir checks para regras de negócio por contrato.
-- Integrar catálogo técnico com data lineage automatizado.
-- Publicar scorecards de governança por dataset em rotina agendada.
+- versionamento de políticas LGPD por domínio com validação no pipeline de publicação;
+- checks de regras de negócio por contrato com relatório dedicado;
+- lineage técnico automatizado integrado ao catálogo;
+- scorecards de governança por dataset em rotina agendada.
 
 ## Links
 
 - Streamlit app: [governed-analytics-platform.streamlit.app](https://governed-analytics-platform.streamlit.app/)
 - GitHub: [samuelmaia-analytics/Governed-Analytics-Platform](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
+- índice técnico: [docs/README.md](docs/README.md)
 

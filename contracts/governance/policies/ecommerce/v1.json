@@ -1,8 +1,9 @@
 {
-  "policy_domain": "ecommerce",
-  "policy_version": 1,
+  "policy_id": "lgpd_policy_ecommerce_fact_orders_dashboard",
+  "domain": "ecommerce",
+  "version": 1,
+  "effective_date": "2026-04-29",
   "dataset_name": "fact_orders_dashboard",
-  "source_dataset": "fact_orders_enriched",
   "required_columns": [
     "order_id",
     "order_item_id",
@@ -72,22 +73,11 @@
     "payment_type_mode": "unknown",
     "seller_volume_tier": "long_tail"
   },
-  "lgpd_principles": [
-    {
-      "principle": "necessidade",
-      "control": "A camada publicada mantém apenas os atributos necessários para leitura executiva e remove identificadores transacionais e quase-identificadores."
-    },
-    {
-      "principle": "adequacao",
-      "control": "O uso publicado é restrito a indicadores executivos, sem expor granularidade operacional desnecessária para esse propósito."
-    },
-    {
-      "principle": "seguranca",
-      "control": "Chaves publicadas são pseudonimizadas antes do consumo e a camada interna permanece separada da camada exposta."
-    },
-    {
-      "principle": "prevencao",
-      "control": "O pipeline falha quando detecta colunas proibidas, pseudonimização ausente ou vazamento de campos classificados como não publicáveis."
-    }
-  ]
+  "rules": [
+    "published layer must expose only required columns",
+    "published layer must not expose forbidden columns",
+    "id fields must remain pseudonymized with approved prefixes",
+    "defaults for nullable dimensions must follow governance contract"
+  ],
+  "owner": "data-governance@governed-analytics-platform.local"
 }

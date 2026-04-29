@@ -1,0 +1,9 @@
+dataset_name,dimension,score,status,source,total_checks,failed_checks
+fact_orders_enriched,data_quality,96.92,healthy,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\curated\quality\fact_orders_enriched_quality_checks.csv,25,1
+fact_orders_dashboard,schema_contracts,100.0,healthy,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\curated\quality\schema_contract_results.csv,38,0
+fact_orders_enriched,schema_contracts,100.0,healthy,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\curated\quality\schema_contract_results.csv,64,0
+olist_customers_dataset,schema_contracts,100.0,healthy,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\curated\quality\schema_contract_results.csv,9,0
+olist_order_items_dataset,schema_contracts,100.0,healthy,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\curated\quality\schema_contract_results.csv,11,0
+olist_orders_dataset,schema_contracts,100.0,healthy,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\curated\quality\schema_contract_results.csv,12,0
+fact_orders_dashboard,privacy_governance,25.0,critical,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\curated\quality\privacy_governance_results.csv,16,12
+fact_orders_dashboard,published_monitoring,100.0,healthy,C:\Users\samue\PycharmProjects\Governed Analytics Platform\data\published\monitoring\published_layer_monitoring.csv,12,0

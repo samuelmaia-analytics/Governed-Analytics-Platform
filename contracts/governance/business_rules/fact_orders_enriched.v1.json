@@ -1,0 +1,55 @@
+{
+  "contract_id": "business_rules_fact_orders_enriched",
+  "version": 1,
+  "dataset_name": "fact_orders_enriched",
+  "owner": "analytics-engineering@governed-analytics-platform.local",
+  "rules": [
+    {
+      "rule_id": "price_non_negative",
+      "description": "Preco deve ser maior ou igual a zero.",
+      "severity": "high",
+      "type": "range",
+      "column": "price",
+      "params": { "min": 0 }
+    },
+    {
+      "rule_id": "freight_non_negative",
+      "description": "Frete deve ser maior ou igual a zero.",
+      "severity": "high",
+      "type": "range",
+      "column": "freight_value",
+      "params": { "min": 0 }
+    },
+    {
+      "rule_id": "order_status_whitelist",
+      "description": "Status deve estar na lista canônica.",
+      "severity": "medium",
+      "type": "accepted_values",
+      "column": "order_status",
+      "params": {
+        "allowed": ["approved", "canceled", "created", "delivered", "invoiced", "processing", "shipped", "unavailable", "unknown"]
+      }
+    },
+    {
+      "rule_id": "delivered_requires_delivery_date",
+      "description": "Pedidos entregues precisam de data de entrega.",
+      "severity": "high",
+      "type": "not_null_if",
+      "column": "order_delivered_customer_date",
+      "params": {
+        "if_column": "order_status",
+        "if_equals": "delivered"
+      }
+    },
+    {
+      "rule_id": "delivery_after_purchase",
+      "description": "Entrega nao pode ocorrer antes da compra.",
+      "severity": "high",
+      "type": "compare_columns",
+      "columns": ["order_delivered_customer_date", "order_purchase_timestamp"],
+      "params": {
+        "operator": ">="
+      }
+    }
+  ]
+}

@@ -21,6 +21,7 @@ from src.config import (
 )
 from src.data_classification import CLASSIFICATION_ROWS
 from src.ingest import configure_logging
+from src.lgpd_policy import load_policy, validate_policy_shape
 from src.utils import ensure_directory
 
 LOGGER = logging.getLogger(__name__)
@@ -138,6 +139,17 @@ def load_privacy_contract(path: Path = PRIVACY_CONTRACT_PATH) -> dict[str, objec
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_domain_policy(contract: dict[str, object]) -> dict[str, object]:
+    domain = str(contract.get("policy_domain", "")).strip()
+    if not domain:
+        raise ValueError("Contrato de privacidade sem `policy_domain`.")
+    raw_version = contract.get("policy_version")
+    version = int(raw_version) if raw_version is not None else None
+    policy = load_policy(domain=domain, version=version)
+    validate_policy_shape(policy)
+    return policy
+
+
 def build_published_dashboard_table(df: pd.DataFrame) -> pd.DataFrame:
     published = df.copy()
 
@@ -170,6 +182,7 @@ def _validate_prefixed_tokens(series: pd.Series, prefix: str) -> bool:
 def validate_privacy_controls(
     df: pd.DataFrame,
     contract: dict[str, object],
+    policy: dict[str, object],
     source_df: pd.DataFrame | None = None,
 ) -> list[PrivacyCheck]:
     checks: list[PrivacyCheck] = []
@@ -253,6 +266,39 @@ def validate_privacy_controls(
         )
     )
 
+    policy_required = set(policy.get("required_columns", []))
+    policy_forbidden = set(policy.get("forbidden_columns", []))
+    policy_pseudonymized = policy.get("pseudonymized_columns", {})
+    policy_defaults = policy.get("default_fill_values", {})
+    checks.append(
+        PrivacyCheck(
+            check_name="policy_required_columns_alignment",
+            status="PASS" if required_columns == policy_required else "FAIL",
+            details="Contrato e política LGPD devem ter as mesmas colunas obrigatórias.",
+        )
+    )
+    checks.append(
+        PrivacyCheck(
+            check_name="policy_forbidden_columns_alignment",
+            status="PASS" if forbidden_columns == policy_forbidden else "FAIL",
+            details="Contrato e política LGPD devem ter as mesmas colunas proibidas.",
+        )
+    )
+    checks.append(
+        PrivacyCheck(
+            check_name="policy_pseudonymization_alignment",
+            status="PASS" if pseudonymized_columns == policy_pseudonymized else "FAIL",
+            details="Contrato e política LGPD devem ter o mesmo mapeamento de pseudonimização.",
+        )
+    )
+    checks.append(
+        PrivacyCheck(
+            check_name="policy_default_fill_alignment",
+            status="PASS" if default_fill_values == policy_defaults else "FAIL",
+            details="Contrato e política LGPD devem ter os mesmos defaults de preenchimento.",
+        )
+    )
+
     return checks
 
 
@@ -276,7 +322,12 @@ def save_outputs(df: pd.DataFrame) -> PublishedArtifacts:
     )
 
 
-def render_report(artifacts: PublishedArtifacts, contract: dict[str, object], checks: list[PrivacyCheck]) -> str:
+def render_report(
+    artifacts: PublishedArtifacts,
+    contract: dict[str, object],
+    policy: dict[str, object],
+    checks: list[PrivacyCheck],
+) -> str:
     principles = contract.get("lgpd_principles", [])
     validation_summary = "PASS" if all(check.status == "PASS" for check in checks) else "FAIL"
     lines = [
@@ -295,6 +346,13 @@ def render_report(artifacts: PublishedArtifacts, contract: dict[str, object], ch
 
     lines.extend(
         [
+            "",
+            "## Política LGPD Versionada",
+            "",
+            f"- Domínio: `{policy.get('domain', '-')}`",
+            f"- Versão: `v{policy.get('version', '-')}`",
+            f"- Vigência: `{policy.get('effective_date', '-')}`",
+            f"- Owner: `{policy.get('owner', '-')}`",
             "",
             "## Camadas de Exposição",
             "",
@@ -362,9 +420,14 @@ def render_report(artifacts: PublishedArtifacts, contract: dict[str, object], ch
     return "\n".join(lines)
 
 
-def save_report(artifacts: PublishedArtifacts, contract: dict[str, object], checks: list[PrivacyCheck]) -> Path:
+def save_report(
+    artifacts: PublishedArtifacts,
+    contract: dict[str, object],
+    policy: dict[str, object],
+    checks: list[PrivacyCheck],
+) -> Path:
     ensure_directory(DOCS_DIR)
-    REPORT_PATH.write_text(render_report(artifacts, contract, checks), encoding="utf-8")
+    REPORT_PATH.write_text(render_report(artifacts, contract, policy, checks), encoding="utf-8")
     LOGGER.info("Documentação de privacidade salva em %s", REPORT_PATH)
     return REPORT_PATH
 
@@ -373,14 +436,15 @@ def run_publish_dashboard() -> PublishedArtifacts:
     internal_df = load_internal_fact()
     published_df = build_published_dashboard_table(internal_df)
     contract = load_privacy_contract()
-    checks = validate_privacy_controls(published_df, contract, source_df=internal_df)
+    policy = load_domain_policy(contract)
+    checks = validate_privacy_controls(published_df, contract, policy, source_df=internal_df)
     save_privacy_results(checks)
     failures = [check for check in checks if check.status == "FAIL"]
     if failures:
         failed_names = ", ".join(check.check_name for check in failures)
         raise RuntimeError(f"Validação LGPD/governança falhou na camada publicada: {failed_names}")
     artifacts = save_outputs(published_df)
-    save_report(artifacts, contract, checks)
+    save_report(artifacts, contract, policy, checks)
     return artifacts
 
 

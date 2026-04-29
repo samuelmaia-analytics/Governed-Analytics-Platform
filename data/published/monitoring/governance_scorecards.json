@@ -1,0 +1,104 @@
+{
+  "generated_at_utc": "2026-04-29T12:01:53.301816+00:00",
+  "metrics": [
+    {
+      "dataset_name": "fact_orders_enriched",
+      "dimension": "data_quality",
+      "score": 96.92,
+      "status": "healthy",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\curated\\quality\\fact_orders_enriched_quality_checks.csv",
+      "total_checks": 25,
+      "failed_checks": 1
+    },
+    {
+      "dataset_name": "fact_orders_dashboard",
+      "dimension": "schema_contracts",
+      "score": 100.0,
+      "status": "healthy",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\curated\\quality\\schema_contract_results.csv",
+      "total_checks": 38,
+      "failed_checks": 0
+    },
+    {
+      "dataset_name": "fact_orders_enriched",
+      "dimension": "schema_contracts",
+      "score": 100.0,
+      "status": "healthy",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\curated\\quality\\schema_contract_results.csv",
+      "total_checks": 64,
+      "failed_checks": 0
+    },
+    {
+      "dataset_name": "olist_customers_dataset",
+      "dimension": "schema_contracts",
+      "score": 100.0,
+      "status": "healthy",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\curated\\quality\\schema_contract_results.csv",
+      "total_checks": 9,
+      "failed_checks": 0
+    },
+    {
+      "dataset_name": "olist_order_items_dataset",
+      "dimension": "schema_contracts",
+      "score": 100.0,
+      "status": "healthy",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\curated\\quality\\schema_contract_results.csv",
+      "total_checks": 11,
+      "failed_checks": 0
+    },
+    {
+      "dataset_name": "olist_orders_dataset",
+      "dimension": "schema_contracts",
+      "score": 100.0,
+      "status": "healthy",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\curated\\quality\\schema_contract_results.csv",
+      "total_checks": 12,
+      "failed_checks": 0
+    },
+    {
+      "dataset_name": "fact_orders_dashboard",
+      "dimension": "privacy_governance",
+      "score": 25.0,
+      "status": "critical",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\curated\\quality\\privacy_governance_results.csv",
+      "total_checks": 16,
+      "failed_checks": 12
+    },
+    {
+      "dataset_name": "fact_orders_dashboard",
+      "dimension": "published_monitoring",
+      "score": 100.0,
+      "status": "healthy",
+      "source": "C:\\Users\\samue\\PycharmProjects\\Governed Analytics Platform\\data\\published\\monitoring\\published_layer_monitoring.csv",
+      "total_checks": 12,
+      "failed_checks": 0
+    }
+  ],
+  "dataset_scorecards": [
+    {
+      "dataset_name": "fact_orders_dashboard",
+      "governance_score": 75.0,
+      "status": "critical"
+    },
+    {
+      "dataset_name": "fact_orders_enriched",
+      "governance_score": 98.46,
+      "status": "healthy"
+    },
+    {
+      "dataset_name": "olist_customers_dataset",
+      "governance_score": 100.0,
+      "status": "healthy"
+    },
+    {
+      "dataset_name": "olist_order_items_dataset",
+      "governance_score": 100.0,
+      "status": "healthy"
+    },
+    {
+      "dataset_name": "olist_orders_dataset",
+      "governance_score": 100.0,
+      "status": "healthy"
+    }
+  ]
+}

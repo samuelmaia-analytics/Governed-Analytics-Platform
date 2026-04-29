@@ -2,6 +2,10 @@
 
 Esta pasta concentra os artefatos da apresentação final do projeto.
 
+## Objetivo
+
+Garantir uma narrativa consistente entre resultado executivo, evidências técnicas e limites reais da solução implementada.
+
 ## Arquivos principais
 
 - `project_deck.md`: estrutura sugerida de slides
@@ -24,6 +28,12 @@ Esta pasta concentra os artefatos da apresentação final do projeto.
 - usar links e screenshots reais do repositório
 - manter consistência entre narrativa executiva e evidência técnica
 - não vender integrações opcionais como parte central da solução
+
+## Ordem recomendada de preparo
+
+1. estruturar narrativa no `project_deck.md`
+2. ajustar tom e tempo no `talk_track.md`
+3. validar alinhamento com evidências em `images/` e `docs/`
 
 ## Referências
 

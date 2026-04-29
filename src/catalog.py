@@ -277,6 +277,16 @@ def collect_assets() -> list[CatalogAsset]:
             True,
         ),
         (
+            PUBLISHED_MONITORING_DIR / "governance_scorecards.csv",
+            "published_monitoring",
+            "governance_scorecard",
+            "Scorecards de governança por dataset com qualidade, contratos, privacidade e monitoramento.",
+            "1 linha por dimensão de scorecard e dataset",
+            "dataset_name + dimension",
+            "fact_orders_enriched_quality_checks, privacy_governance_results, schema_contract_results, published_layer_monitoring",
+            True,
+        ),
+        (
             OPS_DIR / "operational_job_results.json",
             "curated_ops",
             "operational_execution_log",
@@ -341,8 +351,10 @@ def collect_assets() -> list[CatalogAsset]:
         DOCS_DIR / "governance_policy.md",
         DOCS_DIR / "schema_contract_report.md",
         DOCS_DIR / "published_layer_monitoring.md",
+        DOCS_DIR / "governance_scorecards.md",
         DOCS_DIR / "semantic_layer.md",
         DOCS_DIR / "operational_job_report.md",
+        DOCS_DIR / "technical_lineage.md",
         REPORT_PATH,
     ]
     for path in docs_to_catalog:
@@ -386,6 +398,21 @@ def collect_assets() -> list[CatalogAsset]:
                 grain="1 linha por check de contrato",
                 primary_key="dataset_name + check_name",
                 source_assets="contracts/curated, contracts/published",
+                publication_ready=True,
+            )
+        )
+
+    technical_lineage_path = CATALOG_DIR / "technical_lineage.json"
+    if technical_lineage_path.exists():
+        assets.append(
+            build_asset(
+                path=technical_lineage_path,
+                zone="curated_ops",
+                asset_type="technical_lineage",
+                description="Lineage técnico automatizado com relação source-transform-output dos ativos principais.",
+                grain="1 linha por aresta de lineage",
+                primary_key="source + transform + output",
+                source_assets="run_platform_pipeline, build_analytics, publish_dashboard, semantic_layer, quality",
                 publication_ready=True,
             )
         )
