@@ -93,6 +93,7 @@ Leitura correta:
 - `contracts/governance/privacy_governance.json`: contrato versionado de exposição LGPD/governança
 - `src/semantic_layer.py`: marts publicados para logística, seller e cohort
 - `src/published_monitoring.py`: freshness e qualidade recorrente da camada publicada
+- `src/governance_scorecards.py`: scorecards recorrentes de governança por dataset na camada publicada
 - `src/platform_publication.py`: orquestra sync de catálogo e publicação idempotente de pipeline em ambiente de plataforma
 - `.github/workflows/operate-published-layer.yml`: job agendado com artefatos operacionais e falha observável
 - `.github/workflows/deploy-streamlit.yml`: promoção controlada de `develop`, `release` ou `main` para o branch de deploy do ambiente correspondente

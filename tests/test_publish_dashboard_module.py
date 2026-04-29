@@ -73,8 +73,9 @@ def test_validate_privacy_controls_passes_for_compliant_published_table() -> Non
     source_df = build_source_df()
     published = publish_dashboard.build_published_dashboard_table(source_df)
     contract = publish_dashboard.load_privacy_contract()
+    policy = publish_dashboard.load_domain_policy(contract)
 
-    checks = publish_dashboard.validate_privacy_controls(published, contract, source_df=source_df)
+    checks = publish_dashboard.validate_privacy_controls(published, contract, policy, source_df=source_df)
 
     assert checks
     assert all(check.status == "PASS" for check in checks)
@@ -85,8 +86,9 @@ def test_validate_privacy_controls_detects_forbidden_column_exposure() -> None:
     published = publish_dashboard.build_published_dashboard_table(source_df)
     published["customer_city"] = "sao paulo"
     contract = publish_dashboard.load_privacy_contract()
+    policy = publish_dashboard.load_domain_policy(contract)
 
-    checks = publish_dashboard.validate_privacy_controls(published, contract, source_df=source_df)
+    checks = publish_dashboard.validate_privacy_controls(published, contract, policy, source_df=source_df)
 
     failed = {check.check_name for check in checks if check.status == "FAIL"}
     assert "forbidden_columns_absent" in failed
@@ -98,8 +100,9 @@ def test_validate_privacy_controls_detects_wrong_default_for_source_nulls() -> N
     published = publish_dashboard.build_published_dashboard_table(source_df)
     published["order_status"] = "invalid_default"
     contract = publish_dashboard.load_privacy_contract()
+    policy = publish_dashboard.load_domain_policy(contract)
 
-    checks = publish_dashboard.validate_privacy_controls(published, contract, source_df=source_df)
+    checks = publish_dashboard.validate_privacy_controls(published, contract, policy, source_df=source_df)
 
     failed = {check.check_name for check in checks if check.status == "FAIL"}
     assert "default_fill__order_status" in failed

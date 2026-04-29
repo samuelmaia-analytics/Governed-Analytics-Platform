@@ -11,6 +11,9 @@ def test_resolve_steps_returns_full_pipeline_when_none_provided() -> None:
 
     assert steps == [step.name for step in PIPELINE_STEPS]
     assert "publish" in steps
+    assert "business_rules" in steps
+    assert "lineage" in steps
+    assert "scorecards" in steps
 
 
 def test_resolve_steps_preserves_explicit_selection_order() -> None:
@@ -25,6 +28,9 @@ def test_list_steps_prints_all_pipeline_steps(capsys) -> None:
     output = capsys.readouterr().out
     assert "- inventory:" in output
     assert "- publish:" in output
+    assert "- business_rules:" in output
+    assert "- lineage:" in output
+    assert "- scorecards:" in output
 
 
 def test_main_lists_steps_without_running_pipeline(monkeypatch) -> None:

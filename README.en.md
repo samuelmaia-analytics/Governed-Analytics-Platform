@@ -7,7 +7,13 @@
 
 **Language:** [PT-BR](README.md) | `EN`
 
-A Streamlit analytics platform that demonstrates Data Governance, LGPD classification, Data Quality, automated EDA, and executive reporting.
+A governed Streamlit analytics platform that demonstrates Data Governance, LGPD classification, data quality, automated EDA, and executive reporting.
+
+## TL;DR
+
+- focus: Analytics Engineering with governance controls from ingestion to published layer;
+- delivery: Streamlit app, Python pipeline, contracts, and operational docs;
+- audience: data engineering, analytics, and technical leadership.
 
 ## Business Problem
 
@@ -31,6 +37,17 @@ The project implements a governed analytics product approach:
 - Data Quality checks with severity and status.
 - EDA (descriptive stats, null profile, outliers, correlation).
 - Governance Report generated in `docs/`.
+- Domain-versioned LGPD policies under `contracts/governance/policies/`.
+- Contract-driven business rules under `contracts/governance/business_rules/`.
+- Automated technical lineage in `data/curated/catalog/technical_lineage.json`.
+- Dataset governance scorecards in `data/published/monitoring/governance_scorecards.csv`.
+
+## Operational Governance (implemented)
+
+- domain-level LGPD policy versioning enforced in publication flow;
+- contract-based business rule validation with dedicated report;
+- automated technical lineage integrated into the technical catalog;
+- scheduled governance scorecards per dataset.
 
 ## Main Structure
 
@@ -49,9 +66,12 @@ The project implements a governed analytics product approach:
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+cp .env.example .env
 ```
 
-New app:
+## Run Apps
+
+Executive app:
 
 ```bash
 streamlit run app/main.py
@@ -75,3 +95,4 @@ pytest --cov=src --cov=streamlit_app --cov-report=term-missing
 
 - Streamlit app: [governed-analytics-platform.streamlit.app](https://governed-analytics-platform.streamlit.app/)
 - GitHub: [samuelmaia-analytics/Governed-Analytics-Platform](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
+- technical index: [docs/README.en.md](docs/README.en.md)

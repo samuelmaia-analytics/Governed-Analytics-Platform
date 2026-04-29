@@ -16,12 +16,15 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.build_analytics import run_build
+from src.business_rule_validation import main as business_rules_main
 from src.catalog import main as catalog_main
 from src.config import DOCS_DIR, OPS_DIR, PATHS
 from src.data_classification import main as classification_main
 from src.export_power_bi import run_export
 from src.export_query_result_images import export_all_query_result_images
 from src.ingest import configure_logging, run_inventory
+from src.lineage import main as lineage_main
+from src.governance_scorecards import main as governance_scorecards_main
 from src.preprocess import run_profiling
 from src.publish_dashboard import run_publish_dashboard
 from src.published_monitoring import (
@@ -79,8 +82,11 @@ PIPELINE_STEPS = [
     PipelineStep("semantic", "Materializa marts semânticos publicados para logística, seller e cohort."),
     PipelineStep("classify", "Materializa o inventário de classificação de dados do projeto."),
     PipelineStep("contracts", "Valida os contratos simples de schema das camadas principais."),
+    PipelineStep("business_rules", "Executa regras de negócio declaradas por contrato."),
     PipelineStep("quality", "Executa os checks de qualidade e salva os relatórios."),
     PipelineStep("monitor", "Monitora freshness e qualidade da camada publicada."),
+    PipelineStep("scorecards", "Publica scorecards de governança por dataset."),
+    PipelineStep("lineage", "Gera lineage técnico automatizado do pipeline."),
     PipelineStep("catalog", "Materializa a coleção local e o inventário catalogável."),
     PipelineStep("queries", "Executa as queries SQL e exporta os resultados tabulares."),
     PipelineStep("screenshots", "Converte os resultados das queries em imagens PNG."),
@@ -117,8 +123,11 @@ STEP_HANDLERS: dict[str, StepHandler] = {
     "semantic": run_semantic_layer,
     "classify": classification_main,
     "contracts": schema_contracts_main,
+    "business_rules": business_rules_main,
     "quality": _run_quality_step,
     "monitor": _run_monitor_step,
+    "scorecards": governance_scorecards_main,
+    "lineage": lineage_main,
     "catalog": catalog_main,
     "queries": _run_queries_step,
     "screenshots": export_all_query_result_images,

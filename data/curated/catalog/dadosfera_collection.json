@@ -22,8 +22,8 @@
     "published_monitoring"
   ],
   "publication_summary": {
-    "total_assets": 100,
-    "publishable_assets": 40,
+    "total_assets": 104,
+    "publishable_assets": 44,
     "core_asset": "fact_orders_enriched",
     "dashboard_consumer": "data/published/dashboard/fact_orders_dashboard.parquet",
     "catalog_version": "1.0.0"
@@ -405,6 +405,20 @@
       "source_assets": "fact_orders_dashboard",
       "record_count": 12,
       "column_count": 6,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "governance_scorecards",
+      "zone": "published_monitoring",
+      "asset_type": "governance_scorecard",
+      "relative_path": "data/published/monitoring/governance_scorecards.csv",
+      "file_format": "csv",
+      "description": "Scorecards de governança por dataset com qualidade, contratos, privacidade e monitoramento.",
+      "grain": "1 linha por dimensão de scorecard e dataset",
+      "primary_key": "dataset_name + dimension",
+      "source_assets": "fact_orders_enriched_quality_checks, privacy_governance_results, schema_contract_results, published_layer_monitoring",
+      "record_count": 8,
+      "column_count": 7,
       "publication_ready": true
     },
     {
@@ -1220,6 +1234,20 @@
       "publication_ready": true
     },
     {
+      "asset_name": "governance_scorecards",
+      "zone": "documentation",
+      "asset_type": "documentation_asset",
+      "relative_path": "docs/governance_scorecards.md",
+      "file_format": "markdown",
+      "description": "Documento de apoio para catálogo, arquitetura e operação complementar.",
+      "grain": "não aplicável",
+      "primary_key": "não aplicável",
+      "source_assets": "documentacao_do_projeto",
+      "record_count": null,
+      "column_count": null,
+      "publication_ready": true
+    },
+    {
       "asset_name": "semantic_layer",
       "zone": "documentation",
       "asset_type": "documentation_asset",
@@ -1238,6 +1266,20 @@
       "zone": "documentation",
       "asset_type": "documentation_asset",
       "relative_path": "docs/operational_job_report.md",
+      "file_format": "markdown",
+      "description": "Documento de apoio para catálogo, arquitetura e operação complementar.",
+      "grain": "não aplicável",
+      "primary_key": "não aplicável",
+      "source_assets": "documentacao_do_projeto",
+      "record_count": null,
+      "column_count": null,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "technical_lineage",
+      "zone": "documentation",
+      "asset_type": "documentation_asset",
+      "relative_path": "docs/technical_lineage.md",
       "file_format": "markdown",
       "description": "Documento de apoio para catálogo, arquitetura e operação complementar.",
       "grain": "não aplicável",
@@ -1287,6 +1329,20 @@
       "source_assets": "contracts/curated, contracts/published",
       "record_count": 134,
       "column_count": 5,
+      "publication_ready": true
+    },
+    {
+      "asset_name": "technical_lineage",
+      "zone": "curated_ops",
+      "asset_type": "technical_lineage",
+      "relative_path": "data/curated/catalog/technical_lineage.json",
+      "file_format": "json",
+      "description": "Lineage técnico automatizado com relação source-transform-output dos ativos principais.",
+      "grain": "1 linha por aresta de lineage",
+      "primary_key": "source + transform + output",
+      "source_assets": "run_platform_pipeline, build_analytics, publish_dashboard, semantic_layer, quality",
+      "record_count": null,
+      "column_count": null,
       "publication_ready": true
     },
     {

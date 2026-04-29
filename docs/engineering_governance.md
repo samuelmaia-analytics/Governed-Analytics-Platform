@@ -14,7 +14,9 @@ Este documento consolida os guardrails operacionais do repositório para elevar 
 ## Governança de Dados e LGPD
 
 - `contracts/governance/privacy_governance.json` define o contrato canônico de exposição da camada publicada.
+- `contracts/governance/policies/<dominio>/vN.json` define políticas LGPD versionadas por domínio de dados.
 - `src/publish_dashboard.py` aplica pseudonimização, minimização e validação automática desse contrato.
+- `src/publish_dashboard.py` também valida alinhamento entre contrato canônico e política versionada.
 - o pipeline falha quando detecta coluna proibida, ausência de pseudonimização, defaults de proteção não aplicados ou vazamento de campo classificado como não publicável.
 - `data/curated/quality/privacy_governance_results.csv` materializa a evidência tabular desses checks.
 - `docs/privacy_governance.md` consolida a fronteira de exposição e a evidência textual da validação aplicada.

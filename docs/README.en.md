@@ -6,7 +6,7 @@
 
 **Language:** [PT-BR](README.md) | `EN`
 
-This file is the index for the `docs/` folder. Full project context and local setup remain in the root README.
+Technical index for the `docs/` folder. Full project context and local setup remain in the [root README](../README.en.md).
 
 ## Start Here
 
@@ -16,14 +16,10 @@ This file is the index for the `docs/` folder. Full project context and local se
 4. [privacy_governance.md](privacy_governance.md)
 5. [technical_narrative.md](technical_narrative.md)
 
-## Main Guides
+## Main Guides (valid in this repository)
 
 - [executive_summary.md](executive_summary.md): executive overview
 - [architecture.md](architecture.md): implemented architecture
-- [target_architecture_and_roadmap.md](target_architecture_and_roadmap.md): target architecture and roadmap
-- [dbt_adoption.md](dbt_adoption.md): dbt positioning for semantic and governance layers
-- [dbt_lineage.md](dbt_lineage.md): lineage between Python assets, dbt marts, and consumers
-- [product_brief.md](product_brief.md): analytics product positioning
 - [operating_model.md](operating_model.md): pipeline, publication, deploy, and operations
 - [privacy_governance.md](privacy_governance.md): exposure boundary, LGPD, and checks
 - [engineering_governance.md](engineering_governance.md): repository guardrails and workflows
@@ -41,3 +37,12 @@ This file is the index for the `docs/` folder. Full project context and local se
 - [published_layer_monitoring.md](published_layer_monitoring.md)
 - [semantic_layer.md](semantic_layer.md)
 - [operational_job_report.md](operational_job_report.md)
+- [technical_lineage.md](technical_lineage.md)
+- [governance_scorecards.md](governance_scorecards.md)
+
+## Runbooks and Ops
+
+- [release_runbook.md](release_runbook.md)
+- [rollback_runbook.md](rollback_runbook.md)
+- [publication_checklist.md](publication_checklist.md)
+- [streamlit_capture_runbook.md](streamlit_capture_runbook.md)

@@ -2,6 +2,12 @@
 
 Este diretório concentra os dados do projeto organizados em camadas e artefatos derivados.
 
+## Princípios
+
+- separar claramente camada interna (`curated`) e camada publicada (`published`);
+- manter reprodutibilidade dos artefatos derivados via pipeline;
+- evitar consumo direto de ativos internos por aplicações executivas.
+
 ## Estrutura
 
 - `raw/landing/olist/`: arquivos CSV originais do dataset Olist
@@ -10,9 +16,11 @@ Este diretório concentra os dados do projeto organizados em camadas e artefatos
 - `curated/analytics/`: camada analítica interna
 - `curated/quality/`: resultados de qualidade e contratos
 - `curated/catalog/`: manifesto e inventário da coleção
+- `curated/catalog/technical_lineage.json`: lineage técnico automatizado
 - `curated/query_results/`: resultados materializados das queries
 - `curated/genai/`: saídas do experimento de extração de features
 - `published/dashboard/`: camada publicada do dashboard
+- `published/monitoring/governance_scorecards.csv`: scorecards de governança por dataset
 - `processed/bi_exports/`: exportações para Power BI
 - `screenshots/query_results/`: PNGs gerados a partir das queries
 - `external/`: entradas auxiliares não transacionais
@@ -31,6 +39,12 @@ Este diretório concentra os dados do projeto organizados em camadas e artefatos
 - use `fact_orders_dashboard.csv` para upload manual em plataforma externa
 - use os arquivos de `processed/bi_exports/` no Power BI
 
+## Fluxo recomendado de consumo
+
+1. exploração e modelagem: `raw` -> `standardized` -> `curated`
+2. exposição executiva: `curated` -> `published/dashboard`
+3. consumo BI externo: `published` -> `processed/bi_exports`
+
 ## Observações
 
 - o dashboard não deve consumir a camada analítica interna diretamente
@@ -42,3 +56,5 @@ Este diretório concentra os dados do projeto organizados em camadas e artefatos
 - arquitetura: [../docs/architecture.md](../docs/architecture.md)
 - modelagem: [../docs/02_carga_e_modelagem.md](../docs/02_carga_e_modelagem.md)
 - catálogo: [../docs/collection_catalog.md](../docs/collection_catalog.md)
+- lineage técnico: [../docs/technical_lineage.md](../docs/technical_lineage.md)
+- scorecards: [../docs/governance_scorecards.md](../docs/governance_scorecards.md)

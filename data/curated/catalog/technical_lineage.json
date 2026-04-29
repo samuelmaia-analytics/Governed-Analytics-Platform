@@ -1,0 +1,53 @@
+{
+  "lineage_version": "1.0.0",
+  "edges": [
+    {
+      "source": "data/raw/landing/olist/*.csv",
+      "transform": "src/preprocess.py",
+      "output": "data/standardized/olist/*.parquet",
+      "layer": "standardized"
+    },
+    {
+      "source": "data/standardized/olist/*.parquet",
+      "transform": "src/build_analytics.py",
+      "output": "data/curated/analytics/fact_orders_enriched.parquet",
+      "layer": "curated_analytics"
+    },
+    {
+      "source": "data/curated/analytics/fact_orders_enriched.parquet",
+      "transform": "src/publish_dashboard.py",
+      "output": "data/published/dashboard/fact_orders_dashboard.parquet",
+      "layer": "published_dashboard"
+    },
+    {
+      "source": "data/published/dashboard/fact_orders_dashboard.parquet",
+      "transform": "src/semantic_layer.py",
+      "output": "data/published/semantic/*.parquet",
+      "layer": "published_semantic"
+    },
+    {
+      "source": "data/curated/analytics/fact_orders_enriched.parquet",
+      "transform": "src/run_analytics_queries.py",
+      "output": "data/curated/query_results/*.csv",
+      "layer": "curated_query_results"
+    },
+    {
+      "source": "data/curated/query_results/*.csv",
+      "transform": "src/export_query_result_images.py",
+      "output": "data/screenshots/query_results/*.png",
+      "layer": "documentation_media"
+    },
+    {
+      "source": "data/curated/analytics/fact_orders_enriched.parquet",
+      "transform": "src/quality.py",
+      "output": "data/curated/quality/fact_orders_enriched_quality_checks.csv",
+      "layer": "curated_quality"
+    },
+    {
+      "source": "data/published/dashboard/fact_orders_dashboard.parquet",
+      "transform": "src/published_monitoring.py",
+      "output": "data/published/monitoring/published_layer_monitoring.csv",
+      "layer": "published_monitoring"
+    }
+  ]
+}

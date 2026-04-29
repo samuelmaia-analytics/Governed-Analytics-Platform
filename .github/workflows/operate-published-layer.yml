@@ -54,6 +54,9 @@ jobs:
       - name: Monitor published layer
         run: python src/published_monitoring.py --max-freshness-hours "$PUBLISHED_MONITOR_MAX_FRESHNESS_HOURS" --fail-on-alert
 
+      - name: Publish governance scorecards
+        run: python src/governance_scorecards.py
+
       - name: Publish platform assets
         if: ${{ env.DADOSFERA_PLATFORM_PUBLICATION_ENABLED == 'true' && env.DADOSFERA_ENABLED == 'true' }}
         run: |
@@ -72,6 +75,7 @@ jobs:
           name: published-layer-ops-artifacts
           path: |
             docs/published_layer_monitoring.md
+            docs/governance_scorecards.md
             docs/operational_job_report.md
             docs/semantic_layer.md
             docs/platform_publication.md
@@ -87,6 +91,7 @@ jobs:
           echo "- App environment: $APP_ENV" >> "$GITHUB_STEP_SUMMARY"
           echo "- Workflow date (UTC): $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_STEP_SUMMARY"
           echo "- Monitoring report: docs/published_layer_monitoring.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Governance scorecards: docs/governance_scorecards.md" >> "$GITHUB_STEP_SUMMARY"
           echo "- Operational report: docs/operational_job_report.md" >> "$GITHUB_STEP_SUMMARY"
           echo "- Semantic report: docs/semantic_layer.md" >> "$GITHUB_STEP_SUMMARY"
           echo "- Platform publication report: docs/platform_publication.md" >> "$GITHUB_STEP_SUMMARY"
