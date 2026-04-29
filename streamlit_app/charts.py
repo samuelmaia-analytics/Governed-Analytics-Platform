@@ -221,7 +221,10 @@ def chart_state_delay_rate(df: pd.DataFrame) -> go.Figure:
         labels={"uf": "UF", "atraso_pct": "Taxa de atraso (%)"},
         color_discrete_sequence=[COLORS["danger"]],
     )
-    return base_layout(fig)
+    fig = base_layout(fig)
+    fig.update_layout(margin=dict(l=10, r=16, t=86, b=24))
+    fig.update_xaxes(rangemode="tozero")
+    return fig
 
 
 def chart_delivery_boxplot(df: pd.DataFrame) -> go.Figure:
