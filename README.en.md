@@ -121,13 +121,39 @@ pytest --cov=src --cov=streamlit_app --cov-report=term-missing
 - Publication decision states: `Approved`, `Needs Review`, `Blocked`.
 - Monitoring history append function: call `src.governance_history.append_governance_history`.
 
+```bash
+python -c "from pathlib import Path; import pandas as pd; from src.data_quality import run_data_quality_checks; from src.lgpd_classifier import classify_dataframe_columns; from src.governance_history import append_governance_history_from_dataframes; df = pd.read_csv('data/samples/sample_governance_dataset.csv'); classification = classify_dataframe_columns(df); quality = run_data_quality_checks(df); append_governance_history_from_dataframes(df=df, classification_df=classification, quality_result=quality, publication_status='Needs Review'); print(Path('data/published/monitoring/governance_history.csv').resolve())"
+```
+
 ## Case Study Snapshot
 
 Given a synthetic commerce dataset with personal identifiers and quality issues, the platform classifies privacy exposure, executes quality checks, summarizes governance risk, and provides a clear publication decision with recommended remediation actions.
 
 ## Screenshots
 
-- Placeholder: add Streamlit captures for Executive Overview, LGPD Risk, Data Quality, and Governance Control Center.
+### Executive Overview
+
+![Executive Overview](./assets/screenshots/executive_overview_v3.png)
+
+### LGPD & Privacy Risk
+
+![LGPD & Privacy Risk](./assets/screenshots/lgpd_privacy_risk.png)
+
+### Data Quality
+
+![Data Quality](./assets/screenshots/data_quality.png)
+
+### Governance Control Center
+
+![Governance Control Center](./assets/screenshots/governance_control_center.png)
+
+### How to refresh screenshots locally
+
+```bash
+pip install -e ".[dev]"
+python -m playwright install chromium
+python scripts/capture_streamlit_screenshots.py
+```
 
 ## Links
 
