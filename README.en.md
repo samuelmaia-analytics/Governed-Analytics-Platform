@@ -9,6 +9,10 @@
 
 A governed Streamlit analytics platform that demonstrates Data Governance, LGPD classification, data quality, automated EDA, and executive reporting.
 
+## Executive Positioning
+
+This repository simulates an executive-ready governed analytics product: privacy-aware, quality-gated, auditable, and explainable for publication decisions.
+
 ## TL;DR
 
 - focus: Analytics Engineering with governance controls from ingestion to published layer;
@@ -29,6 +33,15 @@ The project implements a governed analytics product approach:
 - automated EDA for analytical acceleration;
 - Markdown reports for technical and executive governance.
 
+## Architecture Summary
+
+1. `src/data_loader.py` reads synthetic sample datasets.
+2. `src/lgpd_classifier.py` classifies columns by LGPD category.
+3. `src/risk_scoring.py` computes explainable privacy risk score and publication recommendation.
+4. `src/data_quality.py` + `src/data_quality_rules.py` run built-in and YAML-driven quality checks.
+5. `src/report_generator.py` materializes governance artifacts in `docs/`.
+6. `app/main.py` exposes executive governance pages in Streamlit.
+
 ## Core Features
 
 - Executive Overview with governance KPIs.
@@ -41,6 +54,16 @@ The project implements a governed analytics product approach:
 - Contract-driven business rules under `contracts/governance/business_rules/`.
 - Automated technical lineage in `data/curated/catalog/technical_lineage.json`.
 - Dataset governance scorecards in `data/published/monitoring/governance_scorecards.csv`.
+- Governance Control Center page with publication readiness and top risk actions.
+- Privacy transformation module (`src/privacy_transformations.py`) with masking/anonymization actions.
+- Governance run history (`data/published/monitoring/governance_history.csv`) for traceability.
+
+## What This Demonstrates to Recruiters
+
+- Analytics engineering with reproducible governance controls.
+- LGPD-oriented privacy-by-design in analytical products.
+- Contract/rule-driven data quality validation.
+- Typed Python modules, tests, CI compatibility, and executive UX delivery.
 
 ## Operational Governance (implemented)
 
@@ -90,6 +113,21 @@ ruff check src streamlit_app app tests
 python -m mypy src/data_loader.py src/data_quality.py src/eda.py src/lgpd_classifier.py src/risk_scoring.py src/report_generator.py src/governance_types.py app/main.py app/context.py app/components/cards.py app/pages/data_catalog.py app/pages/data_quality.py app/pages/eda.py app/pages/executive_overview.py app/pages/governance_report.py app/pages/lgpd_privacy_risk.py
 pytest --cov=src --cov=streamlit_app --cov-report=term-missing
 ```
+
+## Governance Features
+
+- Explainable privacy score components and recommendations.
+- Declarative quality checks (`contracts/data_quality_rules.yml`).
+- Publication decision states: `Approved`, `Needs Review`, `Blocked`.
+- Monitoring history append function: call `src.governance_history.append_governance_history`.
+
+## Case Study Snapshot
+
+Given a synthetic commerce dataset with personal identifiers and quality issues, the platform classifies privacy exposure, executes quality checks, summarizes governance risk, and provides a clear publication decision with recommended remediation actions.
+
+## Screenshots
+
+- Placeholder: add Streamlit captures for Executive Overview, LGPD Risk, Data Quality, and Governance Control Center.
 
 ## Links
 

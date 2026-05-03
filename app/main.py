@@ -8,6 +8,7 @@ from app.pages.data_catalog import render_data_catalog
 from app.pages.data_quality import render_data_quality
 from app.pages.eda import render_eda
 from app.pages.executive_overview import render_executive_overview
+from app.pages.governance_control_center import render_governance_control_center
 from app.pages.governance_report import render_governance_report
 from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk
 
@@ -48,6 +49,16 @@ def _render_report_page(context: GovernanceAppContext, locale: str) -> None:
     render_governance_report(context.report_paths, locale)
 
 
+def _render_control_center_page(context: GovernanceAppContext, locale: str) -> None:
+    render_governance_control_center(
+        context.df,
+        context.classification_df,
+        context.risk_result,
+        context.quality_results,
+        locale,
+    )
+
+
 def main() -> None:
     locale = build_locale_selector()
     st.title(t("app_title", locale))
@@ -63,6 +74,11 @@ def main() -> None:
         st.Page(lambda: _render_quality_page(context, locale), title=t("nav_quality", locale), icon=":material/check_circle:"),
         st.Page(lambda: _render_eda_page(context, locale), title=t("nav_eda", locale), icon=":material/monitoring:"),
         st.Page(lambda: _render_report_page(context, locale), title=t("nav_report", locale), icon=":material/description:"),
+        st.Page(
+            lambda: _render_control_center_page(context, locale),
+            title=t("nav_control_center", locale),
+            icon=":material/admin_panel_settings:",
+        ),
     ]
     navigation = st.navigation(pages=pages, position="top")
     navigation.run()

@@ -10,6 +10,7 @@ class DataQualityCheck(TypedDict):
     affected_columns: str
     affected_rows: int
     recommendation: str
+    rule_source: str
 
 
 class DataQualityResult(TypedDict):
@@ -30,4 +31,7 @@ class PrivacyRiskResult(TypedDict):
     score: int
     risk_level: str
     summary: str
+    score_components: dict[str, int]
+    component_explanations: dict[str, str]
+    publication_recommendation: str
     recommendations: list[str]

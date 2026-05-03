@@ -60,6 +60,10 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
         LOCALE_PT_BR: "Relatório de Governança",
         LOCALE_EN_US: "Governance Report",
     },
+    "nav_control_center": {
+        LOCALE_PT_BR: "Central de Controles",
+        LOCALE_EN_US: "Control Center",
+    },
 }
 
 

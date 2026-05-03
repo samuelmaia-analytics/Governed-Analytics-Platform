@@ -1,0 +1,43 @@
+rules:
+  - name: order_id_not_null
+    type: not_null
+    columns: [order_id]
+    severity: high
+    recommendation: Fill or remediate missing order identifiers before publication.
+  - name: order_id_unique
+    type: unique
+    columns: [order_id]
+    severity: high
+    recommendation: Ensure order identifiers are unique in the analytical grain.
+  - name: revenue_accepted_range
+    type: accepted_range
+    columns: [revenue]
+    severity: medium
+    params:
+      min: 0
+      max: 1000000
+    recommendation: Review outlier revenue records and business rule boundaries.
+  - name: order_date_no_future
+    type: no_future_dates
+    columns: [order_date]
+    severity: medium
+    recommendation: Correct records with future dates before publication.
+  - name: revenue_no_negative
+    type: no_negative_values
+    columns: [revenue]
+    severity: medium
+    recommendation: Negative revenue should be justified or corrected.
+  - name: customer_email_max_null
+    type: max_null_pct
+    columns: [customer_email]
+    severity: low
+    params:
+      max_null_pct: 40
+    recommendation: Improve email completeness or document expected null rates.
+  - name: order_status_allowed_values
+    type: allowed_values
+    columns: [order_status]
+    severity: medium
+    params:
+      allowed: [delivered, shipped, canceled, processing]
+    recommendation: Standardize order status values according to contract.

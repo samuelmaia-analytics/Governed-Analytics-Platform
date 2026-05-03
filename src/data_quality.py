@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 
+from src.data_quality_rules import execute_quality_rules, load_quality_rules
 from src.governance_types import DataQualityCheck, DataQualityResult
 
 
@@ -30,6 +32,7 @@ def _check_negative_numeric_values(df: pd.DataFrame) -> list[DataQualityCheck]:
                 "affected_columns": column,
                 "affected_rows": negative_rows,
                 "recommendation": "Validate business rule and fix negative values or document accepted exceptions.",
+                "rule_source": "built_in",
             }
         )
     return checks
@@ -52,6 +55,7 @@ def _check_future_dates(df: pd.DataFrame) -> list[DataQualityCheck]:
                 "affected_columns": column,
                 "affected_rows": affected_rows,
                 "recommendation": "Correct reference dates or ensure timezone/calendar conventions are applied.",
+                "rule_source": "built_in",
             }
         )
     return checks
@@ -79,6 +83,7 @@ def run_data_quality_checks(df: pd.DataFrame) -> DataQualityResult:
             "affected_columns": ", ".join(high_null_columns) if high_null_columns else "",
             "affected_rows": total_rows if high_null_columns else 0,
             "recommendation": "Review source completeness and enforce mandatory fields for critical columns.",
+            "rule_source": "built_in",
         },
         {
             "check_name": "duplicate_rows",
@@ -87,6 +92,7 @@ def run_data_quality_checks(df: pd.DataFrame) -> DataQualityResult:
             "affected_columns": "",
             "affected_rows": duplicate_rows,
             "recommendation": "Remove duplicates and validate ingestion keys/grain assumptions.",
+            "rule_source": "built_in",
         },
         {
             "check_name": "constant_columns",
@@ -95,10 +101,15 @@ def run_data_quality_checks(df: pd.DataFrame) -> DataQualityResult:
             "affected_columns": ", ".join(constant_columns) if constant_columns else "",
             "affected_rows": total_rows if constant_columns else 0,
             "recommendation": "Drop or review constant columns to simplify the analytical model.",
+            "rule_source": "built_in",
         },
     ]
     checks.extend(_check_negative_numeric_values(df))
     checks.extend(_check_future_dates(df))
+    default_rules_path = Path("contracts/data_quality_rules.yml")
+    if default_rules_path.exists():
+        rules = load_quality_rules(default_rules_path)
+        checks.extend(execute_quality_rules(df, rules, rule_source=str(default_rules_path)))
 
     failed_checks = [check for check in checks if check["status"] == "FAIL"]
     return {

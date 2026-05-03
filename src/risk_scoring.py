@@ -39,6 +39,9 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
             "score": 0,
             "risk_level": "low",
             "summary": "No columns found for privacy evaluation.",
+            "score_components": {"empty_dataset": 0},
+            "component_explanations": {"empty_dataset": "No classified columns were provided."},
+            "publication_recommendation": "approved",
             "recommendations": ["Validate the dataset schema before publishing."],
         }
 
@@ -72,16 +75,22 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
     elif total_rows >= 1_000:
         volume_penalty = 5
 
-    raw_score = (
-        personal_count * 7
-        + sensitive_count * 15
-        + indirect_count * 4
-        + null_penalty
-        + direct_identifier_bonus
-        + volume_penalty
-    )
+    score_components = {
+        "personal_data_exposure": personal_count * 7,
+        "sensitive_data_exposure": sensitive_count * 15,
+        "indirect_identifier_exposure": indirect_count * 4,
+        "critical_null_penalty": null_penalty,
+        "direct_identifier_bonus": direct_identifier_bonus,
+        "volume_penalty": volume_penalty,
+    }
+    raw_score = sum(score_components.values())
     score = max(0, min(100, int(raw_score)))
     risk_level = _risk_level_from_score(score)
+    publication_recommendation = "approved"
+    if risk_level == "medium":
+        publication_recommendation = "needs_review"
+    if risk_level == "high":
+        publication_recommendation = "blocked"
 
     recommendations = [
         "Apply masking for direct identifiers in shared datasets.",
@@ -94,14 +103,27 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
             "Keep recurring LGPD checks in CI to prevent regressions.",
             "Maintain data dictionary and ownership metadata updated.",
         ]
+    if risk_level == "high":
+        recommendations.append("Block publication until masking/anonymization controls are implemented.")
 
     summary = (
         f"Dataset with {personal_count} personal, {sensitive_count} sensitive and "
         f"{indirect_count} indirect identifier columns over {total_rows} rows."
     )
+    component_explanations = {
+        "personal_data_exposure": "Each personal-data column contributes 7 points.",
+        "sensitive_data_exposure": "Each sensitive personal-data column contributes 15 points.",
+        "indirect_identifier_exposure": "Each indirect identifier contributes 4 points.",
+        "critical_null_penalty": "Average null percentage on personal/sensitive columns converted to up to 15 points.",
+        "direct_identifier_bonus": "Direct identifier column hints (e.g., cpf/email/phone) add 15 points.",
+        "volume_penalty": "Higher row volumes increase exposure impact.",
+    }
     return {
         "score": score,
         "risk_level": risk_level,
         "summary": summary,
+        "score_components": score_components,
+        "component_explanations": component_explanations,
+        "publication_recommendation": publication_recommendation,
         "recommendations": recommendations,
     }

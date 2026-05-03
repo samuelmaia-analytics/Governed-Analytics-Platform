@@ -9,6 +9,10 @@
 
 Plataforma analítica governada em Streamlit para demonstrar governança de dados, classificação LGPD, qualidade, EDA automatizada e geração de relatórios executivos.
 
+## Posicionamento Executivo
+
+Este repositório simula um produto analítico governado para uso executivo: com privacidade, qualidade, auditabilidade e decisão de publicação explicável.
+
 ## TL;DR
 
 - foco: Analytics Engineering com controles de governança desde a ingestão até a camada publicada;
@@ -29,6 +33,15 @@ O projeto implementa uma abordagem de produto analítico governado:
 - EDA automatizada para suporte analítico rápido;
 - geração de relatórios Markdown para documentação executiva e técnica.
 
+## Resumo de Arquitetura
+
+1. `src/data_loader.py` carrega dados sintéticos de exemplo.
+2. `src/lgpd_classifier.py` classifica colunas por categoria LGPD.
+3. `src/risk_scoring.py` calcula score de risco explicável e recomendação de publicação.
+4. `src/data_quality.py` + `src/data_quality_rules.py` executam checks de qualidade heurísticos e declarativos em YAML.
+5. `src/report_generator.py` gera artefatos de governança em `docs/`.
+6. `app/main.py` entrega a interface executiva no Streamlit.
+
 ## Funcionalidades
 
 - Executive Overview com KPIs de governança e risco.
@@ -41,6 +54,16 @@ O projeto implementa uma abordagem de produto analítico governado:
 - Regras de negócio declarativas por contrato em `contracts/governance/business_rules/`.
 - Lineage técnico automatizado em `data/curated/catalog/technical_lineage.json`.
 - Scorecards de governança por dataset em `data/published/monitoring/governance_scorecards.csv`.
+- Página Governance Control Center com prontidão de publicação e principais riscos.
+- Módulo de transformações de privacidade (`src/privacy_transformations.py`) com ações de mascaramento/anonimização.
+- Histórico de monitoramento de governança em `data/published/monitoring/governance_history.csv`.
+
+## O que isso demonstra para recrutadores
+
+- Analytics Engineering com controles de governança reproduzíveis.
+- Privacidade por design orientada a LGPD.
+- Qualidade de dados declarativa via contratos/regras.
+- Python tipado, testes automatizados, CI e entrega de produto executivo.
 
 ## Fluxo de dados
 
@@ -131,6 +154,21 @@ Testes novos incluídos:
 - `tests/test_lgpd_classifier.py`
 - `tests/test_risk_scoring.py`
 - `tests/test_data_quality.py`
+
+## Features de Governança
+
+- Score de risco de privacidade explicável por componente.
+- Checks declarativos de qualidade em `contracts/data_quality_rules.yml`.
+- Estados de decisão de publicação: `Approved`, `Needs Review`, `Blocked`.
+- Função de histórico de monitoramento: `src.governance_history.append_governance_history`.
+
+## Mini estudo de caso
+
+Com um dataset sintético de e-commerce contendo identificadores pessoais e problemas de qualidade, a plataforma classifica risco LGPD, valida regras de qualidade e recomenda decisão de publicação com ações de remediação objetivas.
+
+## Screenshots
+
+- Placeholder: adicionar capturas do Executive Overview, LGPD & Privacy Risk, Data Quality e Governance Control Center.
 
 ## Governança operacional (implementado)
 
