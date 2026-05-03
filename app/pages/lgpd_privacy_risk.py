@@ -44,6 +44,11 @@ def render_lgpd_privacy_risk(
         st.write(f"- {recommendation}")
 
     st.divider()
+    st.info(
+        "Use the Privacy Transformation Preview below to see exactly how masking/anonymization will affect the shared dataset."
+        if locale == LOCALE_EN_US
+        else "Use a Prévia de Transformações de Privacidade abaixo para visualizar exatamente como mascaramento/anonimização afetam o dataset compartilhado."
+    )
     st.markdown("**Privacy Transformation Preview**" if locale == LOCALE_EN_US else "**Prévia de Transformações de Privacidade**")
     transformed_df, metadata_df = apply_privacy_actions(df, classification_df)
 

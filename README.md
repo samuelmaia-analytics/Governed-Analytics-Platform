@@ -2,6 +2,9 @@
 
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Coverage](https://img.shields.io/badge/Coverage-80%25%2B-brightgreen)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 [![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
 
@@ -12,6 +15,14 @@ Plataforma analítica governada em Streamlit para demonstrar governança de dado
 ## Posicionamento Executivo
 
 Este repositório simula um produto analítico governado para uso executivo: com privacidade, qualidade, auditabilidade e decisão de publicação explicável.
+
+## Visão Rápida para Recrutadores
+
+- Produto analítico governado, não apenas dashboard.
+- Classificação LGPD e score de risco explicável.
+- Regras declarativas de qualidade com YAML.
+- Screenshots e documentação automatizadas.
+- Testes, CI, lint e execução local reproduzível.
 
 ## TL;DR
 
@@ -154,6 +165,9 @@ Testes novos incluídos:
 - `tests/test_lgpd_classifier.py`
 - `tests/test_risk_scoring.py`
 - `tests/test_data_quality.py`
+- `tests/test_privacy_transformations.py`
+- `tests/test_data_quality_rules.py`
+- `tests/test_governance_history.py`
 
 ## Features de Governança
 

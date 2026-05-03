@@ -2,6 +2,9 @@
 
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Coverage](https://img.shields.io/badge/Coverage-80%25%2B-brightgreen)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 [![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
 
@@ -12,6 +15,14 @@ A governed Streamlit analytics platform that demonstrates Data Governance, LGPD 
 ## Executive Positioning
 
 This repository simulates an executive-ready governed analytics product: privacy-aware, quality-gated, auditable, and explainable for publication decisions.
+
+## Recruiter Quick View
+
+- Governed analytics product, not only a dashboard.
+- LGPD classification and explainable risk scoring.
+- Declarative YAML-based data quality rules.
+- Automated screenshots and documentation.
+- Tests, CI, lint, and reproducible local execution.
 
 ## TL;DR
 
@@ -113,6 +124,15 @@ ruff check src streamlit_app app tests
 python -m mypy src/data_loader.py src/data_quality.py src/eda.py src/lgpd_classifier.py src/risk_scoring.py src/report_generator.py src/governance_types.py app/main.py app/context.py app/components/cards.py app/pages/data_catalog.py app/pages/data_quality.py app/pages/eda.py app/pages/executive_overview.py app/pages/governance_report.py app/pages/lgpd_privacy_risk.py
 pytest --cov=src --cov=streamlit_app --cov-report=term-missing
 ```
+
+Highlighted tests:
+
+- `tests/test_lgpd_classifier.py`
+- `tests/test_risk_scoring.py`
+- `tests/test_data_quality.py`
+- `tests/test_privacy_transformations.py`
+- `tests/test_data_quality_rules.py`
+- `tests/test_governance_history.py`
 
 ## Governance Features
 
