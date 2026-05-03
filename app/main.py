@@ -1,16 +1,27 @@
 from __future__ import annotations
 
+# ruff: noqa: E402, I001
+
+import sys
+from pathlib import Path
+
 import streamlit as st
 
-from app.context import GovernanceAppContext, build_context
-from app.i18n import build_locale_selector, t
-from app.pages.data_catalog import render_data_catalog
-from app.pages.data_quality import render_data_quality
-from app.pages.eda import render_eda
-from app.pages.executive_overview import render_executive_overview
-from app.pages.governance_control_center import render_governance_control_center
-from app.pages.governance_report import render_governance_report
-from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk
+PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from app.context import GovernanceAppContext, build_context  # noqa: E402
+from app.i18n import build_locale_selector, t  # noqa: E402
+from app.pages.data_catalog import render_data_catalog  # noqa: E402
+from app.pages.data_quality import render_data_quality  # noqa: E402
+from app.pages.eda import render_eda  # noqa: E402
+from app.pages.executive_overview import render_executive_overview  # noqa: E402
+from app.pages.governance_control_center import (
+    render_governance_control_center,  # noqa: E402
+)
+from app.pages.governance_report import render_governance_report  # noqa: E402
+from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk  # noqa: E402
 
 st.set_page_config(
     page_title="Governed Analytics Platform",
