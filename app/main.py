@@ -34,7 +34,7 @@ def _render_catalog_page(context: GovernanceAppContext, locale: str) -> None:
 
 
 def _render_lgpd_page(context: GovernanceAppContext, locale: str) -> None:
-    render_lgpd_privacy_risk(context.classification_df, context.risk_result, locale)
+    render_lgpd_privacy_risk(context.df, context.classification_df, context.risk_result, locale)
 
 
 def _render_quality_page(context: GovernanceAppContext, locale: str) -> None:
@@ -68,16 +68,47 @@ def main() -> None:
     context = build_context(locale)
 
     pages = [
-        st.Page(lambda: _render_executive_page(context, locale), title=t("nav_executive", locale), icon=":material/dashboard:"),
-        st.Page(lambda: _render_catalog_page(context, locale), title=t("nav_catalog", locale), icon=":material/table_view:"),
-        st.Page(lambda: _render_lgpd_page(context, locale), title=t("nav_lgpd", locale), icon=":material/policy:"),
-        st.Page(lambda: _render_quality_page(context, locale), title=t("nav_quality", locale), icon=":material/check_circle:"),
-        st.Page(lambda: _render_eda_page(context, locale), title=t("nav_eda", locale), icon=":material/monitoring:"),
-        st.Page(lambda: _render_report_page(context, locale), title=t("nav_report", locale), icon=":material/description:"),
+        st.Page(
+            lambda: _render_executive_page(context, locale),
+            title=t("nav_executive", locale),
+            icon=":material/dashboard:",
+            url_path="executive-overview",
+        ),
+        st.Page(
+            lambda: _render_catalog_page(context, locale),
+            title=t("nav_catalog", locale),
+            icon=":material/table_view:",
+            url_path="data-catalog",
+        ),
+        st.Page(
+            lambda: _render_lgpd_page(context, locale),
+            title=t("nav_lgpd", locale),
+            icon=":material/policy:",
+            url_path="lgpd-privacy-risk",
+        ),
+        st.Page(
+            lambda: _render_quality_page(context, locale),
+            title=t("nav_quality", locale),
+            icon=":material/check_circle:",
+            url_path="data-quality",
+        ),
+        st.Page(
+            lambda: _render_eda_page(context, locale),
+            title=t("nav_eda", locale),
+            icon=":material/monitoring:",
+            url_path="eda",
+        ),
+        st.Page(
+            lambda: _render_report_page(context, locale),
+            title=t("nav_report", locale),
+            icon=":material/description:",
+            url_path="governance-report",
+        ),
         st.Page(
             lambda: _render_control_center_page(context, locale),
             title=t("nav_control_center", locale),
             icon=":material/admin_panel_settings:",
+            url_path="governance-control-center",
         ),
     ]
     navigation = st.navigation(pages=pages, position="top")

@@ -37,9 +37,13 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
     if classification_df.empty:
         return {
             "score": 0,
+            "total_score": 0,
             "risk_level": "low",
+            "explanation": "No columns found for privacy evaluation.",
             "summary": "No columns found for privacy evaluation.",
+            "components": {"empty_dataset": 0},
             "score_components": {"empty_dataset": 0},
+            "per_component_points": {"empty_dataset": 0},
             "component_explanations": {"empty_dataset": "No classified columns were provided."},
             "publication_recommendation": "approved",
             "recommendations": ["Validate the dataset schema before publishing."],
@@ -110,6 +114,14 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
         f"Dataset with {personal_count} personal, {sensitive_count} sensitive and "
         f"{indirect_count} indirect identifier columns over {total_rows} rows."
     )
+    explanation = (
+        f"Risk score {score}/100 calculated from personal exposure ({score_components['personal_data_exposure']}), "
+        f"sensitive exposure ({score_components['sensitive_data_exposure']}), "
+        f"indirect identifiers ({score_components['indirect_identifier_exposure']}), "
+        f"data quality penalty ({score_components['critical_null_penalty']}), "
+        f"direct identifier boost ({score_components['direct_identifier_bonus']}) and "
+        f"volume penalty ({score_components['volume_penalty']})."
+    )
     component_explanations = {
         "personal_data_exposure": "Each personal-data column contributes 7 points.",
         "sensitive_data_exposure": "Each sensitive personal-data column contributes 15 points.",
@@ -120,9 +132,13 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
     }
     return {
         "score": score,
+        "total_score": score,
         "risk_level": risk_level,
+        "explanation": explanation,
         "summary": summary,
+        "components": score_components,
         "score_components": score_components,
+        "per_component_points": score_components,
         "component_explanations": component_explanations,
         "publication_recommendation": publication_recommendation,
         "recommendations": recommendations,

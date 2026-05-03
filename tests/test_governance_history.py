@@ -11,9 +11,13 @@ def test_append_governance_history(tmp_path: Path) -> None:
     output = tmp_path / "governance_history.csv"
     privacy_result = {
         "score": 40,
+        "total_score": 40,
         "risk_level": "medium",
+        "explanation": "",
         "summary": "",
+        "components": {},
         "score_components": {},
+        "per_component_points": {},
         "component_explanations": {},
         "publication_recommendation": "needs_review",
         "recommendations": [],
@@ -50,4 +54,3 @@ def test_append_governance_history(tmp_path: Path) -> None:
     stored = pd.read_csv(output)
     assert len(stored) == 2
     assert "run_timestamp" in stored.columns
-

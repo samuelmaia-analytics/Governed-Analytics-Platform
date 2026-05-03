@@ -7,6 +7,7 @@ import pandas as pd
 
 from src.config import PUBLISHED_MONITORING_DIR
 from src.governance_types import DataQualityResult, PrivacyRiskResult
+from src.risk_scoring import calculate_privacy_risk_score
 from src.utils import ensure_directory
 
 DEFAULT_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "governance_history.csv"
@@ -39,3 +40,21 @@ def append_governance_history(
     row_df.to_csv(history_path, index=False)
     return history_path
 
+
+def append_governance_history_from_dataframes(
+    *,
+    df: pd.DataFrame,
+    classification_df: pd.DataFrame,
+    quality_result: DataQualityResult,
+    publication_status: str,
+    history_path: Path = DEFAULT_HISTORY_PATH,
+) -> Path:
+    privacy_result = calculate_privacy_risk_score(classification_df, total_rows=len(df))
+    return append_governance_history(
+        total_rows=int(len(df)),
+        total_columns=int(df.shape[1]),
+        privacy_result=privacy_result,
+        quality_result=quality_result,
+        publication_status=publication_status,
+        history_path=history_path,
+    )

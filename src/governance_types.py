@@ -29,9 +29,13 @@ class DataQualityResult(TypedDict):
 
 class PrivacyRiskResult(TypedDict):
     score: int
+    total_score: int
     risk_level: str
+    explanation: str
     summary: str
+    components: dict[str, int]
     score_components: dict[str, int]
+    per_component_points: dict[str, int]
     component_explanations: dict[str, str]
     publication_recommendation: str
     recommendations: list[str]

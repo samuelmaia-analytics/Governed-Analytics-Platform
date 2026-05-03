@@ -42,7 +42,7 @@ def hash_value(value: object) -> str:
 
 
 def generalize_date_to_year(value: object) -> str:
-    date = pd.to_datetime(value, errors="coerce")
+    date = pd.to_datetime(str(value), errors="coerce")
     if pd.isna(date):
         return "unknown_year"
     return str(int(date.year))
@@ -89,4 +89,3 @@ def apply_privacy_actions(df: pd.DataFrame, classification_df: pd.DataFrame) -> 
             continue
         metadata_rows.append({"column_name": column_name, "action": "review", "note": "Column preserved and flagged for review."})
     return transformed_df, pd.DataFrame(metadata_rows)
-

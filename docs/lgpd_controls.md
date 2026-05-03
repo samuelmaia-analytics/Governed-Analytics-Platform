@@ -1,6 +1,6 @@
 # LGPD Controls
 
-- Generated at: **2026-04-27 12:46:34 UTC**
+- Generated at: **2026-05-03 20:54:28 UTC**
 - Risk score: **87 / 100**
 - Risk level: **high**
 
@@ -37,3 +37,4 @@
 - Anonymize or remove sensitive columns from executive layers.
 - Review null patterns in critical personal-data columns.
 - Document legal basis and retention policy for personal data usage.
+- Block publication until masking/anonymization controls are implemented.

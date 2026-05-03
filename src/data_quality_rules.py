@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 from src.governance_types import DataQualityCheck
 
@@ -140,7 +140,7 @@ def execute_quality_rules(df: pd.DataFrame, rules: list[DataQualityRule], *, rul
         elif rule_type == "max_null_pct":
             max_null_pct = float(rule.params.get("max_null_pct", 0))
             column_pct = df[columns].isna().mean() * 100
-            failing_columns = [column for column, pct in column_pct.items() if float(pct) > max_null_pct]
+            failing_columns = [str(column) for column, pct in column_pct.items() if float(pct) > max_null_pct]
             checks.append(
                 _build_check(
                     rule=rule,
@@ -164,4 +164,3 @@ def execute_quality_rules(df: pd.DataFrame, rules: list[DataQualityRule], *, rul
                 )
             )
     return checks
-

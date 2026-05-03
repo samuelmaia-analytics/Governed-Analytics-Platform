@@ -14,6 +14,10 @@ def test_returns_score_between_0_and_100() -> None:
     )
     result = calculate_privacy_risk_score(classification_df, total_rows=1000)
     assert 0 <= result["score"] <= 100
+    assert result["total_score"] == result["score"]
+    assert result["components"] == result["score_components"]
+    assert result["per_component_points"] == result["score_components"]
+    assert result["explanation"]
     assert "score_components" in result
     assert "publication_recommendation" in result
 

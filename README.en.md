@@ -131,21 +131,13 @@ Given a synthetic commerce dataset with personal identifiers and quality issues,
 
 ## Screenshots
 
-### Executive Overview
+Expected screenshot paths (local generation):
 
-![Executive Overview](./assets/screenshots/executive_overview_v3.png)
-
-### LGPD & Privacy Risk
-
-![LGPD & Privacy Risk](./assets/screenshots/lgpd_privacy_risk.png)
-
-### Data Quality
-
-![Data Quality](./assets/screenshots/data_quality.png)
-
-### Governance Control Center
-
-![Governance Control Center](./assets/screenshots/governance_control_center.png)
+- `assets/screenshots/executive_overview.png`
+- `assets/screenshots/lgpd_privacy_risk.png`
+- `assets/screenshots/data_quality.png`
+- `assets/screenshots/governance_control_center.png`
+- `assets/screenshots/privacy_transformation_preview.png` (optional, if section is visible)
 
 ### How to refresh screenshots locally
 

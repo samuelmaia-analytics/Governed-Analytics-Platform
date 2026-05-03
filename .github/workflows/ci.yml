@@ -43,6 +43,9 @@ jobs:
           src/eda.py
           src/lgpd_classifier.py
           src/risk_scoring.py
+          src/privacy_transformations.py
+          src/data_quality_rules.py
+          src/governance_history.py
           src/report_generator.py
           src/governance_types.py
           app/main.py
@@ -52,6 +55,7 @@ jobs:
           app/pages/data_quality.py
           app/pages/eda.py
           app/pages/executive_overview.py
+          app/pages/governance_control_center.py
           app/pages/governance_report.py
           app/pages/lgpd_privacy_risk.py
 
