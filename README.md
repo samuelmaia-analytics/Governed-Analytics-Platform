@@ -16,19 +16,23 @@ Plataforma analítica governada em Streamlit para demonstrar governança de dado
 
 Este repositório simula um produto analítico governado para uso executivo: com privacidade, qualidade, auditabilidade e decisão de publicação explicável.
 
-## Visão Rápida para Recrutadores
-
-- Produto analítico governado, não apenas dashboard.
-- Classificação LGPD e score de risco explicável.
-- Regras declarativas de qualidade com YAML.
-- Screenshots e documentação automatizadas.
-- Testes, CI, lint e execução local reproduzível.
-
 ## TL;DR
 
 - foco: Analytics Engineering com controles de governança desde a ingestão até a camada publicada;
 - entrega: app Streamlit, pipeline Python, contratos e documentação operacional;
 - público: engenharia de dados, analytics e liderança técnica.
+
+## Visão rápida para recrutadores
+
+- Produto analítico governado, não apenas um dashboard.
+- Pipeline Python modular da ingestão à camada publicada.
+- Classificação LGPD por coluna.
+- Score de risco de privacidade explicável.
+- Regras declarativas de qualidade em YAML.
+- Data Quality Score e decisão de publicação no app.
+- Privacy masking/anonymization preview na interface.
+- Screenshots automatizadas com Playwright.
+- Testes, CI, Ruff, Pytest e execução local reproduzível.
 
 ## Problema de negócio
 

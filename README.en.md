@@ -16,19 +16,23 @@ A governed Streamlit analytics platform that demonstrates Data Governance, LGPD 
 
 This repository simulates an executive-ready governed analytics product: privacy-aware, quality-gated, auditable, and explainable for publication decisions.
 
-## Recruiter Quick View
-
-- Governed analytics product, not only a dashboard.
-- LGPD classification and explainable risk scoring.
-- Declarative YAML-based data quality rules.
-- Automated screenshots and documentation.
-- Tests, CI, lint, and reproducible local execution.
-
 ## TL;DR
 
 - focus: Analytics Engineering with governance controls from ingestion to published layer;
 - delivery: Streamlit app, Python pipeline, contracts, and operational docs;
 - audience: data engineering, analytics, and technical leadership.
+
+## Recruiter Quick View
+
+- Governed analytics product, not only a dashboard.
+- Modular Python pipeline from ingestion to published layer.
+- Column-level LGPD classification.
+- Explainable privacy risk scoring.
+- Declarative YAML-based data quality rules.
+- Data Quality Score and publication decision in the app.
+- Privacy masking/anonymization preview in the interface.
+- Automated screenshots with Playwright.
+- Tests, CI, Ruff, Pytest, and reproducible local execution.
 
 ## Business Problem
 
