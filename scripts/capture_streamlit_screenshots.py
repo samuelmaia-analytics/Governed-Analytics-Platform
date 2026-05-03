@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 from urllib.error import URLError
@@ -26,6 +27,50 @@ PRIVACY_PREVIEW_ANCHORS = [
     "Prévia de Transformações de Privacidade",
     "Prévia de Transformação de Privacidade",
 ]
+
+
+def update_readme_screenshots_section() -> None:
+    generated_privacy = (OUTPUT_DIR / "privacy_transformation_preview.png").exists()
+    screenshots_lines = [
+        "## Screenshots",
+        "",
+        "### Executive Overview",
+        "![Executive Overview](assets/screenshots/executive_overview.png)",
+        "",
+        "### LGPD & Privacy Risk",
+        "![LGPD & Privacy Risk](assets/screenshots/lgpd_privacy_risk.png)",
+        "",
+        "### Data Quality",
+        "![Data Quality](assets/screenshots/data_quality.png)",
+        "",
+        "### Governance Control Center",
+        "![Governance Control Center](assets/screenshots/governance_control_center.png)",
+        "",
+    ]
+    if generated_privacy:
+        screenshots_lines.extend(
+            [
+                "### Privacy Transformation Preview",
+                "![Privacy Transformation Preview](assets/screenshots/privacy_transformation_preview.png)",
+                "",
+            ]
+        )
+    screenshots_block = "\n".join(screenshots_lines)
+
+    readme_targets = [
+        (ROOT_DIR / "README.md", "### Como atualizar screenshots localmente"),
+        (ROOT_DIR / "README.en.md", "### How to refresh screenshots locally"),
+    ]
+    for readme_path, marker in readme_targets:
+        content = readme_path.read_text(encoding="utf-8")
+        start = content.find("## Screenshots")
+        end = content.find(marker)
+        if start == -1 or end == -1 or end <= start:
+            print(f"[WARN] Could not update screenshots section in {readme_path}")
+            continue
+        updated = content[:start] + screenshots_block + "\n" + content[end:]
+        readme_path.write_text(updated, encoding="utf-8")
+        print(f"[OK] Updated screenshots section in {readme_path}")
 
 
 def wait_for_app_ready(timeout_seconds: int = 120) -> None:
@@ -91,8 +136,9 @@ def try_capture_privacy_preview(page: Page) -> None:
     print("[WARN] Privacy Transformation Preview section not found; skipping optional screenshot.")
 
 
-def main() -> None:
+def main() -> int:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    before_pngs = set(OUTPUT_DIR.glob("*.png"))
     streamlit_proc: subprocess.Popen[str] | None = None
     try:
         streamlit_proc = subprocess.Popen(
@@ -144,6 +190,19 @@ def main() -> None:
             except subprocess.TimeoutExpired:
                 streamlit_proc.kill()
 
+    after_pngs = set(OUTPUT_DIR.glob("*.png"))
+    generated_now = sorted(path for path in after_pngs if path not in before_pngs)
+    if not after_pngs:
+        print(f"[ERROR] No PNG files found in {OUTPUT_DIR}")
+        return 1
+    print(f"[OK] Total PNG files in {OUTPUT_DIR}: {len(after_pngs)}")
+    if generated_now:
+        print(f"[OK] Newly generated in this run: {len(generated_now)}")
+    else:
+        print("[WARN] No brand-new files were created; existing screenshots were refreshed.")
+    update_readme_screenshots_section()
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

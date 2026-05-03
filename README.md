@@ -172,13 +172,20 @@ Com um dataset sintético de e-commerce contendo identificadores pessoais e prob
 
 ## Screenshots
 
-Expected screenshot paths (local generation):
+### Executive Overview
+![Executive Overview](assets/screenshots/executive_overview.png)
 
-- `assets/screenshots/executive_overview.png`
-- `assets/screenshots/lgpd_privacy_risk.png`
-- `assets/screenshots/data_quality.png`
-- `assets/screenshots/governance_control_center.png`
-- `assets/screenshots/privacy_transformation_preview.png` (optional, if section is visible)
+### LGPD & Privacy Risk
+![LGPD & Privacy Risk](assets/screenshots/lgpd_privacy_risk.png)
+
+### Data Quality
+![Data Quality](assets/screenshots/data_quality.png)
+
+### Governance Control Center
+![Governance Control Center](assets/screenshots/governance_control_center.png)
+
+### Privacy Transformation Preview
+![Privacy Transformation Preview](assets/screenshots/privacy_transformation_preview.png)
 
 ### Como atualizar screenshots localmente
 
