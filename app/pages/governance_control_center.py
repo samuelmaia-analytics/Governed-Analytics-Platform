@@ -23,6 +23,34 @@ def _data_quality_score(quality_results: DataQualityResult) -> int:
     return max(0, 100 - quality_results["failed_checks_count"] * 10)
 
 
+def build_publication_decision_rationale(
+    risk_result: PrivacyRiskResult,
+    quality_results: DataQualityResult,
+    classification_df: pd.DataFrame,
+) -> tuple[str, list[str], list[str], list[str]]:
+    publication_status = _governance_status(risk_result["risk_level"], quality_results["failed_checks_count"])
+    personal_count = int((classification_df["lgpd_classification"] == "personal_data").sum())
+    sensitive_count = int((classification_df["lgpd_classification"] == "sensitive_personal_data").sum())
+    indirect_count = int((classification_df["lgpd_classification"] == "indirect_identifier").sum())
+
+    reasons = [
+        f"Privacy risk level: {risk_result['risk_level']} ({risk_result['score']}/100).",
+        f"Failed quality checks: {quality_results['failed_checks_count']}.",
+        f"Sensitive/personal/indirect columns: {sensitive_count}/{personal_count}/{indirect_count}.",
+    ]
+    actions = list(risk_result["recommendations"][:5])
+    if quality_results["failed_checks_count"] > 0:
+        actions.append("Remediate failed quality checks before executive publication.")
+
+    evidence = [
+        "LGPD classification inventory (column-level).",
+        "Privacy risk score components and recommendation.",
+        "Data quality checks table with PASS/FAIL status.",
+        "Published-layer governance and privacy contract checks.",
+    ]
+    return publication_status, reasons, actions, evidence
+
+
 def save_governance_snapshot(
     *,
     df: pd.DataFrame,
@@ -63,8 +91,12 @@ def render_governance_control_center(
     sensitive_count = int((privacy_columns == "sensitive_personal_data").sum())
     indirect_count = int((privacy_columns == "indirect_identifier").sum())
     quality_score = _data_quality_score(quality_results)
-    governance_status = _governance_status(risk_result["risk_level"], quality_results["failed_checks_count"])
-    publication_status = "Approved" if governance_status == "Approved" else ("Needs Review" if governance_status == "Needs Review" else "Blocked")
+    governance_status, rationale_reasons, rationale_actions, rationale_evidence = build_publication_decision_rationale(
+        risk_result,
+        quality_results,
+        classification_df,
+    )
+    publication_status = governance_status
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Governance Status" if is_en else "Status de Governança", governance_status)
@@ -165,25 +197,21 @@ def render_governance_control_center(
         )
 
     with st.expander("Decision Rationale" if is_en else "Racional da Decisão", expanded=False):
-        rationale_lines = [
-            (
-                f"Privacy risk level `{risk_result['risk_level']}` with score `{risk_result['score']}/100`."
-                if is_en
-                else f"Nível de risco de privacidade `{risk_result['risk_level']}` com score `{risk_result['score']}/100`."
-            ),
-            (
-                f"Failed quality checks: `{quality_results['failed_checks_count']}`."
-                if is_en
-                else f"Checks de qualidade reprovados: `{quality_results['failed_checks_count']}`."
-            ),
-            (
-                f"Sensitive columns: `{sensitive_count}`, personal columns: `{personal_count}`, indirect identifiers: `{indirect_count}`."
-                if is_en
-                else f"Colunas sensíveis: `{sensitive_count}`, pessoais: `{personal_count}`, identificadores indiretos: `{indirect_count}`."
-            ),
-        ]
-        for line in rationale_lines:
+        for line in rationale_reasons:
             st.write(f"- {line}")
+
+    st.markdown("## Publication Decision" if is_en else "## Decisão de Publicação")
+    st.markdown("**Decision**" if is_en else "**Decisão**")
+    st.write(publication_status)
+    st.markdown("**Main Reasons**" if is_en else "**Principais Motivos**")
+    for reason in rationale_reasons:
+        st.write(f"- {reason}")
+    st.markdown("**Recommended Actions**" if is_en else "**Ações Recomendadas**")
+    for action in rationale_actions:
+        st.write(f"- {action}")
+    st.markdown("**Evidence Generated**" if is_en else "**Evidências Geradas**")
+    for item in rationale_evidence:
+        st.write(f"- {item}")
 
     st.markdown("**Executive Recommendation**" if is_en else "**Recomendação Executiva Final**")
     recommendation_text = (

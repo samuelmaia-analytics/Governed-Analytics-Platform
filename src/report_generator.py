@@ -9,6 +9,11 @@ from src.data_quality import generate_data_quality_table, run_data_quality_check
 from src.eda import dataset_overview
 from src.governance_types import DataQualityResult, PrivacyRiskResult
 from src.lgpd_classifier import classify_dataframe_columns
+from src.privacy_governance_artifacts import (
+    build_risk_matrix,
+    build_treatment_inventory,
+    generate_ripd_markdown,
+)
 from src.risk_scoring import calculate_privacy_risk_score
 
 DEFAULT_DOCS_DIR = Path("docs")
@@ -140,6 +145,7 @@ def generate_markdown_reports(df: pd.DataFrame, docs_dir: str | Path = DEFAULT_D
     data_dictionary_path = docs_path / "data_dictionary.md"
     lgpd_controls_path = docs_path / "lgpd_controls.md"
     data_quality_path = docs_path / "data_quality_report.md"
+    ripd_sample_path = docs_path / "lgpd_ripd_sample.md"
 
     data_dictionary_path.write_text(
         _build_data_dictionary_markdown(df, classification_df),
@@ -154,8 +160,22 @@ def generate_markdown_reports(df: pd.DataFrame, docs_dir: str | Path = DEFAULT_D
         encoding="utf-8",
     )
 
+    treatment_inventory = build_treatment_inventory("fact_orders_dashboard")
+    risk_matrix = build_risk_matrix(classification_df, risk_result, quality_results)
+    ripd_sample_path.write_text(
+        generate_ripd_markdown(
+            dataset_name="fact_orders_dashboard",
+            treatment_inventory=treatment_inventory,
+            risk_matrix=risk_matrix,
+            risk_result=risk_result,
+            quality_result=quality_results,
+        ),
+        encoding="utf-8",
+    )
+
     return {
         "data_dictionary": data_dictionary_path,
         "lgpd_controls": lgpd_controls_path,
         "data_quality_report": data_quality_path,
+        "lgpd_ripd_sample": ripd_sample_path,
     }

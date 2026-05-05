@@ -1,0 +1,44 @@
+version: 1
+description: Contract-based LGPD-inspired classification overrides for portfolio simulation.
+
+column_rules:
+  exact:
+    customer_email:
+      lgpd_classification: personal_data
+      risk_level: high
+      recommended_action: mask
+      reason: "Contract override: customer_email is personal data."
+    customer_document:
+      lgpd_classification: personal_data
+      risk_level: high
+      recommended_action: remove
+      reason: "Contract override: customer_document should not be published."
+    health_status:
+      lgpd_classification: sensitive_personal_data
+      risk_level: high
+      recommended_action: anonymize
+      reason: "Contract override: health_status is sensitive personal data."
+
+  contains:
+    - token: cpf
+      lgpd_classification: personal_data
+      risk_level: high
+      recommended_action: remove
+      reason: "Contract rule: token 'cpf' indicates direct identifier."
+    - token: email
+      lgpd_classification: personal_data
+      risk_level: high
+      recommended_action: mask
+      reason: "Contract rule: token 'email' indicates personal contact data."
+    - token: phone
+      lgpd_classification: personal_data
+      risk_level: high
+      recommended_action: mask
+      reason: "Contract rule: token 'phone' indicates personal contact data."
+
+  regex:
+    - pattern: "(?i).*zip.*"
+      lgpd_classification: indirect_identifier
+      risk_level: medium
+      recommended_action: review
+      reason: "Contract rule: ZIP-like columns are indirect identifiers."
