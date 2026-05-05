@@ -125,7 +125,7 @@ jobs:
 
       - name: Push deployment branch
         run: |
-          git push origin HEAD:${{ needs.resolve-plan.outputs.deployment_branch }} --force
+          git push origin HEAD:refs/heads/${{ needs.resolve-plan.outputs.deployment_branch }} --force
 
       - name: Write deployment summary
         run: |
