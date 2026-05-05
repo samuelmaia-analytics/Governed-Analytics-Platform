@@ -163,3 +163,4 @@ Total de arquivos analisados: **9**
 | --- | --- |
 | `product_category_name` | `object` |
 | `product_category_name_english` | `object` |
+

@@ -41,3 +41,4 @@ python src/run_platform_pipeline.py --steps build publish semantic quality contr
 - monitoramento da camada publicada sem falha crítica aberta
 - contratos e quality checks válidos
 - documentação central sem inconsistência óbvia
+

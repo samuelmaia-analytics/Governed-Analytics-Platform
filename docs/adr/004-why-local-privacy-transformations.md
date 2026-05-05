@@ -15,3 +15,4 @@
 ## Alternatives considered
 - External privacy/anonymization APIs.
 - Manual spreadsheet-based transformations.
+

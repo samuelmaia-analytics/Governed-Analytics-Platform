@@ -12,3 +12,4 @@ Mapeamento automatizado de fluxo técnico entre fontes, transformações e ativo
 | `data/curated/query_results/*.csv` | `src/export_query_result_images.py` | `data/screenshots/query_results/*.png` | `documentation_media` |
 | `data/curated/analytics/fact_orders_enriched.parquet` | `src/quality.py` | `data/curated/quality/fact_orders_enriched_quality_checks.csv` | `curated_quality` |
 | `data/published/dashboard/fact_orders_dashboard.parquet` | `src/published_monitoring.py` | `data/published/monitoring/published_layer_monitoring.csv` | `published_monitoring` |
+

@@ -91,3 +91,4 @@ Este documento materializa a coleção do projeto em formato versionável, pront
 
 - esta implementação representa uma coleção operacional em nível de projeto, adequada para prova de conceito local.
 - uma integração nativa com uma plataforma externa exigiria autenticação, endpoint e contrato específicos, que não foram fornecidos no enunciado.
+

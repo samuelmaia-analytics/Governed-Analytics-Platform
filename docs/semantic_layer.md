@@ -46,3 +46,4 @@ Esses marts são derivados da camada publicada para suportar leitura executiva e
 
 - O projeto usa dados públicos e sintéticos para demonstração de governança e analytics engineering.
 - Métricas executivas são orientadas a portfólio e podem exigir ajuste para cenários de negócio específicos.
+

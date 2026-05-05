@@ -9,3 +9,4 @@ Estado atual:
 - a solução principal continua local e reproduzível
 - a camada publicada continua sendo a fronteira de consumo analítico
 - integrações externas permanecem opcionais e fora do escopo principal de apresentação
+

@@ -9,3 +9,4 @@ Resumo:
 - o projeto não depende de pipeline nativo externo para executar localmente
 - artefatos de integração continuam opcionais
 - a operação principal segue baseada no pipeline local e na camada publicada
+

@@ -75,3 +75,4 @@
 ## Histórico
 
 Os arquivos numerados `00` a `10` foram mantidos como trilha histórica do projeto e podem ser usados como narrativa de evolução.
+

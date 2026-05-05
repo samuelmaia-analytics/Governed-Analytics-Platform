@@ -9,3 +9,4 @@ Para apresentação do projeto, priorize:
 - capturas do dashboard em `images/dashboard/`
 - evidências geradas localmente pelo pipeline
 - documentação de arquitetura, governança e consumo publicada em `docs/`
+

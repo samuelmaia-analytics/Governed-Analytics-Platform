@@ -95,6 +95,7 @@ O projeto usa o dataset público da Olist como caso analítico, mas aplica contr
 - Este repositório demonstra controles técnicos de exposição, não um modelo corporativo completo de IAM.
 - Em cenário real, recomenda-se matriz de acesso por persona (engenharia, analytics, negócio, auditoria).
 - A camada interna (`curated`) deve permanecer restrita a papéis técnicos autorizados.
+- Referência de portfólio para acesso e retenção: `docs/access_and_retention_policy.md`.
 
 ## Data minimization e publication controls
 
@@ -107,3 +108,4 @@ O projeto usa o dataset público da Olist como caso analítico, mas aplica contr
 - o dataset Olist é público e anonimizado, mas o projeto adota privacidade por design para refletir prática corporativa.
 - esta camada não substitui controles organizacionais de acesso, mas reduz exposição desnecessária no produto analítico publicado.
 - o projeto **não afirma conformidade jurídica plena com LGPD**; ele simula controles técnicos inspirados em boas práticas.
+

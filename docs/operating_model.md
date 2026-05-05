@@ -153,3 +153,4 @@ Uma operação saudável deste projeto exige, ao mesmo tempo:
 - o núcleo do projeto está nas camadas de analytics engineering e dashboard
 - artefatos complementares não mudam a operação principal
 - integrações externas dependem de credencial e ambiente, então a automação local é a prova principal
+

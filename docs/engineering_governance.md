@@ -43,3 +43,4 @@ Este documento consolida os guardrails operacionais do repositório para elevar 
 - Não foram adicionados orquestradores, camadas de infraestrutura ou controles corporativos completos.
 - O reforço foi concentrado em confiabilidade de entrega, rastreabilidade e governança leve.
 - O objetivo continua sendo demonstrar analytics engineering orientado a produto no contexto do projeto.
+

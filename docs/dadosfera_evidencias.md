@@ -11,3 +11,4 @@ Para avaliação atual, use como fontes principais:
 - `docs/architecture.md`
 - `docs/05_dashboard.md`
 - `images/dashboard/`
+

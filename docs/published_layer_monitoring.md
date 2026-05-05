@@ -28,3 +28,4 @@ Relatorio recorrente de freshness e qualidade da camada `fact_orders_dashboard`.
 ## Alertas
 
 - Nenhum alerta aberto na execucao atual.
+

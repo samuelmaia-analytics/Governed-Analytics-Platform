@@ -3,8 +3,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
+- Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -146,6 +146,7 @@ O maior risco é vender heurística como se fosse LLM real. A documentação fin
 - implementação mínima do item: pronta
 - chamada real à LLM: validada localmente com `gpt-4.1-mini`
 - saída final atual: `data/curated/genai/product_text_features.csv` com `extraction_mode=openai_api`
+
 
 
 

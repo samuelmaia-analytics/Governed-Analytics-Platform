@@ -2,8 +2,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
+- Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 
 Este documento descreve o dashboard final do projeto como camada oficial de consumo executivo, explicando a origem dos dados, a lógica de exposição e a leitura de negócio que o app sustenta.
 
@@ -144,7 +144,7 @@ Essa é uma decisão deliberada. A profundidade exploratória continua existindo
 
 ### Dashboard online
 
-- `https://olist-governed-analytics-platform.streamlit.app/`
+- `https://governed-analytics-platform.streamlit.app/`
 
 ### Screenshots finais do app
 
@@ -160,3 +160,4 @@ Essa é uma decisão deliberada. A profundidade exploratória continua existindo
 - operação do projeto: [docs/operating_model.md](./operating_model.md)
 - publicação segura: [docs/privacy_governance.md](./privacy_governance.md)
 - deck: [presentation/project_deck.md](../presentation/project_deck.md)
+

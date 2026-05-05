@@ -85,3 +85,4 @@ O relatório salvo pelo fluxo segue a estrutura:
 ## Relação com o restante do projeto
 
 A publicação em plataforma não substitui o pipeline local. Ela consome os artefatos já produzidos pelo fluxo principal e formaliza a etapa de exposição externa do produto analítico.
+

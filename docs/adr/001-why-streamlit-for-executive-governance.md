@@ -15,3 +15,4 @@
 ## Alternatives considered
 - Flask/FastAPI + SPA frontend.
 - Dash-based application.
+

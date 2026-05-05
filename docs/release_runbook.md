@@ -70,3 +70,4 @@ python src/run_platform_pipeline.py --steps build publish semantic quality contr
 - validar se a camada publicada segue pseudonimizada e minimizada
 - validar se o monitoramento da camada publicada ficou sem alertas críticos
 - validar se os marts `logistics_slice`, `seller_slice`, `cohort_slice`, `category_slice` e `state_performance_slice` foram materializados
+

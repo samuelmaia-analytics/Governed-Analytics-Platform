@@ -3,8 +3,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
+- Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Coleção na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/collection/1101-samuel-maia-03-2026`
 - Dashboard na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/dashboard/294-dashboard-executivo-de-vendas`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
@@ -37,6 +37,7 @@ Este documento centraliza as extensões do projeto.
 - LLM externa integrada e executada por API: validada localmente
 - dados para Power BI: feitos
 - dashboard Power BI materializado: depende de execução manual
+
 
 
 

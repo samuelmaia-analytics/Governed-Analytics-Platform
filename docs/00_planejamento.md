@@ -2,8 +2,8 @@
 
 ## Acesso Rápido
 
-- Repositório: `https://github.com/samuelmaia-analytics/olist-governed-analytics-platform`
-- Dashboard Streamlit: `https://olist-governed-analytics-platform.streamlit.app/`
+- Repositório: `https://github.com/samuelmaia-analytics/Governed-Analytics-Platform`
+- Dashboard Streamlit: `https://governed-analytics-platform.streamlit.app/`
 - Ativo principal na Dadosfera: `https://metabase-treinamentos.dadosfera.ai/model/2719-fact-orders-dashboard`
 
 Este documento registra o plano do projeto já reconciliado com o estado atual do repositório, distinguindo itens concluídos, pontos parcialmente preparados e dependências de evidência final na plataforma.
@@ -163,4 +163,5 @@ Os pontos mais sensíveis do projeto são:
 2. manter docs alinhadas ao estado real do repositório
 3. acompanhar os workflows de CI, lint e operação publicada
 4. só promover pipeline nativo como “feito” quando houver evidência final de execução
+
 

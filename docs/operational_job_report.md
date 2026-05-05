@@ -24,3 +24,4 @@
 | `queries` | **PASS** | 0.31 | - |
 | `screenshots` | **PASS** | 3.66 | - |
 | `bi` | **PASS** | 5.32 | - |
+
