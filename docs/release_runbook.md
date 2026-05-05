@@ -20,8 +20,8 @@ Este runbook resume o fluxo mínimo de release do projeto para manter consistên
 4. Executar:
 
 ```bash
-pip install -r requirements.lock
-python -m ruff check src streamlit_app tests
+uv sync --extra dev
+python -m ruff check src app tests
 python -m pytest tests
 python src/run_platform_pipeline.py --list-steps
 ```

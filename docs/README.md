@@ -8,6 +8,16 @@
 
 Índice técnico da pasta `docs/`. Contexto geral, setup e execução local ficam no [README da raiz](../README.md).
 
+## Índice rápido de artefatos de governança
+
+| Artefato | Link |
+| --- | --- |
+| Controles LGPD | [lgpd_controls.md](lgpd_controls.md) |
+| Relatório de qualidade | [data_quality_report.md](data_quality_report.md) |
+| Lineage técnico (JSON) | [technical_lineage.json](../data/curated/catalog/technical_lineage.json) |
+| Scorecards de governança | [governance_scorecards.csv](../data/published/monitoring/governance_scorecards.csv) |
+| Histórico de governança | [governance_history.csv](../data/published/monitoring/governance_history.csv) |
+
 ## Comece por aqui
 
 1. [executive_summary.md](executive_summary.md)

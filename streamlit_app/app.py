@@ -1,4 +1,5 @@
 from __future__ import annotations
+# DEPRECATED: Use app/main.py instead. This file will be removed in a future release.
 
 import sys
 from pathlib import Path

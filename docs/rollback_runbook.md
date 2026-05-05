@@ -19,7 +19,7 @@ Este runbook define a resposta mínima para rollback do projeto quando uma alter
 3. Reexecutar:
 
 ```bash
-python -m ruff check src streamlit_app tests
+python -m ruff check src app tests
 python -m pytest tests
 ```
 

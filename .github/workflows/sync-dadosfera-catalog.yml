@@ -35,7 +35,9 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install uv
+          uv sync --extra dev
 
       - name: Validate required secrets
         run: |
@@ -53,4 +55,4 @@ jobs:
 
       - name: Sync catalog assets
         if: ${{ env.DADOSFERA_ACCESS_TOKEN != '' || env.DADOSFERA_API_TOKEN != '' || env.DADOSFERA_TOTP == '' }}
-        run: python src/dadosfera_catalog_sync.py
+        run: uv run python src/dadosfera_catalog_sync.py

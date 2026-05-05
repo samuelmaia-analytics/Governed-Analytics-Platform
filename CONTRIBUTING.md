@@ -18,7 +18,7 @@ Este repositório segue um fluxo mínimo de contribuição para manter consistê
 ## Checks locais
 
 ```bash
-python -m ruff check src streamlit_app tests
+python -m ruff check src app tests
 python -m pytest tests
 python src/run_platform_pipeline.py --list-steps
 ```

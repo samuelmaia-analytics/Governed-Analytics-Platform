@@ -22,7 +22,6 @@ dependencies = [
     "python-dotenv",
     "PyYAML",
     "jinja2",
-    "pytest",
     "requests",
 ]
 
@@ -36,7 +35,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov=streamlit_app --cov-report=term-missing --cov-fail-under=80"
+addopts = "--cov=src --cov=app --cov-report=term-missing --cov-fail-under=80"
 testpaths = ["tests"]
 
 [tool.ruff]

@@ -1,5 +1,7 @@
 # Dados
 
+Todos os datasets neste diretório são sintéticos, gerados para fins de demonstração. Nenhum dado real ou pessoal está presente.
+
 Este diretório concentra os dados do projeto organizados em camadas e artefatos derivados.
 
 ## Princípios

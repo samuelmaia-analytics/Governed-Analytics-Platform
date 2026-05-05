@@ -3,7 +3,7 @@
 [![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Coverage](https://img.shields.io/badge/Coverage-80%25%2B-brightgreen)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 [![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
@@ -92,7 +92,7 @@ The project implements a governed analytics product approach:
 | Path | Purpose |
 | --- | --- |
 | `app/` | modern executive Streamlit app |
-| `streamlit_app/` | legacy app preserved for compatibility |
+| `streamlit_app/` | legacy app (deprecated) |
 | `src/` | analytics engineering and governance modules |
 | `data/samples/` | synthetic demonstration dataset |
 | `docs/` | governance reports and technical docs |
@@ -103,7 +103,7 @@ The project implements a governed analytics product approach:
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+uv sync
 cp .env.example .env
 ```
 
@@ -115,7 +115,9 @@ Executive app:
 streamlit run app/main.py
 ```
 
-Legacy app:
+## Legacy
+
+Legacy app (deprecated):
 
 ```bash
 streamlit run streamlit_app/app.py
@@ -124,9 +126,9 @@ streamlit run streamlit_app/app.py
 ## Testing and Quality Gates
 
 ```bash
-ruff check src streamlit_app app tests
+ruff check src app tests
 python -m mypy src/data_loader.py src/data_quality.py src/eda.py src/lgpd_classifier.py src/risk_scoring.py src/report_generator.py src/governance_types.py app/main.py app/context.py app/components/cards.py app/pages/data_catalog.py app/pages/data_quality.py app/pages/eda.py app/pages/executive_overview.py app/pages/governance_report.py app/pages/lgpd_privacy_risk.py
-pytest --cov=src --cov=streamlit_app --cov-report=term-missing
+pytest --cov=src --cov=app --cov-report=term-missing
 ```
 
 Highlighted tests:
@@ -173,10 +175,19 @@ Given a synthetic commerce dataset with personal identifiers and quality issues,
 ### How to refresh screenshots locally
 
 ```bash
-pip install -e ".[dev]"
+uv sync --extra dev
 python -m playwright install chromium
 python scripts/capture_streamlit_screenshots.py
 ```
+
+## Makefile Targets
+
+- `make install`: install dependencies with `uv sync`
+- `make lint`: run `ruff check src app tests`
+- `make test`: run `pytest --cov=src --cov=app --cov-report=term-missing`
+- `make pipeline`: run pipeline modules in sequence (`data_loader` -> `lgpd_classifier` -> `risk_scoring` -> `data_quality` -> `report_generator`)
+- `make app`: run app with `streamlit run app/main.py`
+- `make screenshots`: capture screenshots with `python scripts/capture_streamlit_screenshots.py`
 
 ## Links
 

@@ -46,27 +46,29 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install uv
+          uv sync --extra dev
 
       - name: Build, publish and expand semantic layer
-        run: python src/run_platform_pipeline.py --steps build publish semantic
+        run: uv run python src/run_platform_pipeline.py --steps build publish semantic
 
       - name: Monitor published layer
-        run: python src/published_monitoring.py --max-freshness-hours "$PUBLISHED_MONITOR_MAX_FRESHNESS_HOURS" --fail-on-alert
+        run: uv run python src/published_monitoring.py --max-freshness-hours "$PUBLISHED_MONITOR_MAX_FRESHNESS_HOURS" --fail-on-alert
 
       - name: Publish governance scorecards
-        run: python src/governance_scorecards.py
+        run: uv run python src/governance_scorecards.py
 
       - name: Publish platform assets
         if: ${{ env.DADOSFERA_PLATFORM_PUBLICATION_ENABLED == 'true' && env.DADOSFERA_ENABLED == 'true' }}
         run: |
-          python src/platform_publication.py \
+          uv run python src/platform_publication.py \
             --target-environment "$APP_ENV" \
             --execute-pipeline
 
       - name: Deploy Dadosfera native pipeline
         if: ${{ env.DADOSFERA_AUTODEPLOY_PIPELINE == 'true' && (env.DADOSFERA_ACCESS_TOKEN != '' || env.DADOSFERA_API_TOKEN != '' || (env.DADOSFERA_USERNAME != '' && env.DADOSFERA_PASSWORD != '' && env.DADOSFERA_TOTP == '')) }}
-        run: python src/dadosfera_pipeline_ops.py deploy --definition contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json --execute
+        run: uv run python src/dadosfera_pipeline_ops.py deploy --definition contracts/dadosfera/pipelines/fact_orders_dashboard_s3_parquet_pipeline.json --execute
 
       - name: Upload operational artifacts
         if: ${{ always() }}

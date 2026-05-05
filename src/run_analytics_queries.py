@@ -53,7 +53,7 @@ def connect() -> duckdb.DuckDBPyConnection:
     if duckdb is None:
         raise ImportError(
             "DuckDB nao esta instalado no ambiente atual. "
-            "Instale com `pip install duckdb` ou `pip install -r requirements.txt`."
+            "Instale com `pip install duckdb` ou `uv sync`."
         ) from DUCKDB_IMPORT_ERROR
 
     connection = duckdb.connect(database=":memory:")
