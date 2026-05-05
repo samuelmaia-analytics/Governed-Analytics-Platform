@@ -103,7 +103,7 @@ The project implements a governed analytics product approach:
 python -m venv .venv
 .venv\Scripts\activate
 uv sync
-cp .env.example .env
+copy .env.example .env
 ```
 
 ## Run Apps
@@ -119,7 +119,7 @@ streamlit run app/main.py
 ```bash
 ruff check src app tests
 python -m mypy src/data_loader.py src/data_quality.py src/eda.py src/lgpd_classifier.py src/risk_scoring.py src/report_generator.py src/governance_types.py app/main.py app/context.py app/components/cards.py app/pages/data_catalog.py app/pages/data_quality.py app/pages/eda.py app/pages/executive_overview.py app/pages/governance_report.py app/pages/lgpd_privacy_risk.py
-pytest --cov=src --cov=app --cov-report=term-missing
+pytest --cov=src --cov=app --cov-report=xml
 ```
 
 Highlighted tests:
@@ -175,7 +175,7 @@ python scripts/capture_streamlit_screenshots.py
 
 - `make install`: install dependencies with `uv sync`
 - `make lint`: run `ruff check src app tests`
-- `make test`: run `pytest --cov=src --cov=app --cov-report=term-missing`
+- `make test`: run `pytest --cov=src --cov=app --cov-report=xml`
 - `make pipeline`: run pipeline modules in sequence (`data_loader` -> `lgpd_classifier` -> `risk_scoring` -> `data_quality` -> `report_generator`)
 - `make app`: run app with `streamlit run app/main.py`
 - `make screenshots`: capture screenshots with `python scripts/capture_streamlit_screenshots.py`

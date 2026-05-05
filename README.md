@@ -124,7 +124,7 @@ flowchart LR
 python -m venv .venv
 .venv\Scripts\activate
 uv sync
-cp .env.example .env
+copy .env.example .env
 ```
 
 ## Como executar
@@ -154,7 +154,7 @@ streamlit run app/main.py
 
 ```bash
 ruff check src app tests
-pytest --cov=src --cov=app --cov-report=term-missing
+pytest --cov=src --cov=app --cov-report=xml
 ```
 
 Testes novos incluídos:
@@ -210,7 +210,7 @@ python scripts/capture_streamlit_screenshots.py
 
 - `make install`: instala dependências com `uv sync`
 - `make lint`: executa `ruff check src app tests`
-- `make test`: executa `pytest --cov=src --cov=app --cov-report=term-missing`
+- `make test`: executa `pytest --cov=src --cov=app --cov-report=xml`
 - `make pipeline`: executa o pipeline em sequência (`data_loader` -> `lgpd_classifier` -> `risk_scoring` -> `data_quality` -> `report_generator`)
 - `make app`: inicia o app com `streamlit run app/main.py`
 - `make screenshots`: captura screenshots com `python scripts/capture_streamlit_screenshots.py`
