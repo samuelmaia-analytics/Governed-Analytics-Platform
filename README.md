@@ -4,71 +4,46 @@
 [![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 
-**Idioma:** `PT-BR` | [EN](README.en.md)
+**Language:** `English` | [Português](README.pt-BR.md)
 
-Plataforma analítica governada para portfólio.
-O foco é Analytics Engineering com controles de governança, qualidade e privacidade.
+Portfolio-grade governed analytics platform focused on Analytics Engineering, Data Governance, LGPD-inspired controls, data quality, and executive delivery.
 
-> Este projeto não é apenas dashboard.
-> É um case de engenharia analítica com camada publicada, critérios de prontidão e entrega executiva.
+## Executive Summary
 
-## Resumo executivo
+This project transforms relational CSV inputs into a privacy-aware published analytical layer.
+It combines:
 
-Este repositório demonstra um fluxo completo:
+- modular data pipeline;
+- LGPD-inspired classification;
+- explainable privacy risk scoring;
+- data quality controls;
+- publication decision states;
+- Streamlit executive app;
+- testing and CI quality gates.
 
-1. ingestão e transformação de dados;
-2. classificação de privacidade inspirada em LGPD;
-3. avaliação de risco explicável;
-4. validação de qualidade;
-5. publicação controlada para consumo executivo.
+## Business Impact
 
-## Impacto de negócio
+- Reduces exposure risk by separating internal analytics from published executive consumption.
+- Improves trust with explicit publication status (`Approved`, `Needs Review`, `Blocked`).
+- Accelerates technical review with reproducible governance evidence.
+- Demonstrates product-oriented analytics engineering, not only dashboarding.
 
-- Reduz risco de exposição indevida ao separar camada interna e camada publicada.
-- Aumenta confiança executiva com decisão explícita de publicação (`Approved`, `Needs Review`, `Blocked`).
-- Melhora velocidade de revisão técnica com evidências automatizadas de qualidade e privacidade.
-- Cria narrativa defensável para auditoria técnica com contratos, score de risco e relatórios.
+## Why this project matters
 
-## Como revisar este projeto em 5 minutos
+Many portfolio projects stop at visual output.
+This repository demonstrates the governed journey from ingestion to controlled publication.
 
-1. Leia as seções de problema e solução.
-2. Veja a arquitetura e a separação entre camadas.
-3. Rode `make install`, `make test`, `make app`.
-4. Abra o app e confira:
-   - Executive Overview
-   - LGPD & Privacy Risk
-   - Data Quality
-   - Governance Control Center
-5. Revise `docs/privacy_governance.md` e `docs/semantic_layer.md`.
+## Architecture Overview
 
-## Problema de negócio
+Core flow:
 
-Em muitos times, dashboards são publicados sem critérios claros de qualidade e privacidade.
-Isso aumenta risco operacional, risco regulatório e perda de confiança.
+ingestion -> standardization -> analytical enrichment -> data quality checks -> LGPD-inspired classification -> explainable risk score -> controlled publication -> executive app.
 
-## Solução
+Key boundary:
 
-O projeto aplica uma abordagem de produto analítico governado:
-
-- pipeline modular em Python;
-- separação explícita entre camada interna e camada publicada;
-- classificação e risco de privacidade;
-- regras de qualidade em contrato;
-- documentação operacional e executiva versionada.
-
-## Problema -> Solução -> Evidência
-
-| Problema | Solução | Evidência |
-| --- | --- | --- |
-| Exposição indevida de dados | Minimização e pseudonimização antes de publicar | `docs/privacy_governance.md` |
-| Qualidade inconsistente | Regras declarativas + checagens automatizadas | `contracts/data_quality_rules.yml`, `src/data_quality_rules.py` |
-| Métricas ambíguas | Camada semântica documentada | `docs/semantic_layer.md`, `src/semantic_layer.py` |
-| Baixa confiança operacional | CI, lint e testes | `.github/workflows/ci.yml` |
-
-## Arquitetura resumida
+the app consumes the published layer (`data/published/dashboard`) instead of the full internal curated layer.
 
 ```mermaid
 flowchart LR
@@ -84,60 +59,46 @@ flowchart LR
     E --> G
 ```
 
-## Architecture Overview
+## Implemented vs Simulated
 
-O fluxo principal segue: ingestão -> padronização -> enriquecimento analítico -> qualidade -> classificação LGPD -> score de risco -> publicação controlada -> app executivo.
+### Implemented
 
-A fronteira crítica do projeto é a camada `data/published/dashboard`, usada como superfície oficial de consumo.
-Isso evita acoplamento entre exploração interna (`curated`) e exposição executiva.
+- Modular Python pipeline with reproducible execution.
+- Column classification by heuristics plus YAML contract rules.
+- Explainable privacy risk score and publication decision logic.
+- Rule-based quality checks and governance evidence artifacts.
+- Streamlit executive views including publication rationale.
+- Tests, linting, mypy checks, and CI workflows.
 
-## Implementado vs Simulado
+### Simulated
 
-### Implementado
+- Processing inventory metadata (controller/operator/DPO) with fictional entities.
+- Mini RIPD document for demonstration.
+- Legal basis and retention model represented for governance simulation.
+- Full enterprise IAM and centralized audit platform integration.
 
-- Pipeline Python modular com etapas reproduzíveis.
-- Classificação LGPD por heurística e contrato YAML.
-- Score de risco explicável e decisão de publicação.
-- Regras de qualidade e checks automatizados.
-- App Streamlit com seção executiva de decisão de publicação.
-- Testes, lint, type-check e CI.
+## Production Readiness Boundaries
 
-### Simulado
+- This is a **production-inspired portfolio project**.
+- It uses **sample, synthetic, or public data only**.
+- It **does not process real personal data**.
+- It demonstrates engineering patterns such as:
+  - data contracts;
+  - quality gates;
+  - LGPD-inspired classification;
+  - observability;
+  - lineage;
+  - CI/CD.
+- It is **not** a live enterprise production system.
 
-- Inventário de tratamento com controlador/operador/encarregado fictícios.
-- Mini RIPD em Markdown para demonstração técnica.
-- Base legal e retenção em linguagem de portfólio.
-- Controles corporativos avançados (IAM completo, trilha centralizada de auditoria, fluxo jurídico formal).
+## What this project demonstrates
 
-## Como um recrutador deve ler este projeto em 60 segundos
+- Analytics Engineering mindset with governance-by-design.
+- Clear internal vs published data boundaries.
+- Reproducible local run with quality gates.
+- Executive communication of risk, quality, and publication readiness.
 
-1. Leia **Impacto de negócio** para entender valor prático.
-2. Leia **Implementado vs Simulado** para separar maturidade técnica de escopo de portfólio.
-3. Abra `docs/recruiter_summary.md` para resumo orientado a entrevista.
-4. Veja no app a seção **Publication Decision**.
-5. Valide que CI e testes estão ativos no GitHub Actions.
-
-## Estrutura principal
-
-| Caminho | Finalidade |
-| --- | --- |
-| `app/` | Interface Streamlit executiva |
-| `src/` | Pipeline, governança e qualidade |
-| `contracts/` | Contratos e regras declarativas |
-| `docs/` | Relatórios e documentação |
-| `tests/` | Testes automatizados |
-| `.github/workflows/` | CI/CD |
-| `powerbi/` | Artefatos de apoio para BI |
-
-## Stack
-
-- Python 3.11+
-- Pandas, NumPy, DuckDB
-- Streamlit, Plotly
-- Pytest, Ruff, MyPy
-- GitHub Actions
-
-## Setup local
+## How to run locally
 
 ### Linux / macOS
 
@@ -146,6 +107,8 @@ python -m venv .venv
 source .venv/bin/activate
 make install
 cp .env.example .env
+make test
+make app
 ```
 
 ### Windows PowerShell
@@ -155,81 +118,53 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 make install
 copy .env.example .env
-```
-
-## Execução
-
-```bash
 make test
 make app
 ```
 
-## Targets do Makefile
+## How to review this project in 5 minutes
 
-- `make install`: instala dependências com `uv sync`
-- `make lint`: executa `ruff check src app tests`
-- `make test`: executa `pytest --cov=src --cov=app --cov-report=xml`
-- `make pipeline`: executa os módulos do pipeline em sequência
-- `make app`: inicia o app Streamlit principal
-- `make screenshots`: captura screenshots do app
-- `make clean`: remove caches e artefatos locais
+1. Read until **Implemented vs Simulated**.
+2. Open `docs/architecture.md` and `docs/privacy_governance.md`.
+3. Run `make test`.
+4. Open the Streamlit app and inspect **Governance Control Center**.
+5. Review `docs/semantic_layer.md` and `docs/recruiter_summary.md`.
 
-## Governança e privacidade
+## Streamlit Executive App
 
-- Controles **LGPD-inspired** aplicados na camada publicada.
-- Classificação de colunas por sensibilidade.
-- Privacy Risk Score explicável.
-- Publication Readiness com estados claros para decisão.
+Main pages:
 
-O projeto não declara conformidade jurídica plena.
-Ele demonstra controles técnicos de engenharia orientados à privacidade.
+- Executive Overview
+- Data Catalog
+- LGPD & Privacy Risk
+- Data Quality
+- EDA
+- Governance Report
+- Governance Control Center
 
-## Qualidade de dados
+## Main Structure
 
-- Regras de `not_null`, unicidade, faixas e consistência temporal.
-- Resultado consolidado para leitura executiva.
-- Evidências de validação integradas à documentação.
+| Path | Purpose |
+| --- | --- |
+| `app/` | Streamlit executive interface |
+| `src/` | Pipeline and governance logic |
+| `contracts/` | Data quality and governance contracts |
+| `docs/` | Technical and executive documentation |
+| `tests/` | Automated tests |
+| `.github/workflows/` | CI/CD |
+| `powerbi/` | BI export artifacts |
 
-## Notas para recrutadores
+## Recruiter Notes
 
-Este repositório demonstra:
+Strong interview discussion artifact for:
 
-- pensamento de produto analítico;
-- separação de camadas e controles de publicação;
-- rastreabilidade técnica;
-- documentação orientada a decisão.
-
-## Limitações e considerações de produção
-
-- Projeto **portfolio-grade** e **production-oriented**.
-- Foco em execução local e CI no GitHub Actions.
-- Controles são simulados para contexto de demonstração.
-- Para produção real, ainda seriam necessários IAM, auditoria centralizada e governança organizacional formal.
-
-## Mini estudo de caso (melhorado)
-
-Contexto:
-um dataset relacional de e-commerce é processado para consumo executivo com critérios de privacidade e qualidade.
-
-Problema:
-sem fronteira de publicação, identificadores e atributos quase-identificadores podem vazar para dashboards.
-
-Solução aplicada:
-- classificação de colunas (heurística + contrato);
-- score de risco explicável;
-- validação de qualidade;
-- decisão final de publicação com evidências.
-
-Resultado esperado:
-o produto executivo consome uma camada minimizada, com decisão explícita e rastreabilidade técnica.
+- Analytics Engineer
+- Data Engineer
+- Data Governance / Data Platform profiles
+- Senior Data Analyst roles with ownership scope
 
 ## Links
 
 - Streamlit app: <https://governed-analytics-platform.streamlit.app/>
-- Repositório: <https://github.com/samuelmaia-analytics/Governed-Analytics-Platform>
-- Índice técnico: [docs/README.md](docs/README.md)
-
-## Licença
-
-CC BY-NC 4.0.
-Veja: <https://creativecommons.org/licenses/by-nc/4.0/>.
+- Repository: <https://github.com/samuelmaia-analytics/Governed-Analytics-Platform>
+- Technical docs index: [docs/README.en.md](docs/README.en.md)
