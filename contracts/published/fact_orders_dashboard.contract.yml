@@ -1,0 +1,109 @@
+dataset_name: fact_orders_dashboard
+owner: analytics_governance_team
+domain: executive_analytics
+description: >
+  Published executive-facing dataset with minimization and pseudonymization
+  controls, designed for Streamlit and BI consumption under governance checks.
+grain: one row per order_id + order_item_id
+primary_key:
+  - order_id
+  - order_item_id
+freshness_sla: daily_before_09_00_utc
+privacy_classification: published_privacy_aware
+
+columns:
+  - name: order_id
+    type: string
+    nullable: false
+    description: Pseudonymized order key for executive drill-down-safe analysis.
+    classification: pseudonymized_identifier
+    quality_rules:
+      - not_null
+      - prefixed_hash_pattern
+
+  - name: order_item_id
+    type: integer
+    nullable: false
+    description: Item index in order.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - positive_integer
+
+  - name: customer_unique_id
+    type: string
+    nullable: false
+    description: Pseudonymized customer key for recurrence KPIs.
+    classification: pseudonymized_identifier
+    quality_rules:
+      - not_null
+      - prefixed_hash_pattern
+
+  - name: seller_key
+    type: string
+    nullable: false
+    description: Pseudonymized seller key for seller-level performance cuts.
+    classification: pseudonymized_identifier
+    quality_rules:
+      - not_null
+      - prefixed_hash_pattern
+
+  - name: order_status
+    type: string
+    nullable: false
+    description: Standardized order lifecycle status for operations KPIs.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - allowed_values
+
+  - name: order_date
+    type: date
+    nullable: false
+    description: Canonical date for time-series metrics.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - no_future_dates
+
+  - name: total_item_value
+    type: float
+    nullable: false
+    description: Revenue-at-item value for GMV and ticket metrics.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - non_negative
+      - accepted_range
+
+  - name: customer_state
+    type: string
+    nullable: false
+    description: State-level geography for executive regional cuts.
+    classification: indirect_identifier
+    quality_rules:
+      - not_null_or_default_fill
+      - accepted_state_pattern
+
+lineage:
+  upstream:
+    - data/curated/analytics/fact_orders_enriched.parquet
+    - contracts/governance/privacy_governance.json
+    - contracts/data_quality_rules.yml
+  downstream:
+    - app/main.py
+    - data/published/semantic/category_slice.parquet
+    - data/published/semantic/cohort_slice.parquet
+    - data/published/monitoring/published_layer_monitoring.csv
+
+publication_policy:
+  minimum_quality_score: 80
+  maximum_privacy_risk_score: 70
+  freshness_requirement: fresh
+  contract_required: true
+  blocking_conditions:
+    - critical_rule_failures_gt_0
+    - schema_contract_failed
+    - sensitive_data_without_protection
+    - privacy_risk_score_gt_maximum
+    - freshness_stale

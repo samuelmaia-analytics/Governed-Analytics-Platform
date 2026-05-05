@@ -4,7 +4,7 @@ from typing import SupportsInt, cast
 
 import pandas as pd
 
-from src.governance_types import PrivacyRiskResult
+from src.governance_types import PrivacyRiskResult, PublicationRecommendation, RiskLevel
 
 
 def _coerce_int(value: object) -> int:
@@ -25,7 +25,7 @@ def _coerce_int(value: object) -> int:
     return 0
 
 
-def _risk_level_from_score(score: int) -> str:
+def _risk_level_from_score(score: int) -> RiskLevel:
     if score <= 30:
         return "low"
     if score <= 70:
@@ -90,7 +90,7 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
     raw_score = sum(score_components.values())
     score = max(0, min(100, int(raw_score)))
     risk_level = _risk_level_from_score(score)
-    publication_recommendation = "approved"
+    publication_recommendation: PublicationRecommendation = "approved"
     if risk_level == "medium":
         publication_recommendation = "needs_review"
     if risk_level == "high":

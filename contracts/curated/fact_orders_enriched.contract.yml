@@ -1,0 +1,112 @@
+dataset_name: fact_orders_enriched
+owner: analytics_platform_team
+domain: ecommerce_analytics
+description: >
+  Curated internal analytical fact table at order-item grain, used as the main
+  upstream source for quality checks, governance controls, semantic artifacts,
+  and published dashboard outputs.
+grain: one row per order_id + order_item_id + product_id + seller_id
+primary_key:
+  - order_id
+  - order_item_id
+  - product_id
+  - seller_id
+freshness_sla: daily_before_08_00_utc
+privacy_classification: internal_controlled
+
+columns:
+  - name: order_id
+    type: string
+    nullable: false
+    description: Order identifier in curated layer (internal use).
+    classification: indirect_identifier
+    quality_rules:
+      - not_null
+      - expected_prefix_or_hash_internal
+
+  - name: order_item_id
+    type: integer
+    nullable: false
+    description: Item index within order.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - positive_integer
+
+  - name: customer_unique_id
+    type: string
+    nullable: false
+    description: Stable customer key used for recurrence analytics.
+    classification: personal_data
+    quality_rules:
+      - not_null
+      - profile_for_masking_before_publication
+
+  - name: order_status
+    type: string
+    nullable: false
+    description: Business order lifecycle status.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - allowed_values
+
+  - name: order_date
+    type: date
+    nullable: false
+    description: Normalized order date for temporal analysis.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - no_future_dates
+
+  - name: total_item_value
+    type: float
+    nullable: false
+    description: Revenue amount at item-level analytical grain.
+    classification: non_personal
+    quality_rules:
+      - not_null
+      - non_negative
+      - accepted_range
+
+  - name: customer_state
+    type: string
+    nullable: true
+    description: Customer state-level geography for regional analysis.
+    classification: indirect_identifier
+    quality_rules:
+      - max_null_pct
+      - expected_state_code_or_fallback
+
+  - name: seller_id
+    type: string
+    nullable: false
+    description: Internal seller identifier used for joins in curated layer.
+    classification: personal_data
+    quality_rules:
+      - not_null
+      - remove_or_pseudonymize_before_publication
+
+lineage:
+  upstream:
+    - data/raw/landing/olist/olist_orders_dataset.csv
+    - data/raw/landing/olist/olist_order_items_dataset.csv
+    - data/raw/landing/olist/olist_customers_dataset.csv
+    - data/raw/landing/olist/olist_sellers_dataset.csv
+  downstream:
+    - data/published/dashboard/fact_orders_dashboard.parquet
+    - data/published/semantic/logistics_slice.parquet
+    - data/published/semantic/seller_slice.parquet
+    - data/published/monitoring/governance_scorecards.csv
+
+publication_policy:
+  minimum_quality_score: 80
+  maximum_privacy_risk_score: 70
+  freshness_requirement: fresh
+  contract_required: true
+  blocking_conditions:
+    - critical_rule_failures_gt_0
+    - schema_contract_failed
+    - sensitive_data_without_protection
+    - freshness_stale

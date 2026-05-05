@@ -3,10 +3,12 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Pattern
+from typing import Pattern, cast
 
 import pandas as pd
 import yaml  # type: ignore[import-untyped]
+
+from src.governance_types import LGPDClassification, RecommendedAction, RiskLevel
 
 PERSONAL_TERMS = {
     "email",
@@ -44,17 +46,17 @@ DEFAULT_RULES_PATH = Path("contracts/governance/lgpd_classification_rules.yml")
 
 @dataclass(frozen=True)
 class ColumnClassification:
-    lgpd_classification: str
-    risk_level: str
-    recommended_action: str
+    lgpd_classification: LGPDClassification
+    risk_level: RiskLevel
+    recommended_action: RecommendedAction
     reason: str
 
 
 @dataclass(frozen=True)
 class ContractRule:
-    lgpd_classification: str
-    risk_level: str
-    recommended_action: str
+    lgpd_classification: LGPDClassification
+    risk_level: RiskLevel
+    recommended_action: RecommendedAction
     reason: str
 
 
@@ -67,6 +69,24 @@ class ClassificationContract:
 
 def normalize_name(column_name: str) -> str:
     return column_name.strip().lower()
+
+
+def _as_lgpd_classification(value: str) -> LGPDClassification:
+    allowed = {"non_personal", "personal_data", "sensitive_personal_data", "indirect_identifier"}
+    normalized = value.strip()
+    return cast(LGPDClassification, normalized if normalized in allowed else "non_personal")
+
+
+def _as_risk_level(value: str) -> RiskLevel:
+    allowed = {"low", "medium", "high"}
+    normalized = value.strip().lower()
+    return cast(RiskLevel, normalized if normalized in allowed else "medium")
+
+
+def _as_recommended_action(value: str) -> RecommendedAction:
+    allowed = {"keep", "mask", "anonymize", "remove", "review"}
+    normalized = value.strip().lower()
+    return cast(RecommendedAction, normalized if normalized in allowed else "review")
 
 
 def load_classification_contract(contract_path: str | Path | None = DEFAULT_RULES_PATH) -> ClassificationContract:
@@ -82,9 +102,9 @@ def load_classification_contract(contract_path: str | Path | None = DEFAULT_RULE
     exact_rules: dict[str, ContractRule] = {}
     for column_name, rule in (column_rules.get("exact", {}) or {}).items():
         exact_rules[normalize_name(str(column_name))] = ContractRule(
-            lgpd_classification=str(rule["lgpd_classification"]),
-            risk_level=str(rule["risk_level"]),
-            recommended_action=str(rule["recommended_action"]),
+            lgpd_classification=_as_lgpd_classification(str(rule["lgpd_classification"])),
+            risk_level=_as_risk_level(str(rule["risk_level"])),
+            recommended_action=_as_recommended_action(str(rule["recommended_action"])),
             reason=str(rule["reason"]),
         )
 
@@ -94,9 +114,9 @@ def load_classification_contract(contract_path: str | Path | None = DEFAULT_RULE
             (
                 normalize_name(str(item["token"])),
                 ContractRule(
-                    lgpd_classification=str(item["lgpd_classification"]),
-                    risk_level=str(item["risk_level"]),
-                    recommended_action=str(item["recommended_action"]),
+                    lgpd_classification=_as_lgpd_classification(str(item["lgpd_classification"])),
+                    risk_level=_as_risk_level(str(item["risk_level"])),
+                    recommended_action=_as_recommended_action(str(item["recommended_action"])),
                     reason=str(item["reason"]),
                 ),
             )
@@ -108,9 +128,9 @@ def load_classification_contract(contract_path: str | Path | None = DEFAULT_RULE
             (
                 re.compile(str(item["pattern"])),
                 ContractRule(
-                    lgpd_classification=str(item["lgpd_classification"]),
-                    risk_level=str(item["risk_level"]),
-                    recommended_action=str(item["recommended_action"]),
+                    lgpd_classification=_as_lgpd_classification(str(item["lgpd_classification"])),
+                    risk_level=_as_risk_level(str(item["risk_level"])),
+                    recommended_action=_as_recommended_action(str(item["recommended_action"])),
                     reason=str(item["reason"]),
                 ),
             )
@@ -152,7 +172,7 @@ def classify_by_contract(column_name: str, contract: ClassificationContract) -> 
     return None
 
 
-def detect_by_column_name(column_name: str) -> tuple[str, str]:
+def detect_by_column_name(column_name: str) -> tuple[LGPDClassification, str]:
     normalized = normalize_name(column_name)
     if any(term in normalized for term in SENSITIVE_TERMS):
         return "sensitive_personal_data", "Column name indicates sensitive data."
@@ -163,7 +183,7 @@ def detect_by_column_name(column_name: str) -> tuple[str, str]:
     return "non_personal", "No personal-data indicators found in column name."
 
 
-def detect_by_regex(series: pd.Series) -> tuple[str, str]:
+def detect_by_regex(series: pd.Series) -> tuple[LGPDClassification, str]:
     if series.empty:
         return "non_personal", "Column has no values to profile."
 
@@ -185,7 +205,9 @@ def detect_by_regex(series: pd.Series) -> tuple[str, str]:
     return "non_personal", "No personal-data regex pattern matched sampled values."
 
 
-def merge_signal_priority(name_signal: str, regex_signal: str) -> str:
+def merge_signal_priority(
+    name_signal: LGPDClassification, regex_signal: LGPDClassification
+) -> LGPDClassification:
     priority = {
         "sensitive_personal_data": 4,
         "personal_data": 3,
@@ -195,7 +217,9 @@ def merge_signal_priority(name_signal: str, regex_signal: str) -> str:
     return name_signal if priority[name_signal] >= priority[regex_signal] else regex_signal
 
 
-def map_risk_and_action(classification: str, column_name: str) -> tuple[str, str]:
+def map_risk_and_action(
+    classification: LGPDClassification, column_name: str
+) -> tuple[RiskLevel, RecommendedAction]:
     lowered = column_name.lower()
     if classification == "sensitive_personal_data":
         if any(token in lowered for token in ["biometric", "biometrico"]):

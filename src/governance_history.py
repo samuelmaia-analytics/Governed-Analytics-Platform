@@ -2,18 +2,16 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Literal
 from uuid import uuid4
 
 import pandas as pd
 
 from src.config import PUBLISHED_MONITORING_DIR
-from src.governance_types import DataQualityResult, PrivacyRiskResult
+from src.governance_types import DataQualityResult, FreshnessStatus, PrivacyRiskResult
 from src.risk_scoring import calculate_privacy_risk_score
 from src.utils import ensure_directory
 
 DEFAULT_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "governance_history.csv"
-FreshnessStatus = Literal["fresh", "warning", "stale", "unknown"]
 
 
 def _compute_warning_and_critical_failures(quality_result: DataQualityResult) -> tuple[int, int]:

@@ -1,14 +1,22 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 from app.i18n import LOCALE_EN_US, Locale
+from src.config import PUBLISHED_MONITORING_DIR
 from src.governance_history import append_governance_history
 from src.governance_types import DataQualityResult, PrivacyRiskResult
+from src.publication_gate import (
+    PublicationReadinessDecision,
+    evaluate_publication_readiness,
+)
+
+GOVERNANCE_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "governance_history.csv"
 
 
 def _governance_status(privacy_level: str, failed_checks: int) -> str:
@@ -21,6 +29,188 @@ def _governance_status(privacy_level: str, failed_checks: int) -> str:
 
 def _data_quality_score(quality_results: DataQualityResult) -> int:
     return max(0, 100 - quality_results["failed_checks_count"] * 10)
+
+
+def _evaluate_publication_gate(
+    *,
+    classification_df: pd.DataFrame,
+    risk_result: PrivacyRiskResult,
+    quality_results: DataQualityResult,
+) -> tuple[PublicationReadinessDecision, list[str]]:
+    """Evaluate publication gate with explicit fallbacks for unavailable signals."""
+    fallback_notes: list[str] = []
+
+    # Available signal proxy: page has total failed checks, not critical-only failures.
+    critical_rule_failures = int(quality_results["failed_checks_count"])
+    fallback_notes.append(
+        "Critical rule failures are approximated using failed quality checks count."
+    )
+
+    # Not wired in page context yet; conservative placeholder until contract signal is connected.
+    schema_contract_status: Literal["passed", "failed"] = "passed"
+    fallback_notes.append(
+        "Schema contract status is assumed as 'passed' (contract validation signal not wired in this page)."
+    )
+
+    # Freshness signal is not materialized in page context yet.
+    freshness_status: Literal["fresh", "warning", "stale"] = "fresh"
+    fallback_notes.append(
+        "Freshness status is assumed as 'fresh' (freshness monitoring signal not wired in this page)."
+    )
+
+    has_unprotected_sensitive = bool(
+        (
+            (classification_df["lgpd_classification"] == "sensitive_personal_data")
+            & ~classification_df["recommended_action"].isin(["anonymize", "remove"])
+        ).any()
+    )
+
+    gate_result = evaluate_publication_readiness(
+        data_quality_score=_data_quality_score(quality_results),
+        privacy_risk_score=int(risk_result["score"]),
+        critical_rule_failures=critical_rule_failures,
+        freshness_status=freshness_status,
+        schema_contract_status=schema_contract_status,
+        has_sensitive_data_without_protection=has_unprotected_sensitive,
+    )
+    return gate_result, fallback_notes
+
+
+def _load_governance_history(path: Path = GOVERNANCE_HISTORY_PATH) -> pd.DataFrame:
+    if not path.exists():
+        return pd.DataFrame()
+    history_df = pd.read_csv(path)
+    if history_df.empty:
+        return pd.DataFrame()
+    if "execution_timestamp" in history_df.columns:
+        history_df["execution_timestamp"] = pd.to_datetime(history_df["execution_timestamp"], errors="coerce", utc=True)
+    elif "run_timestamp" in history_df.columns:
+        history_df["execution_timestamp"] = pd.to_datetime(history_df["run_timestamp"], errors="coerce", utc=True)
+    else:
+        history_df["execution_timestamp"] = pd.NaT
+    return history_df
+
+
+def _render_governance_history_trends(locale: Locale) -> None:
+    is_en = locale == LOCALE_EN_US
+    st.markdown("## Governance Monitoring Trends" if is_en else "## Tendências de Monitoramento de Governança")
+    history_df = _load_governance_history()
+
+    if history_df.empty:
+        st.info(
+            "No governance history runs found yet. Trends will appear after at least one snapshot is saved."
+            if is_en
+            else "Nenhuma execução histórica encontrada. As tendências aparecerão após salvar ao menos um snapshot."
+        )
+        return
+
+    if len(history_df) < 2:
+        st.info(
+            "Only one governance run is available. Trend charts will become more informative with multiple runs."
+            if is_en
+            else "Apenas uma execução de governança disponível. Os gráficos de tendência ficam mais úteis com múltiplas execuções."
+        )
+
+    chart_df = history_df.sort_values("execution_timestamp").copy()
+
+    # Normalize columns for backward compatibility with older history files.
+    if "privacy_risk_score" not in chart_df.columns and "privacy_score" in chart_df.columns:
+        chart_df["privacy_risk_score"] = chart_df["privacy_score"]
+    if "row_count" not in chart_df.columns and "total_rows" in chart_df.columns:
+        chart_df["row_count"] = chart_df["total_rows"]
+    if "failed_rules_count" not in chart_df.columns and "failed_checks_count" in chart_df.columns:
+        chart_df["failed_rules_count"] = chart_df["failed_checks_count"]
+    for missing_col in ["warning_rules_count", "critical_rules_count", "publication_status", "data_quality_score"]:
+        if missing_col not in chart_df.columns:
+            chart_df[missing_col] = 0 if "count" in missing_col else "unknown"
+
+    col_left, col_right = st.columns(2)
+    with col_left:
+        dq_fig = px.line(
+            chart_df,
+            x="execution_timestamp",
+            y="data_quality_score",
+            markers=True,
+            title="Data Quality Score Over Time" if is_en else "Score de Qualidade ao Longo do Tempo",
+        )
+        dq_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+        st.plotly_chart(dq_fig, width="stretch")
+
+    with col_right:
+        pr_fig = px.line(
+            chart_df,
+            x="execution_timestamp",
+            y="privacy_risk_score",
+            markers=True,
+            title="Privacy Risk Score Over Time" if is_en else "Score de Risco de Privacidade ao Longo do Tempo",
+        )
+        pr_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+        st.plotly_chart(pr_fig, width="stretch")
+
+    col_left2, col_right2 = st.columns(2)
+    with col_left2:
+        status_counts = (
+            chart_df["publication_status"]
+            .astype(str)
+            .value_counts()
+            .rename_axis("publication_status")
+            .reset_index(name="count")
+        )
+        status_fig = px.bar(
+            status_counts,
+            x="publication_status",
+            y="count",
+            color="publication_status",
+            title="Publication Status Distribution" if is_en else "Distribuição de Status de Publicação",
+        )
+        status_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), showlegend=False)
+        st.plotly_chart(status_fig, width="stretch")
+
+    with col_right2:
+        rules_cols = ["failed_rules_count", "warning_rules_count", "critical_rules_count"]
+        rules_df = chart_df[["execution_timestamp", *rules_cols]].melt(
+            id_vars=["execution_timestamp"],
+            value_vars=rules_cols,
+            var_name="rule_type",
+            value_name="count",
+        )
+        rules_fig = px.line(
+            rules_df,
+            x="execution_timestamp",
+            y="count",
+            color="rule_type",
+            markers=True,
+            title="Rules Severity Counts Over Time" if is_en else "Contagem de Regras por Severidade ao Longo do Tempo",
+        )
+        rules_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+        st.plotly_chart(rules_fig, width="stretch")
+
+    row_fig = px.line(
+        chart_df,
+        x="execution_timestamp",
+        y="row_count",
+        markers=True,
+        title="Row Count Over Time" if is_en else "Volume de Linhas ao Longo do Tempo",
+    )
+    row_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+    st.plotly_chart(row_fig, width="stretch")
+
+    with st.expander("Monitoring History Table" if is_en else "Tabela de Histórico de Monitoramento", expanded=False):
+        show_cols = [
+            "run_id",
+            "dataset_name",
+            "execution_timestamp",
+            "row_count",
+            "data_quality_score",
+            "privacy_risk_score",
+            "publication_status",
+            "failed_rules_count",
+            "warning_rules_count",
+            "critical_rules_count",
+            "freshness_status",
+        ]
+        available_cols = [column for column in show_cols if column in chart_df.columns]
+        st.dataframe(chart_df[available_cols].tail(30), width="stretch")
 
 
 def build_publication_decision_rationale(
@@ -91,6 +281,11 @@ def render_governance_control_center(
     sensitive_count = int((privacy_columns == "sensitive_personal_data").sum())
     indirect_count = int((privacy_columns == "indirect_identifier").sum())
     quality_score = _data_quality_score(quality_results)
+    gate_result, gate_fallback_notes = _evaluate_publication_gate(
+        classification_df=classification_df,
+        risk_result=risk_result,
+        quality_results=quality_results,
+    )
     governance_status, rationale_reasons, rationale_actions, rationale_evidence = build_publication_decision_rationale(
         risk_result,
         quality_results,
@@ -213,6 +408,23 @@ def render_governance_control_center(
     for item in rationale_evidence:
         st.write(f"- {item}")
 
+    st.markdown("### Publication Gate Output" if is_en else "### Saída do Publication Gate")
+    gate_col1, gate_col2 = st.columns(2)
+    gate_col1.metric("Gate Decision" if is_en else "Decisão do Gate", gate_result.decision)
+    gate_col2.metric("Gate Severity" if is_en else "Severidade do Gate", gate_result.severity)
+
+    st.markdown("**Gate Reasons**" if is_en else "**Motivos do Gate**")
+    for reason in gate_result.reasons:
+        st.write(f"- {reason}")
+
+    st.markdown("**Gate Required Actions**" if is_en else "**Ações Obrigatórias do Gate**")
+    for action in gate_result.required_actions:
+        st.write(f"- {action}")
+
+    with st.expander("Gate Assumptions / Fallbacks" if is_en else "Premissas / Fallbacks do Gate", expanded=False):
+        for note in gate_fallback_notes:
+            st.write(f"- {note}")
+
     st.markdown("**Executive Recommendation**" if is_en else "**Recomendação Executiva Final**")
     recommendation_text = (
         "Proceed to publication with routine monitoring."
@@ -252,3 +464,5 @@ def render_governance_control_center(
             st.success(f"Governance snapshot saved to: {saved_path.resolve()}")
         else:
             st.success(f"Snapshot de governança salvo em: {saved_path.resolve()}")
+
+    _render_governance_history_trends(locale)

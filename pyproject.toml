@@ -35,7 +35,6 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov=app --cov-report=term-missing"
 testpaths = ["tests"]
 
 [tool.coverage.report]

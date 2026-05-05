@@ -1,6 +1,19 @@
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Literal, TypedDict
+
+DataQualityStatus = Literal["PASS", "FAIL"]
+DataQualitySeverity = Literal["low", "medium", "high", "critical"]
+LGPDClassification = Literal[
+    "non_personal",
+    "personal_data",
+    "sensitive_personal_data",
+    "indirect_identifier",
+]
+RiskLevel = Literal["low", "medium", "high"]
+RecommendedAction = Literal["keep", "mask", "anonymize", "remove", "review"]
+PublicationRecommendation = Literal["approved", "needs_review", "blocked"]
+FreshnessStatus = Literal["fresh", "warning", "stale", "unknown"]
 
 
 class DataQualityCheck(TypedDict):
@@ -30,12 +43,12 @@ class DataQualityResult(TypedDict):
 class PrivacyRiskResult(TypedDict):
     score: int
     total_score: int
-    risk_level: str
+    risk_level: RiskLevel
     explanation: str
     summary: str
     components: dict[str, int]
     score_components: dict[str, int]
     per_component_points: dict[str, int]
     component_explanations: dict[str, str]
-    publication_recommendation: str
+    publication_recommendation: PublicationRecommendation
     recommendations: list[str]
