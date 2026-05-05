@@ -35,8 +35,18 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov=app --cov-report=term-missing --cov-fail-under=80"
+addopts = "--cov=src --cov=app --cov-report=term-missing --cov-fail-under=100"
 testpaths = ["tests"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+include = [
+    "src/config.py",
+    "src/data_loader.py",
+    "src/data_quality_rules.py",
+    "src/governance_types.py",
+]
 
 [tool.ruff]
 target-version = "py311"
