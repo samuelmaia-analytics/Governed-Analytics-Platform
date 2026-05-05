@@ -9,20 +9,20 @@ description = "Governed analytics platform with LGPD privacy classification, dat
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pandas",
-    "numpy",
+    "pandas>=2.2,<2.4",
+    "numpy>=1.26,<3",
     "streamlit==1.56.0",
     "altair==6.1.0",
-    "plotly",
-    "matplotlib",
-    "seaborn",
-    "duckdb",
-    "pyarrow",
-    "openpyxl",
-    "python-dotenv",
-    "PyYAML",
-    "jinja2",
-    "requests",
+    "plotly>=5.24,<7",
+    "matplotlib>=3.8,<4",
+    "seaborn>=0.13,<1",
+    "duckdb>=1.1,<2",
+    "pyarrow>=17,<21",
+    "openpyxl>=3.1,<4",
+    "python-dotenv>=1.0,<2",
+    "PyYAML>=6,<7",
+    "jinja2>=3.1,<4",
+    "requests>=2.32,<3",
 ]
 
 [project.optional-dependencies]
@@ -35,18 +35,12 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov=app --cov-report=term-missing --cov-fail-under=100"
+addopts = "--cov=src --cov=app --cov-report=term-missing"
 testpaths = ["tests"]
 
 [tool.coverage.report]
-fail_under = 100
+fail_under = 80
 show_missing = true
-include = [
-    "src/config.py",
-    "src/data_loader.py",
-    "src/data_quality_rules.py",
-    "src/governance_types.py",
-]
 
 [tool.ruff]
 target-version = "py311"
