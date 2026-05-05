@@ -8,6 +8,32 @@
 
 Índice técnico da pasta `docs/`. Contexto geral, setup e execução local ficam no [README da raiz](../README.md).
 
+## Trilhas de leitura
+
+### Recruiter (5 minutos)
+
+1. [executive_summary.md](executive_summary.md)
+2. [architecture.md](architecture.md)
+3. [privacy_governance.md](privacy_governance.md)
+4. [semantic_layer.md](semantic_layer.md)
+
+### Tech Lead (15 minutos)
+
+1. [architecture.md](architecture.md)
+2. [operating_model.md](operating_model.md)
+3. [engineering_governance.md](engineering_governance.md)
+4. [data_quality_report.md](data_quality_report.md)
+5. [technical_narrative.md](technical_narrative.md)
+
+### Governance Reviewer (20 minutos)
+
+1. [privacy_governance.md](privacy_governance.md)
+2. [access_and_retention_policy.md](access_and_retention_policy.md)
+3. [lgpd_controls.md](lgpd_controls.md)
+4. [governance_policy.md](governance_policy.md)
+5. [release_runbook.md](release_runbook.md)
+6. [rollback_runbook.md](rollback_runbook.md)
+
 ## Índice rápido de artefatos de governança
 
 | Artefato | Link |
@@ -53,7 +79,7 @@
 ## Camada semântica e lineage
 
 - o pipeline Python continua produzindo `fact_orders_enriched` e `fact_orders_dashboard`
-- o dbt entra depois desses ativos para documentação, testes, lineage e marts reutilizáveis
+- a camada semântica publicada é derivada da camada `published` para recortes executivos e operacionais
 - Streamlit, Power BI e workflows SQL devem ser lidos a partir da camada publicada e dos marts semânticos
 
 ## Runbooks e operação
