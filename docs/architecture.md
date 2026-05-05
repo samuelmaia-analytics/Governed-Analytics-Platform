@@ -264,8 +264,8 @@ Leitura operacional:
 13. `src/export_power_bi.py`
    Gera os exports do modelo complementar para Power BI.
 
-14. `streamlit_app/app.py`
-   Consome exclusivamente a camada publicada do dashboard.
+14. `app/main.py`
+    Consome exclusivamente a camada publicada do dashboard.
 
 15. `src/genai_feature_extraction.py`
    Materializa a extração adicional de features em texto desestruturado.

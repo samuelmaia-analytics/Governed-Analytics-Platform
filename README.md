@@ -25,6 +25,13 @@ Este repositório demonstra um fluxo completo:
 4. validação de qualidade;
 5. publicação controlada para consumo executivo.
 
+## Impacto de negócio
+
+- Reduz risco de exposição indevida ao separar camada interna e camada publicada.
+- Aumenta confiança executiva com decisão explícita de publicação (`Approved`, `Needs Review`, `Blocked`).
+- Melhora velocidade de revisão técnica com evidências automatizadas de qualidade e privacidade.
+- Cria narrativa defensável para auditoria técnica com contratos, score de risco e relatórios.
+
 ## Como revisar este projeto em 5 minutos
 
 1. Leia as seções de problema e solução.
@@ -76,6 +83,39 @@ flowchart LR
     D --> G
     E --> G
 ```
+
+## Architecture Overview
+
+O fluxo principal segue: ingestão -> padronização -> enriquecimento analítico -> qualidade -> classificação LGPD -> score de risco -> publicação controlada -> app executivo.
+
+A fronteira crítica do projeto é a camada `data/published/dashboard`, usada como superfície oficial de consumo.
+Isso evita acoplamento entre exploração interna (`curated`) e exposição executiva.
+
+## Implementado vs Simulado
+
+### Implementado
+
+- Pipeline Python modular com etapas reproduzíveis.
+- Classificação LGPD por heurística e contrato YAML.
+- Score de risco explicável e decisão de publicação.
+- Regras de qualidade e checks automatizados.
+- App Streamlit com seção executiva de decisão de publicação.
+- Testes, lint, type-check e CI.
+
+### Simulado
+
+- Inventário de tratamento com controlador/operador/encarregado fictícios.
+- Mini RIPD em Markdown para demonstração técnica.
+- Base legal e retenção em linguagem de portfólio.
+- Controles corporativos avançados (IAM completo, trilha centralizada de auditoria, fluxo jurídico formal).
+
+## Como um recrutador deve ler este projeto em 60 segundos
+
+1. Leia **Impacto de negócio** para entender valor prático.
+2. Leia **Implementado vs Simulado** para separar maturidade técnica de escopo de portfólio.
+3. Abra `docs/recruiter_summary.md` para resumo orientado a entrevista.
+4. Veja no app a seção **Publication Decision**.
+5. Valide que CI e testes estão ativos no GitHub Actions.
 
 ## Estrutura principal
 
@@ -165,6 +205,23 @@ Este repositório demonstra:
 - Foco em execução local e CI no GitHub Actions.
 - Controles são simulados para contexto de demonstração.
 - Para produção real, ainda seriam necessários IAM, auditoria centralizada e governança organizacional formal.
+
+## Mini estudo de caso (melhorado)
+
+Contexto:
+um dataset relacional de e-commerce é processado para consumo executivo com critérios de privacidade e qualidade.
+
+Problema:
+sem fronteira de publicação, identificadores e atributos quase-identificadores podem vazar para dashboards.
+
+Solução aplicada:
+- classificação de colunas (heurística + contrato);
+- score de risco explicável;
+- validação de qualidade;
+- decisão final de publicação com evidências.
+
+Resultado esperado:
+o produto executivo consome uma camada minimizada, com decisão explícita e rastreabilidade técnica.
 
 ## Links
 
