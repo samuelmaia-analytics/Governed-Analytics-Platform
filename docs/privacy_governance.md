@@ -1,6 +1,7 @@
 # Privacidade, LGPD e Governança
 
 Este documento registra as decisões de privacidade por design e governança aplicadas ao projeto.
+Os controles aqui descritos são **LGPD-inspired privacy controls** para fins de engenharia e portfólio, sem representar parecer jurídico.
 
 ## Controles Alinhados à LGPD
 
@@ -9,6 +10,12 @@ O projeto usa o dataset público da Olist como caso analítico, mas aplica contr
 - `adequacao`: O uso publicado é restrito a indicadores executivos, sem expor granularidade operacional desnecessária para esse propósito.
 - `seguranca`: Chaves publicadas são pseudonimizadas antes do consumo e a camada interna permanece separada da camada exposta.
 - `prevencao`: O pipeline falha quando detecta colunas proibidas, pseudonimização ausente ou vazamento de campos classificados como não publicáveis.
+
+## Data classification e privacy risk scoring
+
+- A classificação de colunas é materializada por `src/lgpd_classifier.py` com categorias como `non_personal`, `personal_data`, `sensitive_personal_data` e `indirect_identifier`.
+- O risco é quantificado por `src/risk_scoring.py`, produzindo score explicável e nível de risco (`low`, `medium`, `high`).
+- A decisão operacional deve considerar risco de privacidade, qualidade e contexto de uso do dado publicado.
 
 ## Camadas de Exposição
 
@@ -83,7 +90,20 @@ O projeto usa o dataset público da Olist como caso analítico, mas aplica contr
 - tabelas detalhadas do app devem exibir apenas chaves pseudonimizadas e dimensões agregadas necessárias ao projeto.
 - uploads manuais em plataforma devem usar preferencialmente o CSV da camada publicada.
 
+## Access considerations
+
+- Este repositório demonstra controles técnicos de exposição, não um modelo corporativo completo de IAM.
+- Em cenário real, recomenda-se matriz de acesso por persona (engenharia, analytics, negócio, auditoria).
+- A camada interna (`curated`) deve permanecer restrita a papéis técnicos autorizados.
+
+## Data minimization e publication controls
+
+- A publicação aplica minimização ativa: somente colunas necessárias para consumo executivo.
+- Identificadores são pseudonimizados para reduzir risco de reidentificação na camada de exposição.
+- A publicação é bloqueada quando controles de governança não são atendidos.
+
 ## Limitações e Escopo
 
 - o dataset Olist é público e anonimizado, mas o projeto adota privacidade por design para refletir prática corporativa.
 - esta camada não substitui controles organizacionais de acesso, mas reduz exposição desnecessária no produto analítico publicado.
+- o projeto **não afirma conformidade jurídica plena com LGPD**; ele simula controles técnicos inspirados em boas práticas.

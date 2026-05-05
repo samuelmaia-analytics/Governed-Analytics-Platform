@@ -12,6 +12,8 @@
 
 Plataforma analítica governada em Streamlit para demonstrar governança de dados, classificação LGPD, qualidade, EDA automatizada e geração de relatórios executivos.
 
+> Este não é apenas um dashboard. É um case de Analytics Engineering com governança, qualidade, classificação de privacidade, risco explicável, camada publicada e entrega executiva.
+
 ## Posicionamento Executivo
 
 Este repositório simula um produto analítico governado para uso executivo: com privacidade, qualidade, auditabilidade e decisão de publicação explicável.
@@ -21,6 +23,14 @@ Este repositório simula um produto analítico governado para uso executivo: com
 - foco: Analytics Engineering com controles de governança desde a ingestão até a camada publicada;
 - entrega: app Streamlit, pipeline Python, contratos e documentação operacional;
 - público: engenharia de dados, analytics e liderança técnica.
+
+## Como revisar em 5 minutos
+
+1. Leia o problema e a solução nas seções **Problema de negócio** e **Solução**.
+2. Veja o fluxo em **Resumo de Arquitetura** e a separação de camadas em `docs/architecture.md`.
+3. Rode localmente com `make install`, `make test` e `make app`.
+4. Abra o app e valide as páginas **Executive Overview**, **LGPD & Privacy Risk**, **Data Quality** e **Governance Control Center**.
+5. Confira evidências em `docs/privacy_governance.md`, `docs/data_quality_report.md` e `docs/semantic_layer.md`.
 
 ## Visão rápida para recrutadores
 
@@ -47,6 +57,16 @@ O projeto implementa uma abordagem de produto analítico governado:
 - checks de qualidade de dados reutilizáveis;
 - EDA automatizada para suporte analítico rápido;
 - geração de relatórios Markdown para documentação executiva e técnica.
+
+## Problem -> Solution -> Evidence
+
+| Problem | Solution | Evidence |
+| --- | --- | --- |
+| Entrega analítica sem fronteira de exposição | Camada interna (`curated`) separada da camada publicada (`published`) | `docs/architecture.md`, `src/publish_dashboard.py` |
+| Risco de exposição desnecessária de dados | Controles de minimização + pseudonimização antes da publicação | `docs/privacy_governance.md`, `contracts/governance/privacy_governance.json` |
+| Qualidade inconsistente entre execução e consumo | Regras declarativas + checks automatizados no pipeline | `contracts/data_quality_rules.yml`, `src/data_quality_rules.py`, `tests/test_data_quality_rules.py` |
+| Métricas pouco rastreáveis para decisão | Camada semântica publicada + documentação de métricas | `src/semantic_layer.py`, `docs/semantic_layer.md` |
+| Falta de confiabilidade operacional | CI, lint, testes e runbooks de release/rollback | `.github/workflows/`, `docs/release_runbook.md`, `docs/rollback_runbook.md` |
 
 ## Resumo de Arquitetura
 
@@ -121,9 +141,13 @@ flowchart LR
 ## Setup rápido
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-uv sync
+make install
+cp .env.example .env
+```
+
+No Windows PowerShell, use:
+
+```powershell
 copy .env.example .env
 ```
 
@@ -132,7 +156,15 @@ copy .env.example .env
 App executivo:
 
 ```bash
-streamlit run app/main.py
+make app
+```
+
+## Execução local mínima
+
+```bash
+make install
+make test
+make app
 ```
 
 ## Exemplos de uso
@@ -153,8 +185,8 @@ streamlit run app/main.py
 ## Qualidade e testes
 
 ```bash
-ruff check src app tests
-pytest --cov=src --cov=app --cov-report=xml
+make lint
+make test
 ```
 
 Testes novos incluídos:
@@ -212,8 +244,16 @@ python scripts/capture_streamlit_screenshots.py
 - `make lint`: executa `ruff check src app tests`
 - `make test`: executa `pytest --cov=src --cov=app --cov-report=xml`
 - `make pipeline`: executa o pipeline em sequência (`data_loader` -> `lgpd_classifier` -> `risk_scoring` -> `data_quality` -> `report_generator`)
-- `make app`: inicia o app com `streamlit run app/main.py`
-- `make screenshots`: captura screenshots com `python scripts/capture_streamlit_screenshots.py`
+- `make app`: inicia o app com `uv run streamlit run app/main.py`
+- `make screenshots`: captura screenshots com `uv run python scripts/capture_streamlit_screenshots.py`
+- `make clean`: remove caches e artefatos locais de execução
+
+## Considerações de produção e limitações
+
+- Este projeto é **production-oriented** para portfólio, com controles simulados e evidências reprodutíveis.
+- Os controles de privacidade são **LGPD-inspired** e não substituem validação jurídica formal.
+- O foco operacional atual é execução local + GitHub Actions; não há orquestração distribuída full-scale.
+- A camada publicada é intencionalmente minimizada para consumo executivo e não cobre todos os casos analíticos internos.
 
 ## Governança operacional (implementado)
 

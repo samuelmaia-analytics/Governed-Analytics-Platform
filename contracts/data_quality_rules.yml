@@ -41,3 +41,15 @@ rules:
     params:
       allowed: [delivered, shipped, canceled, processing]
     recommendation: Standardize order status values according to contract.
+  - name: order_status_not_null
+    type: not_null
+    columns: [order_status]
+    severity: high
+    recommendation: Order status is required before publication.
+  - name: order_date_max_null
+    type: max_null_pct
+    columns: [order_date]
+    severity: high
+    params:
+      max_null_pct: 5
+    recommendation: Order date completeness must stay above 95% for publication.
