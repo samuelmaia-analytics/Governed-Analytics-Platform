@@ -1,84 +1,39 @@
 # Documentação
 
-[![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
-[![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
-[![Language](https://img.shields.io/badge/Language-PT--BR-0A66C2)](../README.md)
-
 **Language:** `PT-BR` | [EN](README.en.md)
 
-Índice técnico da pasta `docs/`.
-Contexto geral, setup e execução local ficam no [README da raiz](../README.md).
+Estrutura de documentação reorganizada para leitura rápida e manutenção:
 
-## Trilhas de leitura
+- `docs/executive/`: narrativa executiva e resumo para recrutadores
+- `docs/architecture/`: arquitetura, camada semântica e narrativa técnica
+- `docs/governance/`: controles privacy-aware e documentos LGPD-inspired
+- `docs/operations/`: runbooks e modelo operacional
+- `docs/reports/`: relatórios gerados pelo pipeline
+- `docs/legacy/`: trilha histórica numerada preservada (`00` a `10`)
 
-### Recrutador (5 minutos)
+## Leitura recomendada (5-10 minutos)
 
-1. [recruiter_summary.md](recruiter_summary.md)
-2. [executive_summary.md](executive_summary.md)
-3. [case_study.md](case_study.md)
-4. [architecture.md](architecture.md)
-5. [privacy_governance.md](privacy_governance.md)
+1. [executive/recruiter_summary.md](executive/recruiter_summary.md)
+2. [architecture/architecture.md](architecture/architecture.md)
+3. [governance/privacy_governance.md](governance/privacy_governance.md)
+4. [architecture/semantic_layer.md](architecture/semantic_layer.md)
+5. [operations/operating_model.md](operations/operating_model.md)
 
-### Tech Lead (15 minutos)
+## Fronteiras de prontidão de produção
 
-1. [architecture.md](architecture.md)
-2. [operating_model.md](operating_model.md)
-3. [data_governance_operating_model.md](data_governance_operating_model.md)
-4. [engineering_governance.md](engineering_governance.md)
-5. [data_quality_report.md](data_quality_report.md)
+- Projeto de portfólio com orientação de produção.
+- Dados sintéticos/públicos, sem uso de dados pessoais reais.
+- Controles inspirados em LGPD, sem certificação jurídica.
+- Sem IAM corporativo completo, trilha centralizada de auditoria e workflow formal de DPO.
 
-### Governança / Privacidade (20 minutos)
+## Índice rápido
 
-1. [privacy_governance.md](privacy_governance.md)
-2. [lgpd_ripd_sample.md](lgpd_ripd_sample.md)
-3. [access_and_retention_policy.md](access_and_retention_policy.md)
-4. [lgpd_controls.md](lgpd_controls.md)
-5. [governance_policy.md](governance_policy.md)
-
-## Índice rápido de artefatos
-
-| Artefato | Link |
+| Área | Documento |
 | --- | --- |
-| Controles LGPD | [lgpd_controls.md](lgpd_controls.md) |
-| Relatório de qualidade | [data_quality_report.md](data_quality_report.md) |
-| Camada semântica | [semantic_layer.md](semantic_layer.md) |
-| Privacidade e governança | [privacy_governance.md](privacy_governance.md) |
-| Mini RIPD (simulado) | [lgpd_ripd_sample.md](lgpd_ripd_sample.md) |
-| Lineage técnico (JSON) | [technical_lineage.json](../data/curated/catalog/technical_lineage.json) |
-| Scorecards de governança | [governance_scorecards.csv](../data/published/monitoring/governance_scorecards.csv) |
-| Histórico de governança | [governance_history.csv](../data/published/monitoring/governance_history.csv) |
-
-## Guias principais
-
-- [executive_summary.md](executive_summary.md): visão executiva
-- [architecture.md](architecture.md): arquitetura implementada
-- [case_study.md](case_study.md): narrativa de problema, solução e resultado
-- [operating_model.md](operating_model.md): pipeline, publicação, deploy e operação
-- [data_governance_operating_model.md](data_governance_operating_model.md): modelo de governança operacional
-- [privacy_governance.md](privacy_governance.md): fronteira de exposição e controles privacy-aware
-- [technical_narrative.md](technical_narrative.md): defesa técnica consolidada
-
-## Relatórios gerados
-
-- [raw_data_inventory.md](raw_data_inventory.md)
-- [eda_summary.md](eda_summary.md)
-- [fact_orders_enriched.md](fact_orders_enriched.md)
-- [data_quality_report.md](data_quality_report.md)
-- [schema_contract_report.md](schema_contract_report.md)
-- [data_classification.md](data_classification.md)
-- [published_layer_monitoring.md](published_layer_monitoring.md)
-- [semantic_layer.md](semantic_layer.md)
-- [operational_job_report.md](operational_job_report.md)
-- [technical_lineage.md](technical_lineage.md)
-- [governance_scorecards.md](governance_scorecards.md)
-
-## Runbooks e operação
-
-- [release_runbook.md](release_runbook.md)
-- [rollback_runbook.md](rollback_runbook.md)
-- [publication_checklist.md](publication_checklist.md)
-- [streamlit_capture_runbook.md](streamlit_capture_runbook.md)
-
-## Histórico
-
-Os arquivos numerados `00` a `10` foram mantidos como trilha histórica do projeto.
+| Executivo | [executive/executive_summary.md](executive/executive_summary.md) |
+| Caso | [executive/case_study.md](executive/case_study.md) |
+| Arquitetura | [architecture/architecture.md](architecture/architecture.md) |
+| Governança | [governance/privacy_governance.md](governance/privacy_governance.md) |
+| Operação | [operations/release_runbook.md](operations/release_runbook.md) |
+| Relatórios | [reports/data_quality_report.md](reports/data_quality_report.md) |
+| Histórico | [legacy/00_planejamento.md](legacy/00_planejamento.md) |

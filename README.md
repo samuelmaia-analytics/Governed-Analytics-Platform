@@ -82,6 +82,7 @@ flowchart LR
 - This is a **production-inspired portfolio project**.
 - It uses **sample, synthetic, or public data only**.
 - It **does not process real personal data**.
+- It implements **LGPD-inspired controls**, not legal certification.
 - It demonstrates engineering patterns such as:
   - data contracts;
   - quality gates;
@@ -89,6 +90,8 @@ flowchart LR
   - observability;
   - lineage;
   - CI/CD.
+- It does **not** include enterprise IAM, centralized audit logging, formal DPO workflow, or real DPA processing agreements.
+- A real production rollout would require legal, security, and infrastructure approval.
 - It is **not** a live enterprise production system.
 
 ## What this project demonstrates
@@ -125,10 +128,10 @@ make app
 ## How to review this project in 5 minutes
 
 1. Read until **Implemented vs Simulated**.
-2. Open `docs/architecture.md` and `docs/privacy_governance.md`.
+2. Open `docs/architecture/architecture.md` and `docs/governance/privacy_governance.md`.
 3. Run `make test`.
 4. Open the Streamlit app and inspect **Governance Control Center**.
-5. Review `docs/semantic_layer.md` and `docs/recruiter_summary.md`.
+5. Review `docs/architecture/semantic_layer.md` and `docs/executive/recruiter_summary.md`.
 
 ## Streamlit Executive App
 

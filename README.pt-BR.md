@@ -34,7 +34,7 @@ Este repositório demonstra um fluxo completo:
 2. Veja a arquitetura e a separação entre camadas.
 3. Rode `make install`, `make test`, `make app`.
 4. Abra o app e confira páginas de governança.
-5. Revise `docs/privacy_governance.md` e `docs/semantic_layer.md`.
+5. Revise `docs/governance/privacy_governance.md` e `docs/architecture/semantic_layer.md`.
 
 ## Problema de negócio
 
@@ -68,6 +68,14 @@ Abordagem de produto analítico governado:
 - Mini RIPD em Markdown para demonstração técnica.
 - Base legal e retenção em linguagem de portfólio.
 - Controles corporativos avançados (IAM completo e trilha centralizada de auditoria).
+
+## Limites de prontidão para produção
+
+- Projeto de portfólio com inspiração de produção.
+- Uso de dados sintéticos, públicos ou de demonstração.
+- Controles inspirados em LGPD, sem certificação jurídica.
+- Sem IAM corporativo completo, trilha centralizada de auditoria, workflow formal de DPO ou acordo real de processamento de dados.
+- Uma implantação real exigiria aprovação jurídica, segurança e infraestrutura.
 
 ## Setup local
 
