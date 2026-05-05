@@ -6,60 +6,56 @@
 
 **Language:** `PT-BR` | [EN](README.en.md)
 
-Índice técnico da pasta `docs/`. Contexto geral, setup e execução local ficam no [README da raiz](../README.md).
+Índice técnico da pasta `docs/`.
+Contexto geral, setup e execução local ficam no [README da raiz](../README.md).
 
 ## Trilhas de leitura
 
-### Recruiter (5 minutos)
+### Recrutador (5 minutos)
 
-1. [executive_summary.md](executive_summary.md)
-2. [architecture.md](architecture.md)
-3. [privacy_governance.md](privacy_governance.md)
-4. [semantic_layer.md](semantic_layer.md)
+1. [recruiter_summary.md](recruiter_summary.md)
+2. [executive_summary.md](executive_summary.md)
+3. [case_study.md](case_study.md)
+4. [architecture.md](architecture.md)
+5. [privacy_governance.md](privacy_governance.md)
 
 ### Tech Lead (15 minutos)
 
 1. [architecture.md](architecture.md)
 2. [operating_model.md](operating_model.md)
-3. [engineering_governance.md](engineering_governance.md)
-4. [data_quality_report.md](data_quality_report.md)
-5. [technical_narrative.md](technical_narrative.md)
+3. [data_governance_operating_model.md](data_governance_operating_model.md)
+4. [engineering_governance.md](engineering_governance.md)
+5. [data_quality_report.md](data_quality_report.md)
 
-### Governance Reviewer (20 minutos)
+### Governança / Privacidade (20 minutos)
 
 1. [privacy_governance.md](privacy_governance.md)
-2. [access_and_retention_policy.md](access_and_retention_policy.md)
-3. [lgpd_controls.md](lgpd_controls.md)
-4. [governance_policy.md](governance_policy.md)
-5. [release_runbook.md](release_runbook.md)
-6. [rollback_runbook.md](rollback_runbook.md)
+2. [lgpd_ripd_sample.md](lgpd_ripd_sample.md)
+3. [access_and_retention_policy.md](access_and_retention_policy.md)
+4. [lgpd_controls.md](lgpd_controls.md)
+5. [governance_policy.md](governance_policy.md)
 
-## Índice rápido de artefatos de governança
+## Índice rápido de artefatos
 
 | Artefato | Link |
 | --- | --- |
 | Controles LGPD | [lgpd_controls.md](lgpd_controls.md) |
 | Relatório de qualidade | [data_quality_report.md](data_quality_report.md) |
+| Camada semântica | [semantic_layer.md](semantic_layer.md) |
+| Privacidade e governança | [privacy_governance.md](privacy_governance.md) |
+| Mini RIPD (simulado) | [lgpd_ripd_sample.md](lgpd_ripd_sample.md) |
 | Lineage técnico (JSON) | [technical_lineage.json](../data/curated/catalog/technical_lineage.json) |
 | Scorecards de governança | [governance_scorecards.csv](../data/published/monitoring/governance_scorecards.csv) |
 | Histórico de governança | [governance_history.csv](../data/published/monitoring/governance_history.csv) |
 
-## Comece por aqui
-
-1. [executive_summary.md](executive_summary.md)
-2. [architecture.md](architecture.md)
-3. [operating_model.md](operating_model.md)
-4. [privacy_governance.md](privacy_governance.md)
-5. [technical_narrative.md](technical_narrative.md)
-
-## Guias principais (válidos no repositório)
+## Guias principais
 
 - [executive_summary.md](executive_summary.md): visão executiva
 - [architecture.md](architecture.md): arquitetura implementada
+- [case_study.md](case_study.md): narrativa de problema, solução e resultado
 - [operating_model.md](operating_model.md): pipeline, publicação, deploy e operação
-- [privacy_governance.md](privacy_governance.md): fronteira de exposição, LGPD e checks da camada publicada
-- [engineering_governance.md](engineering_governance.md): guardrails do repositório e workflows
-- [platform_publication.md](platform_publication.md): publicação em ambiente de plataforma
+- [data_governance_operating_model.md](data_governance_operating_model.md): modelo de governança operacional
+- [privacy_governance.md](privacy_governance.md): fronteira de exposição e controles privacy-aware
 - [technical_narrative.md](technical_narrative.md): defesa técnica consolidada
 
 ## Relatórios gerados
@@ -76,12 +72,6 @@
 - [technical_lineage.md](technical_lineage.md)
 - [governance_scorecards.md](governance_scorecards.md)
 
-## Camada semântica e lineage
-
-- o pipeline Python continua produzindo `fact_orders_enriched` e `fact_orders_dashboard`
-- a camada semântica publicada é derivada da camada `published` para recortes executivos e operacionais
-- Streamlit, Power BI e workflows SQL devem ser lidos a partir da camada publicada e dos marts semânticos
-
 ## Runbooks e operação
 
 - [release_runbook.md](release_runbook.md)
@@ -89,16 +79,6 @@
 - [publication_checklist.md](publication_checklist.md)
 - [streamlit_capture_runbook.md](streamlit_capture_runbook.md)
 
-## Materiais complementares
-
-- [collection_catalog.md](collection_catalog.md)
-- [governance_policy.md](governance_policy.md)
-- [privacy_governance.md](privacy_governance.md)
-- [branch_protection_recommendation.md](branch_protection_recommendation.md)
-- [bi_bonus.md](bi_bonus.md)
-- [genai_bonus.md](genai_bonus.md)
-
 ## Histórico
 
-Os arquivos numerados `00` a `10` foram mantidos como trilha histórica do projeto e podem ser usados como narrativa de evolução.
-
+Os arquivos numerados `00` a `10` foram mantidos como trilha histórica do projeto.

@@ -6,27 +6,59 @@
 
 **Language:** [PT-BR](README.md) | `EN`
 
-Technical index for the `docs/` folder. Full project context and local setup remain in the [root README](../README.en.md).
+Technical index for the `docs/` folder.
+Project overview and local setup are in the [root README](../README.en.md).
 
-## Start Here
+## Reading paths
 
-1. [executive_summary.md](executive_summary.md)
-2. [architecture.md](architecture.md)
-3. [operating_model.md](operating_model.md)
-4. [privacy_governance.md](privacy_governance.md)
-5. [technical_narrative.md](technical_narrative.md)
+### Recruiter (5 minutes)
 
-## Main Guides (valid in this repository)
+1. [recruiter_summary.md](recruiter_summary.md)
+2. [executive_summary.md](executive_summary.md)
+3. [case_study.md](case_study.md)
+4. [architecture.md](architecture.md)
+5. [privacy_governance.md](privacy_governance.md)
+
+### Tech Lead (15 minutes)
+
+1. [architecture.md](architecture.md)
+2. [operating_model.md](operating_model.md)
+3. [data_governance_operating_model.md](data_governance_operating_model.md)
+4. [engineering_governance.md](engineering_governance.md)
+5. [data_quality_report.md](data_quality_report.md)
+
+### Governance / Privacy Reviewer (20 minutes)
+
+1. [privacy_governance.md](privacy_governance.md)
+2. [lgpd_ripd_sample.md](lgpd_ripd_sample.md)
+3. [access_and_retention_policy.md](access_and_retention_policy.md)
+4. [lgpd_controls.md](lgpd_controls.md)
+5. [governance_policy.md](governance_policy.md)
+
+## Governance artifacts quick index
+
+| Artifact | Link |
+| --- | --- |
+| LGPD controls | [lgpd_controls.md](lgpd_controls.md) |
+| Data quality report | [data_quality_report.md](data_quality_report.md) |
+| Semantic layer | [semantic_layer.md](semantic_layer.md) |
+| Privacy governance | [privacy_governance.md](privacy_governance.md) |
+| Mini RIPD (simulated) | [lgpd_ripd_sample.md](lgpd_ripd_sample.md) |
+| Technical lineage (JSON) | [technical_lineage.json](../data/curated/catalog/technical_lineage.json) |
+| Governance scorecards | [governance_scorecards.csv](../data/published/monitoring/governance_scorecards.csv) |
+| Governance history | [governance_history.csv](../data/published/monitoring/governance_history.csv) |
+
+## Core guides
 
 - [executive_summary.md](executive_summary.md): executive overview
 - [architecture.md](architecture.md): implemented architecture
-- [operating_model.md](operating_model.md): pipeline, publication, deploy, and operations
-- [privacy_governance.md](privacy_governance.md): exposure boundary, LGPD, and checks
-- [engineering_governance.md](engineering_governance.md): repository guardrails and workflows
-- [platform_publication.md](platform_publication.md): publication in platform environment
+- [case_study.md](case_study.md): problem-solution-outcome narrative
+- [operating_model.md](operating_model.md): pipeline, publication, deploy, and ops
+- [data_governance_operating_model.md](data_governance_operating_model.md): governance operating model
+- [privacy_governance.md](privacy_governance.md): privacy-aware exposure boundary and controls
 - [technical_narrative.md](technical_narrative.md): consolidated technical defense
 
-## Generated Reports
+## Generated reports
 
 - [raw_data_inventory.md](raw_data_inventory.md)
 - [eda_summary.md](eda_summary.md)
@@ -40,10 +72,9 @@ Technical index for the `docs/` folder. Full project context and local setup rem
 - [technical_lineage.md](technical_lineage.md)
 - [governance_scorecards.md](governance_scorecards.md)
 
-## Runbooks and Ops
+## Runbooks and operations
 
 - [release_runbook.md](release_runbook.md)
 - [rollback_runbook.md](rollback_runbook.md)
 - [publication_checklist.md](publication_checklist.md)
 - [streamlit_capture_runbook.md](streamlit_capture_runbook.md)
-
