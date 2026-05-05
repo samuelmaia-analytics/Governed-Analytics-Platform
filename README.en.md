@@ -92,7 +92,6 @@ The project implements a governed analytics product approach:
 | Path | Purpose |
 | --- | --- |
 | `app/` | modern executive Streamlit app |
-| `streamlit_app/` | legacy app (deprecated) |
 | `src/` | analytics engineering and governance modules |
 | `data/samples/` | synthetic demonstration dataset |
 | `docs/` | governance reports and technical docs |
@@ -113,14 +112,6 @@ Executive app:
 
 ```bash
 streamlit run app/main.py
-```
-
-## Legacy
-
-Legacy app (deprecated):
-
-```bash
-streamlit run streamlit_app/app.py
 ```
 
 ## Testing and Quality Gates

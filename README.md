@@ -113,7 +113,6 @@ flowchart LR
 | Caminho | Finalidade |
 | --- | --- |
 | `app/` | nova interface executiva Streamlit por abas |
-| `streamlit_app/` | app legado (deprecado) |
 | `src/` | módulos de Analytics Engineering, LGPD e qualidade |
 | `data/samples/` | datasets sintéticos para demonstração |
 | `docs/` | relatórios e documentação de governança |
@@ -134,14 +133,6 @@ App executivo:
 
 ```bash
 streamlit run app/main.py
-```
-
-## Legado
-
-App legado (deprecado):
-
-```bash
-streamlit run streamlit_app/app.py
 ```
 
 ## Exemplos de uso
