@@ -17,6 +17,8 @@ from src.privacy_governance_artifacts import (
 from src.risk_scoring import calculate_privacy_risk_score
 
 DEFAULT_DOCS_DIR = Path("docs")
+DEFAULT_REPORTS_DIR = DEFAULT_DOCS_DIR / "reports"
+DEFAULT_GOVERNANCE_DIR = DEFAULT_DOCS_DIR / "governance"
 
 
 def _now_utc_iso() -> str:
@@ -136,16 +138,20 @@ def _build_data_quality_markdown(df: pd.DataFrame, quality_table: pd.DataFrame, 
 def generate_markdown_reports(df: pd.DataFrame, docs_dir: str | Path = DEFAULT_DOCS_DIR) -> dict[str, Path]:
     docs_path = Path(docs_dir)
     docs_path.mkdir(parents=True, exist_ok=True)
+    reports_path = docs_path / "reports"
+    governance_path = docs_path / "governance"
+    reports_path.mkdir(parents=True, exist_ok=True)
+    governance_path.mkdir(parents=True, exist_ok=True)
 
     classification_df = classify_dataframe_columns(df)
     risk_result = calculate_privacy_risk_score(classification_df, total_rows=len(df))
     quality_results: DataQualityResult = run_data_quality_checks(df)
     quality_table = generate_data_quality_table(df)
 
-    data_dictionary_path = docs_path / "data_dictionary.md"
-    lgpd_controls_path = docs_path / "lgpd_controls.md"
-    data_quality_path = docs_path / "data_quality_report.md"
-    ripd_sample_path = docs_path / "lgpd_ripd_sample.md"
+    data_dictionary_path = reports_path / "data_dictionary.md"
+    lgpd_controls_path = governance_path / "lgpd_controls.md"
+    data_quality_path = reports_path / "data_quality_report.md"
+    ripd_sample_path = governance_path / "lgpd_ripd_sample.md"
 
     data_dictionary_path.write_text(
         _build_data_dictionary_markdown(df, classification_df),

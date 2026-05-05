@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -9,6 +10,7 @@ from src.governance_history import append_governance_history
 
 def test_append_governance_history(tmp_path: Path) -> None:
     output = tmp_path / "governance_history.csv"
+    decision_output = tmp_path / "publication_decision.json"
     privacy_result = {
         "score": 40,
         "total_score": 40,
@@ -47,6 +49,7 @@ def test_append_governance_history(tmp_path: Path) -> None:
         dataset_name="fact_orders_dashboard",
         freshness_status="warning",
         history_path=output,
+        publication_decision_path=decision_output,
     )
     append_governance_history(
         total_rows=10,
@@ -57,6 +60,7 @@ def test_append_governance_history(tmp_path: Path) -> None:
         dataset_name="fact_orders_dashboard",
         freshness_status="warning",
         history_path=output,
+        publication_decision_path=decision_output,
     )
     stored = pd.read_csv(output)
     assert len(stored) == 2
@@ -77,10 +81,16 @@ def test_append_governance_history(tmp_path: Path) -> None:
     assert int(stored["critical_rules_count"].iloc[0]) == 1
     assert int(stored["warning_rules_count"].iloc[0]) == 1
     assert "run_timestamp" in stored.columns
+    assert decision_output.exists()
+    payload = json.loads(decision_output.read_text(encoding="utf-8"))
+    assert payload["dataset"] == "fact_orders_dashboard"
+    assert payload["status"] == "Needs Review"
+    assert payload["failed_checks"] == 2
 
 
 def test_append_governance_history_defaults_for_optional_fields(tmp_path: Path) -> None:
     output = tmp_path / "governance_history.csv"
+    decision_output = tmp_path / "publication_decision.json"
     privacy_result = {
         "score": 20,
         "total_score": 20,
@@ -114,9 +124,12 @@ def test_append_governance_history_defaults_for_optional_fields(tmp_path: Path) 
         quality_result=quality_result,
         publication_status="Approved",
         history_path=output,
+        publication_decision_path=decision_output,
     )
     stored = pd.read_csv(output)
     assert stored["dataset_name"].iloc[0] == "fact_orders_dashboard"
     assert stored["freshness_status"].iloc[0] == "unknown"
     assert int(stored["warning_rules_count"].iloc[0]) == 0
     assert int(stored["critical_rules_count"].iloc[0]) == 0
+    payload = json.loads(decision_output.read_text(encoding="utf-8"))
+    assert payload["status"] == "Approved"

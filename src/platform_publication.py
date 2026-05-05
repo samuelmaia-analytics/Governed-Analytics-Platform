@@ -23,7 +23,7 @@ from src.observability import configure_logging
 from src.settings import load_app_settings
 
 DEFAULT_PIPELINE_DEFINITION_PATH = ROOT_DIR / "contracts" / "dadosfera" / "pipelines" / "fact_orders_dashboard_s3_parquet_pipeline.json"
-DEFAULT_REPORT_PATH = DOCS_DIR / "platform_publication.md"
+DEFAULT_REPORT_PATH = DOCS_DIR / "reports" / "platform_publication.md"
 
 
 @dataclass(frozen=True)

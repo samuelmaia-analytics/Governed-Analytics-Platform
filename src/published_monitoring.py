@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 PUBLISHED_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
 RESULTS_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv"
 SUMMARY_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.json"
-REPORT_PATH = DOCS_DIR / "published_layer_monitoring.md"
+REPORT_PATH = DOCS_DIR / "reports" / "published_layer_monitoring.md"
 EXPECTED_COLUMNS = {
     "order_id",
     "order_item_id",

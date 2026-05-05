@@ -12,6 +12,8 @@ from pathlib import Path
 from time import perf_counter
 from typing import Callable
 
+import pandas as pd
+
 if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
@@ -22,12 +24,20 @@ from src.config import DOCS_DIR, OPS_DIR, PATHS
 from src.data_classification import main as classification_main
 from src.export_power_bi import run_export
 from src.export_query_result_images import export_all_query_result_images
+from src.governance_history import save_publication_decision_artifact
+from src.governance_observability import (
+    evaluate_governance_observability,
+    load_governance_history,
+    save_observability_results,
+)
 from src.governance_scorecards import main as governance_scorecards_main
 from src.ingest import configure_logging, run_inventory
 from src.lineage import main as lineage_main
 from src.preprocess import run_profiling
 from src.publish_dashboard import run_publish_dashboard
 from src.published_monitoring import (
+    EXPECTED_COLUMNS,
+    PUBLISHED_PARQUET_PATH,
     run_monitoring,
 )
 from src.published_monitoring import (
@@ -93,7 +103,7 @@ PIPELINE_STEPS = [
     PipelineStep("bi", "Exporta os datasets auxiliares para Power BI."),
 ]
 PIPELINE_RESULTS_PATH = OPS_DIR / "operational_job_results.json"
-PIPELINE_REPORT_PATH = DOCS_DIR / "operational_job_report.md"
+PIPELINE_REPORT_PATH = DOCS_DIR / "reports" / "operational_job_report.md"
 StepHandler = Callable[[], None]
 
 
@@ -108,6 +118,35 @@ def _run_monitor_step() -> None:
     results = run_monitoring()
     save_published_monitoring_results(results)
     save_published_monitoring_report(results)
+    published_df = load_published_monitoring_frame()
+    history_df = load_governance_history()
+    freshness_result = next((item for item in results if item.check_name == "published_file_freshness_hours"), None)
+    freshness_status = "fresh" if freshness_result and freshness_result.status == "PASS" else "stale"
+    observability_checks = evaluate_governance_observability(
+        expected_columns=EXPECTED_COLUMNS,
+        observed_columns=list(published_df.columns),
+        freshness_status=freshness_status,
+        history_df=history_df,
+    )
+    save_observability_results(observability_checks)
+    failed_checks_count = int(sum(result.status == "FAIL" for result in results))
+    latest_quality_score = int(history_df["data_quality_score"].iloc[-1]) if "data_quality_score" in history_df.columns and not history_df.empty else max(0, 100 - (failed_checks_count * 10))
+    latest_privacy_risk = int(history_df["privacy_risk_score"].iloc[-1]) if "privacy_risk_score" in history_df.columns and not history_df.empty else 0
+    publication_status = "Approved" if failed_checks_count == 0 else "Needs Review"
+    save_publication_decision_artifact(
+        dataset_name="fact_orders_dashboard",
+        publication_status=publication_status,
+        data_quality_score=latest_quality_score,
+        privacy_risk_score=latest_privacy_risk,
+        failed_checks_count=failed_checks_count,
+        timestamp_utc=datetime.now(UTC).isoformat(),
+    )
+
+
+def load_published_monitoring_frame() -> pd.DataFrame:
+    if not PUBLISHED_PARQUET_PATH.exists():
+        return pd.DataFrame()
+    return pd.read_parquet(PUBLISHED_PARQUET_PATH)
 
 
 def _run_queries_step() -> None:
