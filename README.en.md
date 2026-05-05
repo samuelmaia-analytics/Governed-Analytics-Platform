@@ -6,139 +6,104 @@
 [![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
-[![Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
 
 **Language:** [PT-BR](README.md) | `EN`
 
-A portfolio-grade governed analytics platform that demonstrates Analytics Engineering, data governance, LGPD-inspired controls, data quality, and executive delivery.
+A portfolio-grade governed analytics platform.
+This repository shows Analytics Engineering practices with governance controls and executive delivery.
 
-> This is not only a dashboard. It is an Analytics Engineering case with governance, quality controls, privacy classification, explainable risk scoring, a published layer, and executive delivery.
+> This is not only a dashboard.
+> It is a privacy-aware, production-oriented analytics case with publication controls.
 
 ## Executive Summary
 
-This repository presents a **production-oriented** analytical platform built over public Olist data.  
-It combines pipeline engineering, privacy-aware publication controls, quality checks, contracts, monitoring, and executive consumption in Streamlit and Power BI.
+The project demonstrates how to transform relational CSV inputs into a governed published analytics layer.
+It combines data pipeline execution, privacy classification, explainable risk scoring, data quality checks, and executive reporting.
 
 ## Why this project matters
 
-Most analytics portfolios stop at dashboards. This project demonstrates the full path from raw data to a governed published layer with explicit controls and operational evidence.
+Many analytics portfolios stop at visualizations.
+This one highlights controlled publication, quality evidence, and reproducibility.
 
 ## What this project demonstrates
 
-- Analytics Engineering with explicit internal vs published layers.
-- LGPD-inspired controls for minimization and pseudonymization before publication.
-- Declarative and code-driven data quality checks.
-- Explainable privacy risk scoring and publication readiness states.
-- CI/CD guardrails with linting, tests, and coverage reporting.
+- Internal vs published layer separation.
+- LGPD-inspired privacy controls.
+- Explainable privacy risk scoring.
+- Data quality checks with explicit rules.
+- CI quality gates and test coverage.
+- Executive-facing Streamlit experience.
 
-## How to review in 5 minutes
+## How to review this project in 5 minutes
 
 1. Read **Business Problem** and **Solution**.
-2. Check the pipeline and layer separation in **Architecture Summary** and `docs/architecture.md`.
-3. Run locally with `make install`, `make test`, and `make app`.
-4. Open the app and inspect **Executive Overview**, **LGPD & Privacy Risk**, **Data Quality**, and **Governance Control Center**.
-5. Validate governance evidence in `docs/privacy_governance.md`, `docs/data_quality_report.md`, and `docs/semantic_layer.md`.
-
-## Recruiter Quick View
-
-- Governed analytics product, not only a dashboard.
-- Modular Python pipeline from ingestion to published layer.
-- Column-level LGPD classification.
-- Explainable privacy risk scoring.
-- Declarative YAML-based data quality rules.
-- Data Quality Score and publication decision in the app.
-- Privacy masking/anonymization preview in the interface.
-- Automated screenshots with Playwright.
-- Tests, CI, Ruff, Pytest, and reproducible local execution.
+2. Inspect **Architecture** and publication boundaries.
+3. Run `make install`, `make test`, `make app`.
+4. Review key app pages:
+   - Executive Overview
+   - LGPD & Privacy Risk
+   - Data Quality
+   - Governance Control Center
+5. Open `docs/privacy_governance.md` and `docs/semantic_layer.md`.
 
 ## Business Problem
 
-Analytics teams often accelerate delivery without formal controls for quality, privacy, and traceability. This creates regulatory risk, low trust in data assets, and weak governance for executive decisions.
+Analytics outputs are often published without clear controls for privacy, quality, and traceability.
+That creates delivery risk, trust issues, and inconsistent decision criteria.
 
 ## Solution
 
-The project implements a governed analytics product approach:
+This repository implements a governed analytics flow:
 
-- explicit boundary between internal and published layers;
-- column-level LGPD classification with privacy risk scoring;
-- reusable data quality checks;
-- automated EDA for analytical acceleration;
-- Markdown reports for technical and executive governance.
+- modular Python pipeline;
+- explicit published-layer constraints;
+- privacy classification and risk scoring;
+- contract-driven quality checks;
+- executive documentation and operational evidence.
 
 ## Problem -> Solution -> Evidence
 
 | Problem | Solution | Evidence |
 | --- | --- | --- |
-| Analytics delivery without a clear exposure boundary | Internal (`curated`) and published (`published`) layers are explicitly separated | `docs/architecture.md`, `src/publish_dashboard.py` |
-| Unnecessary data exposure risk | Data minimization + pseudonymization before publication | `docs/privacy_governance.md`, `contracts/governance/privacy_governance.json` |
-| Inconsistent data quality between processing and consumption | Declarative quality rules + automated checks in pipeline | `contracts/data_quality_rules.yml`, `src/data_quality_rules.py`, `tests/test_data_quality_rules.py` |
-| Ambiguous decision metrics | Published semantic layer with documented KPI definitions | `src/semantic_layer.py`, `docs/semantic_layer.md` |
-| Low operational confidence | CI, lint, tests, and release/rollback runbooks | `.github/workflows/`, `docs/release_runbook.md`, `docs/rollback_runbook.md` |
+| Uncontrolled exposure | Minimized and pseudonymized published layer | `docs/privacy_governance.md` |
+| Weak quality confidence | Declarative rules + automated checks | `contracts/data_quality_rules.yml` |
+| Metric inconsistency | Documented semantic layer | `docs/semantic_layer.md` |
+| Low operational trust | CI, lint, test gates | `.github/workflows/ci.yml` |
 
 ## Architecture
 
-1. `src/data_loader.py` reads synthetic sample datasets.
-2. `src/lgpd_classifier.py` classifies columns by LGPD category.
-3. `src/risk_scoring.py` computes explainable privacy risk score and publication recommendation.
-4. `src/data_quality.py` + `src/data_quality_rules.py` run built-in and YAML-driven quality checks.
-5. `src/report_generator.py` materializes governance artifacts in `docs/`.
-6. `app/main.py` exposes executive governance pages in Streamlit.
-
-The architectural boundary is intentional:
-- internal analytical layer for engineering (`curated`);
-- privacy-aware published layer for executive consumption (`published`).
-
-## Core Features
-
-- Executive Overview with governance KPIs.
-- Data Catalog with metadata and column dictionary.
-- LGPD & Privacy Risk with recommendations.
-- Data Quality checks with severity and status.
-- EDA (descriptive stats, null profile, outliers, correlation).
-- Governance Report generated in `docs/`.
-- Domain-versioned LGPD policies under `contracts/governance/policies/`.
-- Contract-driven business rules under `contracts/governance/business_rules/`.
-- Automated technical lineage in `data/curated/catalog/technical_lineage.json`.
-- Dataset governance scorecards in `data/published/monitoring/governance_scorecards.csv`.
-- Governance Control Center page with publication readiness and top risk actions.
-- Privacy transformation module (`src/privacy_transformations.py`) with masking/anonymization actions.
-- Governance run history (`data/published/monitoring/governance_history.csv`) for traceability.
-
-## What This Demonstrates to Recruiters
-
-- Analytics engineering with reproducible governance controls.
-- LGPD-oriented privacy-by-design in analytical products.
-- Contract/rule-driven data quality validation.
-- Typed Python modules, tests, CI compatibility, and executive UX delivery.
+```mermaid
+flowchart LR
+    A[Raw Data] --> B[src/data_loader.py]
+    B --> C[src/lgpd_classifier.py]
+    B --> D[src/data_quality.py]
+    C --> E[src/risk_scoring.py]
+    D --> F[src/report_generator.py]
+    E --> F
+    B --> G[app/main.py]
+    C --> G
+    D --> G
+    E --> G
+```
 
 ## Data Governance and Privacy Controls
 
-- LGPD-inspired classification categories and explainable risk scoring.
-- Publication checks for forbidden columns, pseudonymization and required fields.
-- Data minimization for executive exposure.
-- Governance artifacts and monitoring outputs versioned in-repo.
+- LGPD-inspired column classification.
+- Explainable privacy risk score with action hints.
+- Publication checks before executive exposure.
+- Privacy-aware published layer for dashboard consumption.
 
-These controls are **privacy-aware engineering controls** and do not replace legal assessment.
-
-## Main Structure
-
-| Path | Purpose |
-| --- | --- |
-| `app/` | modern executive Streamlit app |
-| `src/` | analytics engineering and governance modules |
-| `data/samples/` | synthetic demonstration dataset |
-| `docs/` | governance reports and technical docs |
-| `tests/` | automated test suite |
+These controls are technical controls and do not replace legal assessment.
 
 ## Data Quality
 
-- Rules in `contracts/data_quality_rules.yml` cover nulls, uniqueness, range checks, allowed values, and publication-critical completeness.
-- Quality outputs are materialized and consumed by governance pages and reports.
-- The goal is consistent evidence between pipeline execution and executive consumption.
+- Rule categories include completeness, validity, consistency, and critical publication checks.
+- Results are aggregated for executive visibility and detailed for engineering diagnosis.
 
 ## Streamlit App
 
-The app is organized into executive-oriented pages:
+Main pages:
+
 - Executive Overview
 - Data Catalog
 - LGPD & Privacy Risk
@@ -147,7 +112,21 @@ The app is organized into executive-oriented pages:
 - Governance Report
 - Governance Control Center
 
+## Main Structure
+
+| Path | Purpose |
+| --- | --- |
+| `app/` | Executive Streamlit interface |
+| `src/` | Pipeline, governance, and quality modules |
+| `contracts/` | Declarative contracts and rules |
+| `docs/` | Governance and semantic documentation |
+| `tests/` | Automated tests |
+| `.github/workflows/` | CI/CD workflows |
+| `powerbi/` | BI export support artifacts |
+
 ## How to run locally
+
+### Linux / macOS
 
 ```bash
 python -m venv .venv
@@ -156,7 +135,7 @@ make install
 cp .env.example .env
 ```
 
-On Windows PowerShell, use:
+### Windows PowerShell
 
 ```powershell
 python -m venv .venv
@@ -165,114 +144,36 @@ make install
 copy .env.example .env
 ```
 
-## Run Apps
-
-Executive app:
+## Run
 
 ```bash
+make test
 make app
 ```
 
-## How to review this project in 5 minutes
-
-1. Read **Executive Summary** and **Why this project matters**.
-2. Inspect **Architecture** and the published-layer boundary.
-3. Run `make install`, `make test`, and `make app`.
-4. Open Governance Control Center and LGPD & Privacy Risk pages.
-5. Review `docs/privacy_governance.md` and `docs/semantic_layer.md`.
-
-## Testing and Quality Gates
-
-```bash
-make lint
-python -m mypy src/data_loader.py src/data_quality.py src/eda.py src/lgpd_classifier.py src/risk_scoring.py src/report_generator.py src/governance_types.py app/main.py app/context.py app/components/cards.py app/pages/data_catalog.py app/pages/data_quality.py app/pages/eda.py app/pages/executive_overview.py app/pages/governance_report.py app/pages/lgpd_privacy_risk.py
-make test
-```
-
-Highlighted tests:
-
-- `tests/test_lgpd_classifier.py`
-- `tests/test_risk_scoring.py`
-- `tests/test_data_quality.py`
-- `tests/test_privacy_transformations.py`
-- `tests/test_data_quality_rules.py`
-- `tests/test_governance_history.py`
-
 ## Recruiter Notes
 
-- This is not only a dashboard project; it is a **portfolio-grade governed analytics platform**.
-- It shows design decisions, controls, tests, and operational artifacts expected in real analytics teams.
-- The project is suitable for Data Analyst, Analytics Engineer, Data Engineer, BI Analyst, and Data Governance-oriented roles.
+This project is suitable to discuss:
 
-## Governance Features
-
-- Explainable privacy score components and recommendations.
-- Declarative quality checks (`contracts/data_quality_rules.yml`).
-- Publication decision states: `Approved`, `Needs Review`, `Blocked`.
-- Monitoring history append function: call `src.governance_history.append_governance_history`.
-
-```bash
-python -c "from pathlib import Path; import pandas as pd; from src.data_quality import run_data_quality_checks; from src.lgpd_classifier import classify_dataframe_columns; from src.governance_history import append_governance_history_from_dataframes; df = pd.read_csv('data/samples/sample_governance_dataset.csv'); classification = classify_dataframe_columns(df); quality = run_data_quality_checks(df); append_governance_history_from_dataframes(df=df, classification_df=classification, quality_result=quality, publication_status='Needs Review'); print(Path('data/published/monitoring/governance_history.csv').resolve())"
-```
-
-## Case Study Snapshot
-
-Given a synthetic commerce dataset with personal identifiers and quality issues, the platform classifies privacy exposure, executes quality checks, summarizes governance risk, and provides a clear publication decision with recommended remediation actions.
-
-## Screenshots
-
-### Executive Overview
-![Executive Overview](assets/screenshots/executive_overview.png)
-
-### LGPD & Privacy Risk
-![LGPD & Privacy Risk](assets/screenshots/lgpd_privacy_risk.png)
-
-### Data Quality
-![Data Quality](assets/screenshots/data_quality.png)
-
-### Governance Control Center
-![Governance Control Center](assets/screenshots/governance_control_center.png)
-
-### Privacy Transformation Preview
-![Privacy Transformation Preview](assets/screenshots/privacy_transformation_preview.png)
-
-### How to refresh screenshots locally
-
-```bash
-uv sync --extra dev
-python -m playwright install chromium
-python scripts/capture_streamlit_screenshots.py
-```
-
-## Makefile Targets
-
-- `make install`: install dependencies with `uv sync`
-- `make lint`: run `ruff check src app tests`
-- `make test`: run `pytest --cov=src --cov=app --cov-report=xml`
-- `make pipeline`: run pipeline modules in sequence (`data_loader` -> `lgpd_classifier` -> `risk_scoring` -> `data_quality` -> `report_generator`)
-- `make app`: run app with `uv run streamlit run app/main.py`
-- `make screenshots`: capture screenshots with `uv run python scripts/capture_streamlit_screenshots.py`
-- `make clean`: remove local caches and runtime artifacts
+- governed analytics architecture decisions;
+- privacy-aware publication boundaries;
+- quality-control evidence and contracts;
+- reproducible local setup and CI gates.
 
 ## Limitations and Production Considerations
 
-- This is a **portfolio-grade, production-oriented** project with simulated governance controls and reproducible evidence.
-- Privacy controls are **LGPD-inspired** and do not represent legal compliance certification.
-- The current operational model focuses on local execution + GitHub Actions, not distributed enterprise orchestration.
-- The published layer is intentionally minimized for executive consumption and does not replace full internal analytical access.
+- This is a portfolio-grade and production-oriented implementation.
+- Controls are simulated for demonstration with public/synthetic context.
+- Real production environments require IAM, centralized audit, and legal/security validation workflows.
+- The published layer is intentionally constrained for executive use.
 
 ## Links
 
-- Streamlit app: [governed-analytics-platform.streamlit.app](https://governed-analytics-platform.streamlit.app/)
-- GitHub: [samuelmaia-analytics/Governed-Analytics-Platform](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)
-- technical index: [docs/README.en.md](docs/README.en.md)
+- Streamlit app: <https://governed-analytics-platform.streamlit.app/>
+- Repository: <https://github.com/samuelmaia-analytics/Governed-Analytics-Platform>
+- Technical index: [docs/README.en.md](docs/README.en.md)
 
 ## License
 
-This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
-
-To view a copy of this license, visit:
-https://creativecommons.org/licenses/by-nc/4.0/
-
-[![License: CC BY-NC 4.0](https://licensebuttons.net/l/by-nc/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc/4.0/)
-
+CC BY-NC 4.0.
+See: <https://creativecommons.org/licenses/by-nc/4.0/>.
