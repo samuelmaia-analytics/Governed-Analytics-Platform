@@ -103,9 +103,23 @@ O projeto usa o dataset público da Olist como caso analítico, mas aplica contr
 - Identificadores são pseudonimizados para reduzir risco de reidentificação na camada de exposição.
 - A publicação é bloqueada quando controles de governança não são atendidos.
 
+## Masking/anonymization preview
+
+- O projeto inclui preview técnico de transformações de privacidade no app executivo, com foco em entendimento de impacto de mascaramento/anonimização.
+- As transformações são implementadas em `src/privacy_transformations.py` e exibidas em contexto analítico para suporte à decisão de publicação.
+- O objetivo é demonstrar trade-off entre utilidade analítica e redução de exposição.
+
 ## Limitações e Escopo
 
 - o dataset Olist é público e anonimizado, mas o projeto adota privacidade por design para refletir prática corporativa.
 - esta camada não substitui controles organizacionais de acesso, mas reduz exposição desnecessária no produto analítico publicado.
 - o projeto **não afirma conformidade jurídica plena com LGPD**; ele simula controles técnicos inspirados em boas práticas.
+
+## Recommended production considerations
+
+- definir matriz formal de acesso por persona e ambiente (dev/stage/prod);
+- estabelecer política de retenção aprovada por jurídico/compliance;
+- integrar auditoria de acessos e trilha de publicação em repositório central de logs;
+- revisar periodicamente regras de classificação e pesos de risco conforme contexto de negócio;
+- validar controles com áreas jurídica e de segurança antes de qualquer uso com dados pessoais reais.
 

@@ -10,19 +10,26 @@
 
 **Language:** [PT-BR](README.md) | `EN`
 
-A governed Streamlit analytics platform that demonstrates Data Governance, LGPD classification, data quality, automated EDA, and executive reporting.
+A portfolio-grade governed analytics platform that demonstrates Analytics Engineering, data governance, LGPD-inspired controls, data quality, and executive delivery.
 
 > This is not only a dashboard. It is an Analytics Engineering case with governance, quality controls, privacy classification, explainable risk scoring, a published layer, and executive delivery.
 
-## Executive Positioning
+## Executive Summary
 
-This repository simulates an executive-ready governed analytics product: privacy-aware, quality-gated, auditable, and explainable for publication decisions.
+This repository presents a **production-oriented** analytical platform built over public Olist data.  
+It combines pipeline engineering, privacy-aware publication controls, quality checks, contracts, monitoring, and executive consumption in Streamlit and Power BI.
 
-## TL;DR
+## Why this project matters
 
-- focus: Analytics Engineering with governance controls from ingestion to published layer;
-- delivery: Streamlit app, Python pipeline, contracts, and operational docs;
-- audience: data engineering, analytics, and technical leadership.
+Most analytics portfolios stop at dashboards. This project demonstrates the full path from raw data to a governed published layer with explicit controls and operational evidence.
+
+## What this project demonstrates
+
+- Analytics Engineering with explicit internal vs published layers.
+- LGPD-inspired controls for minimization and pseudonymization before publication.
+- Declarative and code-driven data quality checks.
+- Explainable privacy risk scoring and publication readiness states.
+- CI/CD guardrails with linting, tests, and coverage reporting.
 
 ## How to review in 5 minutes
 
@@ -68,7 +75,7 @@ The project implements a governed analytics product approach:
 | Ambiguous decision metrics | Published semantic layer with documented KPI definitions | `src/semantic_layer.py`, `docs/semantic_layer.md` |
 | Low operational confidence | CI, lint, tests, and release/rollback runbooks | `.github/workflows/`, `docs/release_runbook.md`, `docs/rollback_runbook.md` |
 
-## Architecture Summary
+## Architecture
 
 1. `src/data_loader.py` reads synthetic sample datasets.
 2. `src/lgpd_classifier.py` classifies columns by LGPD category.
@@ -76,6 +83,10 @@ The project implements a governed analytics product approach:
 4. `src/data_quality.py` + `src/data_quality_rules.py` run built-in and YAML-driven quality checks.
 5. `src/report_generator.py` materializes governance artifacts in `docs/`.
 6. `app/main.py` exposes executive governance pages in Streamlit.
+
+The architectural boundary is intentional:
+- internal analytical layer for engineering (`curated`);
+- privacy-aware published layer for executive consumption (`published`).
 
 ## Core Features
 
@@ -100,12 +111,14 @@ The project implements a governed analytics product approach:
 - Contract/rule-driven data quality validation.
 - Typed Python modules, tests, CI compatibility, and executive UX delivery.
 
-## Operational Governance (implemented)
+## Data Governance and Privacy Controls
 
-- domain-level LGPD policy versioning enforced in publication flow;
-- contract-based business rule validation with dedicated report;
-- automated technical lineage integrated into the technical catalog;
-- scheduled governance scorecards per dataset.
+- LGPD-inspired classification categories and explainable risk scoring.
+- Publication checks for forbidden columns, pseudonymization and required fields.
+- Data minimization for executive exposure.
+- Governance artifacts and monitoring outputs versioned in-repo.
+
+These controls are **privacy-aware engineering controls** and do not replace legal assessment.
 
 ## Main Structure
 
@@ -117,7 +130,24 @@ The project implements a governed analytics product approach:
 | `docs/` | governance reports and technical docs |
 | `tests/` | automated test suite |
 
-## Run Locally
+## Data Quality
+
+- Rules in `contracts/data_quality_rules.yml` cover nulls, uniqueness, range checks, allowed values, and publication-critical completeness.
+- Quality outputs are materialized and consumed by governance pages and reports.
+- The goal is consistent evidence between pipeline execution and executive consumption.
+
+## Streamlit App
+
+The app is organized into executive-oriented pages:
+- Executive Overview
+- Data Catalog
+- LGPD & Privacy Risk
+- Data Quality
+- EDA
+- Governance Report
+- Governance Control Center
+
+## How to run locally
 
 ```bash
 make install
@@ -138,13 +168,13 @@ Executive app:
 make app
 ```
 
-## Minimal local run
+## How to review this project in 5 minutes
 
-```bash
-make install
-make test
-make app
-```
+1. Read **Executive Summary** and **Why this project matters**.
+2. Inspect **Architecture** and the published-layer boundary.
+3. Run `make install`, `make test`, and `make app`.
+4. Open Governance Control Center and LGPD & Privacy Risk pages.
+5. Review `docs/privacy_governance.md` and `docs/semantic_layer.md`.
 
 ## Testing and Quality Gates
 
@@ -162,6 +192,12 @@ Highlighted tests:
 - `tests/test_privacy_transformations.py`
 - `tests/test_data_quality_rules.py`
 - `tests/test_governance_history.py`
+
+## Recruiter Notes
+
+- This is not only a dashboard project; it is a **portfolio-grade governed analytics platform**.
+- It shows design decisions, controls, tests, and operational artifacts expected in real analytics teams.
+- The project is suitable for Data Analyst, Analytics Engineer, Data Engineer, BI Analyst, and Data Governance-oriented roles.
 
 ## Governance Features
 
@@ -213,7 +249,7 @@ python scripts/capture_streamlit_screenshots.py
 - `make screenshots`: capture screenshots with `uv run python scripts/capture_streamlit_screenshots.py`
 - `make clean`: remove local caches and runtime artifacts
 
-## Production considerations and limitations
+## Limitations and Production Considerations
 
 - This is a **portfolio-grade, production-oriented** project with simulated governance controls and reproducible evidence.
 - Privacy controls are **LGPD-inspired** and do not represent legal compliance certification.
