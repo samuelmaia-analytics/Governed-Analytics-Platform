@@ -67,12 +67,34 @@ jobs:
       - name: Validate release governance contract
         run: uv run python src/governance_validation.py
 
-      - name: Run tests with coverage
+      - name: Run tests with coverage (global)
         run: uv run pytest --cov=src --cov=app --cov-report=xml
 
-      - name: Upload coverage to Codecov
+      - name: Generate coverage report for src flag
+        run: uv run pytest --cov=src --cov-report=xml:coverage-src.xml --cov-report=
+
+      - name: Generate coverage report for app flag
+        run: uv run pytest --cov=app --cov-report=xml:coverage-app.xml --cov-report=
+
+      - name: Upload global coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
+      - name: Upload src coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage-src.xml
+          flags: src
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+
+      - name: Upload app coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage-app.xml
+          flags: app
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true

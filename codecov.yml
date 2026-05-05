@@ -1,0 +1,25 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 83%
+        threshold: 1%
+      src:
+        flags:
+          - src
+        target: 95%
+        threshold: 1%
+      app:
+        flags:
+          - app
+        target: 80%
+        threshold: 1%
+    patch:
+      default:
+        target: 100%
+        threshold: 0%
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: true

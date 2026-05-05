@@ -1,0 +1,13 @@
+[report]
+omit =
+    tests/*
+    docs/*
+    notebooks/*
+    scripts/*
+    data/*
+    reports/*
+    assets/*
+    */__init__.py
+    .venv/*
+    venv/*
+    */site-packages/*
