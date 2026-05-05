@@ -150,6 +150,8 @@ The app is organized into executive-oriented pages:
 ## How to run locally
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 make install
 cp .env.example .env
 ```
@@ -157,6 +159,9 @@ cp .env.example .env
 On Windows PowerShell, use:
 
 ```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+make install
 copy .env.example .env
 ```
 

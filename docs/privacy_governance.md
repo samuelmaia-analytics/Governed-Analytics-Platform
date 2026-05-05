@@ -76,11 +76,11 @@ O projeto usa o dataset público da Olist como caso analítico, mas aplica contr
 | `pseudonymized__order_id` | **PASS** | Prefixo esperado: `order_id_` |
 | `pseudonymized__customer_unique_id` | **PASS** | Prefixo esperado: `customer_unique_id_` |
 | `pseudonymized__seller_key` | **PASS** | Prefixo esperado: `seller_id_` |
-| `default_fill__customer_state` | **PASS** | nulls=0 | default_observado=False |
-| `default_fill__seller_state` | **PASS** | nulls=0 | default_observado=False |
-| `default_fill__order_status` | **PASS** | nulls=0 | default_observado=False |
-| `default_fill__payment_type_mode` | **PASS** | nulls=0 | default_observado=True |
-| `default_fill__seller_volume_tier` | **PASS** | nulls=0 | default_observado=True |
+| `default_fill__customer_state` | **PASS** | nulls=0; default_observado=False |
+| `default_fill__seller_state` | **PASS** | nulls=0; default_observado=False |
+| `default_fill__order_status` | **PASS** | nulls=0; default_observado=False |
+| `default_fill__payment_type_mode` | **PASS** | nulls=0; default_observado=True |
+| `default_fill__seller_volume_tier` | **PASS** | nulls=0; default_observado=True |
 | `classification_leakage` | **PASS** | Colunas sensíveis expostas: nenhuma |
 
 ## Política de Uso
