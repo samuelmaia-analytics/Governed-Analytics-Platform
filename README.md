@@ -133,6 +133,19 @@ make app
 4. Open the Streamlit app and inspect **Governance Control Center**.
 5. Review `docs/architecture/semantic_layer.md` and `docs/executive/recruiter_summary.md`.
 
+## Recruiter / Hiring Manager Summary
+
+- This project is not only a dashboard; it demonstrates an end-to-end governed analytics workflow.
+- It combines pipeline engineering, governance controls, privacy-aware publication, and executive delivery.
+- It is designed to show Analytics Engineering and Data Governance ownership in a portfolio context.
+
+## Technical Reviewer Notes
+
+- Core governance decisions are explainable and tested (publication gate, risk scoring, quality checks).
+- Contracts and monitoring artifacts are versioned and reproducible.
+- The Streamlit interface is expected to consume published/governed outputs for executive use.
+- See: `docs/technical_review.md` and `docs/production_readiness.md`.
+
 ## Streamlit Executive App
 
 Main pages:

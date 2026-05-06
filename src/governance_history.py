@@ -55,6 +55,8 @@ def append_governance_history(
     warning_rules_count, critical_rules_count = _compute_warning_and_critical_failures(quality_result)
     total_rows_value = int(total_rows)
     duplicate_rows_value = int(quality_result.get("duplicate_rows", 0))
+    data_quality_score = max(0, 100 - (failed_rules_count * 10))
+    privacy_risk_score = int(privacy_result["score"])
     row_count = total_rows_value
     null_rate = 0.0
     null_pct_by_column = quality_result.get("null_pct_by_column", {})
@@ -71,8 +73,8 @@ def append_governance_history(
         "null_rate": round(null_rate, 4),
         "duplicate_rate": round(duplicate_rate, 4),
         "freshness_status": freshness_status,
-        "data_quality_score": max(0, 100 - (failed_rules_count * 10)),
-        "privacy_risk_score": int(privacy_result["score"]),
+        "data_quality_score": data_quality_score,
+        "privacy_risk_score": privacy_risk_score,
         "publication_status": publication_status,
         "failed_rules_count": failed_rules_count,
         "warning_rules_count": warning_rules_count,
@@ -81,7 +83,7 @@ def append_governance_history(
         "run_timestamp": execution_timestamp,
         "total_rows": total_rows_value,
         "total_columns": total_columns,
-        "privacy_score": int(privacy_result["score"]),
+        "privacy_score": privacy_risk_score,
         "privacy_risk_level": privacy_result["risk_level"],
         "failed_checks_count": failed_rules_count,
     }
@@ -93,8 +95,8 @@ def append_governance_history(
     save_publication_decision_artifact(
         dataset_name=dataset_name,
         publication_status=publication_status,
-        data_quality_score=int(row["data_quality_score"]),
-        privacy_risk_score=int(row["privacy_risk_score"]),
+        data_quality_score=data_quality_score,
+        privacy_risk_score=privacy_risk_score,
         failed_checks_count=failed_rules_count,
         timestamp_utc=execution_timestamp,
         output_path=publication_decision_path,

@@ -14,6 +14,8 @@ from src.lgpd_classifier import classify_dataframe_columns
 from src.report_generator import generate_markdown_reports
 from src.risk_scoring import calculate_privacy_risk_score
 
+DEFAULT_PUBLISHED_DATASET = Path("data/published/dashboard/fact_orders_dashboard.csv")
+
 
 @dataclass(frozen=True)
 class GovernanceAppContext:
@@ -37,7 +39,11 @@ def load_input_dataframe(locale: Locale) -> pd.DataFrame:
         return pd.read_csv(uploaded_file)
 
     if use_sample:
+        if DEFAULT_PUBLISHED_DATASET.exists():
+            return load_dataset(DEFAULT_PUBLISHED_DATASET)
         return load_dataset(DEFAULT_SAMPLE_DATASET)
+    if DEFAULT_PUBLISHED_DATASET.exists():
+        return load_dataset(DEFAULT_PUBLISHED_DATASET)
     return load_dataset(DEFAULT_SAMPLE_DATASET)
 
 
