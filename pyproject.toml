@@ -7,7 +7,7 @@ name = "olist-governed-analytics-platform"
 version = "0.1.0"
 description = "Governed analytics platform with LGPD privacy classification, data quality controls, schema contracts, audit reports, and Streamlit executive interface."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "pandas>=2.2,<3.1",
     "numpy>=1.26,<3",
