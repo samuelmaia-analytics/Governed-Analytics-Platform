@@ -33,6 +33,7 @@ Documentation layout was reorganized for faster technical review:
 | Executive | [executive/executive_summary.md](executive/executive_summary.md) |
 | Case Study | [executive/case_study.md](executive/case_study.md) |
 | Architecture | [architecture/architecture.md](architecture/architecture.md) |
+| API | [../src/api.py](../src/api.py) |
 | Governance | [governance/privacy_governance.md](governance/privacy_governance.md) |
 | Operations | [operations/release_runbook.md](operations/release_runbook.md) |
 | Reports | [reports/data_quality_report.md](reports/data_quality_report.md) |

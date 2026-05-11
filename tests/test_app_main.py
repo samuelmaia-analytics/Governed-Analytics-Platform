@@ -47,6 +47,10 @@ def test_main_entrypoints_are_callable() -> None:
     assert callable(main_module._render_lgpd_page)
     assert callable(main_module._render_quality_page)
     assert callable(main_module._render_eda_page)
+    assert callable(main_module._render_revenue_page)
+    assert callable(main_module._render_seller_performance_page)
+    assert callable(main_module._render_cohort_retention_page)
+    assert callable(main_module._render_genai_page)
     assert callable(main_module._render_report_page)
     assert callable(main_module._render_control_center_page)
 
@@ -94,6 +98,16 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
     )
     monkeypatch.setattr(main_module, "_render_eda_page", lambda _context, _locale: None)
     monkeypatch.setattr(
+        main_module, "_render_revenue_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(
+        main_module, "_render_seller_performance_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(
+        main_module, "_render_cohort_retention_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(main_module, "_render_genai_page", lambda _context, _locale: None)
+    monkeypatch.setattr(
         main_module, "_render_report_page", lambda _context, _locale: None
     )
     monkeypatch.setattr(
@@ -102,5 +116,5 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
 
     main_module.main()
 
-    assert calls.count("page") == 7
+    assert calls.count("page") == 11
     assert "navigation_run" in calls

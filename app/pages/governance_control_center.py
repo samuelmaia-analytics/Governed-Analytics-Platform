@@ -15,8 +15,12 @@ from src.publication_gate import (
     PublicationReadinessDecision,
     evaluate_publication_readiness,
 )
+from src.schema_contracts import RESULTS_PATH as SCHEMA_CONTRACT_RESULTS_PATH
 
 GOVERNANCE_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "governance_history.csv"
+PUBLISHED_MONITORING_RESULTS_PATH = (
+    PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv"
+)
 
 
 def _governance_status(privacy_level: str, failed_checks: int) -> str:
@@ -31,6 +35,49 @@ def _data_quality_score(quality_results: DataQualityResult) -> int:
     return max(0, 100 - quality_results["failed_checks_count"] * 10)
 
 
+def _load_schema_contract_status() -> tuple[Literal["passed", "failed"], str | None]:
+    if not SCHEMA_CONTRACT_RESULTS_PATH.exists():
+        return "passed", "Schema contract results file not found; assumed 'passed'."
+    try:
+        checks_df = pd.read_csv(SCHEMA_CONTRACT_RESULTS_PATH)
+    except Exception:
+        return "passed", "Schema contract results could not be parsed; assumed 'passed'."
+    if checks_df.empty or "status" not in checks_df.columns:
+        return "passed", "Schema contract results are empty/invalid; assumed 'passed'."
+    has_failures = checks_df["status"].astype(str).str.upper().eq("FAIL").any()
+    return ("failed", None) if has_failures else ("passed", None)
+
+
+def _load_freshness_status() -> tuple[Literal["fresh", "warning", "stale"], str | None]:
+    if not PUBLISHED_MONITORING_RESULTS_PATH.exists():
+        return "fresh", "Published monitoring file not found; assumed 'fresh'."
+    try:
+        checks_df = pd.read_csv(PUBLISHED_MONITORING_RESULTS_PATH)
+    except Exception:
+        return "fresh", "Published monitoring file could not be parsed; assumed 'fresh'."
+    if checks_df.empty or "check_name" not in checks_df.columns:
+        return "fresh", "Published monitoring checks are empty/invalid; assumed 'fresh'."
+
+    freshness_rows = checks_df[
+        checks_df["check_name"].astype(str) == "published_file_freshness_hours"
+    ]
+    if freshness_rows.empty:
+        return "fresh", "Freshness check not found in monitoring results; assumed 'fresh'."
+
+    freshness_row = freshness_rows.iloc[-1]
+    status = str(freshness_row.get("status", "")).upper()
+    if status == "PASS":
+        return "fresh", None
+
+    metric_value = pd.to_numeric(freshness_row.get("metric_value"), errors="coerce")
+    threshold = pd.to_numeric(freshness_row.get("threshold"), errors="coerce")
+    if pd.notna(metric_value) and pd.notna(threshold) and float(metric_value) <= float(
+        threshold
+    ) * 1.5:
+        return "warning", None
+    return "stale", None
+
+
 def _evaluate_publication_gate(
     *,
     classification_df: pd.DataFrame,
@@ -40,23 +87,32 @@ def _evaluate_publication_gate(
     """Evaluate publication gate with explicit fallbacks for unavailable signals."""
     fallback_notes: list[str] = []
 
-    # Available signal proxy: page has total failed checks, not critical-only failures.
-    critical_rule_failures = int(quality_results["failed_checks_count"])
-    fallback_notes.append(
-        "Critical rule failures are approximated using failed quality checks count."
-    )
+    checks = quality_results.get("checks", [])
+    if checks and all(
+        isinstance(check, dict) and {"status", "severity"}.issubset(check.keys())
+        for check in checks
+    ):
+        critical_rule_failures = int(
+            sum(
+                1
+                for check in checks
+                if str(check.get("status", "")).upper() == "FAIL"
+                and str(check.get("severity", "")).lower() in {"high", "critical"}
+            )
+        )
+    else:
+        critical_rule_failures = int(quality_results["failed_checks_count"])
+        fallback_notes.append(
+            "Critical rule failures fallback to total failed checks (missing check severity metadata)."
+        )
 
-    # Not wired in page context yet; conservative placeholder until contract signal is connected.
-    schema_contract_status: Literal["passed", "failed"] = "passed"
-    fallback_notes.append(
-        "Schema contract status is assumed as 'passed' (contract validation signal not wired in this page)."
-    )
+    schema_contract_status, schema_note = _load_schema_contract_status()
+    if schema_note:
+        fallback_notes.append(schema_note)
 
-    # Freshness signal is not materialized in page context yet.
-    freshness_status: Literal["fresh", "warning", "stale"] = "fresh"
-    fallback_notes.append(
-        "Freshness status is assumed as 'fresh' (freshness monitoring signal not wired in this page)."
-    )
+    freshness_status, freshness_note = _load_freshness_status()
+    if freshness_note:
+        fallback_notes.append(freshness_note)
 
     has_unprotected_sensitive = bool(
         (

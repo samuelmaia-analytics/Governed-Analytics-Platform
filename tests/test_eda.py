@@ -8,7 +8,9 @@ from src.eda import (
     descriptive_statistics,
     detect_outliers_iqr,
     dtype_distribution,
+    generate_storytelling_insights,
     null_profile,
+    run_statistical_tests,
     top_categories,
 )
 
@@ -64,3 +66,23 @@ def test_null_profile_reports_null_percentage() -> None:
     profile = null_profile(_build_df())
     status_row = profile.loc[profile["column_name"] == "status"].iloc[0]
     assert float(status_row["null_pct"]) > 0.0
+
+
+def test_generate_storytelling_insights_returns_non_empty_list() -> None:
+    insights = generate_storytelling_insights(_build_df())
+    assert insights
+    assert any("null" in line.lower() for line in insights)
+
+
+def test_run_statistical_tests_returns_known_columns() -> None:
+    df = pd.DataFrame(
+        {
+            "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "y": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+        }
+    )
+    tests_df = run_statistical_tests(df)
+    assert not tests_df.empty
+    assert {"test_name", "target", "statistic", "p_value", "interpretation"}.issubset(
+        set(tests_df.columns)
+    )

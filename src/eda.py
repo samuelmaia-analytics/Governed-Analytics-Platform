@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import math
+
+import numpy as np
 import pandas as pd
 
 
@@ -94,3 +97,103 @@ def null_profile(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     return profile.sort_values("null_pct", ascending=False).reset_index(drop=True)
+
+
+def generate_storytelling_insights(df: pd.DataFrame) -> list[str]:
+    insights: list[str] = []
+    if df.empty:
+        return insights
+
+    nulls = null_profile(df)
+    if not nulls.empty:
+        top_null = nulls.iloc[0]
+        if float(top_null["null_pct"]) > 0:
+            insights.append(
+                f"Highest null concentration is `{top_null['column_name']}` with {float(top_null['null_pct']):.1f}% missing values."
+            )
+
+    categories = top_categories(df, top_n=1)
+    if not categories.empty:
+        top_cat = categories.sort_values("count", ascending=False).iloc[0]
+        insights.append(
+            f"Top category concentration: `{top_cat['column_name']}` = `{top_cat['category']}` with {int(top_cat['count'])} rows ({float(top_cat['percentage']):.1f}%)."
+        )
+
+    outliers = detect_outliers_iqr(df)
+    if not outliers.empty:
+        top_outlier = outliers.sort_values("outlier_pct", ascending=False).iloc[0]
+        if float(top_outlier["outlier_pct"]) > 0:
+            insights.append(
+                f"Strongest outlier signal appears in `{top_outlier['column_name']}` ({float(top_outlier['outlier_pct']):.1f}% rows outside IQR bounds)."
+            )
+
+    numeric_df = df.select_dtypes(include=["number"])
+    if numeric_df.shape[1] >= 2:
+        corr = numeric_df.corr(numeric_only=True).abs()
+        np.fill_diagonal(corr.values, np.nan)
+        stacked = corr.stack()
+        if not stacked.empty:
+            best_pair = stacked.idxmax()
+            best_value = float(stacked.max())
+            insights.append(
+                f"Highest numeric correlation is between `{best_pair[0]}` and `{best_pair[1]}` (|r|={best_value:.2f})."
+            )
+
+    return insights
+
+
+def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
+    rows: list[dict[str, object]] = []
+    numeric_df = df.select_dtypes(include=["number"])
+    for column in numeric_df.columns[:5]:
+        series = numeric_df[column].dropna().astype(float)
+        n = int(series.shape[0])
+        if n < 8:
+            continue
+        centered = series - series.mean()
+        variance = float((centered**2).mean())
+        if variance == 0:
+            continue
+        skew = float(((centered**3).mean()) / (variance ** 1.5))
+        kurt = float(((centered**4).mean()) / (variance**2))
+        jb_stat = (n / 6.0) * (skew**2 + ((kurt - 3.0) ** 2) / 4.0)
+        # For chi-square(df=2), survival function is exp(-x/2).
+        p_value = float(math.exp(-jb_stat / 2.0))
+        rows.append(
+            {
+                "test_name": "jarque_bera_normality",
+                "target": column,
+                "statistic": round(jb_stat, 4),
+                "p_value": round(p_value, 6),
+                "interpretation": "non_normal"
+                if p_value < 0.05
+                else "cannot_reject_normality",
+            }
+        )
+
+    if numeric_df.shape[1] >= 2 and len(numeric_df) >= 8:
+        corr = numeric_df.corr(numeric_only=True).abs()
+        np.fill_diagonal(corr.values, np.nan)
+        stacked = corr.stack()
+        if not stacked.empty:
+            col_x, col_y = stacked.idxmax()
+            pair = numeric_df[[col_x, col_y]].dropna()
+            n = len(pair)
+            if n >= 8:
+                r = float(pair[col_x].corr(pair[col_y]))
+                clamped_r = min(max(r, -0.999999), 0.999999)
+                z = 0.5 * math.log((1 + clamped_r) / (1 - clamped_r)) * math.sqrt(n - 3)
+                p_value = float(math.erfc(abs(z) / math.sqrt(2)))
+                rows.append(
+                    {
+                        "test_name": "pearson_correlation_significance",
+                        "target": f"{col_x}~{col_y}",
+                        "statistic": round(r, 4),
+                        "p_value": round(p_value, 6),
+                        "interpretation": "significant_correlation"
+                        if p_value < 0.05
+                        else "weak_evidence",
+                    }
+                )
+
+    return pd.DataFrame(rows)

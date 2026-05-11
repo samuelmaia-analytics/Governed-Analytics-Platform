@@ -107,9 +107,26 @@ Páginas principais:
 | Catálogo de Dados | Inventário de colunas com busca e filtro por classificação LGPD |
 | LGPD e Risco de Privacidade | Score de risco, distribuição de classificações, prévia de transformações |
 | Qualidade de Dados | Checks de qualidade, perfil de nulos, distribuição por severidade |
-| EDA | Visão geral estatística + análise interativa por coluna (histograma/boxplot) |
+| EDA | Visão geral estatística com insights narrativos e testes estatísticos |
+| Revenue Analytics | Evolução mensal da receita, Pareto por categoria, cohort e top sellers |
+| Seller Performance | Ranking de sellers, distribuição por tier e métricas de SLA |
+| Cohort Retention | Heatmap de retenção por cohort e heatmap de ticket médio |
+| GenAI Insights | Saída de extração de features de texto de produto |
 | Relatório de Governança | Relatórios markdown renderizados com visão raw |
 | Central de Controles | Publication gate, racional de decisão, tendências históricas de governança |
+
+## Endpoint FastAPI
+
+O status de governança também está disponível via API:
+
+- `GET /health`
+- `GET /api/v1/governance/status`
+
+Execução local:
+
+```bash
+uvicorn src.api:app --reload --port 8000
+```
 
 ## Estrutura Principal
 

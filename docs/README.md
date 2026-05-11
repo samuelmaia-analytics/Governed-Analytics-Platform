@@ -33,6 +33,7 @@ Estrutura de documentação reorganizada para leitura rápida e manutenção:
 | Executivo | [executive/executive_summary.md](executive/executive_summary.md) |
 | Caso | [executive/case_study.md](executive/case_study.md) |
 | Arquitetura | [architecture/architecture.md](architecture/architecture.md) |
+| API | [../src/api.py](../src/api.py) |
 | Governança | [governance/privacy_governance.md](governance/privacy_governance.md) |
 | Operação | [operations/release_runbook.md](operations/release_runbook.md) |
 | Relatórios | [reports/data_quality_report.md](reports/data_quality_report.md) |

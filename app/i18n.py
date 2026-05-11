@@ -56,6 +56,22 @@ _TRANSLATIONS: dict[str, dict[Locale, str]] = {
         LOCALE_PT_BR: "EDA",
         LOCALE_EN_US: "EDA",
     },
+    "nav_revenue": {
+        LOCALE_PT_BR: "Revenue Analytics",
+        LOCALE_EN_US: "Revenue Analytics",
+    },
+    "nav_seller_performance": {
+        LOCALE_PT_BR: "Seller Performance",
+        LOCALE_EN_US: "Seller Performance",
+    },
+    "nav_cohort_retention": {
+        LOCALE_PT_BR: "Cohort Retention",
+        LOCALE_EN_US: "Cohort Retention",
+    },
+    "nav_genai": {
+        LOCALE_PT_BR: "GenAI Insights",
+        LOCALE_EN_US: "GenAI Insights",
+    },
     "nav_report": {
         LOCALE_PT_BR: "Relatório de Governança",
         LOCALE_EN_US: "Governance Report",

@@ -50,7 +50,10 @@ The platform is composed of the following major components:
 11. **Streamlit executive app**
     - presents governance KPIs, risk rationale, and publication decision context.
 
-12. **CI/CD workflows**
+12. **FastAPI governance endpoint**
+    - exposes publication/governance status for external consumers and integration.
+
+13. **CI/CD workflows**
     - enforces lint, tests, and coverage gates for repository reliability.
 
 ## 3) Data flow
@@ -113,6 +116,7 @@ These states support auditable and explainable publication governance.
 | Monitoring History | `src/governance_history.py`, `src/published_monitoring.py` | Persist historical governance/publication snapshots | monitoring + history files |
 | Technical Lineage | `src/lineage.py`, `docs/technical_lineage.md` | Track transformation lineage and dependencies | lineage artifacts |
 | Executive App | `app/main.py`, `app/pages/*` | Present governance and publication decision views | Streamlit UI |
+| FastAPI Endpoint | `src/api.py` | Serve governance/publication status over HTTP (`/api/v1/governance/status`) | JSON API response |
 | CI/CD Workflows | `.github/workflows/*` | Enforce lint/test/coverage and governance checks | CI validation status |
 
 ## 7) Production readiness boundaries

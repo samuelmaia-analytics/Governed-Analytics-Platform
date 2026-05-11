@@ -234,3 +234,68 @@ def test_render_governance_control_center_with_history(monkeypatch) -> None:
         quality_results=quality_result,  # type: ignore[arg-type]
         locale="pt-BR",  # type: ignore[arg-type]
     )
+
+
+def test_load_schema_contract_status_from_real_results(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "schema_contract_results.csv"
+    pd.DataFrame(
+        [
+            {"check_name": "a", "status": "PASS"},
+            {"check_name": "b", "status": "FAIL"},
+        ]
+    ).to_csv(path, index=False)
+    monkeypatch.setattr(gcc, "SCHEMA_CONTRACT_RESULTS_PATH", path)
+
+    status, note = gcc._load_schema_contract_status()
+    assert status == "failed"
+    assert note is None
+
+
+def test_load_freshness_status_from_monitoring_results(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "published_layer_monitoring.csv"
+    pd.DataFrame(
+        [
+            {
+                "check_name": "published_file_freshness_hours",
+                "status": "FAIL",
+                "metric_value": 40,
+                "threshold": 36,
+            }
+        ]
+    ).to_csv(path, index=False)
+    monkeypatch.setattr(gcc, "PUBLISHED_MONITORING_RESULTS_PATH", path)
+
+    status, note = gcc._load_freshness_status()
+    assert status == "warning"
+    assert note is None
+
+
+def test_evaluate_publication_gate_uses_critical_failures_from_severity() -> None:
+    classification_df = pd.DataFrame(
+        {
+            "lgpd_classification": ["non_personal"],
+            "recommended_action": ["keep"],
+        }
+    )
+    risk_result = {
+        "score": 20,
+        "risk_level": "low",
+        "recommendations": [],
+    }
+    quality_result = {
+        "failed_checks_count": 3,
+        "checks": [
+            {"status": "FAIL", "severity": "low"},
+            {"status": "FAIL", "severity": "high"},
+            {"status": "PASS", "severity": "critical"},
+        ],
+    }
+
+    gate_result, fallback_notes = gcc._evaluate_publication_gate(  # type: ignore[arg-type]
+        classification_df=classification_df,
+        risk_result=risk_result,  # type: ignore[arg-type]
+        quality_results=quality_result,  # type: ignore[arg-type]
+    )
+    assert gate_result.decision == "Blocked"
+    assert any("Critical rule failures detected: 1." in reason for reason in gate_result.reasons)
+    assert not any("Critical rule failures fallback" in note for note in fallback_notes)

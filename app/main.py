@@ -15,13 +15,17 @@ from app.context import GovernanceAppContext, build_context  # noqa: E402
 from app.i18n import build_locale_selector, t  # noqa: E402
 from app.pages.data_catalog import render_data_catalog  # noqa: E402
 from app.pages.data_quality import render_data_quality  # noqa: E402
+from app.pages.cohort_retention import render_cohort_retention  # noqa: E402
 from app.pages.eda import render_eda  # noqa: E402
 from app.pages.executive_overview import render_executive_overview  # noqa: E402
 from app.pages.governance_control_center import (
     render_governance_control_center,  # noqa: E402
 )
 from app.pages.governance_report import render_governance_report  # noqa: E402
+from app.pages.genai_insights import render_genai_insights  # noqa: E402
 from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk  # noqa: E402
+from app.pages.revenue_analytics import render_revenue_analytics  # noqa: E402
+from app.pages.seller_performance import render_seller_performance  # noqa: E402
 
 st.set_page_config(
     page_title="Governed Analytics Platform",
@@ -60,6 +64,22 @@ def _render_eda_page(context: GovernanceAppContext, locale: str) -> None:
 
 def _render_report_page(context: GovernanceAppContext, locale: str) -> None:
     render_governance_report(context.report_paths, locale)
+
+
+def _render_revenue_page(context: GovernanceAppContext, locale: str) -> None:
+    render_revenue_analytics(context.df, locale)
+
+
+def _render_seller_performance_page(_context: GovernanceAppContext, locale: str) -> None:
+    render_seller_performance(locale)
+
+
+def _render_cohort_retention_page(_context: GovernanceAppContext, locale: str) -> None:
+    render_cohort_retention(locale)
+
+
+def _render_genai_page(_context: GovernanceAppContext, locale: str) -> None:
+    render_genai_insights(locale)
 
 
 def _render_control_center_page(context: GovernanceAppContext, locale: str) -> None:
@@ -112,6 +132,30 @@ def main() -> None:
             title=t("nav_eda", locale),
             icon=":material/monitoring:",
             url_path="eda",
+        ),
+        st.Page(
+            lambda: _render_revenue_page(context, locale),
+            title=t("nav_revenue", locale),
+            icon=":material/paid:",
+            url_path="revenue-analytics",
+        ),
+        st.Page(
+            lambda: _render_seller_performance_page(context, locale),
+            title=t("nav_seller_performance", locale),
+            icon=":material/storefront:",
+            url_path="seller-performance",
+        ),
+        st.Page(
+            lambda: _render_cohort_retention_page(context, locale),
+            title=t("nav_cohort_retention", locale),
+            icon=":material/grid_view:",
+            url_path="cohort-retention",
+        ),
+        st.Page(
+            lambda: _render_genai_page(context, locale),
+            title=t("nav_genai", locale),
+            icon=":material/auto_awesome:",
+            url_path="genai-insights",
         ),
         st.Page(
             lambda: _render_report_page(context, locale),

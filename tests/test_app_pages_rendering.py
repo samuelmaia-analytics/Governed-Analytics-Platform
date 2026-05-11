@@ -5,11 +5,15 @@ from pathlib import Path
 import pandas as pd
 
 import app.components.cards as cards
+import app.pages.cohort_retention as cohort_page
 import app.pages.data_quality as data_quality_page
 import app.pages.eda as eda_page
 import app.pages.executive_overview as executive_overview_page
+import app.pages.genai_insights as genai_page
 import app.pages.governance_report as governance_report_page
 import app.pages.lgpd_privacy_risk as lgpd_page
+import app.pages.revenue_analytics as revenue_page
+import app.pages.seller_performance as seller_page
 
 
 class _FakeContainer:
@@ -271,3 +275,118 @@ def test_render_executive_overview_and_governance_report(
         {"existing": existing, "missing": missing},
         locale="en-US",  # type: ignore[arg-type]
     )
+
+
+def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) -> None:
+    monkeypatch.setattr(revenue_page, "st", _FakeStreamlit())
+    monkeypatch.setattr(revenue_page, "px", _FakePlotlyExpress())
+
+    df = pd.DataFrame(
+        {
+            "order_year_month": ["2024-01", "2024-01", "2024-02"],
+            "seller_key": ["s1", "s2", "s1"],
+            "total_item_value": [100.0, 120.0, 200.0],
+        }
+    )
+    category_slice = pd.DataFrame(
+        {
+            "product_category_name_english": ["cat_a", "cat_b"],
+            "revenue": [500.0, 300.0],
+        }
+    )
+    cohort_slice = pd.DataFrame(
+        {
+            "purchase_cohort_month": ["2024-01", "2024-01", "2024-02"],
+            "cohort_order_month_number": [0, 1, 0],
+            "customers": [100, 40, 80],
+            "avg_ticket": [120.0, 110.0, 130.0],
+        }
+    )
+
+    monkeypatch.setattr(
+        revenue_page,
+        "_load_semantic_slice",
+        lambda path: category_slice.copy()
+        if "category_slice" in str(path)
+        else cohort_slice.copy(),
+    )
+    revenue_page.render_revenue_analytics(df, locale="pt-BR")  # type: ignore[arg-type]
+
+    monkeypatch.setattr(revenue_page, "_load_semantic_slice", lambda _path: pd.DataFrame())
+    revenue_page.render_revenue_analytics(df, locale="en-US")  # type: ignore[arg-type]
+
+
+def test_render_seller_performance_with_and_without_data(monkeypatch) -> None:
+    monkeypatch.setattr(seller_page, "st", _FakeStreamlit())
+    monkeypatch.setattr(seller_page, "px", _FakePlotlyExpress())
+
+    seller_df = pd.DataFrame(
+        {
+            "seller_key": ["s1", "s2"],
+            "seller_state": ["SP", "RJ"],
+            "seller_volume_tier": ["core", "core"],
+            "total_items": [100, 80],
+            "seller_order_count": [90, 70],
+            "avg_ticket": [120.0, 140.0],
+            "avg_delivery_time_days": [10.0, 12.0],
+            "delay_rate": [0.05, 0.08],
+            "avg_review_score": [4.2, 4.0],
+        }
+    )
+    monkeypatch.setattr(seller_page, "_load_seller_slice", lambda: seller_df.copy())
+    seller_page.render_seller_performance(locale="pt-BR")  # type: ignore[arg-type]
+
+    monkeypatch.setattr(seller_page, "_load_seller_slice", lambda: pd.DataFrame())
+    seller_page.render_seller_performance(locale="en-US")  # type: ignore[arg-type]
+
+
+def test_render_cohort_retention_with_and_without_data(monkeypatch) -> None:
+    monkeypatch.setattr(cohort_page, "st", _FakeStreamlit())
+    monkeypatch.setattr(cohort_page, "px", _FakePlotlyExpress())
+
+    cohort_df = pd.DataFrame(
+        {
+            "purchase_cohort_month": ["2024-01", "2024-01", "2024-02"],
+            "cohort_order_month_number": [0, 1, 0],
+            "customers": [100, 45, 80],
+            "avg_ticket": [120.0, 115.0, 130.0],
+        }
+    )
+    monkeypatch.setattr(cohort_page, "_load_cohort_slice", lambda: cohort_df.copy())
+    cohort_page.render_cohort_retention(locale="pt-BR")  # type: ignore[arg-type]
+
+    monkeypatch.setattr(cohort_page, "_load_cohort_slice", lambda: pd.DataFrame())
+    cohort_page.render_cohort_retention(locale="en-US")  # type: ignore[arg-type]
+
+
+def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
+    monkeypatch.setattr(genai_page, "st", _FakeStreamlit())
+    monkeypatch.setattr(genai_page, "px", _FakePlotlyExpress())
+
+    genai_df = pd.DataFrame(
+        {
+            "source_id": ["a1", "a2"],
+            "category": ["Phone Accessories", "Phone Accessories"],
+            "extraction_mode": ["reference", "reference"],
+            "model_name": ["reference_output", "reference_output"],
+        }
+    )
+    monkeypatch.setattr(genai_page, "_load_genai_features", lambda: genai_df.copy())
+    genai_page.render_genai_insights(locale="pt-BR")  # type: ignore[arg-type]
+
+    monkeypatch.setattr(genai_page, "_load_genai_features", lambda: pd.DataFrame())
+    genai_page.render_genai_insights(locale="en-US")  # type: ignore[arg-type]
+
+
+def test_load_genai_features_drops_empty_rows(tmp_path: Path, monkeypatch) -> None:
+    csv_path = tmp_path / "product_text_features.csv"
+    csv_path.write_text(
+        "source_id;title;category\n"
+        "phone_case_001;Phone Case;Accessories\n"
+        ";;\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(genai_page, "GENAI_FEATURES_PATH", csv_path)
+    loaded = genai_page._load_genai_features()
+    assert len(loaded) == 1
+    assert loaded.iloc[0]["source_id"] == "phone_case_001"

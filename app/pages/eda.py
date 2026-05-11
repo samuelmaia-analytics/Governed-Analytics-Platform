@@ -14,9 +14,31 @@ from src.eda import (
     top_categories,
 )
 
+try:
+    from src.eda import generate_storytelling_insights, run_statistical_tests
+except ImportError:
+    def generate_storytelling_insights(_df: pd.DataFrame) -> list[str]:
+        return []
+
+    def run_statistical_tests(_df: pd.DataFrame) -> pd.DataFrame:
+        return pd.DataFrame()
+
 
 def _render_overview(df: pd.DataFrame, locale: Locale) -> None:
     is_en = locale == LOCALE_EN_US
+    insights = generate_storytelling_insights(df)
+    st.markdown(
+        "**Narrative Insights**" if is_en else "**Insights Narrativos**"
+    )
+    if insights:
+        for insight in insights:
+            st.write(f"- {insight}")
+    else:
+        st.info(
+            "No narrative insights available for this dataset."
+            if is_en
+            else "Sem insights narrativos disponíveis para este dataset."
+        )
 
     st.markdown(
         "**Estatísticas Descritivas**" if not is_en else "**Descriptive Statistics**"
@@ -70,6 +92,17 @@ def _render_overview(df: pd.DataFrame, locale: Locale) -> None:
             corr_df, text_auto=True, aspect="auto", color_continuous_scale="Blues"
         )
         st.plotly_chart(fig, width="stretch")
+
+    st.markdown("**Statistical Tests**" if is_en else "**Testes Estatísticos**")
+    tests_df = run_statistical_tests(df)
+    if tests_df.empty:
+        st.info(
+            "Not enough numeric data for statistical tests."
+            if is_en
+            else "Dados numéricos insuficientes para testes estatísticos."
+        )
+    else:
+        st.dataframe(tests_df, width="stretch")
 
 
 def _render_column_analysis(df: pd.DataFrame, locale: Locale) -> None:
