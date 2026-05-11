@@ -63,7 +63,11 @@ def classify_columns(df: pd.DataFrame) -> dict[str, list[str]]:
         if column_name.endswith("_id") or column_name == "id":
             id_columns.append(column)
 
-        if is_datetime64_any_dtype(series) or "date" in column_name or "timestamp" in column_name:
+        if (
+            is_datetime64_any_dtype(series)
+            or "date" in column_name
+            or "timestamp" in column_name
+        ):
             date_columns.append(column)
             continue
 
@@ -98,11 +102,15 @@ def build_nulls_profile(df: pd.DataFrame, table_name: str) -> pd.DataFrame:
             "null_ratio": [float(null_ratio[column]) for column in df.columns],
         }
     )
-    return profile.sort_values(["null_count", "column_name"], ascending=[False, True]).reset_index(drop=True)
+    return profile.sort_values(
+        ["null_count", "column_name"], ascending=[False, True]
+    ).reset_index(drop=True)
 
 
 def detect_possible_keys(df: pd.DataFrame, id_columns: list[str]) -> pd.DataFrame:
-    candidate_columns = id_columns or [column for column in df.columns if column.lower().endswith("_id")]
+    candidate_columns = id_columns or [
+        column for column in df.columns if column.lower().endswith("_id")
+    ]
     rows: list[dict[str, object]] = []
 
     for column in candidate_columns:
@@ -111,7 +119,9 @@ def detect_possible_keys(df: pd.DataFrame, id_columns: list[str]) -> pd.DataFram
             uniqueness_ratio = 0.0
             is_possible_key = False
         else:
-            uniqueness_ratio = float(non_null_series.nunique(dropna=True) / len(non_null_series))
+            uniqueness_ratio = float(
+                non_null_series.nunique(dropna=True) / len(non_null_series)
+            )
             is_possible_key = non_null_series.is_unique and df[column].isna().sum() == 0
 
         rows.append(
@@ -137,13 +147,19 @@ def detect_possible_keys(df: pd.DataFrame, id_columns: list[str]) -> pd.DataFram
             ]
         )
 
-    return pd.DataFrame(rows).sort_values(
-        ["is_possible_key", "uniqueness_ratio", "column_name"],
-        ascending=[False, False, True],
-    ).reset_index(drop=True)
+    return (
+        pd.DataFrame(rows)
+        .sort_values(
+            ["is_possible_key", "uniqueness_ratio", "column_name"],
+            ascending=[False, False, True],
+        )
+        .reset_index(drop=True)
+    )
 
 
-def build_columns_profile(df: pd.DataFrame, table_name: str, column_groups: dict[str, list[str]]) -> pd.DataFrame:
+def build_columns_profile(
+    df: pd.DataFrame, table_name: str, column_groups: dict[str, list[str]]
+) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for column in df.columns:
         if column in column_groups["id_columns"]:
@@ -187,7 +203,9 @@ def build_duplicate_profile(df: pd.DataFrame, table_name: str) -> pd.DataFrame:
     )
 
 
-def profile_table(path: Path) -> tuple[TableProfile, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def profile_table(
+    path: Path,
+) -> tuple[TableProfile, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     table_name = path.stem
     df, encoding, _ = load_csv(path)
     df = standardize_columns(df)
@@ -199,7 +217,9 @@ def profile_table(path: Path) -> tuple[TableProfile, pd.DataFrame, pd.DataFrame,
     columns_profile = build_columns_profile(df, table_name, column_groups)
     duplicate_profile = build_duplicate_profile(df, table_name)
 
-    possible_keys = possible_keys_profile.loc[possible_keys_profile["is_possible_key"], "column_name"].tolist()
+    possible_keys = possible_keys_profile.loc[
+        possible_keys_profile["is_possible_key"], "column_name"
+    ].tolist()
 
     profile = TableProfile(
         table_name=table_name,
@@ -224,7 +244,13 @@ def profile_table(path: Path) -> tuple[TableProfile, pd.DataFrame, pd.DataFrame,
         ", ".join(profile.possible_keys) if profile.possible_keys else "nenhuma",
         profile.duplicate_rows,
     )
-    return profile, columns_profile, nulls_profile, possible_keys_profile, duplicate_profile
+    return (
+        profile,
+        columns_profile,
+        nulls_profile,
+        possible_keys_profile,
+        duplicate_profile,
+    )
 
 
 def save_profile_tables(
@@ -236,10 +262,16 @@ def save_profile_tables(
 ) -> None:
     PROFILING_DIR.mkdir(parents=True, exist_ok=True)
 
-    columns_profile.to_csv(PROFILING_DIR / f"{table_name}_columns_profile.csv", index=False)
+    columns_profile.to_csv(
+        PROFILING_DIR / f"{table_name}_columns_profile.csv", index=False
+    )
     nulls_profile.to_csv(PROFILING_DIR / f"{table_name}_nulls_profile.csv", index=False)
-    possible_keys_profile.to_csv(PROFILING_DIR / f"{table_name}_possible_keys.csv", index=False)
-    duplicate_profile.to_csv(PROFILING_DIR / f"{table_name}_duplicate_profile.csv", index=False)
+    possible_keys_profile.to_csv(
+        PROFILING_DIR / f"{table_name}_possible_keys.csv", index=False
+    )
+    duplicate_profile.to_csv(
+        PROFILING_DIR / f"{table_name}_duplicate_profile.csv", index=False
+    )
 
 
 def save_consolidated_tables(
@@ -272,10 +304,16 @@ def save_consolidated_tables(
     )
 
     overview.to_csv(PROFILING_DIR / "profiling_overview.csv", index=False)
-    pd.concat(columns_profiles, ignore_index=True).to_csv(PROFILING_DIR / "all_columns_profile.csv", index=False)
-    pd.concat(nulls_profiles, ignore_index=True).to_csv(PROFILING_DIR / "all_nulls_profile.csv", index=False)
+    pd.concat(columns_profiles, ignore_index=True).to_csv(
+        PROFILING_DIR / "all_columns_profile.csv", index=False
+    )
+    pd.concat(nulls_profiles, ignore_index=True).to_csv(
+        PROFILING_DIR / "all_nulls_profile.csv", index=False
+    )
 
-    non_empty_keys_profiles = [profile for profile in keys_profiles if not profile.empty]
+    non_empty_keys_profiles = [
+        profile for profile in keys_profiles if not profile.empty
+    ]
     if non_empty_keys_profiles:
         pd.concat(non_empty_keys_profiles, ignore_index=True).to_csv(
             PROFILING_DIR / "all_possible_keys.csv",
@@ -294,10 +332,14 @@ def save_consolidated_tables(
             ]
         ).to_csv(PROFILING_DIR / "all_possible_keys.csv", index=False)
 
-    pd.concat(duplicate_profiles, ignore_index=True).to_csv(PROFILING_DIR / "all_duplicate_profile.csv", index=False)
+    pd.concat(duplicate_profiles, ignore_index=True).to_csv(
+        PROFILING_DIR / "all_duplicate_profile.csv", index=False
+    )
 
 
-def render_eda_summary(profiles: list[TableProfile], nulls_profiles: list[pd.DataFrame]) -> str:
+def render_eda_summary(
+    profiles: list[TableProfile], nulls_profiles: list[pd.DataFrame]
+) -> str:
     lines = [
         "# Resumo de EDA",
         "",
@@ -374,9 +416,13 @@ def render_eda_summary(profiles: list[TableProfile], nulls_profiles: list[pd.Dat
     return "\n".join(lines)
 
 
-def save_eda_summary(profiles: list[TableProfile], nulls_profiles: list[pd.DataFrame]) -> Path:
+def save_eda_summary(
+    profiles: list[TableProfile], nulls_profiles: list[pd.DataFrame]
+) -> Path:
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
-    EDA_SUMMARY_PATH.write_text(render_eda_summary(profiles, nulls_profiles), encoding="utf-8")
+    EDA_SUMMARY_PATH.write_text(
+        render_eda_summary(profiles, nulls_profiles), encoding="utf-8"
+    )
     LOGGER.info("Relatório EDA salvo em %s", EDA_SUMMARY_PATH)
     return EDA_SUMMARY_PATH
 
@@ -391,11 +437,19 @@ def run_profiling() -> list[TableProfile]:
     duplicate_profiles: list[pd.DataFrame] = []
 
     for path in csv_files:
-        profile, columns_profile, nulls_profile, possible_keys_profile, duplicate_profile = profile_table(path)
+        (
+            profile,
+            columns_profile,
+            nulls_profile,
+            possible_keys_profile,
+            duplicate_profile,
+        ) = profile_table(path)
         profiles.append(profile)
         columns_profiles.append(columns_profile)
         nulls_profiles.append(nulls_profile)
-        keys_profiles.append(possible_keys_profile.assign(table_name=profile.table_name))
+        keys_profiles.append(
+            possible_keys_profile.assign(table_name=profile.table_name)
+        )
         duplicate_profiles.append(duplicate_profile)
         save_profile_tables(
             profile.table_name,
@@ -405,7 +459,9 @@ def run_profiling() -> list[TableProfile]:
             duplicate_profile,
         )
 
-    save_consolidated_tables(profiles, columns_profiles, nulls_profiles, keys_profiles, duplicate_profiles)
+    save_consolidated_tables(
+        profiles, columns_profiles, nulls_profiles, keys_profiles, duplicate_profiles
+    )
     save_eda_summary(profiles, nulls_profiles)
     return profiles
 

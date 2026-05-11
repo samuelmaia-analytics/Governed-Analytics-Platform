@@ -61,7 +61,9 @@ def _apply_masking_strategy(column_name: str, series: pd.Series) -> pd.Series:
     return series.map(hash_value)
 
 
-def apply_privacy_actions(df: pd.DataFrame, classification_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def apply_privacy_actions(
+    df: pd.DataFrame, classification_df: pd.DataFrame
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     transformed_df = df.copy()
     metadata_rows: list[dict[str, str]] = []
     for row in classification_df.itertuples(index=False):
@@ -70,22 +72,58 @@ def apply_privacy_actions(df: pd.DataFrame, classification_df: pd.DataFrame) -> 
         if column_name not in transformed_df.columns:
             continue
         if action == "keep":
-            metadata_rows.append({"column_name": column_name, "action": "keep", "note": "Column preserved."})
+            metadata_rows.append(
+                {
+                    "column_name": column_name,
+                    "action": "keep",
+                    "note": "Column preserved.",
+                }
+            )
             continue
         if action == "mask":
-            transformed_df[column_name] = _apply_masking_strategy(column_name, transformed_df[column_name])
-            metadata_rows.append({"column_name": column_name, "action": "mask", "note": "Masked direct identifier."})
+            transformed_df[column_name] = _apply_masking_strategy(
+                column_name, transformed_df[column_name]
+            )
+            metadata_rows.append(
+                {
+                    "column_name": column_name,
+                    "action": "mask",
+                    "note": "Masked direct identifier.",
+                }
+            )
             continue
         if action == "anonymize":
             if "date" in column_name.lower() or "data" in column_name.lower():
-                transformed_df[column_name] = transformed_df[column_name].map(generalize_date_to_year)
+                transformed_df[column_name] = transformed_df[column_name].map(
+                    generalize_date_to_year
+                )
             else:
-                transformed_df[column_name] = transformed_df[column_name].map(hash_value)
-            metadata_rows.append({"column_name": column_name, "action": "anonymize", "note": "Anonymized values."})
+                transformed_df[column_name] = transformed_df[column_name].map(
+                    hash_value
+                )
+            metadata_rows.append(
+                {
+                    "column_name": column_name,
+                    "action": "anonymize",
+                    "note": "Anonymized values.",
+                }
+            )
             continue
         if action == "remove":
             transformed_df = transformed_df.drop(columns=[column_name])
-            metadata_rows.append({"column_name": column_name, "action": "remove", "note": "Column removed from dataset."})
+            metadata_rows.append(
+                {
+                    "column_name": column_name,
+                    "action": "remove",
+                    "note": "Column removed from dataset.",
+                }
+            )
             continue
-        metadata_rows.append({"column_name": column_name, "action": "review", "note": "Column preserved and flagged for review."})
+        metadata_rows.append(
+            {
+                "column_name": column_name,
+                "action": "review",
+                "note": "Column preserved and flagged for review.",
+            }
+        )
     return transformed_df, pd.DataFrame(metadata_rows)

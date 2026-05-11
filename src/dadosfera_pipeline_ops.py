@@ -92,7 +92,9 @@ class DadosferaPipelineClient:
                 "has_cookies": False,
             }
 
-    def _request(self, method: str, path: str, *, operation: str, **kwargs: Any) -> requests.Response:
+    def _request(
+        self, method: str, path: str, *, operation: str, **kwargs: Any
+    ) -> requests.Response:
         try:
             response = request_with_retry(
                 self.session,
@@ -130,7 +132,9 @@ class DadosferaPipelineClient:
         last_headers: Any | None = None
         last_sign_in_error: RuntimeError | None = None
 
-        for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
+        for payload in build_sign_in_payloads(
+            username=self.username, password=self.password, totp=self.totp
+        ):
             for endpoint in ("/auth/sign-in", "/auth/signin"):
                 response = request_with_retry(
                     self.session,
@@ -215,21 +219,33 @@ class DadosferaPipelineClient:
         return response.json()
 
     def get_pipeline(self, pipeline_id: str) -> dict[str, Any]:
-        endpoint = normalize_endpoint_path(self.config.get_endpoint_template.format(pipeline_id=pipeline_id))
-        response = self._request("GET", endpoint, operation="dadosfera_get_pipeline", timeout=60)
+        endpoint = normalize_endpoint_path(
+            self.config.get_endpoint_template.format(pipeline_id=pipeline_id)
+        )
+        response = self._request(
+            "GET", endpoint, operation="dadosfera_get_pipeline", timeout=60
+        )
         return response.json()
 
-    def run_pipeline(self, pipeline_id: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+    def run_pipeline(
+        self, pipeline_id: str, payload: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         endpoint = normalize_endpoint_path(self.config.run_endpoint)
         body = {"pipeline_id": pipeline_id}
         if payload:
             body.update(payload)
-        response = self._request("POST", endpoint, operation="dadosfera_run_pipeline", json=body, timeout=60)
+        response = self._request(
+            "POST", endpoint, operation="dadosfera_run_pipeline", json=body, timeout=60
+        )
         return response.json()
 
     def list_pipeline_runs(self, pipeline_id: str) -> dict[str, Any]:
-        endpoint = normalize_endpoint_path(self.config.runs_endpoint_template.format(pipeline_id=pipeline_id))
-        response = self._request("GET", endpoint, operation="dadosfera_list_pipeline_runs", timeout=60)
+        endpoint = normalize_endpoint_path(
+            self.config.runs_endpoint_template.format(pipeline_id=pipeline_id)
+        )
+        response = self._request(
+            "GET", endpoint, operation="dadosfera_list_pipeline_runs", timeout=60
+        )
         return response.json()
 
 
@@ -255,10 +271,15 @@ def resolve_pipeline_id(pipeline_body: dict[str, Any]) -> str:
     raise RuntimeError("Resposta da pipeline sem identificador utilizavel.")
 
 
-def find_pipeline_by_name(client: DadosferaPipelineClient, pipeline_name: str) -> dict[str, Any] | None:
+def find_pipeline_by_name(
+    client: DadosferaPipelineClient, pipeline_name: str
+) -> dict[str, Any] | None:
     response = client.list_pipelines()
     for pipeline in extract_pipeline_items(response):
-        if str(pipeline.get("name") or pipeline.get("display_name") or "") == pipeline_name:
+        if (
+            str(pipeline.get("name") or pipeline.get("display_name") or "")
+            == pipeline_name
+        ):
             return pipeline
     return None
 
@@ -330,11 +351,22 @@ def parse_args() -> argparse.Namespace:
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("list", help="Lista pipelines disponiveis no endpoint configurado.")
+    subparsers.add_parser(
+        "list", help="Lista pipelines disponiveis no endpoint configurado."
+    )
 
-    create_parser = subparsers.add_parser("create", help="Cria pipeline a partir de definicao JSON.")
-    create_parser.add_argument("--definition", type=Path, required=True, help="Arquivo JSON com a definicao do pipeline.")
-    create_parser.add_argument("--execute", action="store_true", help="Executa o pipeline logo apos a criacao.")
+    create_parser = subparsers.add_parser(
+        "create", help="Cria pipeline a partir de definicao JSON."
+    )
+    create_parser.add_argument(
+        "--definition",
+        type=Path,
+        required=True,
+        help="Arquivo JSON com a definicao do pipeline.",
+    )
+    create_parser.add_argument(
+        "--execute", action="store_true", help="Executa o pipeline logo apos a criacao."
+    )
     create_parser.add_argument(
         "--run-payload",
         type=Path,
@@ -346,7 +378,9 @@ def parse_args() -> argparse.Namespace:
 
     run_parser = subparsers.add_parser("run", help="Executa uma pipeline existente.")
     run_parser.add_argument("--pipeline-id", required=True)
-    run_parser.add_argument("--payload", type=Path, help="Arquivo JSON opcional com payload de execucao.")
+    run_parser.add_argument(
+        "--payload", type=Path, help="Arquivo JSON opcional com payload de execucao."
+    )
 
     runs_parser = subparsers.add_parser("runs", help="Lista execucoes de uma pipeline.")
     runs_parser.add_argument("--pipeline-id", required=True)
@@ -399,34 +433,56 @@ def main() -> None:
         print(json.dumps(response, indent=2, ensure_ascii=False))
         if args.execute:
             pipeline_id = resolve_pipeline_id(response)
-            payload = load_json_file(args.run_payload.resolve()) if args.run_payload else {}
+            payload = (
+                load_json_file(args.run_payload.resolve()) if args.run_payload else {}
+            )
             run_response = client.run_pipeline(pipeline_id, payload)
             print(json.dumps(run_response, indent=2, ensure_ascii=False))
         return
 
     if args.command == "get":
-        print(json.dumps(client.get_pipeline(args.pipeline_id), indent=2, ensure_ascii=False))
+        print(
+            json.dumps(
+                client.get_pipeline(args.pipeline_id), indent=2, ensure_ascii=False
+            )
+        )
         return
 
     if args.command == "run":
         payload = load_json_file(args.payload.resolve()) if args.payload else {}
-        print(json.dumps(client.run_pipeline(args.pipeline_id, payload), indent=2, ensure_ascii=False))
+        print(
+            json.dumps(
+                client.run_pipeline(args.pipeline_id, payload),
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
         return
 
     if args.command == "runs":
-        print(json.dumps(client.list_pipeline_runs(args.pipeline_id), indent=2, ensure_ascii=False))
+        print(
+            json.dumps(
+                client.list_pipeline_runs(args.pipeline_id),
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
         return
 
     if args.command == "deploy":
         definition = load_json_file(args.definition.resolve())
         pipeline_name = str(definition.get("name") or "").strip()
         if not pipeline_name:
-            raise RuntimeError("A definicao JSON precisa conter o campo `name` para deploy idempotente.")
+            raise RuntimeError(
+                "A definicao JSON precisa conter o campo `name` para deploy idempotente."
+            )
         existing = find_pipeline_by_name(client, pipeline_name)
         response = existing or client.create_pipeline(definition)
         print(json.dumps(response, indent=2, ensure_ascii=False))
         if args.execute:
-            payload = load_json_file(args.run_payload.resolve()) if args.run_payload else {}
+            payload = (
+                load_json_file(args.run_payload.resolve()) if args.run_payload else {}
+            )
             run_response = client.run_pipeline(resolve_pipeline_id(response), payload)
             print(json.dumps(run_response, indent=2, ensure_ascii=False))
         return

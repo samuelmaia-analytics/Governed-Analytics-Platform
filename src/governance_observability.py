@@ -54,7 +54,14 @@ def _row_count_anomaly_check(history_df: pd.DataFrame) -> ObservabilityCheck:
         )
     series = pd.to_numeric(history_df["row_count"], errors="coerce").dropna()
     if len(series) < 2:
-        return _result("row_count_anomaly", True, "low", "insufficient_history", 30.0, "No numeric history available.")
+        return _result(
+            "row_count_anomaly",
+            True,
+            "low",
+            "insufficient_history",
+            30.0,
+            "No numeric history available.",
+        )
     latest = float(series.iloc[-1])
     baseline = float(series.iloc[:-1].median()) if len(series) > 1 else latest
     if baseline == 0:
@@ -73,10 +80,24 @@ def _row_count_anomaly_check(history_df: pd.DataFrame) -> ObservabilityCheck:
 
 def _null_rate_drift_check(history_df: pd.DataFrame) -> ObservabilityCheck:
     if "null_rate" not in history_df.columns or len(history_df) < 2:
-        return _result("null_rate_drift", True, "low", "insufficient_history", 10.0, "No null-rate drift history available.")
+        return _result(
+            "null_rate_drift",
+            True,
+            "low",
+            "insufficient_history",
+            10.0,
+            "No null-rate drift history available.",
+        )
     series = pd.to_numeric(history_df["null_rate"], errors="coerce").dropna()
     if len(series) < 2:
-        return _result("null_rate_drift", True, "low", "insufficient_history", 10.0, "Insufficient numeric null-rate history.")
+        return _result(
+            "null_rate_drift",
+            True,
+            "low",
+            "insufficient_history",
+            10.0,
+            "Insufficient numeric null-rate history.",
+        )
     latest = float(series.iloc[-1])
     baseline = float(series.iloc[:-1].median())
     drift_pp = latest - baseline
@@ -102,7 +123,14 @@ def _privacy_risk_trend_check(history_df: pd.DataFrame) -> ObservabilityCheck:
         )
     series = pd.to_numeric(history_df["privacy_risk_score"], errors="coerce").dropna()
     if len(series) < 2:
-        return _result("privacy_risk_trend", True, "low", "insufficient_history", 15.0, "Insufficient numeric risk history.")
+        return _result(
+            "privacy_risk_trend",
+            True,
+            "low",
+            "insufficient_history",
+            15.0,
+            "Insufficient numeric risk history.",
+        )
     increase = float(series.iloc[-1] - series.iloc[-2])
     return _result(
         "privacy_risk_trend",
@@ -126,7 +154,14 @@ def _quality_score_trend_check(history_df: pd.DataFrame) -> ObservabilityCheck:
         )
     series = pd.to_numeric(history_df["data_quality_score"], errors="coerce").dropna()
     if len(series) < 2:
-        return _result("quality_score_trend", True, "low", "insufficient_history", -10.0, "Insufficient numeric quality history.")
+        return _result(
+            "quality_score_trend",
+            True,
+            "low",
+            "insufficient_history",
+            -10.0,
+            "Insufficient numeric quality history.",
+        )
     delta = float(series.iloc[-1] - series.iloc[-2])
     return _result(
         "quality_score_trend",
@@ -186,11 +221,15 @@ def save_observability_results(
         "failed_checks": sum(1 for item in checks if item.status == "FAIL"),
         "checks": [asdict(item) for item in checks],
     }
-    output_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    output_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     return output_path
 
 
-def load_governance_history(path: Path = DEFAULT_GOVERNANCE_HISTORY_PATH) -> pd.DataFrame:
+def load_governance_history(
+    path: Path = DEFAULT_GOVERNANCE_HISTORY_PATH,
+) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
     history_df = pd.read_csv(path)

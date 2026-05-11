@@ -39,7 +39,9 @@ def test_extract_features_raises_for_missing_reference() -> None:
         genai.extract_features(df, mode="reference", model="demo-model")
 
 
-def test_flatten_results_write_jsonl_and_main(tmp_path: Path, monkeypatch, capsys) -> None:
+def test_flatten_results_write_jsonl_and_main(
+    tmp_path: Path, monkeypatch, capsys
+) -> None:
     input_path = tmp_path / "input.csv"
     output_csv = tmp_path / "output" / "features.csv"
     output_jsonl = tmp_path / "output" / "features.jsonl"

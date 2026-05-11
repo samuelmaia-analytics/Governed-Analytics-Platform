@@ -18,7 +18,13 @@ from src.utils import ensure_directory
 
 LOGGER = logging.getLogger(__name__)
 FACT_TABLE_PATH = ANALYTICS_DIR / "fact_orders_enriched.parquet"
-CONTRACT_PATH = ROOT_DIR / "contracts" / "governance" / "business_rules" / "fact_orders_enriched.v1.json"
+CONTRACT_PATH = (
+    ROOT_DIR
+    / "contracts"
+    / "governance"
+    / "business_rules"
+    / "fact_orders_enriched.v1.json"
+)
 RESULTS_PATH = QUALITY_DIR / "business_rule_results.csv"
 REPORT_PATH = DOCS_DIR / "business_rule_report.md"
 
@@ -50,12 +56,18 @@ def _validate_contract_shape(contract: dict[str, Any]) -> None:
     required = {"contract_id", "version", "dataset_name", "owner", "rules"}
     missing = sorted(field for field in required if field not in contract)
     if missing:
-        raise ValueError(f"Contrato de regras de negócio inválido. Campos ausentes: {missing}")
+        raise ValueError(
+            f"Contrato de regras de negócio inválido. Campos ausentes: {missing}"
+        )
     if not isinstance(contract["rules"], list) or not contract["rules"]:
-        raise ValueError("Contrato de regras de negócio inválido. `rules` deve ser uma lista não vazia.")
+        raise ValueError(
+            "Contrato de regras de negócio inválido. `rules` deve ser uma lista não vazia."
+        )
 
 
-def _build_result(rule: dict[str, Any], failed_mask: pd.Series, total_rows: int, details: str) -> BusinessRuleResult:
+def _build_result(
+    rule: dict[str, Any], failed_mask: pd.Series, total_rows: int, details: str
+) -> BusinessRuleResult:
     failed_rows = int(failed_mask.sum())
     failure_pct = round((failed_rows / total_rows) * 100, 4) if total_rows > 0 else 0.0
     return BusinessRuleResult(
@@ -125,7 +137,9 @@ def _rule_expression(df: pd.DataFrame, rule: dict[str, Any]) -> pd.Series:
     return (~evaluated.fillna(False)).astype(bool)
 
 
-def run_business_rules(df: pd.DataFrame, contract: dict[str, Any]) -> list[BusinessRuleResult]:
+def run_business_rules(
+    df: pd.DataFrame, contract: dict[str, Any]
+) -> list[BusinessRuleResult]:
     _validate_contract_shape(contract)
     results: list[BusinessRuleResult] = []
     runners = {

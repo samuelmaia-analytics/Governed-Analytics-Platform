@@ -47,7 +47,11 @@ def read_olist_table(file_name: str) -> pd.DataFrame:
     standardized_path = STANDARDIZED_OLIST_DIR / f"{Path(file_name).stem}.parquet"
     if standardized_path.exists():
         df = pd.read_parquet(standardized_path)
-        LOGGER.info("Tabela carregada da camada standardized: %s | shape=(%s, %s)", standardized_path.name, *df.shape)
+        LOGGER.info(
+            "Tabela carregada da camada standardized: %s | shape=(%s, %s)",
+            standardized_path.name,
+            *df.shape,
+        )
         return standardize_columns(df)
 
     landing_path = OLIST_LANDING_DIR / file_name
@@ -86,7 +90,12 @@ def build_payments_agg(payments: pd.DataFrame) -> pd.DataFrame:
             payment_count=("payment_sequential", "count"),
             total_payment_value=("payment_value", "sum"),
             max_payment_installments=("payment_installments", "max"),
-            payment_type_mode=("payment_type", lambda series: series.mode().iloc[0] if not series.mode().empty else pd.NA),
+            payment_type_mode=(
+                "payment_type",
+                lambda series: (
+                    series.mode().iloc[0] if not series.mode().empty else pd.NA
+                ),
+            ),
         )
         .reset_index()
     )
@@ -104,7 +113,10 @@ def build_reviews_agg(reviews: pd.DataFrame) -> pd.DataFrame:
             review_score_min=("review_score", "min"),
             latest_review_creation_date=("review_creation_date", "max"),
             latest_review_answer_timestamp=("review_answer_timestamp", "max"),
-            has_review_comment=("review_comment_message", lambda s: int(s.fillna("").str.strip().ne("").any())),
+            has_review_comment=(
+                "review_comment_message",
+                lambda s: int(s.fillna("").str.strip().ne("").any()),
+            ),
         )
         .reset_index()
     )
@@ -124,7 +136,10 @@ def clean_order_items(order_items: pd.DataFrame) -> pd.DataFrame:
         & order_items["product_id"].notna()
         & order_items["seller_id"].notna()
     ].copy()
-    order_items = order_items[(order_items["price"].fillna(0) >= 0) & (order_items["freight_value"].fillna(0) >= 0)].copy()
+    order_items = order_items[
+        (order_items["price"].fillna(0) >= 0)
+        & (order_items["freight_value"].fillna(0) >= 0)
+    ].copy()
     return order_items
 
 
@@ -154,37 +169,53 @@ def derive_columns(fact_table: pd.DataFrame) -> pd.DataFrame:
     enriched["order_date"] = enriched["order_purchase_timestamp"].dt.date
     enriched["order_year"] = enriched["order_purchase_timestamp"].dt.year
     enriched["order_month"] = enriched["order_purchase_timestamp"].dt.month
-    enriched["purchase_cohort_month"] = enriched["order_purchase_timestamp"].dt.to_period("M").astype(str)
+    enriched["purchase_cohort_month"] = (
+        enriched["order_purchase_timestamp"].dt.to_period("M").astype(str)
+    )
     enriched["delivery_time_days"] = (
         enriched["order_delivered_customer_date"] - enriched["order_purchase_timestamp"]
     ).dt.total_seconds() / 86400
     enriched["estimated_delay_days"] = (
-        enriched["order_delivered_customer_date"] - enriched["order_estimated_delivery_date"]
+        enriched["order_delivered_customer_date"]
+        - enriched["order_estimated_delivery_date"]
     ).dt.total_seconds() / 86400
     enriched["is_delayed"] = (
         enriched["order_delivered_customer_date"].notna()
         & enriched["order_estimated_delivery_date"].notna()
-        & (enriched["order_delivered_customer_date"] > enriched["order_estimated_delivery_date"])
+        & (
+            enriched["order_delivered_customer_date"]
+            > enriched["order_estimated_delivery_date"]
+        )
     )
-    enriched["total_item_value"] = enriched["price"].fillna(0) + enriched["freight_value"].fillna(0)
+    enriched["total_item_value"] = enriched["price"].fillna(0) + enriched[
+        "freight_value"
+    ].fillna(0)
     enriched["freight_to_price_ratio"] = (
-        enriched["freight_value"].where(enriched["price"].fillna(0) > 0).div(enriched["price"].where(enriched["price"].fillna(0) > 0))
+        enriched["freight_value"]
+        .where(enriched["price"].fillna(0) > 0)
+        .div(enriched["price"].where(enriched["price"].fillna(0) > 0))
     )
     enriched["seller_dispatch_time_days"] = (
         enriched["order_delivered_carrier_date"] - enriched["order_approved_at"]
     ).dt.total_seconds() / 86400
     enriched["carrier_delivery_time_days"] = (
-        enriched["order_delivered_customer_date"] - enriched["order_delivered_carrier_date"]
+        enriched["order_delivered_customer_date"]
+        - enriched["order_delivered_carrier_date"]
     ).dt.total_seconds() / 86400
 
-    first_purchase_ts = enriched.groupby("customer_unique_id")["order_purchase_timestamp"].transform("min")
+    first_purchase_ts = enriched.groupby("customer_unique_id")[
+        "order_purchase_timestamp"
+    ].transform("min")
     enriched["customer_first_purchase_timestamp"] = first_purchase_ts
     enriched["cohort_order_month_number"] = (
-        (enriched["order_purchase_timestamp"].dt.year - first_purchase_ts.dt.year) * 12
-        + (enriched["order_purchase_timestamp"].dt.month - first_purchase_ts.dt.month)
+        enriched["order_purchase_timestamp"].dt.year - first_purchase_ts.dt.year
+    ) * 12 + (
+        enriched["order_purchase_timestamp"].dt.month - first_purchase_ts.dt.month
     )
     order_rank = (
-        enriched.groupby(["customer_unique_id", "order_id"], dropna=False)["order_purchase_timestamp"]
+        enriched.groupby(["customer_unique_id", "order_id"], dropna=False)[
+            "order_purchase_timestamp"
+        ]
         .transform("min")
         .groupby(enriched["customer_unique_id"], dropna=False)
         .rank(method="dense")
@@ -194,8 +225,12 @@ def derive_columns(fact_table: pd.DataFrame) -> pd.DataFrame:
 
     seller_order_count = enriched.groupby("seller_id")["order_id"].transform("nunique")
     enriched["seller_order_count"] = seller_order_count.astype("Int64")
-    enriched["seller_avg_delivery_days"] = enriched.groupby("seller_id")["delivery_time_days"].transform("mean")
-    enriched["seller_delay_rate"] = enriched.groupby("seller_id")["is_delayed"].transform("mean")
+    enriched["seller_avg_delivery_days"] = enriched.groupby("seller_id")[
+        "delivery_time_days"
+    ].transform("mean")
+    enriched["seller_delay_rate"] = enriched.groupby("seller_id")[
+        "is_delayed"
+    ].transform("mean")
     enriched["seller_volume_tier"] = pd.cut(
         seller_order_count,
         bins=[-1, 25, 100, 500, float("inf")],
@@ -213,7 +248,9 @@ def remove_obvious_inconsistencies(fact_table: pd.DataFrame) -> pd.DataFrame:
     cleaned = cleaned[
         cleaned["delivery_time_days"].isna() | (cleaned["delivery_time_days"] >= 0)
     ].copy()
-    cleaned = deduplicate(cleaned, subset=["order_id", "order_item_id", "product_id", "seller_id"])
+    cleaned = deduplicate(
+        cleaned, subset=["order_id", "order_item_id", "product_id", "seller_id"]
+    )
     return cleaned
 
 
@@ -241,7 +278,9 @@ def build_payment_reconciliation_summary(fact_table: pd.DataFrame) -> dict[str, 
         )
         .assign(
             order_payment_total=lambda df_: df_["order_payment_total"].fillna(0),
-            abs_gap=lambda df_: (df_["order_items_total"] - df_["order_payment_total"]).abs(),
+            abs_gap=lambda df_: (
+                df_["order_items_total"] - df_["order_payment_total"]
+            ).abs(),
         )
     )
     order_reconciliation["gap_gt_1_real"] = order_reconciliation["abs_gap"] > 1.0
@@ -249,7 +288,9 @@ def build_payment_reconciliation_summary(fact_table: pd.DataFrame) -> dict[str, 
         "orders_reconciled": int(len(order_reconciliation)),
         "avg_abs_gap": round(float(order_reconciliation["abs_gap"].mean()), 4),
         "max_abs_gap": round(float(order_reconciliation["abs_gap"].max()), 4),
-        "orders_gap_gt_1_real_pct": round(float(order_reconciliation["gap_gt_1_real"].mean() * 100), 2),
+        "orders_gap_gt_1_real_pct": round(
+            float(order_reconciliation["gap_gt_1_real"].mean() * 100), 2
+        ),
     }
 
 
@@ -327,16 +368,34 @@ def build_fact_orders_enriched() -> pd.DataFrame:
     customers = clean_customers(read_olist_table("olist_customers_dataset.csv"))
     products = clean_products(read_olist_table("olist_products_dataset.csv"))
     sellers = clean_sellers(read_olist_table("olist_sellers_dataset.csv"))
-    payments = build_payments_agg(convert_datetime_columns(read_olist_table("olist_order_payments_dataset.csv")))
-    reviews = build_reviews_agg(convert_datetime_columns(read_olist_table("olist_order_reviews_dataset.csv")))
-    translation = clean_translation(read_olist_table("product_category_name_translation.csv"))
+    payments = build_payments_agg(
+        convert_datetime_columns(read_olist_table("olist_order_payments_dataset.csv"))
+    )
+    reviews = build_reviews_agg(
+        convert_datetime_columns(read_olist_table("olist_order_reviews_dataset.csv"))
+    )
+    translation = clean_translation(
+        read_olist_table("product_category_name_translation.csv")
+    )
 
-    fact_table = order_items.merge(orders, on="order_id", how="left", validate="many_to_one")
-    fact_table = fact_table.merge(customers, on="customer_id", how="left", validate="many_to_one")
-    fact_table = fact_table.merge(products, on="product_id", how="left", validate="many_to_one")
-    fact_table = fact_table.merge(sellers, on="seller_id", how="left", validate="many_to_one")
-    fact_table = fact_table.merge(payments, on="order_id", how="left", validate="many_to_one")
-    fact_table = fact_table.merge(reviews, on="order_id", how="left", validate="many_to_one")
+    fact_table = order_items.merge(
+        orders, on="order_id", how="left", validate="many_to_one"
+    )
+    fact_table = fact_table.merge(
+        customers, on="customer_id", how="left", validate="many_to_one"
+    )
+    fact_table = fact_table.merge(
+        products, on="product_id", how="left", validate="many_to_one"
+    )
+    fact_table = fact_table.merge(
+        sellers, on="seller_id", how="left", validate="many_to_one"
+    )
+    fact_table = fact_table.merge(
+        payments, on="order_id", how="left", validate="many_to_one"
+    )
+    fact_table = fact_table.merge(
+        reviews, on="order_id", how="left", validate="many_to_one"
+    )
     fact_table = fact_table.merge(
         translation,
         on="product_category_name",

@@ -59,13 +59,17 @@ def evaluate_publication_readiness(
         blocked = True
         severity_rank = max(severity_rank, 4)
         reasons.append(f"Critical rule failures detected: {critical_rule_failures}.")
-        required_actions.append("Resolve critical quality rule failures before publication.")
+        required_actions.append(
+            "Resolve critical quality rule failures before publication."
+        )
 
     if has_sensitive_data_without_protection:
         blocked = True
         severity_rank = max(severity_rank, 4)
         reasons.append("Sensitive data found without masking/anonymization.")
-        required_actions.append("Mask, anonymize, or remove sensitive data before publication.")
+        required_actions.append(
+            "Mask, anonymize, or remove sensitive data before publication."
+        )
 
     if schema_contract_status == "failed":
         blocked = True
@@ -80,7 +84,9 @@ def evaluate_publication_readiness(
             f"Data quality score below recommended threshold "
             f"({data_quality_score} < {MIN_DATA_QUALITY_SCORE_REVIEW})."
         )
-        required_actions.append("Investigate failed checks and improve data quality score.")
+        required_actions.append(
+            "Investigate failed checks and improve data quality score."
+        )
 
     if privacy_risk_score >= PRIVACY_RISK_SCORE_REVIEW:
         needs_review = True

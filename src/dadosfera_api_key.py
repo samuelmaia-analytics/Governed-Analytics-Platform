@@ -74,9 +74,13 @@ class DadosferaApiKeyClient:
         last_headers: Any | None = None
         last_sign_in_error: RuntimeError | None = None
 
-        for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
+        for payload in build_sign_in_payloads(
+            username=self.username, password=self.password, totp=self.totp
+        ):
             for endpoint in ("/auth/sign-in", "/auth/signin"):
-                response = self.session.post(f"{self.base_url}{endpoint}", json=payload, timeout=60)
+                response = self.session.post(
+                    f"{self.base_url}{endpoint}", json=payload, timeout=60
+                )
                 if response.status_code >= 500:
                     last_headers = response.headers
                     continue
@@ -207,12 +211,33 @@ def upsert_env_var(env_path: Path, key: str, value: str) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Cria uma API key da Dadosfera e opcionalmente salva no .env.")
-    parser.add_argument("--permissions", default="1,2,5", help="Lista de IDs de permissao separada por virgula.")
-    parser.add_argument("--env-path", type=Path, default=DEFAULT_ENV_PATH, help="Arquivo .env de destino.")
-    parser.add_argument("--env-var", default="DADOSFERA_API_TOKEN", help="Nome da variavel a persistir no .env.")
-    parser.add_argument("--save-env", action="store_true", help="Salva a nova API key no arquivo .env.")
-    parser.add_argument("--list-only", action="store_true", help="Nao cria chave; apenas lista as chaves existentes.")
+    parser = argparse.ArgumentParser(
+        description="Cria uma API key da Dadosfera e opcionalmente salva no .env."
+    )
+    parser.add_argument(
+        "--permissions",
+        default="1,2,5",
+        help="Lista de IDs de permissao separada por virgula.",
+    )
+    parser.add_argument(
+        "--env-path",
+        type=Path,
+        default=DEFAULT_ENV_PATH,
+        help="Arquivo .env de destino.",
+    )
+    parser.add_argument(
+        "--env-var",
+        default="DADOSFERA_API_TOKEN",
+        help="Nome da variavel a persistir no .env.",
+    )
+    parser.add_argument(
+        "--save-env", action="store_true", help="Salva a nova API key no arquivo .env."
+    )
+    parser.add_argument(
+        "--list-only",
+        action="store_true",
+        help="Nao cria chave; apenas lista as chaves existentes.",
+    )
     parser.add_argument("--json", action="store_true", help="Emite saida em JSON.")
     return parser
 
@@ -244,7 +269,9 @@ def main(argv: list[str] | None = None) -> int:
         output["created_secret"] = created_key
         if args.save_env:
             if not created_key:
-                raise RuntimeError("A API respondeu sem retornar o valor secreto da nova chave.")
+                raise RuntimeError(
+                    "A API respondeu sem retornar o valor secreto da nova chave."
+                )
             upsert_env_var(args.env_path, args.env_var, created_key)
             output["saved_env_path"] = str(args.env_path)
             output["saved_env_var"] = args.env_var
@@ -260,7 +287,9 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 print("A resposta de criacao nao expôs o valor secreto da chave.")
         if output.get("saved_env_path"):
-            print(f"Chave salva em {output['saved_env_path']} na variavel {output['saved_env_var']}.")
+            print(
+                f"Chave salva em {output['saved_env_path']} na variavel {output['saved_env_var']}."
+            )
 
     LOGGER.info(
         "Fluxo de API key finalizado.",

@@ -33,7 +33,9 @@ def load_quality_rules(path: str | Path) -> list[DataQualityRule]:
                 columns=[str(column) for column in item.get("columns", [])],
                 severity=str(item.get("severity", "medium")),
                 params=dict(item.get("params", {})),
-                recommendation=str(item.get("recommendation", "Review data quality issue.")),
+                recommendation=str(
+                    item.get("recommendation", "Review data quality issue.")
+                ),
             )
         )
     return rules
@@ -58,7 +60,9 @@ def _build_check(
     }
 
 
-def execute_quality_rules(df: pd.DataFrame, rules: list[DataQualityRule], *, rule_source: str) -> list[DataQualityCheck]:
+def execute_quality_rules(
+    df: pd.DataFrame, rules: list[DataQualityRule], *, rule_source: str
+) -> list[DataQualityCheck]:
     checks: list[DataQualityCheck] = []
     now = pd.Timestamp(datetime.now(timezone.utc)).tz_localize(None)
     for rule in rules:
@@ -140,7 +144,11 @@ def execute_quality_rules(df: pd.DataFrame, rules: list[DataQualityRule], *, rul
         elif rule_type == "max_null_pct":
             max_null_pct = float(rule.params.get("max_null_pct", 0))
             column_pct = df[columns].isna().mean() * 100
-            failing_columns = [str(column) for column, pct in column_pct.items() if float(pct) > max_null_pct]
+            failing_columns = [
+                str(column)
+                for column, pct in column_pct.items()
+                if float(pct) > max_null_pct
+            ]
             checks.append(
                 _build_check(
                     rule=rule,

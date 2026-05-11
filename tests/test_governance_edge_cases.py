@@ -49,7 +49,9 @@ def test_data_quality_without_default_yaml_rules(monkeypatch: object) -> None:
 def test_lgpd_load_contract_none_and_missing_path() -> None:
     empty_contract = load_classification_contract(None)
     assert empty_contract.exact == {}
-    missing_contract = load_classification_contract(Path("contracts/governance/does_not_exist.yml"))
+    missing_contract = load_classification_contract(
+        Path("contracts/governance/does_not_exist.yml")
+    )
     assert missing_contract.exact == {}
 
 
@@ -84,8 +86,12 @@ def test_lgpd_contract_contains_and_regex_rules(tmp_path: Path) -> None:
 
 
 def test_lgpd_map_risk_sensitive_biometric_and_personal_document() -> None:
-    risk_sensitive, action_sensitive = map_risk_and_action("sensitive_personal_data", "biometric_hash")
-    risk_personal, action_personal = map_risk_and_action("personal_data", "documento_cliente")
+    risk_sensitive, action_sensitive = map_risk_and_action(
+        "sensitive_personal_data", "biometric_hash"
+    )
+    risk_personal, action_personal = map_risk_and_action(
+        "personal_data", "documento_cliente"
+    )
     assert (risk_sensitive, action_sensitive) == ("high", "remove")
     assert (risk_personal, action_personal) == ("high", "remove")
 
@@ -109,7 +115,9 @@ def test_privacy_transformations_invalid_values_and_hash_anonymization() -> None
     assert "keep" in metadata["action"].tolist()
 
 
-def test_governance_history_failure_counter_and_append_from_dataframes(tmp_path: Path) -> None:
+def test_governance_history_failure_counter_and_append_from_dataframes(
+    tmp_path: Path,
+) -> None:
     assert _compute_warning_and_critical_failures({"checks": "invalid"}) == (0, 0)  # type: ignore[arg-type]
 
     quality_result = {
@@ -122,12 +130,18 @@ def test_governance_history_failure_counter_and_append_from_dataframes(tmp_path:
         "cardinality": {},
         "possible_unique_keys": [],
         "constant_columns": [],
-        "checks": [{"check_name": "ok", "status": "PASS", "severity": "low"}, "skip-me"],
+        "checks": [
+            {"check_name": "ok", "status": "PASS", "severity": "low"},
+            "skip-me",
+        ],
         "failed_checks_count": 0,
     }
     df = pd.DataFrame({"customer_email": ["a@x.com", "b@x.com"], "v": [1, 2]})
     classification_df = pd.DataFrame(
-        {"column_name": ["customer_email", "v"], "lgpd_classification": ["personal_data", "non_personal"]}
+        {
+            "column_name": ["customer_email", "v"],
+            "lgpd_classification": ["personal_data", "non_personal"],
+        }
     )
     output = tmp_path / "history.csv"
     path = append_governance_history_from_dataframes(
@@ -159,7 +173,9 @@ def test_risk_scoring_coercion_and_null_penalty_paths() -> None:
             "null_pct": [50.0, 30.0],
         }
     )
-    result = risk_scoring.calculate_privacy_risk_score(classification_df, total_rows=100)
+    result = risk_scoring.calculate_privacy_risk_score(
+        classification_df, total_rows=100
+    )
     assert result["score_components"]["critical_null_penalty"] > 0
 
 

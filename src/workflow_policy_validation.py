@@ -34,14 +34,18 @@ def _normalize_branches(branches: list[Any] | None) -> list[str]:
     return [str(branch).strip() for branch in branches]
 
 
-def validate_workflow_contract(contract: dict[str, Any], root_dir: Path = ROOT_DIR) -> list[WorkflowPolicyResult]:
+def validate_workflow_contract(
+    contract: dict[str, Any], root_dir: Path = ROOT_DIR
+) -> list[WorkflowPolicyResult]:
     results: list[WorkflowPolicyResult] = []
     workflow_specs = contract.get("workflows", [])
 
     for spec in workflow_specs:
         workflow_path = root_dir / str(spec["path"])
         if not workflow_path.exists():
-            results.append(WorkflowPolicyResult("FAIL", f"Workflow ausente: `{spec['path']}`."))
+            results.append(
+                WorkflowPolicyResult("FAIL", f"Workflow ausente: `{spec['path']}`.")
+            )
             continue
 
         workflow = load_workflow_definition(workflow_path)
@@ -55,12 +59,20 @@ def validate_workflow_contract(contract: dict[str, Any], root_dir: Path = ROOT_D
             )
 
         on_section = workflow.get("on", {})
-        push_section = on_section.get("push", {}) if isinstance(on_section, dict) else {}
-        workflow_run_section = on_section.get("workflow_run", {}) if isinstance(on_section, dict) else {}
+        push_section = (
+            on_section.get("push", {}) if isinstance(on_section, dict) else {}
+        )
+        workflow_run_section = (
+            on_section.get("workflow_run", {}) if isinstance(on_section, dict) else {}
+        )
 
         expected_push_branches = _normalize_branches(spec.get("push_branches"))
         if expected_push_branches:
-            actual_push_branches = _normalize_branches(push_section.get("branches")) if isinstance(push_section, dict) else []
+            actual_push_branches = (
+                _normalize_branches(push_section.get("branches"))
+                if isinstance(push_section, dict)
+                else []
+            )
             if actual_push_branches != expected_push_branches:
                 results.append(
                     WorkflowPolicyResult(
@@ -69,10 +81,14 @@ def validate_workflow_contract(contract: dict[str, Any], root_dir: Path = ROOT_D
                     )
                 )
 
-        expected_workflow_run_workflows = _normalize_branches(spec.get("workflow_run_workflows"))
+        expected_workflow_run_workflows = _normalize_branches(
+            spec.get("workflow_run_workflows")
+        )
         if expected_workflow_run_workflows:
             actual_workflow_run_workflows = (
-                _normalize_branches(workflow_run_section.get("workflows")) if isinstance(workflow_run_section, dict) else []
+                _normalize_branches(workflow_run_section.get("workflows"))
+                if isinstance(workflow_run_section, dict)
+                else []
             )
             if actual_workflow_run_workflows != expected_workflow_run_workflows:
                 results.append(
@@ -82,10 +98,14 @@ def validate_workflow_contract(contract: dict[str, Any], root_dir: Path = ROOT_D
                     )
                 )
 
-        expected_workflow_run_branches = _normalize_branches(spec.get("workflow_run_branches"))
+        expected_workflow_run_branches = _normalize_branches(
+            spec.get("workflow_run_branches")
+        )
         if expected_workflow_run_branches:
             actual_workflow_run_branches = (
-                _normalize_branches(workflow_run_section.get("branches")) if isinstance(workflow_run_section, dict) else []
+                _normalize_branches(workflow_run_section.get("branches"))
+                if isinstance(workflow_run_section, dict)
+                else []
             )
             if actual_workflow_run_branches != expected_workflow_run_branches:
                 results.append(
@@ -96,7 +116,11 @@ def validate_workflow_contract(contract: dict[str, Any], root_dir: Path = ROOT_D
                 )
 
     if not results:
-        results.append(WorkflowPolicyResult("PASS", "Workflows alinhados ao contrato de governança."))
+        results.append(
+            WorkflowPolicyResult(
+                "PASS", "Workflows alinhados ao contrato de governança."
+            )
+        )
     return results
 
 
@@ -113,8 +137,12 @@ def render_workflow_policy_report(results: list[WorkflowPolicyResult]) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Valida workflows do GitHub Actions contra o contrato de governança.")
-    parser.add_argument("--contract", type=Path, default=DEFAULT_GOVERNANCE_CONTRACT_PATH)
+    parser = argparse.ArgumentParser(
+        description="Valida workflows do GitHub Actions contra o contrato de governança."
+    )
+    parser.add_argument(
+        "--contract", type=Path, default=DEFAULT_GOVERNANCE_CONTRACT_PATH
+    )
     return parser.parse_args()
 
 

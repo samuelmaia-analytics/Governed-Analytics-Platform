@@ -23,8 +23,12 @@ def test_load_policy_defaults_to_latest_version(tmp_path: Path) -> None:
         "rules": [],
         "owner": "owner@example.com",
     }
-    (policy_dir / "v1.json").write_text(json.dumps({**base_payload, "version": 1}), encoding="utf-8")
-    (policy_dir / "v2.json").write_text(json.dumps({**base_payload, "version": 2}), encoding="utf-8")
+    (policy_dir / "v1.json").write_text(
+        json.dumps({**base_payload, "version": 1}), encoding="utf-8"
+    )
+    (policy_dir / "v2.json").write_text(
+        json.dumps({**base_payload, "version": 2}), encoding="utf-8"
+    )
 
     loaded = load_policy(domain="retail", policies_root=tmp_path / "policies")
 
@@ -40,4 +44,3 @@ def test_validate_policy_shape_raises_for_missing_fields() -> None:
 def test_list_policy_versions_raises_when_domain_absent(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError, match="Domínio de política LGPD inexistente"):
         list_policy_versions("missing", policies_root=tmp_path / "policies")
-

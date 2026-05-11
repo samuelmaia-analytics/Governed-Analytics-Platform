@@ -37,7 +37,9 @@ def build_semantic_source() -> pd.DataFrame:
     )
 
 
-def test_run_semantic_layer_materializes_all_slices(tmp_path: Path, monkeypatch) -> None:
+def test_run_semantic_layer_materializes_all_slices(
+    tmp_path: Path, monkeypatch
+) -> None:
     source_path = tmp_path / "fact_orders_dashboard.parquet"
     semantic_dir = tmp_path / "semantic"
     docs_dir = tmp_path / "docs"
@@ -45,11 +47,21 @@ def test_run_semantic_layer_materializes_all_slices(tmp_path: Path, monkeypatch)
 
     monkeypatch.setattr(semantic_layer, "PUBLISHED_SOURCE_PATH", source_path)
     monkeypatch.setattr(semantic_layer, "PUBLISHED_SEMANTIC_DIR", semantic_dir)
-    monkeypatch.setattr(semantic_layer, "LOGISTICS_PATH", semantic_dir / "logistics_slice.parquet")
-    monkeypatch.setattr(semantic_layer, "SELLER_PATH", semantic_dir / "seller_slice.parquet")
-    monkeypatch.setattr(semantic_layer, "COHORT_PATH", semantic_dir / "cohort_slice.parquet")
-    monkeypatch.setattr(semantic_layer, "CATEGORY_PATH", semantic_dir / "category_slice.parquet")
-    monkeypatch.setattr(semantic_layer, "STATE_PATH", semantic_dir / "state_performance_slice.parquet")
+    monkeypatch.setattr(
+        semantic_layer, "LOGISTICS_PATH", semantic_dir / "logistics_slice.parquet"
+    )
+    monkeypatch.setattr(
+        semantic_layer, "SELLER_PATH", semantic_dir / "seller_slice.parquet"
+    )
+    monkeypatch.setattr(
+        semantic_layer, "COHORT_PATH", semantic_dir / "cohort_slice.parquet"
+    )
+    monkeypatch.setattr(
+        semantic_layer, "CATEGORY_PATH", semantic_dir / "category_slice.parquet"
+    )
+    monkeypatch.setattr(
+        semantic_layer, "STATE_PATH", semantic_dir / "state_performance_slice.parquet"
+    )
     monkeypatch.setattr(semantic_layer, "DOCS_DIR", docs_dir)
     monkeypatch.setattr(semantic_layer, "REPORT_PATH", docs_dir / "semantic_layer.md")
 

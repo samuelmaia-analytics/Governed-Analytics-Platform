@@ -43,16 +43,24 @@ def _markdown_table(df: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
-def _build_data_dictionary_markdown(df: pd.DataFrame, classification_df: pd.DataFrame) -> str:
+def _build_data_dictionary_markdown(
+    df: pd.DataFrame, classification_df: pd.DataFrame
+) -> str:
     generated_at = _now_utc_iso()
     dictionary_df = pd.DataFrame(
         {
             "column_name": df.columns,
             "dtype": [str(dtype) for dtype in df.dtypes],
             "null_pct": (df.isna().mean() * 100).round(2).values,
-            "distinct_values": [int(df[column].nunique(dropna=False)) for column in df.columns],
+            "distinct_values": [
+                int(df[column].nunique(dropna=False)) for column in df.columns
+            ],
         }
-    ).merge(classification_df[["column_name", "lgpd_classification"]], on="column_name", how="left")
+    ).merge(
+        classification_df[["column_name", "lgpd_classification"]],
+        on="column_name",
+        how="left",
+    )
     return "\n".join(
         [
             "# Data Dictionary",
@@ -68,7 +76,9 @@ def _build_data_dictionary_markdown(df: pd.DataFrame, classification_df: pd.Data
     )
 
 
-def _build_lgpd_controls_markdown(df: pd.DataFrame, classification_df: pd.DataFrame, risk_result: PrivacyRiskResult) -> str:
+def _build_lgpd_controls_markdown(
+    df: pd.DataFrame, classification_df: pd.DataFrame, risk_result: PrivacyRiskResult
+) -> str:
     generated_at = _now_utc_iso()
     recommendations = "\n".join(f"- {item}" for item in risk_result["recommendations"])
     return "\n".join(
@@ -96,7 +106,9 @@ def _build_lgpd_controls_markdown(df: pd.DataFrame, classification_df: pd.DataFr
     )
 
 
-def _build_data_quality_markdown(df: pd.DataFrame, quality_table: pd.DataFrame, quality_results: DataQualityResult) -> str:
+def _build_data_quality_markdown(
+    df: pd.DataFrame, quality_table: pd.DataFrame, quality_results: DataQualityResult
+) -> str:
     generated_at = _now_utc_iso()
     failed_checks = int(quality_results["failed_checks_count"])
     next_steps = [
@@ -135,7 +147,9 @@ def _build_data_quality_markdown(df: pd.DataFrame, quality_table: pd.DataFrame, 
     )
 
 
-def generate_markdown_reports(df: pd.DataFrame, docs_dir: str | Path = DEFAULT_DOCS_DIR) -> dict[str, Path]:
+def generate_markdown_reports(
+    df: pd.DataFrame, docs_dir: str | Path = DEFAULT_DOCS_DIR
+) -> dict[str, Path]:
     docs_path = Path(docs_dir)
     docs_path.mkdir(parents=True, exist_ok=True)
     reports_path = docs_path / "reports"

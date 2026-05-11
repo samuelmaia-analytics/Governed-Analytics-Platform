@@ -24,15 +24,27 @@ def paginate_text(text: str) -> list[list[str]]:
         if not raw_line.strip():
             logical_lines.append("")
             continue
-        wrapped = wrap(raw_line, width=MAX_CHARS_PER_LINE, replace_whitespace=False, drop_whitespace=False)
+        wrapped = wrap(
+            raw_line,
+            width=MAX_CHARS_PER_LINE,
+            replace_whitespace=False,
+            drop_whitespace=False,
+        )
         logical_lines.extend(wrapped if wrapped else [""])
 
     lines_per_page = max((PAGE_HEIGHT - TOP_MARGIN - BOTTOM_MARGIN) // LINE_HEIGHT, 1)
-    return [logical_lines[i:i + lines_per_page] for i in range(0, len(logical_lines), lines_per_page)]
+    return [
+        logical_lines[i : i + lines_per_page]
+        for i in range(0, len(logical_lines), lines_per_page)
+    ]
 
 
 def build_page_stream(lines: list[str]) -> str:
-    commands = ["BT", f"/F1 {FONT_SIZE} Tf", f"{LEFT_MARGIN} {PAGE_HEIGHT - TOP_MARGIN} Td"]
+    commands = [
+        "BT",
+        f"/F1 {FONT_SIZE} Tf",
+        f"{LEFT_MARGIN} {PAGE_HEIGHT - TOP_MARGIN} Td",
+    ]
     first_line = True
     for line in lines:
         escaped = escape_pdf_text(line.rstrip())
@@ -65,7 +77,9 @@ def write_pdf(input_path: Path, output_path: Path) -> None:
 
     for lines in pages:
         stream = build_page_stream(lines)
-        content_id = add_object(f"<< /Length {len(stream.encode('latin-1', errors='replace'))} >>\nstream\n{stream}\nendstream")
+        content_id = add_object(
+            f"<< /Length {len(stream.encode('latin-1', errors='replace'))} >>\nstream\n{stream}\nendstream"
+        )
         content_ids.append(content_id)
         page_id = add_object(
             f"<< /Type /Page /Parent {{PAGES_ID}} 0 R /MediaBox [0 0 {PAGE_WIDTH} {PAGE_HEIGHT}] /Resources << /Font << /F1 {font_id} 0 R >> >> /Contents {content_id} 0 R >>"
@@ -78,7 +92,9 @@ def write_pdf(input_path: Path, output_path: Path) -> None:
     objects[pages_placeholder_index] = pages_object.encode("latin-1")
 
     for idx, page_id in enumerate(page_ids, start=1):
-        objects[page_id - 1] = objects[page_id - 1].replace(b"{PAGES_ID}", str(pages_id).encode("latin-1"))
+        objects[page_id - 1] = objects[page_id - 1].replace(
+            b"{PAGES_ID}", str(pages_id).encode("latin-1")
+        )
 
     catalog_id = add_object(f"<< /Type /Catalog /Pages {pages_id} 0 R >>")
 
@@ -106,7 +122,9 @@ def write_pdf(input_path: Path, output_path: Path) -> None:
 
 def main() -> None:
     if len(sys.argv) != 3:
-        raise SystemExit("Uso: python src/export_text_pdf.py <input_md_or_txt> <output_pdf>")
+        raise SystemExit(
+            "Uso: python src/export_text_pdf.py <input_md_or_txt> <output_pdf>"
+        )
 
     input_path = Path(sys.argv[1])
     output_path = Path(sys.argv[2])

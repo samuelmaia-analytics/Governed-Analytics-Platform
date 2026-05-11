@@ -84,10 +84,15 @@ def test_load_contract_iter_paths_and_load_dataset(tmp_path: Path, monkeypatch) 
     assert list(dataset.columns) == ["id"]
 
 
-def test_matches_expected_type_and_render_save_report(tmp_path: Path, monkeypatch) -> None:
+def test_matches_expected_type_and_render_save_report(
+    tmp_path: Path, monkeypatch
+) -> None:
     assert matches_expected_type(pd.Series([True, False]), "boolean") is True
     assert matches_expected_type(pd.Series([1.0, 2.0]), "float") is True
-    assert matches_expected_type(pd.Series(pd.to_datetime(["2018-01-01"])), "datetime") is True
+    assert (
+        matches_expected_type(pd.Series(pd.to_datetime(["2018-01-01"])), "datetime")
+        is True
+    )
 
     checks = [
         ContractCheck(
@@ -100,8 +105,14 @@ def test_matches_expected_type_and_render_save_report(tmp_path: Path, monkeypatc
     ]
     monkeypatch.setattr(schema_contracts, "QUALITY_DIR", tmp_path / "quality")
     monkeypatch.setattr(schema_contracts, "DOCS_DIR", tmp_path / "docs")
-    monkeypatch.setattr(schema_contracts, "RESULTS_PATH", tmp_path / "quality" / "schema_contract_results.csv")
-    monkeypatch.setattr(schema_contracts, "REPORT_PATH", tmp_path / "docs" / "schema_contract_report.md")
+    monkeypatch.setattr(
+        schema_contracts,
+        "RESULTS_PATH",
+        tmp_path / "quality" / "schema_contract_results.csv",
+    )
+    monkeypatch.setattr(
+        schema_contracts, "REPORT_PATH", tmp_path / "docs" / "schema_contract_report.md"
+    )
 
     report = render_report(checks)
     results_path = save_results(checks)
@@ -124,14 +135,24 @@ def test_run_contract_checks_and_main(tmp_path: Path, monkeypatch) -> None:
             details="ok",
         )
     ]
-    monkeypatch.setattr(schema_contracts, "iter_contract_paths", lambda: [contract_path])
-    monkeypatch.setattr(schema_contracts, "load_contract", lambda _path: {"dataset_name": "demo"})
+    monkeypatch.setattr(
+        schema_contracts, "iter_contract_paths", lambda: [contract_path]
+    )
+    monkeypatch.setattr(
+        schema_contracts, "load_contract", lambda _path: {"dataset_name": "demo"}
+    )
     monkeypatch.setattr(schema_contracts, "validate_contract", lambda _contract: checks)
     monkeypatch.setattr(schema_contracts, "configure_logging", lambda: None)
     monkeypatch.setattr(schema_contracts, "QUALITY_DIR", tmp_path / "quality")
     monkeypatch.setattr(schema_contracts, "DOCS_DIR", tmp_path / "docs")
-    monkeypatch.setattr(schema_contracts, "RESULTS_PATH", tmp_path / "quality" / "schema_contract_results.csv")
-    monkeypatch.setattr(schema_contracts, "REPORT_PATH", tmp_path / "docs" / "schema_contract_report.md")
+    monkeypatch.setattr(
+        schema_contracts,
+        "RESULTS_PATH",
+        tmp_path / "quality" / "schema_contract_results.csv",
+    )
+    monkeypatch.setattr(
+        schema_contracts, "REPORT_PATH", tmp_path / "docs" / "schema_contract_report.md"
+    )
 
     result_checks = run_contract_checks()
     schema_contracts.main()

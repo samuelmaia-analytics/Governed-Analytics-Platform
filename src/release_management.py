@@ -49,7 +49,9 @@ def normalize_source_branch(source_branch: str) -> str:
     return "main" if normalized == "master" else normalized
 
 
-def resolve_promotion_plan(target_environment: str, source_ref: str, source_branch: str) -> PromotionPlan:
+def resolve_promotion_plan(
+    target_environment: str, source_ref: str, source_branch: str
+) -> PromotionPlan:
     profile = DEPLOYMENT_PROFILES.get(target_environment)
     if profile is None:
         raise ValueError(f"Ambiente de deploy inválido: {target_environment}")
@@ -71,17 +73,28 @@ def resolve_promotion_plan(target_environment: str, source_ref: str, source_bran
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Resolve plano de promoção entre ambientes de deploy.")
-    parser.add_argument("--target-environment", choices=sorted(DEPLOYMENT_PROFILES.keys()), required=True)
+    parser = argparse.ArgumentParser(
+        description="Resolve plano de promoção entre ambientes de deploy."
+    )
+    parser.add_argument(
+        "--target-environment",
+        choices=sorted(DEPLOYMENT_PROFILES.keys()),
+        required=True,
+    )
     parser.add_argument("--source-ref", required=True)
     parser.add_argument("--source-branch", required=True)
-    parser.add_argument("--github-output", help="Arquivo de output do GitHub Actions para exportar o plano.")
+    parser.add_argument(
+        "--github-output",
+        help="Arquivo de output do GitHub Actions para exportar o plano.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    plan = resolve_promotion_plan(args.target_environment, args.source_ref, args.source_branch)
+    plan = resolve_promotion_plan(
+        args.target_environment, args.source_ref, args.source_branch
+    )
     payload = json.dumps(asdict(plan), ensure_ascii=False)
     print(payload)
     if args.github_output:

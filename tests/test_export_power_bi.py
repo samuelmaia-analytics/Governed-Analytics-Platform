@@ -21,10 +21,22 @@ def build_source_df() -> pd.DataFrame:
             "seller_state": ["MG", "BA"],
             "payment_type_mode": ["credit_card", "boleto"],
             "order_status": ["delivered", "approved"],
-            "order_purchase_timestamp": [pd.Timestamp("2018-01-01 10:00:00"), pd.Timestamp("2018-01-02 11:00:00")],
-            "order_approved_at": [pd.Timestamp("2018-01-01 12:00:00"), pd.Timestamp("2018-01-02 12:00:00")],
-            "order_delivered_customer_date": [pd.Timestamp("2018-01-05 14:00:00"), pd.NaT],
-            "order_estimated_delivery_date": [pd.Timestamp("2018-01-06"), pd.Timestamp("2018-01-07")],
+            "order_purchase_timestamp": [
+                pd.Timestamp("2018-01-01 10:00:00"),
+                pd.Timestamp("2018-01-02 11:00:00"),
+            ],
+            "order_approved_at": [
+                pd.Timestamp("2018-01-01 12:00:00"),
+                pd.Timestamp("2018-01-02 12:00:00"),
+            ],
+            "order_delivered_customer_date": [
+                pd.Timestamp("2018-01-05 14:00:00"),
+                pd.NaT,
+            ],
+            "order_estimated_delivery_date": [
+                pd.Timestamp("2018-01-06"),
+                pd.Timestamp("2018-01-07"),
+            ],
             "price": [100.0, 200.0],
             "freight_value": [10.0, 20.0],
             "total_item_value": [110.0, 220.0],
@@ -45,7 +57,11 @@ def build_source_df() -> pd.DataFrame:
             "product_width_cm": [7.0, 8.0],
         }
     )
-    df["category_label"] = df["product_category_name_english"].fillna(df["product_category_name"]).fillna("unknown")
+    df["category_label"] = (
+        df["product_category_name_english"]
+        .fillna(df["product_category_name"])
+        .fillna("unknown")
+    )
     df["payment_type_mode"] = df["payment_type_mode"].fillna("unknown").astype(str)
     df["order_status"] = df["order_status"].fillna("unknown").astype(str)
     df["customer_state"] = df["customer_state"].fillna("NA").astype(str)
@@ -81,9 +97,14 @@ def test_build_export_bundle_creates_star_schema_with_expected_keys() -> None:
         "status_group",
         "status_description",
     ]
-    assert {"date_key", "product_key", "payment_key", "order_status_key", "customer_key", "seller_key"}.issubset(
-        bundle.fact_sales.columns
-    )
+    assert {
+        "date_key",
+        "product_key",
+        "payment_key",
+        "order_status_key",
+        "customer_key",
+        "seller_key",
+    }.issubset(bundle.fact_sales.columns)
 
 
 def test_validate_export_bundle_accepts_consistent_model() -> None:
@@ -97,5 +118,11 @@ def test_validate_export_bundle_accepts_consistent_model() -> None:
     assert bundle.dim_customer["customer_key"].is_unique
     assert bundle.dim_seller["seller_key"].is_unique
 
-    assert bundle.fact_sales["payment_key"].isin(bundle.dim_payment["payment_key"]).all()
-    assert bundle.fact_sales["order_status_key"].isin(bundle.dim_order_status["order_status_key"]).all()
+    assert (
+        bundle.fact_sales["payment_key"].isin(bundle.dim_payment["payment_key"]).all()
+    )
+    assert (
+        bundle.fact_sales["order_status_key"]
+        .isin(bundle.dim_order_status["order_status_key"])
+        .all()
+    )

@@ -38,7 +38,9 @@ def _quality_result(failed_checks: int) -> dict[str, object]:
 
 
 def test_publication_decision_blocked_for_high_risk() -> None:
-    classification_df = pd.DataFrame({"lgpd_classification": ["sensitive_personal_data", "personal_data"]})
+    classification_df = pd.DataFrame(
+        {"lgpd_classification": ["sensitive_personal_data", "personal_data"]}
+    )
     status, reasons, actions, evidence = build_publication_decision_rationale(
         _risk_result("high", 90),
         _quality_result(0),

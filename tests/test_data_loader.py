@@ -34,4 +34,7 @@ def test_load_dataset_raises_when_path_is_missing(tmp_path: Path) -> None:
 
 
 def test_infer_dataset_name_returns_file_stem() -> None:
-    assert infer_dataset_name("data/samples/sample_governance_dataset.csv") == "sample_governance_dataset"
+    assert (
+        infer_dataset_name("data/samples/sample_governance_dataset.csv")
+        == "sample_governance_dataset"
+    )

@@ -16,7 +16,9 @@ def test_to_snake_case_and_standardize_columns_handle_mixed_input() -> None:
     assert list(standardized.columns) == ["order_id", "customer_id"]
 
 
-def test_read_olist_table_prefers_standardized_parquet(tmp_path: Path, monkeypatch) -> None:
+def test_read_olist_table_prefers_standardized_parquet(
+    tmp_path: Path, monkeypatch
+) -> None:
     standardized_dir = tmp_path / "standardized"
     standardized_dir.mkdir()
     source = pd.DataFrame({"Order ID": [1], "OrderDate": ["2018-01-01"]})
@@ -61,8 +63,12 @@ def test_build_payments_and_reviews_aggregations_return_expected_metrics() -> No
             "order_id": ["o1", "o1", "o2"],
             "review_id": ["r1", "r2", "r3"],
             "review_score": [4, 5, 3],
-            "review_creation_date": pd.to_datetime(["2018-01-02", "2018-01-03", "2018-01-04"]),
-            "review_answer_timestamp": pd.to_datetime(["2018-01-05", "2018-01-06", "2018-01-07"]),
+            "review_creation_date": pd.to_datetime(
+                ["2018-01-02", "2018-01-03", "2018-01-04"]
+            ),
+            "review_answer_timestamp": pd.to_datetime(
+                ["2018-01-05", "2018-01-06", "2018-01-07"]
+            ),
             "review_comment_message": ["ok", "", None],
         }
     )
@@ -70,9 +76,26 @@ def test_build_payments_and_reviews_aggregations_return_expected_metrics() -> No
     payments_agg = build_analytics.build_payments_agg(payments)
     reviews_agg = build_analytics.build_reviews_agg(reviews)
 
-    assert float(payments_agg.loc[payments_agg["order_id"] == "o1", "total_payment_value"].iloc[0]) == 120.0
-    assert int(reviews_agg.loc[reviews_agg["order_id"] == "o1", "review_count"].iloc[0]) == 2
-    assert int(reviews_agg.loc[reviews_agg["order_id"] == "o1", "has_review_comment"].iloc[0]) == 1
+    assert (
+        float(
+            payments_agg.loc[
+                payments_agg["order_id"] == "o1", "total_payment_value"
+            ].iloc[0]
+        )
+        == 120.0
+    )
+    assert (
+        int(reviews_agg.loc[reviews_agg["order_id"] == "o1", "review_count"].iloc[0])
+        == 2
+    )
+    assert (
+        int(
+            reviews_agg.loc[reviews_agg["order_id"] == "o1", "has_review_comment"].iloc[
+                0
+            ]
+        )
+        == 1
+    )
 
 
 def test_clean_helpers_filter_missing_keys() -> None:
@@ -90,10 +113,28 @@ def test_clean_helpers_filter_missing_keys() -> None:
 
     assert len(build_analytics.clean_orders(orders)) == 1
     assert len(build_analytics.clean_order_items(items)) == 1
-    assert len(build_analytics.clean_customers(pd.DataFrame({"customer_id": ["c1", None]}))) == 1
-    assert len(build_analytics.clean_products(pd.DataFrame({"product_id": ["p1", None]}))) == 1
-    assert len(build_analytics.clean_sellers(pd.DataFrame({"seller_id": ["s1", None]}))) == 1
-    assert len(build_analytics.clean_translation(pd.DataFrame({"product_category_name": ["cat", None]}))) == 1
+    assert (
+        len(
+            build_analytics.clean_customers(pd.DataFrame({"customer_id": ["c1", None]}))
+        )
+        == 1
+    )
+    assert (
+        len(build_analytics.clean_products(pd.DataFrame({"product_id": ["p1", None]})))
+        == 1
+    )
+    assert (
+        len(build_analytics.clean_sellers(pd.DataFrame({"seller_id": ["s1", None]})))
+        == 1
+    )
+    assert (
+        len(
+            build_analytics.clean_translation(
+                pd.DataFrame({"product_category_name": ["cat", None]})
+            )
+        )
+        == 1
+    )
 
 
 def test_join_health_reconciliation_and_output_order_are_reported() -> None:
@@ -125,7 +166,9 @@ def test_join_health_reconciliation_and_output_order_are_reported() -> None:
     assert ordered.columns[0] == "order_id"
 
 
-def test_render_report_save_report_and_run_build_return_artifacts(tmp_path: Path, monkeypatch) -> None:
+def test_render_report_save_report_and_run_build_return_artifacts(
+    tmp_path: Path, monkeypatch
+) -> None:
     fact_df = pd.DataFrame(
         {
             "order_id": ["o1"] * 100_002,
@@ -168,9 +211,17 @@ def test_render_report_save_report_and_run_build_return_artifacts(tmp_path: Path
 
     monkeypatch.setattr(build_analytics, "ANALYTICS_DIR", analytics_dir)
     monkeypatch.setattr(build_analytics, "DOCS_DIR", docs_dir)
-    monkeypatch.setattr(build_analytics, "FACT_PARQUET_PATH", analytics_dir / "fact_orders_enriched.parquet")
-    monkeypatch.setattr(build_analytics, "FACT_CSV_PATH", analytics_dir / "fact_orders_enriched.csv")
-    monkeypatch.setattr(build_analytics, "REPORT_PATH", docs_dir / "fact_orders_enriched.md")
+    monkeypatch.setattr(
+        build_analytics,
+        "FACT_PARQUET_PATH",
+        analytics_dir / "fact_orders_enriched.parquet",
+    )
+    monkeypatch.setattr(
+        build_analytics, "FACT_CSV_PATH", analytics_dir / "fact_orders_enriched.csv"
+    )
+    monkeypatch.setattr(
+        build_analytics, "REPORT_PATH", docs_dir / "fact_orders_enriched.md"
+    )
     monkeypatch.setattr(build_analytics, "build_fact_orders_enriched", lambda: fact_df)
 
     report = build_analytics.render_report(fact_df)

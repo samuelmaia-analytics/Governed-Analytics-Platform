@@ -22,7 +22,13 @@ from src.dadosfera_pipeline_ops import (
 from src.observability import configure_logging
 from src.settings import load_app_settings
 
-DEFAULT_PIPELINE_DEFINITION_PATH = ROOT_DIR / "contracts" / "dadosfera" / "pipelines" / "fact_orders_dashboard_s3_parquet_pipeline.json"
+DEFAULT_PIPELINE_DEFINITION_PATH = (
+    ROOT_DIR
+    / "contracts"
+    / "dadosfera"
+    / "pipelines"
+    / "fact_orders_dashboard_s3_parquet_pipeline.json"
+)
 DEFAULT_REPORT_PATH = DOCS_DIR / "reports" / "platform_publication.md"
 
 
@@ -100,19 +106,30 @@ def run_pipeline_publication(
 
     if dry_run:
         status = "DRY_RUN"
-        details = f"pipeline `{pipeline_name}` {'já existe' if existing else 'seria criada'}"
+        details = (
+            f"pipeline `{pipeline_name}` {'já existe' if existing else 'seria criada'}"
+        )
         if execute_pipeline:
             details += " e seria executada"
-        return PlatformPublicationResult(stage="pipeline_publication", status=status, details=details)
+        return PlatformPublicationResult(
+            stage="pipeline_publication", status=status, details=details
+        )
 
     response = existing or client.create_pipeline(definition)
     pipeline_id = resolve_pipeline_id(response)
     details = f"pipeline `{pipeline_name}` pronta com id `{pipeline_id}`"
     if execute_pipeline:
         run_response = client.run_pipeline(pipeline_id, {})
-        run_id = run_response.get("id") or run_response.get("run_id") or run_response.get("uuid") or "unknown"
+        run_id = (
+            run_response.get("id")
+            or run_response.get("run_id")
+            or run_response.get("uuid")
+            or "unknown"
+        )
         details += f" | execução disparada `{run_id}`"
-    return PlatformPublicationResult(stage="pipeline_publication", status="SUCCESS", details=details)
+    return PlatformPublicationResult(
+        stage="pipeline_publication", status="SUCCESS", details=details
+    )
 
 
 def render_report(
@@ -150,7 +167,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base-url", default=settings.dadosfera.base_url)
     parser.add_argument("--target-environment", default="prod")
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST_PATH)
-    parser.add_argument("--pipeline-definition", type=Path, default=DEFAULT_PIPELINE_DEFINITION_PATH)
+    parser.add_argument(
+        "--pipeline-definition", type=Path, default=DEFAULT_PIPELINE_DEFINITION_PATH
+    )
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT_PATH)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--skip-catalog-sync", action="store_true")

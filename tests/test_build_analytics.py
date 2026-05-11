@@ -33,7 +33,9 @@ def test_derive_columns_preserves_null_delay_when_order_is_not_delivered() -> No
     assert bool(result.loc[0, "is_first_order"]) is True
 
 
-def test_remove_obvious_inconsistencies_filters_negative_values_invalid_delivery_and_duplicates() -> None:
+def test_remove_obvious_inconsistencies_filters_negative_values_invalid_delivery_and_duplicates() -> (
+    None
+):
     df = pd.DataFrame(
         {
             "order_id": ["o1", "o1", "o2", "o3"],
@@ -56,4 +58,3 @@ def test_remove_obvious_inconsistencies_filters_negative_values_invalid_delivery
 
     assert len(result) == 1
     assert result.iloc[0]["order_id"] == "o1"
-

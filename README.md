@@ -47,16 +47,17 @@ the app consumes the published layer (`data/published/dashboard`) instead of the
 
 ```mermaid
 flowchart LR
-    A[Raw Data] --> B[src/data_loader.py]
-    B --> C[src/lgpd_classifier.py]
-    B --> D[src/data_quality.py]
-    C --> E[src/risk_scoring.py]
-    D --> F[src/report_generator.py]
+    A[Raw CSV] --> B[ingest & standardize]
+    B --> C[enrich & build analytics]
+    C --> D[LGPD classification]
+    C --> E[data quality checks]
+    D --> F[privacy risk score]
     E --> F
-    B --> G[app/main.py]
-    C --> G
-    D --> G
-    E --> G
+    F --> G{publication gate}
+    G -->|Approved| H[published layer]
+    G -->|Blocked / Needs Review| I[governance report]
+    H --> J[Streamlit executive app]
+    I --> J
 ```
 
 ## Implemented vs Simulated
@@ -150,13 +151,15 @@ make app
 
 Main pages:
 
-- Executive Overview
-- Data Catalog
-- LGPD & Privacy Risk
-- Data Quality
-- EDA
-- Governance Report
-- Governance Control Center
+| Page | What it shows |
+| --- | --- |
+| Executive Overview | Key metrics with trend deltas, data freshness, LGPD-suppressed columns |
+| Data Catalog | Searchable column inventory with LGPD classification filter |
+| LGPD & Privacy Risk | Risk score, classification breakdown, privacy transformation preview |
+| Data Quality | Quality checks, null profile, severity distribution |
+| EDA | Statistical overview + interactive column-level histogram / boxplot |
+| Governance Report | Rendered governance markdown reports with raw view |
+| Governance Control Center | Publication gate, rationale, snapshot history trends |
 
 ## Main Structure
 
@@ -169,15 +172,6 @@ Main pages:
 | `tests/` | Automated tests |
 | `.github/workflows/` | CI/CD |
 | `powerbi/` | BI export artifacts |
-
-## Recruiter Notes
-
-Strong interview discussion artifact for:
-
-- Analytics Engineer
-- Data Engineer
-- Data Governance / Data Platform profiles
-- Senior Data Analyst roles with ownership scope
 
 ## Links
 

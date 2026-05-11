@@ -5,6 +5,7 @@ import logging
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 from pandas.api.types import (
@@ -38,7 +39,7 @@ class ContractCheck:
     details: str
 
 
-def load_contract(path: Path) -> dict[str, object]:
+def load_contract(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -46,7 +47,7 @@ def iter_contract_paths() -> list[Path]:
     return sorted(CONTRACTS_DIR.glob("*/*.contract.json"))
 
 
-def load_dataset(contract: dict[str, object]) -> pd.DataFrame:
+def load_dataset(contract: dict[str, Any]) -> pd.DataFrame:
     dataset_path = ROOT_DIR / str(contract["path"])
     if dataset_path.suffix == ".parquet":
         return pd.read_parquet(dataset_path)
@@ -72,11 +73,14 @@ def matches_expected_type(series: pd.Series, expected_type: str) -> bool:
         if not is_object_dtype(series.dtype):
             return False
         non_null = series.dropna()
-        return non_null.empty or all(hasattr(value, "year") and hasattr(value, "month") and hasattr(value, "day") for value in non_null.head(50))
+        return non_null.empty or all(
+            hasattr(value, "year") and hasattr(value, "month") and hasattr(value, "day")
+            for value in non_null.head(50)
+        )
     raise ValueError(f"Tipo esperado desconhecido: {expected_type}")
 
 
-def validate_contract(contract: dict[str, object]) -> list[ContractCheck]:
+def validate_contract(contract: dict[str, Any]) -> list[ContractCheck]:
     dataset_name = str(contract["dataset_name"])
     layer = str(contract["layer"])
     df = load_dataset(contract)
@@ -167,7 +171,10 @@ def render_report(checks: list[ContractCheck]) -> str:
     df = pd.DataFrame(asdict(check) for check in checks)
     summary = (
         df.groupby(["dataset_name", "layer"], as_index=False)
-        .agg(total_checks=("check_name", "count"), failed_checks=("status", lambda s: int((s == "FAIL").sum())))
+        .agg(
+            total_checks=("check_name", "count"),
+            failed_checks=("status", lambda s: int((s == "FAIL").sum())),
+        )
         .sort_values(["layer", "dataset_name"])
     )
 
@@ -182,11 +189,23 @@ def render_report(checks: list[ContractCheck]) -> str:
         "| --- | --- | ---: | ---: |",
     ]
     for row in summary.itertuples(index=False):
-        lines.append(f"| `{row.dataset_name}` | `{row.layer}` | {int(row.total_checks)} | {int(row.failed_checks)} |")
+        lines.append(
+            f"| `{row.dataset_name}` | `{row.layer}` | {int(row.total_checks)} | {int(row.failed_checks)} |"
+        )
 
-    lines.extend(["", "## Resultado dos Checks", "", "| Dataset | Check | Status | Detalhes |", "| --- | --- | --- | --- |"])
+    lines.extend(
+        [
+            "",
+            "## Resultado dos Checks",
+            "",
+            "| Dataset | Check | Status | Detalhes |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
     for row in df.itertuples(index=False):
-        lines.append(f"| `{row.dataset_name}` | `{row.check_name}` | **{row.status}** | {row.details} |")
+        lines.append(
+            f"| `{row.dataset_name}` | `{row.check_name}` | **{row.status}** | {row.details} |"
+        )
 
     return "\n".join(lines)
 

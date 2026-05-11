@@ -16,10 +16,18 @@ def build_quality_dataset() -> pd.DataFrame:
             "customer_id": ["c1", "c1", "c2"],
             "product_id": ["p1", "p2", "p3"],
             "seller_id": ["s1", "s2", "s3"],
-            "order_purchase_timestamp": pd.to_datetime(["2018-01-01", "2018-01-01", "2018-01-02"]),
-            "order_approved_at": pd.to_datetime(["2018-01-01", "2018-01-01", "2018-01-03"]),
-            "order_delivered_customer_date": pd.to_datetime(["2018-01-03", "2018-01-03", "2018-01-04"]),
-            "order_estimated_delivery_date": pd.to_datetime(["2018-01-02", "2018-01-02", "2018-01-05"]),
+            "order_purchase_timestamp": pd.to_datetime(
+                ["2018-01-01", "2018-01-01", "2018-01-02"]
+            ),
+            "order_approved_at": pd.to_datetime(
+                ["2018-01-01", "2018-01-01", "2018-01-03"]
+            ),
+            "order_delivered_customer_date": pd.to_datetime(
+                ["2018-01-03", "2018-01-03", "2018-01-04"]
+            ),
+            "order_estimated_delivery_date": pd.to_datetime(
+                ["2018-01-02", "2018-01-02", "2018-01-05"]
+            ),
             "price": [100.0, 50.0, 70.0],
             "freight_value": [10.0, 5.0, 9.0],
             "review_score_mean": [4.0, 4.0, 5.0],
@@ -56,7 +64,9 @@ def test_quality_checks_cover_schema_temporal_and_volume_failures() -> None:
     df = build_quality_dataset().drop(columns=["price"]).copy()
     df["freight_value"] = [-1.0, 5.0, 9.0]
     df["order_approved_at"] = pd.to_datetime(["2017-12-31", "2018-01-01", "2018-01-05"])
-    df["order_delivered_customer_date"] = pd.to_datetime(["2017-12-31", "2018-01-03", "2018-01-04"])
+    df["order_delivered_customer_date"] = pd.to_datetime(
+        ["2017-12-31", "2018-01-03", "2018-01-04"]
+    )
 
     schema_result = quality.check_expected_schema(df)
     negatives = quality.check_negative_values(df.assign(price=[100.0, -5.0, 70.0]))
@@ -80,7 +90,9 @@ def test_run_quality_checks_and_render_report_include_residual_note() -> None:
     assert "Nota sobre a Falha Residual" in report
 
 
-def test_save_quality_results_and_report_write_files(tmp_path: Path, monkeypatch) -> None:
+def test_save_quality_results_and_report_write_files(
+    tmp_path: Path, monkeypatch
+) -> None:
     results_path = tmp_path / "quality" / "results.csv"
     report_path = tmp_path / "docs" / "report.md"
     monkeypatch.setattr(quality, "QUALITY_DIR", results_path.parent)

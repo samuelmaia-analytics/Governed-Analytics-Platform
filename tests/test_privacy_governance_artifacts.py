@@ -55,12 +55,20 @@ def test_build_risk_matrix_returns_risks_with_severity() -> None:
     classification_df = pd.DataFrame(
         {
             "column_name": ["cpf", "zip_code", "amount"],
-            "lgpd_classification": ["personal_data", "indirect_identifier", "non_personal"],
+            "lgpd_classification": [
+                "personal_data",
+                "indirect_identifier",
+                "non_personal",
+            ],
         }
     )
-    risk_matrix = build_risk_matrix(classification_df, _risk_result("high", 85), _quality_result(2))
+    risk_matrix = build_risk_matrix(
+        classification_df, _risk_result("high", 85), _quality_result(2)
+    )
     assert len(risk_matrix) >= 3
-    assert {"risk_id", "severity", "mitigation", "evidence"}.issubset(risk_matrix.columns)
+    assert {"risk_id", "severity", "mitigation", "evidence"}.issubset(
+        risk_matrix.columns
+    )
 
 
 def test_generate_ripd_markdown_includes_key_sections() -> None:
@@ -68,7 +76,9 @@ def test_generate_ripd_markdown_includes_key_sections() -> None:
         {"column_name": ["email"], "lgpd_classification": ["personal_data"]}
     )
     inventory = build_treatment_inventory()
-    risk_matrix = build_risk_matrix(classification_df, _risk_result(), _quality_result())
+    risk_matrix = build_risk_matrix(
+        classification_df, _risk_result(), _quality_result()
+    )
     markdown = generate_ripd_markdown(
         dataset_name="fact_orders_dashboard",
         treatment_inventory=inventory,

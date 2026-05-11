@@ -11,32 +11,24 @@
 Plataforma analítica governada para portfólio.
 Foco em Analytics Engineering com controles de governança, qualidade e privacidade.
 
-## Resumo executivo
+## Resumo Executivo
 
 Este repositório demonstra um fluxo completo:
 
 1. ingestão e transformação de dados;
 2. classificação de privacidade inspirada em LGPD;
 3. avaliação de risco explicável;
-4. validação de qualidade;
-5. publicação controlada para consumo executivo.
+4. validação de qualidade com contratos declarativos;
+5. publicação controlada para consumo executivo via Streamlit.
 
-## Impacto de negócio
+## Impacto de Negócio
 
 - Reduz risco de exposição indevida ao separar camada interna e camada publicada.
 - Aumenta confiança executiva com decisão explícita de publicação (`Approved`, `Needs Review`, `Blocked`).
 - Melhora velocidade de revisão técnica com evidências automatizadas de qualidade e privacidade.
-- Cria narrativa defensável para auditoria técnica com contratos, score de risco e relatórios.
+- Cria narrativa defensável para auditoria com contratos, score de risco e relatórios versionados.
 
-## Como revisar este projeto em 5 minutos
-
-1. Leia as seções de problema e solução.
-2. Veja a arquitetura e a separação entre camadas.
-3. Rode `make install`, `make test`, `make app`.
-4. Abra o app e confira páginas de governança.
-5. Revise `docs/governance/privacy_governance.md` e `docs/architecture/semantic_layer.md`.
-
-## Problema de negócio
+## Problema de Negócio
 
 Em muitos times, dashboards são publicados sem critérios claros de qualidade e privacidade.
 Isso aumenta risco operacional, risco regulatório e perda de confiança.
@@ -48,8 +40,29 @@ Abordagem de produto analítico governado:
 - pipeline modular em Python;
 - separação explícita entre camada interna e camada publicada;
 - classificação e risco de privacidade;
-- regras de qualidade em contrato;
+- regras de qualidade em contrato YAML;
 - documentação operacional e executiva versionada.
+
+## Arquitetura
+
+Fluxo principal:
+
+```mermaid
+flowchart LR
+    A[CSV Bruto] --> B[ingestão & padronização]
+    B --> C[enriquecimento & analytics]
+    C --> D[classificação LGPD]
+    C --> E[checks de qualidade]
+    D --> F[score de risco de privacidade]
+    E --> F
+    F --> G{publication gate}
+    G -->|Aprovado| H[camada publicada]
+    G -->|Bloqueado / Em revisão| I[relatório de governança]
+    H --> J[app Streamlit executivo]
+    I --> J
+```
+
+Fronteira chave: o app consome a camada publicada (`data/published/dashboard`), não a camada curada interna completa.
 
 ## Implementado vs Simulado
 
@@ -69,7 +82,7 @@ Abordagem de produto analítico governado:
 - Base legal e retenção em linguagem de portfólio.
 - Controles corporativos avançados (IAM completo e trilha centralizada de auditoria).
 
-## Limites de prontidão para produção
+## Limites de Prontidão para Produção
 
 - Projeto de portfólio com inspiração de produção.
 - Uso de dados sintéticos, públicos ou de demonstração.
@@ -77,7 +90,40 @@ Abordagem de produto analítico governado:
 - Sem IAM corporativo completo, trilha centralizada de auditoria, workflow formal de DPO ou acordo real de processamento de dados.
 - Uma implantação real exigiria aprovação jurídica, segurança e infraestrutura.
 
-## Setup local
+## O que este Projeto Demonstra
+
+- Mentalidade de Analytics Engineering com governança por design.
+- Fronteiras claras entre dados internos e publicados.
+- Execução local reproduzível com quality gates.
+- Comunicação executiva de risco, qualidade e prontidão para publicação.
+
+## App Streamlit Executivo
+
+Páginas principais:
+
+| Página | O que exibe |
+| --- | --- |
+| Visão Executiva | Métricas com deltas de tendência, freshness dos dados, colunas suprimidas por LGPD |
+| Catálogo de Dados | Inventário de colunas com busca e filtro por classificação LGPD |
+| LGPD e Risco de Privacidade | Score de risco, distribuição de classificações, prévia de transformações |
+| Qualidade de Dados | Checks de qualidade, perfil de nulos, distribuição por severidade |
+| EDA | Visão geral estatística + análise interativa por coluna (histograma/boxplot) |
+| Relatório de Governança | Relatórios markdown renderizados com visão raw |
+| Central de Controles | Publication gate, racional de decisão, tendências históricas de governança |
+
+## Estrutura Principal
+
+| Caminho | Propósito |
+| --- | --- |
+| `app/` | Interface executiva Streamlit |
+| `src/` | Lógica de pipeline e governança |
+| `contracts/` | Contratos de qualidade e governança |
+| `docs/` | Documentação técnica e executiva |
+| `tests/` | Testes automatizados |
+| `.github/workflows/` | CI/CD |
+| `powerbi/` | Artefatos de exportação BI |
+
+## Como Rodar Localmente
 
 ### Linux / macOS
 
@@ -100,6 +146,30 @@ copy .env.example .env
 make test
 make app
 ```
+
+## Como Revisar este Projeto em 5 Minutos
+
+1. Leia até **Implementado vs Simulado**.
+2. Abra `docs/architecture/architecture.md` e `docs/governance/privacy_governance.md`.
+3. Rode `make test`.
+4. Abra o app Streamlit e inspecione a **Central de Controles**.
+5. Revise `docs/architecture/semantic_layer.md` e `docs/executive/recruiter_summary.md`.
+
+## Notas para Revisão Técnica
+
+- Decisões de governança são explicáveis e testadas (publication gate, risk scoring, quality checks).
+- Contratos e artefatos de monitoramento são versionados e reproduzíveis.
+- A interface Streamlit consome outputs publicados/governados para uso executivo.
+- Veja: `docs/executive/executive_summary.md` e `docs/architecture/architecture.md`.
+
+## Perfis com Fit para este Projeto
+
+Artefato forte para discussão em entrevistas de:
+
+- Analytics Engineer
+- Data Engineer
+- Data Governance / Data Platform
+- Senior Data Analyst com escopo de ownership
 
 ## Links
 

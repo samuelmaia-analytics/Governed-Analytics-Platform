@@ -25,7 +25,13 @@ def test_returns_score_between_0_and_100() -> None:
 def test_classifies_high_risk_with_many_personal_identifiers() -> None:
     classification_df = pd.DataFrame(
         {
-            "column_name": ["customer_email", "cpf", "customer_name", "health_status", "phone"],
+            "column_name": [
+                "customer_email",
+                "cpf",
+                "customer_name",
+                "health_status",
+                "phone",
+            ],
             "lgpd_classification": [
                 "personal_data",
                 "personal_data",
@@ -54,7 +60,11 @@ def test_classifies_medium_risk() -> None:
     classification_df = pd.DataFrame(
         {
             "column_name": ["email", "state", "customer_id"],
-            "lgpd_classification": ["personal_data", "indirect_identifier", "indirect_identifier"],
+            "lgpd_classification": [
+                "personal_data",
+                "indirect_identifier",
+                "indirect_identifier",
+            ],
         }
     )
     result = calculate_privacy_risk_score(classification_df, total_rows=50_000)

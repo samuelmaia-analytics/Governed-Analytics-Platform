@@ -37,3 +37,13 @@ Estrutura de documentação reorganizada para leitura rápida e manutenção:
 | Operação | [operations/release_runbook.md](operations/release_runbook.md) |
 | Relatórios | [reports/data_quality_report.md](reports/data_quality_report.md) |
 | Histórico | [legacy/00_planejamento.md](legacy/00_planejamento.md) |
+
+## Architecture Decision Records (ADRs)
+
+| ADR | Decisão |
+| --- | --- |
+| [ADR-001](adr/ADR-001-internal-vs-published-layer.md) | Separação entre camada interna (curated) e camada publicada |
+| [ADR-002](adr/ADR-002-yaml-data-quality-contracts.md) | Contratos YAML para regras de qualidade de dados |
+| [ADR-003](adr/ADR-003-lgpd-risk-before-publication.md) | Gate de risco LGPD obrigatório antes da publicação |
+| [ADR-004](adr/ADR-004-streamlit-executive-governance.md) | Streamlit como interface executiva de governança |
+| [ADR-005](adr/ADR-005-local-privacy-transformations.md) | Transformações de privacidade locais sem APIs externas |

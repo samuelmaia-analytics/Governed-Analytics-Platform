@@ -8,7 +8,9 @@ import pytest
 import src.export_query_result_images as export_images
 
 
-def test_validate_input_files_requires_existing_csvs(tmp_path: Path, monkeypatch) -> None:
+def test_validate_input_files_requires_existing_csvs(
+    tmp_path: Path, monkeypatch
+) -> None:
     query_dir = tmp_path / "query_results"
     monkeypatch.setattr(export_images, "QUERY_RESULTS_DIR", query_dir)
 
@@ -21,7 +23,9 @@ def test_validate_input_files_requires_existing_csvs(tmp_path: Path, monkeypatch
         export_images.validate_input_files()
 
     (query_dir / "01_demo.csv").write_text("a,b\n1,2\n", encoding="utf-8")
-    assert [path.name for path in export_images.validate_input_files()] == ["01_demo.csv"]
+    assert [path.name for path in export_images.validate_input_files()] == [
+        "01_demo.csv"
+    ]
 
 
 def test_formatting_preview_and_figure_size_helpers() -> None:

@@ -13,7 +13,10 @@ def build_df() -> pd.DataFrame:
             "freight_value": [2.0, 3.0],
             "order_status": ["delivered", "unknown"],
             "order_delivered_customer_date": [pd.Timestamp("2020-01-02"), pd.NaT],
-            "order_purchase_timestamp": [pd.Timestamp("2020-01-01"), pd.Timestamp("2020-01-03")],
+            "order_purchase_timestamp": [
+                pd.Timestamp("2020-01-01"),
+                pd.Timestamp("2020-01-03"),
+            ],
         }
     )
 
@@ -25,7 +28,13 @@ def test_run_business_rules_evaluates_multiple_types() -> None:
         "dataset_name": "fact_orders_enriched",
         "owner": "owner",
         "rules": [
-            {"rule_id": "r1", "severity": "high", "type": "range", "column": "price", "params": {"min": 0}},
+            {
+                "rule_id": "r1",
+                "severity": "high",
+                "type": "range",
+                "column": "price",
+                "params": {"min": 0},
+            },
             {
                 "rule_id": "r2",
                 "severity": "high",
@@ -44,13 +53,18 @@ def test_run_business_rules_evaluates_multiple_types() -> None:
                 "rule_id": "r4",
                 "severity": "high",
                 "type": "compare_columns",
-                "columns": ["order_delivered_customer_date", "order_purchase_timestamp"],
+                "columns": [
+                    "order_delivered_customer_date",
+                    "order_purchase_timestamp",
+                ],
                 "params": {"operator": ">="},
             },
         ],
     }
 
-    results = {result.rule_id: result for result in run_business_rules(build_df(), contract)}
+    results = {
+        result.rule_id: result for result in run_business_rules(build_df(), contract)
+    }
 
     assert results["r1"].status == "FAIL"
     assert results["r2"].status == "PASS"
@@ -61,4 +75,3 @@ def test_run_business_rules_evaluates_multiple_types() -> None:
 def test_run_business_rules_raises_for_invalid_contract() -> None:
     with pytest.raises(ValueError, match="Campos ausentes"):
         run_business_rules(build_df(), {"rules": []})
-

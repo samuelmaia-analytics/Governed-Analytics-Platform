@@ -7,7 +7,9 @@ import pandas as pd
 from src.governance_types import DataQualityResult, PrivacyRiskResult
 
 
-def build_treatment_inventory(dataset_name: str = "fact_orders_dashboard") -> pd.DataFrame:
+def build_treatment_inventory(
+    dataset_name: str = "fact_orders_dashboard",
+) -> pd.DataFrame:
     rows = [
         {
             "dataset": dataset_name,
@@ -32,9 +34,15 @@ def build_risk_matrix(
     quality_result: DataQualityResult,
 ) -> pd.DataFrame:
     failed_checks = int(quality_result["failed_checks_count"])
-    sensitive_count = int((classification_df["lgpd_classification"] == "sensitive_personal_data").sum())
-    personal_count = int((classification_df["lgpd_classification"] == "personal_data").sum())
-    indirect_count = int((classification_df["lgpd_classification"] == "indirect_identifier").sum())
+    sensitive_count = int(
+        (classification_df["lgpd_classification"] == "sensitive_personal_data").sum()
+    )
+    personal_count = int(
+        (classification_df["lgpd_classification"] == "personal_data").sum()
+    )
+    indirect_count = int(
+        (classification_df["lgpd_classification"] == "indirect_identifier").sum()
+    )
 
     rows = [
         {
@@ -95,7 +103,9 @@ def generate_ripd_markdown(
     quality_result: DataQualityResult,
 ) -> str:
     generated_on = date.today().isoformat()
-    inventory_row = treatment_inventory.iloc[0].to_dict() if not treatment_inventory.empty else {}
+    inventory_row = (
+        treatment_inventory.iloc[0].to_dict() if not treatment_inventory.empty else {}
+    )
     lines = [
         "# Mini RIPD (LGPD-inspired)",
         "",

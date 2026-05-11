@@ -42,4 +42,3 @@ def test_apply_privacy_actions() -> None:
     assert transformed.loc[0, "email"].startswith("a***@")
     assert transformed.loc[0, "order_date"] == "2025"
     assert "review" in metadata["action"].tolist()
-

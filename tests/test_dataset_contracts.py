@@ -51,14 +51,18 @@ def _dataset_contract_paths() -> list[Path]:
 
 def test_dataset_contract_yaml_files_exist() -> None:
     paths = _dataset_contract_paths()
-    assert paths, "No dataset YAML contracts found (expected at least one *.contract.yml)."
+    assert paths, (
+        "No dataset YAML contracts found (expected at least one *.contract.yml)."
+    )
 
 
 def test_dataset_contract_required_top_level_fields() -> None:
     for path in _dataset_contract_paths():
         contract = _load_yaml(path)
         missing = REQUIRED_DATASET_FIELDS - set(contract.keys())
-        assert not missing, f"{path} missing required top-level fields: {sorted(missing)}"
+        assert not missing, (
+            f"{path} missing required top-level fields: {sorted(missing)}"
+        )
 
 
 def test_dataset_contract_columns_structure() -> None:
@@ -70,7 +74,9 @@ def test_dataset_contract_columns_structure() -> None:
         for idx, column in enumerate(columns):
             assert isinstance(column, dict), f"{path} columns[{idx}] must be an object."
             missing = REQUIRED_COLUMN_FIELDS - set(column.keys())
-            assert not missing, f"{path} columns[{idx}] missing required fields: {sorted(missing)}"
+            assert not missing, (
+                f"{path} columns[{idx}] missing required fields: {sorted(missing)}"
+            )
 
 
 def test_dataset_contract_lineage_structure() -> None:
@@ -80,8 +86,12 @@ def test_dataset_contract_lineage_structure() -> None:
         assert isinstance(lineage, dict), f"{path} lineage must be an object."
         assert "upstream" in lineage, f"{path} lineage must include upstream."
         assert "downstream" in lineage, f"{path} lineage must include downstream."
-        assert isinstance(lineage["upstream"], list), f"{path} lineage.upstream must be a list."
-        assert isinstance(lineage["downstream"], list), f"{path} lineage.downstream must be a list."
+        assert isinstance(lineage["upstream"], list), (
+            f"{path} lineage.upstream must be a list."
+        )
+        assert isinstance(lineage["downstream"], list), (
+            f"{path} lineage.downstream must be a list."
+        )
 
 
 def test_dataset_contract_publication_policy_fields() -> None:
@@ -90,4 +100,6 @@ def test_dataset_contract_publication_policy_fields() -> None:
         policy = contract["publication_policy"]
         assert isinstance(policy, dict), f"{path} publication_policy must be an object."
         missing = REQUIRED_PUBLICATION_POLICY_FIELDS - set(policy.keys())
-        assert not missing, f"{path} publication_policy missing required fields: {sorted(missing)}"
+        assert not missing, (
+            f"{path} publication_policy missing required fields: {sorted(missing)}"
+        )

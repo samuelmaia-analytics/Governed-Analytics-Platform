@@ -36,9 +36,14 @@ def test_load_app_settings_uses_current_pipeline_endpoint_defaults(monkeypatch) 
 
     assert settings.dadosfera.list_endpoint == "/platform/pipelines"
     assert settings.dadosfera.create_endpoint == "/platform/pipeline"
-    assert settings.dadosfera.get_endpoint_template == "/platform/pipeline/{pipeline_id}"
+    assert (
+        settings.dadosfera.get_endpoint_template == "/platform/pipeline/{pipeline_id}"
+    )
     assert settings.dadosfera.run_endpoint == "/platform/pipeline/execute"
-    assert settings.dadosfera.runs_endpoint_template == "/platform/pipeline/{pipeline_id}/pipeline_run"
+    assert (
+        settings.dadosfera.runs_endpoint_template
+        == "/platform/pipeline/{pipeline_id}/pipeline_run"
+    )
 
 
 def test_dadosfera_settings_require_enablement_and_credentials(monkeypatch) -> None:
@@ -69,4 +74,6 @@ def test_openai_settings_require_api_key_when_enabled(monkeypatch) -> None:
     except RuntimeError as exc:
         assert "OPENAI_API_KEY" in str(exc)
     else:
-        raise AssertionError("Era esperado erro quando OpenAI está habilitado sem chave.")
+        raise AssertionError(
+            "Era esperado erro quando OpenAI está habilitado sem chave."
+        )

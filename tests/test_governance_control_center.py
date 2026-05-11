@@ -109,6 +109,12 @@ class _FakeContainer:
     def error(self, *_args, **_kwargs) -> None:
         return None
 
+    def divider(self, *_args, **_kwargs) -> None:
+        return None
+
+    def caption(self, *_args, **_kwargs) -> None:
+        return None
+
 
 class _FakeStreamlit(_FakeContainer):
     def subheader(self, *_args, **_kwargs) -> None:
@@ -124,7 +130,9 @@ class _FakeStreamlit(_FakeContainer):
         return False
 
 
-def _sample_inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, object], dict[str, object]]:
+def _sample_inputs() -> tuple[
+    pd.DataFrame, pd.DataFrame, dict[str, object], dict[str, object]
+]:
     df = pd.DataFrame(
         {
             "order_id": ["o1", "o2"],
@@ -163,7 +171,14 @@ def _sample_inputs() -> tuple[pd.DataFrame, pd.DataFrame, dict[str, object], dic
         "cardinality": {"order_id": 2, "value": 2},
         "possible_unique_keys": ["order_id"],
         "constant_columns": [],
-        "checks": [{"check_name": "a", "status": "PASS", "severity": "low", "recommendation": "ok"}],
+        "checks": [
+            {
+                "check_name": "a",
+                "status": "PASS",
+                "severity": "low",
+                "recommendation": "ok",
+            }
+        ],
         "failed_checks_count": 0,
     }
     return df, classification_df, risk_result, quality_result
@@ -173,7 +188,9 @@ def test_render_governance_control_center_handles_empty_history(monkeypatch) -> 
     df, classification_df, risk_result, quality_result = _sample_inputs()
     monkeypatch.setattr(gcc, "st", _FakeStreamlit())
     monkeypatch.setattr(gcc, "px", _FakePlotlyExpress())
-    monkeypatch.setattr(gcc, "_load_governance_history", lambda *_args, **_kwargs: pd.DataFrame())
+    monkeypatch.setattr(
+        gcc, "_load_governance_history", lambda *_args, **_kwargs: pd.DataFrame()
+    )
 
     gcc.render_governance_control_center(
         df=df,
@@ -188,7 +205,10 @@ def test_render_governance_control_center_with_history(monkeypatch) -> None:
     df, classification_df, risk_result, quality_result = _sample_inputs()
     history_df = pd.DataFrame(
         {
-            "execution_timestamp": ["2026-01-01T00:00:00+00:00", "2026-01-02T00:00:00+00:00"],
+            "execution_timestamp": [
+                "2026-01-01T00:00:00+00:00",
+                "2026-01-02T00:00:00+00:00",
+            ],
             "data_quality_score": [95, 90],
             "privacy_risk_score": [20, 40],
             "publication_status": ["Approved", "Needs Review"],
@@ -203,7 +223,9 @@ def test_render_governance_control_center_with_history(monkeypatch) -> None:
     )
     monkeypatch.setattr(gcc, "st", _FakeStreamlit())
     monkeypatch.setattr(gcc, "px", _FakePlotlyExpress())
-    monkeypatch.setattr(gcc, "_load_governance_history", lambda *_args, **_kwargs: history_df)
+    monkeypatch.setattr(
+        gcc, "_load_governance_history", lambda *_args, **_kwargs: history_df
+    )
 
     gcc.render_governance_control_center(
         df=df,

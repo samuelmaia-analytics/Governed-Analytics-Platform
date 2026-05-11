@@ -35,7 +35,10 @@ def test_upsert_env_var_replaces_existing_value(tmp_path: Path) -> None:
 
     upsert_env_var(env_path, "DADOSFERA_API_TOKEN", "new-secret")
 
-    assert env_path.read_text(encoding="utf-8") == "DADOSFERA_API_TOKEN=new-secret\nLOG_FORMAT=text\n"
+    assert (
+        env_path.read_text(encoding="utf-8")
+        == "DADOSFERA_API_TOKEN=new-secret\nLOG_FORMAT=text\n"
+    )
 
 
 def test_upsert_env_var_appends_new_value(tmp_path: Path) -> None:
@@ -44,7 +47,10 @@ def test_upsert_env_var_appends_new_value(tmp_path: Path) -> None:
 
     upsert_env_var(env_path, "DADOSFERA_API_TOKEN", "new-secret")
 
-    assert env_path.read_text(encoding="utf-8") == "LOG_FORMAT=text\nDADOSFERA_API_TOKEN=new-secret\n"
+    assert (
+        env_path.read_text(encoding="utf-8")
+        == "LOG_FORMAT=text\nDADOSFERA_API_TOKEN=new-secret\n"
+    )
 
 
 def test_parse_permissions_rejects_empty_input() -> None:
@@ -94,7 +100,9 @@ def test_main_list_only_json_output(monkeypatch, capsys) -> None:
     assert payload["api_keys"] == [{"id": 1, "name": "default"}]
 
 
-def test_main_raises_when_save_env_requested_without_secret(monkeypatch, tmp_path: Path) -> None:
+def test_main_raises_when_save_env_requested_without_secret(
+    monkeypatch, tmp_path: Path
+) -> None:
     class DummySettings:
         class DadosferaSettings:
             base_url = "https://maestro.example.com"
@@ -135,7 +143,9 @@ def test_main_raises_when_save_env_requested_without_secret(monkeypatch, tmp_pat
 
 
 def test_api_key_client_with_token_skips_sign_in() -> None:
-    client = DadosferaApiKeyClient(base_url="https://maestro.example.com", access_token="token")
+    client = DadosferaApiKeyClient(
+        base_url="https://maestro.example.com", access_token="token"
+    )
 
     client.sign_in()
 
@@ -215,7 +225,15 @@ def test_main_creates_key_and_saves_env(monkeypatch, tmp_path: Path, capsys) -> 
     monkeypatch.setattr(dadosfera_api_key, "configure_logging", lambda: None)
 
     exit_code = dadosfera_api_key.main(
-        ["--permissions", "9", "--save-env", "--env-path", str(env_path), "--env-var", "CUSTOM_TOKEN"]
+        [
+            "--permissions",
+            "9",
+            "--save-env",
+            "--env-path",
+            str(env_path),
+            "--env-var",
+            "CUSTOM_TOKEN",
+        ]
     )
 
     assert exit_code == 0

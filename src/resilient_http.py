@@ -12,7 +12,9 @@ import requests
 class RetryPolicy:
     max_attempts: int = 3
     backoff_seconds: float = 1.0
-    retryable_status_codes: set[int] = field(default_factory=lambda: {429, 500, 502, 503, 504})
+    retryable_status_codes: set[int] = field(
+        default_factory=lambda: {429, 500, 502, 503, 504}
+    )
 
 
 DEFAULT_RETRY_POLICY = RetryPolicy()
@@ -38,7 +40,10 @@ def request_with_retry(
             response = caller(url, **kwargs)
             last_response = response
             status_code = getattr(response, "status_code", 200)
-            if status_code in retry_policy.retryable_status_codes and attempt < retry_policy.max_attempts:
+            if (
+                status_code in retry_policy.retryable_status_codes
+                and attempt < retry_policy.max_attempts
+            ):
                 logger.warning(
                     "HTTP retry agendado após status retornável.",
                     extra={

@@ -7,14 +7,24 @@ from app.i18n import LOCALE_EN_US, Locale
 from src.governance_types import DataQualityResult
 
 
-def render_data_quality(quality_results: DataQualityResult, quality_table: pd.DataFrame, locale: Locale) -> None:
+def render_data_quality(
+    quality_results: DataQualityResult, quality_table: pd.DataFrame, locale: Locale
+) -> None:
     is_en = locale == LOCALE_EN_US
     st.subheader("Data Quality" if locale == LOCALE_EN_US else "Qualidade de Dados")
     failed_checks_count = int(quality_results["failed_checks_count"])
     quality_score = max(0, 100 - failed_checks_count * 10)
 
-    pass_count = int((quality_table["status"] == "PASS").sum()) if "status" in quality_table.columns else 0
-    fail_count = int((quality_table["status"] == "FAIL").sum()) if "status" in quality_table.columns else 0
+    pass_count = (
+        int((quality_table["status"] == "PASS").sum())
+        if "status" in quality_table.columns
+        else 0
+    )
+    fail_count = (
+        int((quality_table["status"] == "FAIL").sum())
+        if "status" in quality_table.columns
+        else 0
+    )
 
     high_fail_count = 0
     medium_fail_count = 0
@@ -25,11 +35,20 @@ def render_data_quality(quality_results: DataQualityResult, quality_table: pd.Da
 
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Total Rows" if locale == LOCALE_EN_US else "Total de Linhas", str(quality_results["total_rows"]))
+        st.metric(
+            "Total Rows" if locale == LOCALE_EN_US else "Total de Linhas",
+            str(quality_results["total_rows"]),
+        )
     with col2:
-        st.metric("Total Columns" if locale == LOCALE_EN_US else "Total de Colunas", str(quality_results["total_columns"]))
+        st.metric(
+            "Total Columns" if locale == LOCALE_EN_US else "Total de Colunas",
+            str(quality_results["total_columns"]),
+        )
     with col3:
-        st.metric("Failed Checks" if locale == LOCALE_EN_US else "Checks com Falha", str(failed_checks_count))
+        st.metric(
+            "Failed Checks" if locale == LOCALE_EN_US else "Checks com Falha",
+            str(failed_checks_count),
+        )
     with col4:
         st.metric("Data Quality Score", f"{quality_score} / 100")
 
@@ -37,7 +56,9 @@ def render_data_quality(quality_results: DataQualityResult, quality_table: pd.Da
     with col5:
         st.metric("PASS vs FAIL", f"{pass_count} / {fail_count}")
     with col6:
-        st.metric("Severity (high / medium)", f"{high_fail_count} / {medium_fail_count}")
+        st.metric(
+            "Severity (high / medium)", f"{high_fail_count} / {medium_fail_count}"
+        )
 
     null_profile = pd.DataFrame(
         list(quality_results["null_pct_by_column"].items()),
@@ -50,7 +71,9 @@ def render_data_quality(quality_results: DataQualityResult, quality_table: pd.Da
     status_df.columns = ["status", "count"]
     st.bar_chart(status_df.set_index("status"))
 
-    st.markdown("**Critical Failed Checks**" if is_en else "**Checks Críticos com Falha**")
+    st.markdown(
+        "**Critical Failed Checks**" if is_en else "**Checks Críticos com Falha**"
+    )
     if {"status", "severity"}.issubset(quality_table.columns):
         critical_failed = quality_table[
             (quality_table["status"] == "FAIL")

@@ -7,7 +7,9 @@ import pandas as pd
 import src.catalog as catalog
 
 
-def test_detect_file_format_and_load_tabular_metadata_support_known_formats(tmp_path: Path) -> None:
+def test_detect_file_format_and_load_tabular_metadata_support_known_formats(
+    tmp_path: Path,
+) -> None:
     csv_path = tmp_path / "sample.csv"
     parquet_path = tmp_path / "sample.parquet"
     pd.DataFrame({"id": [1, 2], "value": [10, 20]}).to_csv(csv_path, index=False)
@@ -68,12 +70,24 @@ def test_collect_assets_and_persist_outputs(tmp_path: Path, monkeypatch) -> None
     ]:
         directory.mkdir(parents=True, exist_ok=True)
 
-    pd.DataFrame({"id": [1]}).to_csv(landing_dir / "olist" / "olist_orders_dataset.csv", index=False)
-    pd.DataFrame({"id": [1]}).to_parquet(standardized_dir / "olist" / "olist_orders_dataset.parquet", index=False)
-    pd.DataFrame({"id": [1]}).to_parquet(analytics_dir / "fact_orders_enriched.parquet", index=False)
-    pd.DataFrame({"check_name": ["ok"]}).to_csv(quality_dir / "fact_orders_enriched_quality_checks.csv", index=False)
-    pd.DataFrame({"query": ["q1"]}).to_csv(query_results_dir / "01_demo.csv", index=False)
-    pd.DataFrame({"id": [1]}).to_parquet(published_dir / "fact_orders_dashboard.parquet", index=False)
+    pd.DataFrame({"id": [1]}).to_csv(
+        landing_dir / "olist" / "olist_orders_dataset.csv", index=False
+    )
+    pd.DataFrame({"id": [1]}).to_parquet(
+        standardized_dir / "olist" / "olist_orders_dataset.parquet", index=False
+    )
+    pd.DataFrame({"id": [1]}).to_parquet(
+        analytics_dir / "fact_orders_enriched.parquet", index=False
+    )
+    pd.DataFrame({"check_name": ["ok"]}).to_csv(
+        quality_dir / "fact_orders_enriched_quality_checks.csv", index=False
+    )
+    pd.DataFrame({"query": ["q1"]}).to_csv(
+        query_results_dir / "01_demo.csv", index=False
+    )
+    pd.DataFrame({"id": [1]}).to_parquet(
+        published_dir / "fact_orders_dashboard.parquet", index=False
+    )
     pd.DataFrame({"metric": [1]}).to_csv(profiling_dir / "profiling.csv", index=False)
     (screenshots_dir / "query_results" / "01_demo.png").write_bytes(b"png")
     (sql_dir / "analytics" / "01_demo.sql").write_text("select 1", encoding="utf-8")
@@ -91,8 +105,12 @@ def test_collect_assets_and_persist_outputs(tmp_path: Path, monkeypatch) -> None
     monkeypatch.setattr(catalog, "SQL_DIR", sql_dir)
     monkeypatch.setattr(catalog, "DOCS_DIR", docs_dir)
     monkeypatch.setattr(catalog, "CATALOG_DIR", catalog_dir)
-    monkeypatch.setattr(catalog, "COLLECTION_PATH", catalog_dir / "dadosfera_collection.json")
-    monkeypatch.setattr(catalog, "ASSET_INVENTORY_PATH", catalog_dir / "collection_assets_inventory.csv")
+    monkeypatch.setattr(
+        catalog, "COLLECTION_PATH", catalog_dir / "dadosfera_collection.json"
+    )
+    monkeypatch.setattr(
+        catalog, "ASSET_INVENTORY_PATH", catalog_dir / "collection_assets_inventory.csv"
+    )
     monkeypatch.setattr(catalog, "REPORT_PATH", docs_dir / "collection_catalog.md")
 
     assets = catalog.collect_assets()

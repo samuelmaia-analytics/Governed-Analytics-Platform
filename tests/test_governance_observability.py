@@ -71,6 +71,8 @@ def test_save_and_load_observability_files(tmp_path: Path) -> None:
     assert "checks" in payload
 
     history_path = tmp_path / "governance_history.csv"
-    pd.DataFrame({"execution_timestamp": ["2026-01-01T00:00:00Z"]}).to_csv(history_path, index=False)
+    pd.DataFrame({"execution_timestamp": ["2026-01-01T00:00:00Z"]}).to_csv(
+        history_path, index=False
+    )
     loaded = load_governance_history(history_path)
     assert not loaded.empty

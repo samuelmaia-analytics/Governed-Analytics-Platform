@@ -8,8 +8,12 @@ def dataset_overview(df: pd.DataFrame) -> dict[str, object]:
         "total_rows": int(len(df)),
         "total_columns": int(df.shape[1]),
         "numeric_columns": int(df.select_dtypes(include=["number"]).shape[1]),
-        "categorical_columns": int(df.select_dtypes(include=["object", "category"]).shape[1]),
-        "datetime_columns": int(df.select_dtypes(include=["datetime64[ns]", "datetimetz"]).shape[1]),
+        "categorical_columns": int(
+            df.select_dtypes(include=["object", "category"]).shape[1]
+        ),
+        "datetime_columns": int(
+            df.select_dtypes(include=["datetime64[ns]", "datetimetz"]).shape[1]
+        ),
     }
 
 
@@ -21,7 +25,9 @@ def descriptive_statistics(df: pd.DataFrame) -> pd.DataFrame:
 def dtype_distribution(df: pd.DataFrame) -> pd.DataFrame:
     dist = df.dtypes.astype(str).value_counts().reset_index()
     dist.columns = ["dtype", "count"]
-    dist["percentage"] = (dist["count"] / len(df.columns) * 100).round(2) if len(df.columns) else 0.0
+    dist["percentage"] = (
+        (dist["count"] / len(df.columns) * 100).round(2) if len(df.columns) else 0.0
+    )
     return dist
 
 

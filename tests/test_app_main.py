@@ -27,9 +27,14 @@ def test_load_input_dataframe_mocks_io_and_csv_read(monkeypatch) -> None:
         def toggle(self, *_args, **_kwargs) -> bool:
             return False
 
+        def caption(self, *_args, **_kwargs) -> None:
+            return None
+
     fake_st = SimpleNamespace(sidebar=FakeSidebar())
     monkeypatch.setattr(context_module, "st", fake_st)
-    monkeypatch.setattr(context_module.pd, "read_csv", lambda _uploaded: expected.copy())
+    monkeypatch.setattr(
+        context_module.pd, "read_csv", lambda _uploaded: expected.copy()
+    )
 
     result = context_module.load_input_dataframe("pt-BR")
     pd.testing.assert_frame_equal(result, expected)
@@ -75,13 +80,25 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
     monkeypatch.setattr(main_module, "build_locale_selector", lambda: "pt-BR")
     monkeypatch.setattr(main_module, "t", lambda _key, _locale: "x")
     monkeypatch.setattr(main_module, "build_context", lambda _locale: SimpleNamespace())
-    monkeypatch.setattr(main_module, "_render_executive_page", lambda _context, _locale: None)
-    monkeypatch.setattr(main_module, "_render_catalog_page", lambda _context, _locale: None)
-    monkeypatch.setattr(main_module, "_render_lgpd_page", lambda _context, _locale: None)
-    monkeypatch.setattr(main_module, "_render_quality_page", lambda _context, _locale: None)
+    monkeypatch.setattr(
+        main_module, "_render_executive_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(
+        main_module, "_render_catalog_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(
+        main_module, "_render_lgpd_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(
+        main_module, "_render_quality_page", lambda _context, _locale: None
+    )
     monkeypatch.setattr(main_module, "_render_eda_page", lambda _context, _locale: None)
-    monkeypatch.setattr(main_module, "_render_report_page", lambda _context, _locale: None)
-    monkeypatch.setattr(main_module, "_render_control_center_page", lambda _context, _locale: None)
+    monkeypatch.setattr(
+        main_module, "_render_report_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(
+        main_module, "_render_control_center_page", lambda _context, _locale: None
+    )
 
     main_module.main()
 

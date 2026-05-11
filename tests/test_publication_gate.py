@@ -43,7 +43,10 @@ def test_blocked_by_unprotected_sensitive_data() -> None:
     )
     assert result.decision == "Blocked"
     assert result.severity == "Critical"
-    assert any("Sensitive data found without masking/anonymization" in reason for reason in result.reasons)
+    assert any(
+        "Sensitive data found without masking/anonymization" in reason
+        for reason in result.reasons
+    )
 
 
 def test_blocked_by_failed_schema_contract() -> None:
@@ -57,7 +60,9 @@ def test_blocked_by_failed_schema_contract() -> None:
     )
     assert result.decision == "Blocked"
     assert result.severity == "Critical"
-    assert any("Schema contract validation failed" in reason for reason in result.reasons)
+    assert any(
+        "Schema contract validation failed" in reason for reason in result.reasons
+    )
 
 
 def test_needs_review_low_data_quality_score() -> None:
@@ -71,7 +76,10 @@ def test_needs_review_low_data_quality_score() -> None:
     )
     assert result.decision == "Needs Review"
     assert result.severity == "Medium"
-    assert any("Data quality score below recommended threshold" in reason for reason in result.reasons)
+    assert any(
+        "Data quality score below recommended threshold" in reason
+        for reason in result.reasons
+    )
 
 
 def test_needs_review_elevated_privacy_risk_score() -> None:
@@ -110,8 +118,14 @@ def test_needs_review_warning_or_stale_freshness_status() -> None:
     assert stale_result.decision == "Needs Review"
     assert warning_result.severity == "Medium"
     assert stale_result.severity == "High"
-    assert any("Freshness status requires attention" in reason for reason in warning_result.reasons)
-    assert any("Freshness status requires attention" in reason for reason in stale_result.reasons)
+    assert any(
+        "Freshness status requires attention" in reason
+        for reason in warning_result.reasons
+    )
+    assert any(
+        "Freshness status requires attention" in reason
+        for reason in stale_result.reasons
+    )
 
 
 def test_returned_object_contains_required_fields() -> None:

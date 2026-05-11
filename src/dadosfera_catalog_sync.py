@@ -20,7 +20,9 @@ from src.resilient_http import DEFAULT_RETRY_POLICY, RetryPolicy, request_with_r
 from src.settings import load_app_settings
 
 DEFAULT_MAESTRO_BASE_URL = "https://maestro.dadosfera.ai"
-DEFAULT_MANIFEST_PATH = ROOT_DIR / "contracts" / "catalog" / "dadosfera_catalog_assets.json"
+DEFAULT_MANIFEST_PATH = (
+    ROOT_DIR / "contracts" / "catalog" / "dadosfera_catalog_assets.json"
+)
 DEFAULT_REPORT_PATH = DOCS_DIR / "dadosfera_api_sync.md"
 LOGGER = logging.getLogger(__name__)
 
@@ -84,7 +86,15 @@ class DadosferaMaestroClient:
                 "has_cookies": False,
             }
 
-    def _request(self, method: str, path: str, *, operation: str, raise_for_status: bool = True, **kwargs: Any) -> requests.Response:
+    def _request(
+        self,
+        method: str,
+        path: str,
+        *,
+        operation: str,
+        raise_for_status: bool = True,
+        **kwargs: Any,
+    ) -> requests.Response:
         try:
             response = request_with_retry(
                 self.session,
@@ -123,7 +133,9 @@ class DadosferaMaestroClient:
         last_headers: Any | None = None
         last_sign_in_error: RuntimeError | None = None
 
-        for payload in build_sign_in_payloads(username=self.username, password=self.password, totp=self.totp):
+        for payload in build_sign_in_payloads(
+            username=self.username, password=self.password, totp=self.totp
+        ):
             for endpoint in ("/auth/sign-in", "/auth/signin"):
                 response = self._request(
                     "POST",
@@ -195,7 +207,12 @@ class DadosferaMaestroClient:
                 "GET",
                 "/catalog",
                 operation="dadosfera_list_catalog_assets",
-                params={"size": size, "page": page, "sort_by": "created_at", "order": "desc"},
+                params={
+                    "size": size,
+                    "page": page,
+                    "sort_by": "created_at",
+                    "order": "desc",
+                },
                 timeout=60,
             )
             body = response.json()
@@ -208,10 +225,18 @@ class DadosferaMaestroClient:
         return assets
 
     def create_data_asset(self, payload: dict[str, Any]) -> dict[str, Any]:
-        response = self._request("POST", "/catalog", operation="dadosfera_create_catalog_asset", json=payload, timeout=60)
+        response = self._request(
+            "POST",
+            "/catalog",
+            operation="dadosfera_create_catalog_asset",
+            json=payload,
+            timeout=60,
+        )
         return response.json()
 
-    def update_data_asset(self, asset_id: int, payload: dict[str, Any]) -> dict[str, Any]:
+    def update_data_asset(
+        self, asset_id: int, payload: dict[str, Any]
+    ) -> dict[str, Any]:
         response = self._request(
             "PUT",
             f"/catalog/data-asset/{asset_id}",
@@ -276,7 +301,9 @@ def extract_asset_id(response_body: dict[str, Any]) -> int | None:
     return None
 
 
-def build_sign_in_payloads(*, username: str, password: str, totp: str | None) -> list[dict[str, str]]:
+def build_sign_in_payloads(
+    *, username: str, password: str, totp: str | None
+) -> list[dict[str, str]]:
     payloads: list[dict[str, str]] = [
         {"username": username, "password": password},
         {"email": username, "password": password},
@@ -295,7 +322,11 @@ def build_sign_in_payloads(*, username: str, password: str, totp: str | None) ->
     return enriched_payloads + payloads
 
 
-def apply_auth_from_response(session: requests.Session, response_body: dict[str, Any], response_headers: Any | None) -> bool:
+def apply_auth_from_response(
+    session: requests.Session,
+    response_body: dict[str, Any],
+    response_headers: Any | None,
+) -> bool:
     access_token = extract_access_token(response_body, response_headers)
     if access_token:
         session.headers.update(
@@ -355,7 +386,9 @@ def try_refresh_access_token(session: requests.Session, base_url: str) -> bool:
     return apply_auth_from_response(session, body, response.headers)
 
 
-def extract_access_token(response_body: dict[str, Any], response_headers: Any | None = None) -> str | None:
+def extract_access_token(
+    response_body: dict[str, Any], response_headers: Any | None = None
+) -> str | None:
     token_candidates = [
         response_body.get("accessToken"),
         response_body.get("access_token"),
@@ -383,7 +416,9 @@ def extract_access_token(response_body: dict[str, Any], response_headers: Any | 
 
     normalized_headers: dict[str, str] = {}
     if response_headers is not None:
-        normalized_headers = {str(key).lower(): str(value) for key, value in response_headers.items()}
+        normalized_headers = {
+            str(key).lower(): str(value) for key, value in response_headers.items()
+        }
         token_candidates.extend(
             [
                 normalized_headers.get("access-token"),
@@ -393,7 +428,11 @@ def extract_access_token(response_body: dict[str, Any], response_headers: Any | 
 
         authorization = normalized_headers.get("authorization")
         if isinstance(authorization, str) and authorization.strip():
-            token_candidates.append(authorization[7:].strip() if authorization.lower().startswith("bearer ") else authorization.strip())
+            token_candidates.append(
+                authorization[7:].strip()
+                if authorization.lower().startswith("bearer ")
+                else authorization.strip()
+            )
 
         set_cookie = normalized_headers.get("set-cookie")
         if isinstance(set_cookie, str):
@@ -413,11 +452,16 @@ def extract_access_token(response_body: dict[str, Any], response_headers: Any | 
     return None
 
 
-def raise_runtime_for_auth_response(response_body: dict[str, Any], response_headers: Any | None = None) -> None:
+def raise_runtime_for_auth_response(
+    response_body: dict[str, Any], response_headers: Any | None = None
+) -> None:
     available_keys = ", ".join(sorted(response_body.keys())) or "<none>"
     header_keys = "<none>"
     if response_headers is not None:
-        header_keys = ", ".join(sorted(str(key).lower() for key in response_headers.keys())) or "<none>"
+        header_keys = (
+            ", ".join(sorted(str(key).lower() for key in response_headers.keys()))
+            or "<none>"
+        )
 
     mfa_status = response_body.get("mfaStatus")
     mfa_hint = ""
@@ -430,7 +474,9 @@ def raise_runtime_for_auth_response(response_body: dict[str, Any], response_head
         detail_parts.append(f"message={response_message.strip()!r}")
     if isinstance(response_error, str) and response_error.strip():
         detail_parts.append(f"error={response_error.strip()!r}")
-    detail_suffix = f" Detalhes da resposta: {', '.join(detail_parts)}." if detail_parts else ""
+    detail_suffix = (
+        f" Detalhes da resposta: {', '.join(detail_parts)}." if detail_parts else ""
+    )
 
     raise RuntimeError(
         "Nao foi possivel localizar o access token nem cookies de sessao na resposta de autenticacao da Dadosfera. "
@@ -455,7 +501,11 @@ def build_sign_in_failure(
 ) -> RuntimeError:
     status_code = getattr(error.response, "status_code", None)
     body_keys = sorted(response_body.keys())
-    header_keys = sorted(str(key).lower() for key in response_headers.keys()) if response_headers is not None else []
+    header_keys = (
+        sorted(str(key).lower() for key in response_headers.keys())
+        if response_headers is not None
+        else []
+    )
     message = response_body.get("message")
     error_code = response_body.get("code") or response_body.get("error")
     details = []
@@ -529,7 +579,9 @@ def raise_runtime_for_http_error(
     ) from error
 
 
-def find_existing_asset(existing_assets: list[dict[str, Any]], target: CatalogAssetSpec) -> dict[str, Any] | None:
+def find_existing_asset(
+    existing_assets: list[dict[str, Any]], target: CatalogAssetSpec
+) -> dict[str, Any] | None:
     for asset in existing_assets:
         if asset.get("external_url") == target.external_url:
             return asset
@@ -555,7 +607,11 @@ def sync_assets(
         existing = find_existing_asset(existing_assets, asset)
         if existing is None:
             if dry_run:
-                results.append(SyncResult("would_create", asset.display_name, None, asset.external_url))
+                results.append(
+                    SyncResult(
+                        "would_create", asset.display_name, None, asset.external_url
+                    )
+                )
                 continue
 
             create_response = client.create_data_asset(build_create_payload(asset))
@@ -563,26 +619,42 @@ def sync_assets(
             if created_id is None:
                 refreshed_assets = client.list_data_assets()
                 matched = find_existing_asset(refreshed_assets, asset)
-                created_id = int(matched["id"]) if matched and matched.get("id") is not None else None
+                created_id = (
+                    int(matched["id"])
+                    if matched and matched.get("id") is not None
+                    else None
+                )
 
             if created_id is not None:
                 client.update_data_asset(created_id, build_update_payload(asset))
 
-            results.append(SyncResult("created", asset.display_name, created_id, asset.external_url))
+            results.append(
+                SyncResult(
+                    "created", asset.display_name, created_id, asset.external_url
+                )
+            )
             continue
 
         asset_id = int(existing["id"])
         if dry_run:
-            results.append(SyncResult("would_update", asset.display_name, asset_id, asset.external_url))
+            results.append(
+                SyncResult(
+                    "would_update", asset.display_name, asset_id, asset.external_url
+                )
+            )
             continue
 
         client.update_data_asset(asset_id, build_update_payload(asset))
-        results.append(SyncResult("updated", asset.display_name, asset_id, asset.external_url))
+        results.append(
+            SyncResult("updated", asset.display_name, asset_id, asset.external_url)
+        )
 
     return results
 
 
-def render_report(results: list[SyncResult], *, manifest_path: Path, dry_run: bool) -> str:
+def render_report(
+    results: list[SyncResult], *, manifest_path: Path, dry_run: bool
+) -> str:
     lines = [
         "# Sync de Catalogo via API da Dadosfera",
         "",
@@ -594,7 +666,9 @@ def render_report(results: list[SyncResult], *, manifest_path: Path, dry_run: bo
     ]
     for result in results:
         asset_id = "" if result.asset_id is None else str(result.asset_id)
-        lines.append(f"| `{result.action}` | `{result.asset_name}` | {asset_id} | `{result.external_url}` |")
+        lines.append(
+            f"| `{result.action}` | `{result.asset_name}` | {asset_id} | `{result.external_url}` |"
+        )
     return "\n".join(lines) + "\n"
 
 
@@ -605,11 +679,27 @@ def save_report(report_path: Path, content: str) -> None:
 
 def parse_args() -> argparse.Namespace:
     settings = load_app_settings()
-    parser = argparse.ArgumentParser(description="Sincroniza ativos do manifesto local com o catalogo da Dadosfera via API.")
-    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST_PATH, help="Manifesto JSON com os ativos a sincronizar.")
-    parser.add_argument("--report", type=Path, default=DEFAULT_REPORT_PATH, help="Caminho do relatorio markdown gerado.")
+    parser = argparse.ArgumentParser(
+        description="Sincroniza ativos do manifesto local com o catalogo da Dadosfera via API."
+    )
+    parser.add_argument(
+        "--manifest",
+        type=Path,
+        default=DEFAULT_MANIFEST_PATH,
+        help="Manifesto JSON com os ativos a sincronizar.",
+    )
+    parser.add_argument(
+        "--report",
+        type=Path,
+        default=DEFAULT_REPORT_PATH,
+        help="Caminho do relatorio markdown gerado.",
+    )
     parser.add_argument("--base-url", default=settings.dadosfera.base_url)
-    parser.add_argument("--dry-run", action="store_true", help="Mostra o plano de sincronizacao sem escrever na API.")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Mostra o plano de sincronizacao sem escrever na API.",
+    )
     return parser.parse_args()
 
 

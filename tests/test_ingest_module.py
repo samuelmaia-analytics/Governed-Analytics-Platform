@@ -8,16 +8,23 @@ import pytest
 import src.ingest as ingest
 
 
-def test_detect_date_columns_identifies_date_and_timestamp_fields(tmp_path: Path) -> None:
+def test_detect_date_columns_identifies_date_and_timestamp_fields(
+    tmp_path: Path,
+) -> None:
     path = tmp_path / "sample.csv"
-    path.write_text("event_date,created_timestamp,name\n2024-01-01,2024-01-01 10:00:00,a\n", encoding="utf-8")
+    path.write_text(
+        "event_date,created_timestamp,name\n2024-01-01,2024-01-01 10:00:00,a\n",
+        encoding="utf-8",
+    )
 
     result = ingest.detect_date_columns(path)
 
     assert result == ["event_date", "created_timestamp"]
 
 
-def test_load_csv_falls_back_to_plain_read_when_parse_dates_fails(monkeypatch, tmp_path: Path) -> None:
+def test_load_csv_falls_back_to_plain_read_when_parse_dates_fails(
+    monkeypatch, tmp_path: Path
+) -> None:
     path = tmp_path / "sample.csv"
     path.write_text("event_date,name\nnot-a-date,a\n", encoding="utf-8")
 
@@ -26,7 +33,12 @@ def test_load_csv_falls_back_to_plain_read_when_parse_dates_fails(monkeypatch, t
 
     def fake_read_csv(*args, **kwargs):  # type: ignore[no-untyped-def]
         parse_dates = kwargs.get("parse_dates")
-        calls.append((kwargs.get("encoding", "utf-8"), tuple(parse_dates) if parse_dates else None))
+        calls.append(
+            (
+                kwargs.get("encoding", "utf-8"),
+                tuple(parse_dates) if parse_dates else None,
+            )
+        )
         if parse_dates:
             raise ValueError("bad parse")
         return original_read_csv(*args, **kwargs)
@@ -42,7 +54,9 @@ def test_load_csv_falls_back_to_plain_read_when_parse_dates_fails(monkeypatch, t
     assert ("utf-8", None) in calls
 
 
-def test_validate_expected_files_returns_all_csvs_when_dataset_is_complete(tmp_path: Path, monkeypatch) -> None:
+def test_validate_expected_files_returns_all_csvs_when_dataset_is_complete(
+    tmp_path: Path, monkeypatch
+) -> None:
     raw_dir = tmp_path / "olist"
     raw_dir.mkdir()
     for file_name in ingest.EXPECTED_FILES:
@@ -55,7 +69,9 @@ def test_validate_expected_files_returns_all_csvs_when_dataset_is_complete(tmp_p
     assert [path.name for path in discovered] == sorted(ingest.EXPECTED_FILES)
 
 
-def test_validate_expected_files_raises_when_any_expected_file_is_missing(tmp_path: Path, monkeypatch) -> None:
+def test_validate_expected_files_raises_when_any_expected_file_is_missing(
+    tmp_path: Path, monkeypatch
+) -> None:
     raw_dir = tmp_path / "olist"
     raw_dir.mkdir()
     for file_name in ingest.EXPECTED_FILES[:-1]:

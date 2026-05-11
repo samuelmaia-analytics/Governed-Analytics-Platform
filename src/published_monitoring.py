@@ -45,7 +45,14 @@ EXPECTED_COLUMNS = {
     "freight_to_price_ratio",
     "total_item_value",
 }
-CRITICAL_COLUMNS = ["order_id", "order_item_id", "seller_key", "order_purchase_timestamp", "price", "freight_value"]
+CRITICAL_COLUMNS = [
+    "order_id",
+    "order_item_id",
+    "seller_key",
+    "order_purchase_timestamp",
+    "price",
+    "freight_value",
+]
 DEFAULT_MAX_FRESHNESS_HOURS = 36
 MIN_ROWS = 100_001
 MAX_MISSING_SELLER_DELAY_RATE_PCT = 1.0
@@ -97,9 +104,13 @@ def load_published_table(path: Path | None = None) -> pd.DataFrame:
     return df
 
 
-def check_file_freshness(path: Path, *, max_freshness_hours: int) -> MonitoringCheckResult:
+def check_file_freshness(
+    path: Path, *, max_freshness_hours: int
+) -> MonitoringCheckResult:
     modified_at = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-    age_hours = round((datetime.now(timezone.utc) - modified_at).total_seconds() / 3600, 2)
+    age_hours = round(
+        (datetime.now(timezone.utc) - modified_at).total_seconds() / 3600, 2
+    )
     return build_result(
         "published_file_freshness_hours",
         age_hours <= max_freshness_hours,
@@ -123,7 +134,9 @@ def check_expected_schema(df: pd.DataFrame) -> MonitoringCheckResult:
 
 
 def check_primary_key_duplicates(df: pd.DataFrame) -> MonitoringCheckResult:
-    duplicate_count = int(df.duplicated(subset=["order_id", "order_item_id"], keep=False).sum())
+    duplicate_count = int(
+        df.duplicated(subset=["order_id", "order_item_id"], keep=False).sum()
+    )
     return build_result(
         "published_primary_key_duplicates",
         duplicate_count == 0,
@@ -176,7 +189,9 @@ def check_critical_nulls(df: pd.DataFrame) -> list[MonitoringCheckResult]:
 
 def check_semantic_coverage(df: pd.DataFrame) -> list[MonitoringCheckResult]:
     missing_semantic_columns = [
-        column for column in ("purchase_cohort_month", "seller_delay_rate") if column not in df.columns
+        column
+        for column in ("purchase_cohort_month", "seller_delay_rate")
+        if column not in df.columns
     ]
     if missing_semantic_columns:
         return [
@@ -189,8 +204,12 @@ def check_semantic_coverage(df: pd.DataFrame) -> list[MonitoringCheckResult]:
                 f"Colunas semanticas ausentes: {missing_semantic_columns}",
             )
         ]
-    cohort_missing_pct = round(float(df["purchase_cohort_month"].isna().mean() * 100), 2)
-    seller_delay_missing_pct = round(float(df["seller_delay_rate"].isna().mean() * 100), 2)
+    cohort_missing_pct = round(
+        float(df["purchase_cohort_month"].isna().mean() * 100), 2
+    )
+    seller_delay_missing_pct = round(
+        float(df["seller_delay_rate"].isna().mean() * 100), 2
+    )
     return [
         build_result(
             "published_missing_pct__purchase_cohort_month",
@@ -211,9 +230,15 @@ def check_semantic_coverage(df: pd.DataFrame) -> list[MonitoringCheckResult]:
     ]
 
 
-def run_monitoring(*, max_freshness_hours: int = DEFAULT_MAX_FRESHNESS_HOURS) -> list[MonitoringCheckResult]:
+def run_monitoring(
+    *, max_freshness_hours: int = DEFAULT_MAX_FRESHNESS_HOURS
+) -> list[MonitoringCheckResult]:
     df = load_published_table()
-    results = [check_file_freshness(PUBLISHED_PARQUET_PATH, max_freshness_hours=max_freshness_hours)]
+    results = [
+        check_file_freshness(
+            PUBLISHED_PARQUET_PATH, max_freshness_hours=max_freshness_hours
+        )
+    ]
     results.append(check_expected_schema(df))
     results.append(check_primary_key_duplicates(df))
     results.append(check_row_volume(df))
@@ -232,7 +257,9 @@ def build_alert_payload(
     severity_order = {"high": 3, "medium": 2, "low": 1}
     max_severity = "low"
     if failed_results:
-        max_severity = max(failed_results, key=lambda result: severity_order.get(result.severity, 0)).severity
+        max_severity = max(
+            failed_results, key=lambda result: severity_order.get(result.severity, 0)
+        ).severity
     return {
         "source": source,
         "environment": environment,
@@ -257,7 +284,9 @@ def send_external_alert(
     headers = {"Content-Type": "application/json"}
     if token:
         headers["Authorization"] = token
-    response = requests.post(webhook_url, json=payload, headers=headers, timeout=timeout_seconds)
+    response = requests.post(
+        webhook_url, json=payload, headers=headers, timeout=timeout_seconds
+    )
     response.raise_for_status()
     return AlertDispatchResult(
         delivered=True,
@@ -314,7 +343,9 @@ def render_report(results: list[MonitoringCheckResult]) -> str:
         lines.append("- Nenhum alerta aberto na execucao atual.")
     else:
         for row in failed_df.itertuples(index=False):
-            lines.append(f"- `{row.check_name}`: {row.details} Valor observado={row.metric_value}.")
+            lines.append(
+                f"- `{row.check_name}`: {row.details} Valor observado={row.metric_value}."
+            )
     return "\n".join(lines) + "\n"
 
 
@@ -325,11 +356,19 @@ def save_report(results: list[MonitoringCheckResult]) -> Path:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Monitora freshness e qualidade da camada published.")
-    parser.add_argument("--max-freshness-hours", type=int, default=DEFAULT_MAX_FRESHNESS_HOURS)
+    parser = argparse.ArgumentParser(
+        description="Monitora freshness e qualidade da camada published."
+    )
+    parser.add_argument(
+        "--max-freshness-hours", type=int, default=DEFAULT_MAX_FRESHNESS_HOURS
+    )
     parser.add_argument("--fail-on-alert", action="store_true")
-    parser.add_argument("--alert-webhook-url", default=os.getenv("EXTERNAL_ALERT_WEBHOOK_URL", ""))
-    parser.add_argument("--alert-webhook-token", default=os.getenv("EXTERNAL_ALERT_WEBHOOK_TOKEN", ""))
+    parser.add_argument(
+        "--alert-webhook-url", default=os.getenv("EXTERNAL_ALERT_WEBHOOK_URL", "")
+    )
+    parser.add_argument(
+        "--alert-webhook-token", default=os.getenv("EXTERNAL_ALERT_WEBHOOK_TOKEN", "")
+    )
     parser.add_argument("--alert-environment", default=os.getenv("APP_ENV", "prod"))
     return parser.parse_args()
 

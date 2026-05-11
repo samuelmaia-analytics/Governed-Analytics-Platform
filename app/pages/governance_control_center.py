@@ -83,9 +83,13 @@ def _load_governance_history(path: Path = GOVERNANCE_HISTORY_PATH) -> pd.DataFra
     if history_df.empty:
         return pd.DataFrame()
     if "execution_timestamp" in history_df.columns:
-        history_df["execution_timestamp"] = pd.to_datetime(history_df["execution_timestamp"], errors="coerce", utc=True)
+        history_df["execution_timestamp"] = pd.to_datetime(
+            history_df["execution_timestamp"], errors="coerce", utc=True
+        )
     elif "run_timestamp" in history_df.columns:
-        history_df["execution_timestamp"] = pd.to_datetime(history_df["run_timestamp"], errors="coerce", utc=True)
+        history_df["execution_timestamp"] = pd.to_datetime(
+            history_df["run_timestamp"], errors="coerce", utc=True
+        )
     else:
         history_df["execution_timestamp"] = pd.NaT
     return history_df
@@ -93,7 +97,11 @@ def _load_governance_history(path: Path = GOVERNANCE_HISTORY_PATH) -> pd.DataFra
 
 def _render_governance_history_trends(locale: Locale) -> None:
     is_en = locale == LOCALE_EN_US
-    st.markdown("## Governance Monitoring Trends" if is_en else "## Tendências de Monitoramento de Governança")
+    st.markdown(
+        "## Governance Monitoring Trends"
+        if is_en
+        else "## Tendências de Monitoramento de Governança"
+    )
     history_df = _load_governance_history()
 
     if history_df.empty:
@@ -114,13 +122,24 @@ def _render_governance_history_trends(locale: Locale) -> None:
     chart_df = history_df.sort_values("execution_timestamp").copy()
 
     # Normalize columns for backward compatibility with older history files.
-    if "privacy_risk_score" not in chart_df.columns and "privacy_score" in chart_df.columns:
+    if (
+        "privacy_risk_score" not in chart_df.columns
+        and "privacy_score" in chart_df.columns
+    ):
         chart_df["privacy_risk_score"] = chart_df["privacy_score"]
     if "row_count" not in chart_df.columns and "total_rows" in chart_df.columns:
         chart_df["row_count"] = chart_df["total_rows"]
-    if "failed_rules_count" not in chart_df.columns and "failed_checks_count" in chart_df.columns:
+    if (
+        "failed_rules_count" not in chart_df.columns
+        and "failed_checks_count" in chart_df.columns
+    ):
         chart_df["failed_rules_count"] = chart_df["failed_checks_count"]
-    for missing_col in ["warning_rules_count", "critical_rules_count", "publication_status", "data_quality_score"]:
+    for missing_col in [
+        "warning_rules_count",
+        "critical_rules_count",
+        "publication_status",
+        "data_quality_score",
+    ]:
         if missing_col not in chart_df.columns:
             chart_df[missing_col] = 0 if "count" in missing_col else "unknown"
 
@@ -131,7 +150,9 @@ def _render_governance_history_trends(locale: Locale) -> None:
             x="execution_timestamp",
             y="data_quality_score",
             markers=True,
-            title="Data Quality Score Over Time" if is_en else "Score de Qualidade ao Longo do Tempo",
+            title="Data Quality Score Over Time"
+            if is_en
+            else "Score de Qualidade ao Longo do Tempo",
         )
         dq_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
         st.plotly_chart(dq_fig, width="stretch")
@@ -142,7 +163,9 @@ def _render_governance_history_trends(locale: Locale) -> None:
             x="execution_timestamp",
             y="privacy_risk_score",
             markers=True,
-            title="Privacy Risk Score Over Time" if is_en else "Score de Risco de Privacidade ao Longo do Tempo",
+            title="Privacy Risk Score Over Time"
+            if is_en
+            else "Score de Risco de Privacidade ao Longo do Tempo",
         )
         pr_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
         st.plotly_chart(pr_fig, width="stretch")
@@ -161,13 +184,19 @@ def _render_governance_history_trends(locale: Locale) -> None:
             x="publication_status",
             y="count",
             color="publication_status",
-            title="Publication Status Distribution" if is_en else "Distribuição de Status de Publicação",
+            title="Publication Status Distribution"
+            if is_en
+            else "Distribuição de Status de Publicação",
         )
         status_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), showlegend=False)
         st.plotly_chart(status_fig, width="stretch")
 
     with col_right2:
-        rules_cols = ["failed_rules_count", "warning_rules_count", "critical_rules_count"]
+        rules_cols = [
+            "failed_rules_count",
+            "warning_rules_count",
+            "critical_rules_count",
+        ]
         rules_df = chart_df[["execution_timestamp", *rules_cols]].melt(
             id_vars=["execution_timestamp"],
             value_vars=rules_cols,
@@ -180,7 +209,9 @@ def _render_governance_history_trends(locale: Locale) -> None:
             y="count",
             color="rule_type",
             markers=True,
-            title="Rules Severity Counts Over Time" if is_en else "Contagem de Regras por Severidade ao Longo do Tempo",
+            title="Rules Severity Counts Over Time"
+            if is_en
+            else "Contagem de Regras por Severidade ao Longo do Tempo",
         )
         rules_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
         st.plotly_chart(rules_fig, width="stretch")
@@ -195,7 +226,10 @@ def _render_governance_history_trends(locale: Locale) -> None:
     row_fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
     st.plotly_chart(row_fig, width="stretch")
 
-    with st.expander("Monitoring History Table" if is_en else "Tabela de Histórico de Monitoramento", expanded=False):
+    with st.expander(
+        "Monitoring History Table" if is_en else "Tabela de Histórico de Monitoramento",
+        expanded=False,
+    ):
         show_cols = [
             "run_id",
             "dataset_name",
@@ -218,10 +252,18 @@ def build_publication_decision_rationale(
     quality_results: DataQualityResult,
     classification_df: pd.DataFrame,
 ) -> tuple[str, list[str], list[str], list[str]]:
-    publication_status = _governance_status(risk_result["risk_level"], quality_results["failed_checks_count"])
-    personal_count = int((classification_df["lgpd_classification"] == "personal_data").sum())
-    sensitive_count = int((classification_df["lgpd_classification"] == "sensitive_personal_data").sum())
-    indirect_count = int((classification_df["lgpd_classification"] == "indirect_identifier").sum())
+    publication_status = _governance_status(
+        risk_result["risk_level"], quality_results["failed_checks_count"]
+    )
+    personal_count = int(
+        (classification_df["lgpd_classification"] == "personal_data").sum()
+    )
+    sensitive_count = int(
+        (classification_df["lgpd_classification"] == "sensitive_personal_data").sum()
+    )
+    indirect_count = int(
+        (classification_df["lgpd_classification"] == "indirect_identifier").sum()
+    )
 
     reasons = [
         f"Privacy risk level: {risk_result['risk_level']} ({risk_result['score']}/100).",
@@ -275,7 +317,9 @@ def render_governance_control_center(
     locale: Locale,
 ) -> None:
     is_en = locale == LOCALE_EN_US
-    st.subheader("Governance Control Center" if is_en else "Central de Controles de Governança")
+    st.subheader(
+        "Governance Control Center" if is_en else "Central de Controles de Governança"
+    )
     privacy_columns = classification_df["lgpd_classification"]
     personal_count = int((privacy_columns == "personal_data").sum())
     sensitive_count = int((privacy_columns == "sensitive_personal_data").sum())
@@ -286,24 +330,43 @@ def render_governance_control_center(
         risk_result=risk_result,
         quality_results=quality_results,
     )
-    governance_status, rationale_reasons, rationale_actions, rationale_evidence = build_publication_decision_rationale(
-        risk_result,
-        quality_results,
-        classification_df,
+    governance_status, rationale_reasons, rationale_actions, rationale_evidence = (
+        build_publication_decision_rationale(
+            risk_result,
+            quality_results,
+            classification_df,
+        )
     )
     publication_status = governance_status
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Governance Status" if is_en else "Status de Governança", governance_status)
-    col2.metric("Privacy Risk Score" if is_en else "Score de Risco de Privacidade", f"{risk_result['score']} / 100")
-    col3.metric("Data Quality Score" if is_en else "Score de Qualidade", f"{quality_score} / 100")
-    col4.metric("Failed Checks" if is_en else "Checks Reprovados", quality_results["failed_checks_count"])
+    col1.metric(
+        "Governance Status" if is_en else "Status de Governança", governance_status
+    )
+    col2.metric(
+        "Privacy Risk Score" if is_en else "Score de Risco de Privacidade",
+        f"{risk_result['score']} / 100",
+    )
+    col3.metric(
+        "Data Quality Score" if is_en else "Score de Qualidade",
+        f"{quality_score} / 100",
+    )
+    col4.metric(
+        "Failed Checks" if is_en else "Checks Reprovados",
+        quality_results["failed_checks_count"],
+    )
 
     col5, col6, col7, col8 = st.columns(4)
     col5.metric("Personal Columns" if is_en else "Colunas Pessoais", personal_count)
     col6.metric("Sensitive Columns" if is_en else "Colunas Sensíveis", sensitive_count)
-    col7.metric("Indirect Identifier Columns" if is_en else "Identificadores Indiretos", indirect_count)
-    col8.metric("Publication Readiness" if is_en else "Prontidão para Publicação", publication_status)
+    col7.metric(
+        "Indirect Identifier Columns" if is_en else "Identificadores Indiretos",
+        indirect_count,
+    )
+    col8.metric(
+        "Publication Readiness" if is_en else "Prontidão para Publicação",
+        publication_status,
+    )
 
     if publication_status == "Approved":
         st.success(
@@ -323,7 +386,11 @@ def render_governance_control_center(
 
     charts_col1, charts_col2 = st.columns(2)
     with charts_col1:
-        st.markdown("**LGPD Classification Distribution**" if is_en else "**Distribuição de Classificação LGPD**")
+        st.markdown(
+            "**LGPD Classification Distribution**"
+            if is_en
+            else "**Distribuição de Classificação LGPD**"
+        )
         class_counts = (
             classification_df["lgpd_classification"]
             .value_counts()
@@ -340,38 +407,79 @@ def render_governance_control_center(
         st.plotly_chart(fig_class, width="stretch")
 
     with charts_col2:
-        st.markdown("**Data Quality Checks (PASS vs FAIL)**" if is_en else "**Checks de Qualidade (PASS vs FAIL)**")
+        st.markdown(
+            "**Data Quality Checks (PASS vs FAIL)**"
+            if is_en
+            else "**Checks de Qualidade (PASS vs FAIL)**"
+        )
         checks_df = pd.DataFrame(quality_results["checks"])
         if checks_df.empty:
-            st.info("No quality checks available." if is_en else "Nenhum check de qualidade disponível.")
+            st.info(
+                "No quality checks available."
+                if is_en
+                else "Nenhum check de qualidade disponível."
+            )
         else:
-            status_counts = checks_df["status"].value_counts().rename_axis("status").reset_index(name="count")
+            status_counts = (
+                checks_df["status"]
+                .value_counts()
+                .rename_axis("status")
+                .reset_index(name="count")
+            )
             fig_checks = px.bar(status_counts, x="status", y="count", color="status")
             fig_checks.update_layout(margin=dict(l=20, r=20, t=20, b=20))
             st.plotly_chart(fig_checks, width="stretch")
 
     st.markdown("**Top Risky Columns**" if is_en else "**Colunas Mais Arriscadas**")
     top_risky_columns = classification_df[
-        classification_df["lgpd_classification"].isin(["sensitive_personal_data", "personal_data", "indirect_identifier"])
+        classification_df["lgpd_classification"].isin(
+            ["sensitive_personal_data", "personal_data", "indirect_identifier"]
+        )
     ].copy()
-    risk_rank = {"sensitive_personal_data": 3, "personal_data": 2, "indirect_identifier": 1}
-    top_risky_columns["risk_rank"] = top_risky_columns["lgpd_classification"].map(risk_rank).fillna(0)
-    top_risky_columns = top_risky_columns.sort_values(by=["risk_rank", "risk_level", "column_name"], ascending=[False, False, True])
+    risk_rank = {
+        "sensitive_personal_data": 3,
+        "personal_data": 2,
+        "indirect_identifier": 1,
+    }
+    top_risky_columns["risk_rank"] = (
+        top_risky_columns["lgpd_classification"].map(risk_rank).fillna(0)
+    )
+    top_risky_columns = top_risky_columns.sort_values(
+        by=["risk_rank", "risk_level", "column_name"], ascending=[False, False, True]
+    )
     st.dataframe(
-        top_risky_columns[["column_name", "lgpd_classification", "risk_level", "recommended_action", "reason"]].head(10),
+        top_risky_columns[
+            [
+                "column_name",
+                "lgpd_classification",
+                "risk_level",
+                "recommended_action",
+                "reason",
+            ]
+        ].head(10),
         width="stretch",
     )
 
-    with st.expander("Risk Details" if is_en else "Detalhes dos Riscos", expanded=False):
+    with st.expander(
+        "Risk Details" if is_en else "Detalhes dos Riscos", expanded=False
+    ):
         st.markdown("**Top Risks**" if is_en else "**Principais Riscos**")
-        failed_checks = [check for check in quality_results["checks"] if check["status"] == "FAIL"]
+        failed_checks = [
+            check for check in quality_results["checks"] if check["status"] == "FAIL"
+        ]
         if not failed_checks and risk_result["risk_level"] == "low":
-            st.write("- No critical governance risks detected." if is_en else "- Nenhum risco crítico de governança detectado.")
+            st.write(
+                "- No critical governance risks detected."
+                if is_en
+                else "- Nenhum risco crítico de governança detectado."
+            )
         else:
             for check in failed_checks[:5]:
                 st.write(f"- {check['check_name']}: {check['recommendation']}")
             if risk_result["risk_level"] in {"medium", "high"}:
-                st.write(f"- Privacy risk level is {risk_result['risk_level']} (score {risk_result['score']}).")
+                st.write(
+                    f"- Privacy risk level is {risk_result['risk_level']} (score {risk_result['score']})."
+                )
 
         st.markdown("**Recommended Actions**" if is_en else "**Ações Recomendadas**")
         for recommendation in risk_result["recommendations"][:5]:
@@ -391,7 +499,9 @@ def render_governance_control_center(
             f"Decisão de publicação: {publication_status}."
         )
 
-    with st.expander("Decision Rationale" if is_en else "Racional da Decisão", expanded=False):
+    with st.expander(
+        "Decision Rationale" if is_en else "Racional da Decisão", expanded=False
+    ):
         for line in rationale_reasons:
             st.write(f"- {line}")
 
@@ -408,24 +518,37 @@ def render_governance_control_center(
     for item in rationale_evidence:
         st.write(f"- {item}")
 
-    st.markdown("### Publication Gate Output" if is_en else "### Saída do Publication Gate")
+    st.markdown(
+        "### Publication Gate Output" if is_en else "### Saída do Publication Gate"
+    )
     gate_col1, gate_col2 = st.columns(2)
-    gate_col1.metric("Gate Decision" if is_en else "Decisão do Gate", gate_result.decision)
-    gate_col2.metric("Gate Severity" if is_en else "Severidade do Gate", gate_result.severity)
+    gate_col1.metric(
+        "Gate Decision" if is_en else "Decisão do Gate", gate_result.decision
+    )
+    gate_col2.metric(
+        "Gate Severity" if is_en else "Severidade do Gate", gate_result.severity
+    )
 
     st.markdown("**Gate Reasons**" if is_en else "**Motivos do Gate**")
     for reason in gate_result.reasons:
         st.write(f"- {reason}")
 
-    st.markdown("**Gate Required Actions**" if is_en else "**Ações Obrigatórias do Gate**")
+    st.markdown(
+        "**Gate Required Actions**" if is_en else "**Ações Obrigatórias do Gate**"
+    )
     for action in gate_result.required_actions:
         st.write(f"- {action}")
 
-    with st.expander("Gate Assumptions / Fallbacks" if is_en else "Premissas / Fallbacks do Gate", expanded=False):
+    with st.expander(
+        "Gate Assumptions / Fallbacks" if is_en else "Premissas / Fallbacks do Gate",
+        expanded=False,
+    ):
         for note in gate_fallback_notes:
             st.write(f"- {note}")
 
-    st.markdown("**Executive Recommendation**" if is_en else "**Recomendação Executiva Final**")
+    st.markdown(
+        "**Executive Recommendation**" if is_en else "**Recomendação Executiva Final**"
+    )
     recommendation_text = (
         "Proceed to publication with routine monitoring."
         if publication_status == "Approved"
@@ -452,7 +575,9 @@ def render_governance_control_center(
     else:
         st.error(recommendation_text)
 
-    button_label = "Save Governance Snapshot" if is_en else "Salvar Snapshot de Governança"
+    button_label = (
+        "Save Governance Snapshot" if is_en else "Salvar Snapshot de Governança"
+    )
     if st.button(button_label, type="primary"):
         saved_path = save_governance_snapshot(
             df=df,
@@ -465,4 +590,11 @@ def render_governance_control_center(
         else:
             st.success(f"Snapshot de governança salvo em: {saved_path.resolve()}")
 
-    _render_governance_history_trends(locale)
+    st.divider()
+    with st.expander(
+        "📈 Tendências Históricas de Governança"
+        if not is_en
+        else "📈 Governance Historical Trends",
+        expanded=False,
+    ):
+        _render_governance_history_trends(locale)

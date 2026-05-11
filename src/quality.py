@@ -256,7 +256,9 @@ def check_category_missing_pct(df: pd.DataFrame) -> QualityCheckResult:
 
 
 def check_undelivered_pct(df: pd.DataFrame) -> QualityCheckResult:
-    undelivered_pct = round(float(df["order_delivered_customer_date"].isna().mean() * 100), 2)
+    undelivered_pct = round(
+        float(df["order_delivered_customer_date"].isna().mean() * 100), 2
+    )
     passed = undelivered_pct <= MAX_UNDELIVERED_PCT
     return build_result(
         "undelivered_orders_pct",
@@ -271,10 +273,12 @@ def check_undelivered_pct(df: pd.DataFrame) -> QualityCheckResult:
 def check_delay_null_consistency(df: pd.DataFrame) -> QualityCheckResult:
     inconsistent_count = int(
         (
-            df["order_delivered_customer_date"].isna() & df["estimated_delay_days"].notna()
+            df["order_delivered_customer_date"].isna()
+            & df["estimated_delay_days"].notna()
         ).sum()
         + (
-            df["order_delivered_customer_date"].notna() & df["estimated_delay_days"].isna()
+            df["order_delivered_customer_date"].notna()
+            & df["estimated_delay_days"].isna()
         ).sum()
     )
     return build_result(
@@ -302,7 +306,12 @@ def check_record_volume(df: pd.DataFrame) -> QualityCheckResult:
 
 def check_dimension_join_coverage(df: pd.DataFrame) -> list[QualityCheckResult]:
     results: list[QualityCheckResult] = []
-    for column in ["customer_unique_id", "customer_state", "seller_state", "payment_type_mode"]:
+    for column in [
+        "customer_unique_id",
+        "customer_state",
+        "seller_state",
+        "payment_type_mode",
+    ]:
         missing_pct = round(float(df[column].isna().mean() * 100), 2)
         results.append(
             build_result(
@@ -326,7 +335,9 @@ def check_payment_reconciliation(df: pd.DataFrame) -> QualityCheckResult:
         )
         .assign(
             order_payment_total=lambda frame: frame["order_payment_total"].fillna(0),
-            abs_gap=lambda frame: (frame["order_items_total"] - frame["order_payment_total"]).abs(),
+            abs_gap=lambda frame: (
+                frame["order_items_total"] - frame["order_payment_total"]
+            ).abs(),
         )
     )
     gap_pct = round(float((order_level["abs_gap"] > 1.0).mean() * 100), 2)
@@ -407,7 +418,9 @@ def render_quality_report(df: pd.DataFrame, results: list[QualityCheckResult]) -
         lines.append("- Nenhum check falhou na validação atual.")
     else:
         for row in failed_df.itertuples(index=False):
-            lines.append(f"- `{row.check_name}`: {row.details} Valor observado={row.metric_value}.")
+            lines.append(
+                f"- `{row.check_name}`: {row.details} Valor observado={row.metric_value}."
+            )
 
     if has_residual_source_issue:
         lines.extend(

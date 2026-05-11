@@ -35,13 +35,18 @@ class SemanticArtifacts:
 
 def load_published_table() -> pd.DataFrame:
     if not PUBLISHED_SOURCE_PATH.exists():
-        raise FileNotFoundError(f"Camada publicada nao encontrada para expansao semantica: {PUBLISHED_SOURCE_PATH}")
+        raise FileNotFoundError(
+            f"Camada publicada nao encontrada para expansao semantica: {PUBLISHED_SOURCE_PATH}"
+        )
     return pd.read_parquet(PUBLISHED_SOURCE_PATH)
 
 
 def build_logistics_slice(df: pd.DataFrame) -> pd.DataFrame:
     logistics = (
-        df.groupby(["order_year", "order_month", "customer_state", "seller_state"], dropna=False)
+        df.groupby(
+            ["order_year", "order_month", "customer_state", "seller_state"],
+            dropna=False,
+        )
         .agg(
             total_items=("order_item_id", "count"),
             delayed_rate=("is_delayed", "mean"),
@@ -52,7 +57,9 @@ def build_logistics_slice(df: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
-    return logistics.sort_values(["order_year", "order_month", "customer_state", "seller_state"]).reset_index(drop=True)
+    return logistics.sort_values(
+        ["order_year", "order_month", "customer_state", "seller_state"]
+    ).reset_index(drop=True)
 
 
 def build_seller_slice(df: pd.DataFrame) -> pd.DataFrame:
@@ -68,7 +75,9 @@ def build_seller_slice(df: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
-    return seller.sort_values(["seller_volume_tier", "seller_key"]).reset_index(drop=True)
+    return seller.sort_values(["seller_volume_tier", "seller_key"]).reset_index(
+        drop=True
+    )
 
 
 def build_cohort_slice(df: pd.DataFrame) -> pd.DataFrame:
@@ -83,13 +92,20 @@ def build_cohort_slice(df: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
-    return cohort.sort_values(["purchase_cohort_month", "cohort_order_month_number"]).reset_index(drop=True)
+    return cohort.sort_values(
+        ["purchase_cohort_month", "cohort_order_month_number"]
+    ).reset_index(drop=True)
 
 
 def build_category_slice(df: pd.DataFrame) -> pd.DataFrame:
     category = (
         df.groupby(
-            ["order_year", "order_month", "product_category_name_english", "payment_type_mode"],
+            [
+                "order_year",
+                "order_month",
+                "product_category_name_english",
+                "payment_type_mode",
+            ],
             dropna=False,
         )
         .agg(
@@ -104,7 +120,12 @@ def build_category_slice(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
     return category.sort_values(
-        ["order_year", "order_month", "product_category_name_english", "payment_type_mode"]
+        [
+            "order_year",
+            "order_month",
+            "product_category_name_english",
+            "payment_type_mode",
+        ]
     ).reset_index(drop=True)
 
 
@@ -123,7 +144,9 @@ def build_state_performance_slice(df: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
-    return state.sort_values(["order_year", "order_month", "customer_state"]).reset_index(drop=True)
+    return state.sort_values(
+        ["order_year", "order_month", "customer_state"]
+    ).reset_index(drop=True)
 
 
 def save_dataset(df: pd.DataFrame, path: Path) -> None:
@@ -177,8 +200,12 @@ def run_semantic_layer() -> SemanticArtifacts:
     save_dataset(cohort, COHORT_PATH)
     save_dataset(category, CATEGORY_PATH)
     save_dataset(state, STATE_PATH)
-    REPORT_PATH.write_text(render_report(logistics, seller, cohort, category, state), encoding="utf-8")
-    LOGGER.info("Camada semantica expandida materializada em %s", PUBLISHED_SEMANTIC_DIR)
+    REPORT_PATH.write_text(
+        render_report(logistics, seller, cohort, category, state), encoding="utf-8"
+    )
+    LOGGER.info(
+        "Camada semantica expandida materializada em %s", PUBLISHED_SEMANTIC_DIR
+    )
     return SemanticArtifacts(
         logistics_path=LOGISTICS_PATH,
         seller_path=SELLER_PATH,

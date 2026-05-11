@@ -19,7 +19,17 @@ def _is_probably_date_column(column_name: str, series: pd.Series) -> bool:
 def _check_negative_numeric_values(df: pd.DataFrame) -> list[DataQualityCheck]:
     checks: list[DataQualityCheck] = []
     numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
-    guarded_keywords = ("revenue", "price", "value", "amount", "qty", "quant", "score", "total", "freight")
+    guarded_keywords = (
+        "revenue",
+        "price",
+        "value",
+        "amount",
+        "qty",
+        "quant",
+        "score",
+        "total",
+        "freight",
+    )
     for column in numeric_cols:
         if not any(keyword in column.lower() for keyword in guarded_keywords):
             continue
@@ -66,21 +76,38 @@ def run_data_quality_checks(df: pd.DataFrame) -> DataQualityResult:
     total_columns = int(df.shape[1])
     null_pct_by_column = {
         str(column): float(value)
-        for column, value in (df.isna().mean() * 100).round(2).sort_values(ascending=False).to_dict().items()
+        for column, value in (df.isna().mean() * 100)
+        .round(2)
+        .sort_values(ascending=False)
+        .to_dict()
+        .items()
     }
-    high_null_columns = [str(column) for column, pct in null_pct_by_column.items() if pct > 30.0]
+    high_null_columns = [
+        str(column) for column, pct in null_pct_by_column.items() if pct > 30.0
+    ]
     duplicate_rows = int(df.duplicated().sum())
     dtype_summary = {str(column): str(dtype) for column, dtype in df.dtypes.items()}
-    cardinality = {str(column): int(value) for column, value in df.nunique(dropna=False).to_dict().items()}
-    possible_unique_keys = [column for column, unique_count in cardinality.items() if unique_count == total_rows and total_rows > 0]
-    constant_columns = [column for column, unique_count in cardinality.items() if unique_count <= 1]
+    cardinality = {
+        str(column): int(value)
+        for column, value in df.nunique(dropna=False).to_dict().items()
+    }
+    possible_unique_keys = [
+        column
+        for column, unique_count in cardinality.items()
+        if unique_count == total_rows and total_rows > 0
+    ]
+    constant_columns = [
+        column for column, unique_count in cardinality.items() if unique_count <= 1
+    ]
 
     checks: list[DataQualityCheck] = [
         {
             "check_name": "high_null_columns_over_30pct",
             "status": "FAIL" if high_null_columns else "PASS",
             "severity": "high" if high_null_columns else "low",
-            "affected_columns": ", ".join(high_null_columns) if high_null_columns else "",
+            "affected_columns": ", ".join(high_null_columns)
+            if high_null_columns
+            else "",
             "affected_rows": total_rows if high_null_columns else 0,
             "recommendation": "Review source completeness and enforce mandatory fields for critical columns.",
             "rule_source": "built_in",
@@ -109,7 +136,9 @@ def run_data_quality_checks(df: pd.DataFrame) -> DataQualityResult:
     default_rules_path = Path("contracts/data_quality_rules.yml")
     if default_rules_path.exists():
         rules = load_quality_rules(default_rules_path)
-        checks.extend(execute_quality_rules(df, rules, rule_source=str(default_rules_path)))
+        checks.extend(
+            execute_quality_rules(df, rules, rule_source=str(default_rules_path))
+        )
 
     failed_checks = [check for check in checks if check["status"] == "FAIL"]
     return {

@@ -75,13 +75,21 @@ class ProjectPaths:
         }
         missing = [name for name, path in required_dirs.items() if not path.exists()]
         if missing:
-            missing_paths = ", ".join(f"{name}={required_dirs[name]}" for name in missing)
-            raise FileNotFoundError(f"Estrutura base do projeto ausente: {missing_paths}")
+            missing_paths = ", ".join(
+                f"{name}={required_dirs[name]}" for name in missing
+            )
+            raise FileNotFoundError(
+                f"Estrutura base do projeto ausente: {missing_paths}"
+            )
 
 
 def load_project_paths() -> ProjectPaths:
     configured_root = os.getenv("PROJECT_ROOT_DIR")
-    root_dir = Path(configured_root).resolve() if configured_root else Path(__file__).resolve().parent.parent
+    root_dir = (
+        Path(configured_root).resolve()
+        if configured_root
+        else Path(__file__).resolve().parent.parent
+    )
     return ProjectPaths.from_root(root_dir)
 
 

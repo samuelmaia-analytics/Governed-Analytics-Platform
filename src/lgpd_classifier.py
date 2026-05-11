@@ -31,7 +31,15 @@ PERSONAL_TERMS = {
     "genero",
 }
 SENSITIVE_TERMS = {"health", "saude", "biometric", "biometrico"}
-INDIRECT_IDENTIFIER_TERMS = {"city", "state", "zip", "postal", "birth", "device", "session"}
+INDIRECT_IDENTIFIER_TERMS = {
+    "city",
+    "state",
+    "zip",
+    "postal",
+    "birth",
+    "device",
+    "session",
+}
 
 REGEX_PATTERNS: dict[str, Pattern[str]] = {
     "email": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
@@ -72,9 +80,16 @@ def normalize_name(column_name: str) -> str:
 
 
 def _as_lgpd_classification(value: str) -> LGPDClassification:
-    allowed = {"non_personal", "personal_data", "sensitive_personal_data", "indirect_identifier"}
+    allowed = {
+        "non_personal",
+        "personal_data",
+        "sensitive_personal_data",
+        "indirect_identifier",
+    }
     normalized = value.strip()
-    return cast(LGPDClassification, normalized if normalized in allowed else "non_personal")
+    return cast(
+        LGPDClassification, normalized if normalized in allowed else "non_personal"
+    )
 
 
 def _as_risk_level(value: str) -> RiskLevel:
@@ -89,7 +104,9 @@ def _as_recommended_action(value: str) -> RecommendedAction:
     return cast(RecommendedAction, normalized if normalized in allowed else "review")
 
 
-def load_classification_contract(contract_path: str | Path | None = DEFAULT_RULES_PATH) -> ClassificationContract:
+def load_classification_contract(
+    contract_path: str | Path | None = DEFAULT_RULES_PATH,
+) -> ClassificationContract:
     if contract_path is None:
         return ClassificationContract(exact={}, contains=[], regex=[])
     path = Path(contract_path)
@@ -102,44 +119,58 @@ def load_classification_contract(contract_path: str | Path | None = DEFAULT_RULE
     exact_rules: dict[str, ContractRule] = {}
     for column_name, rule in (column_rules.get("exact", {}) or {}).items():
         exact_rules[normalize_name(str(column_name))] = ContractRule(
-            lgpd_classification=_as_lgpd_classification(str(rule["lgpd_classification"])),
+            lgpd_classification=_as_lgpd_classification(
+                str(rule["lgpd_classification"])
+            ),
             risk_level=_as_risk_level(str(rule["risk_level"])),
             recommended_action=_as_recommended_action(str(rule["recommended_action"])),
             reason=str(rule["reason"]),
         )
 
     contains_rules: list[tuple[str, ContractRule]] = []
-    for item in (column_rules.get("contains", []) or []):
+    for item in column_rules.get("contains", []) or []:
         contains_rules.append(
             (
                 normalize_name(str(item["token"])),
                 ContractRule(
-                    lgpd_classification=_as_lgpd_classification(str(item["lgpd_classification"])),
+                    lgpd_classification=_as_lgpd_classification(
+                        str(item["lgpd_classification"])
+                    ),
                     risk_level=_as_risk_level(str(item["risk_level"])),
-                    recommended_action=_as_recommended_action(str(item["recommended_action"])),
+                    recommended_action=_as_recommended_action(
+                        str(item["recommended_action"])
+                    ),
                     reason=str(item["reason"]),
                 ),
             )
         )
 
     regex_rules: list[tuple[Pattern[str], ContractRule]] = []
-    for item in (column_rules.get("regex", []) or []):
+    for item in column_rules.get("regex", []) or []:
         regex_rules.append(
             (
                 re.compile(str(item["pattern"])),
                 ContractRule(
-                    lgpd_classification=_as_lgpd_classification(str(item["lgpd_classification"])),
+                    lgpd_classification=_as_lgpd_classification(
+                        str(item["lgpd_classification"])
+                    ),
                     risk_level=_as_risk_level(str(item["risk_level"])),
-                    recommended_action=_as_recommended_action(str(item["recommended_action"])),
+                    recommended_action=_as_recommended_action(
+                        str(item["recommended_action"])
+                    ),
                     reason=str(item["reason"]),
                 ),
             )
         )
 
-    return ClassificationContract(exact=exact_rules, contains=contains_rules, regex=regex_rules)
+    return ClassificationContract(
+        exact=exact_rules, contains=contains_rules, regex=regex_rules
+    )
 
 
-def classify_by_contract(column_name: str, contract: ClassificationContract) -> ColumnClassification | None:
+def classify_by_contract(
+    column_name: str, contract: ClassificationContract
+) -> ColumnClassification | None:
     normalized = normalize_name(column_name)
 
     exact_match = contract.exact.get(normalized)
@@ -179,7 +210,10 @@ def detect_by_column_name(column_name: str) -> tuple[LGPDClassification, str]:
     if any(term in normalized for term in PERSONAL_TERMS):
         return "personal_data", "Column name indicates personal data."
     if any(term in normalized for term in INDIRECT_IDENTIFIER_TERMS):
-        return "indirect_identifier", "Column name indicates indirect identification risk."
+        return (
+            "indirect_identifier",
+            "Column name indicates indirect identification risk.",
+        )
     return "non_personal", "No personal-data indicators found in column name."
 
 
@@ -214,7 +248,9 @@ def merge_signal_priority(
         "indirect_identifier": 2,
         "non_personal": 1,
     }
-    return name_signal if priority[name_signal] >= priority[regex_signal] else regex_signal
+    return (
+        name_signal if priority[name_signal] >= priority[regex_signal] else regex_signal
+    )
 
 
 def map_risk_and_action(
@@ -238,7 +274,9 @@ def classify_column(column_name: str, series: pd.Series) -> ColumnClassification
     name_signal, name_reason = detect_by_column_name(column_name)
     regex_signal, regex_reason = detect_by_regex(series)
     final_classification = merge_signal_priority(name_signal, regex_signal)
-    risk_level, recommended_action = map_risk_and_action(final_classification, column_name)
+    risk_level, recommended_action = map_risk_and_action(
+        final_classification, column_name
+    )
     reason = f"{name_reason} {regex_reason}".strip()
     return ColumnClassification(
         lgpd_classification=final_classification,
@@ -248,12 +286,18 @@ def classify_column(column_name: str, series: pd.Series) -> ColumnClassification
     )
 
 
-def classify_dataframe_columns(df: pd.DataFrame, contract_path: str | Path | None = DEFAULT_RULES_PATH) -> pd.DataFrame:
+def classify_dataframe_columns(
+    df: pd.DataFrame, contract_path: str | Path | None = DEFAULT_RULES_PATH
+) -> pd.DataFrame:
     contract = load_classification_contract(contract_path)
     rows: list[dict[str, object]] = []
     for column_name in df.columns:
         contract_result = classify_by_contract(column_name, contract)
-        column_result = contract_result if contract_result is not None else classify_column(column_name, df[column_name])
+        column_result = (
+            contract_result
+            if contract_result is not None
+            else classify_column(column_name, df[column_name])
+        )
         rows.append(
             {
                 "column_name": column_name,

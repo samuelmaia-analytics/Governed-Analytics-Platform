@@ -42,10 +42,16 @@ def test_run_monitoring_and_save_outputs(tmp_path: Path, monkeypatch) -> None:
 
     monkeypatch.setattr(monitoring, "PUBLISHED_PARQUET_PATH", parquet_path)
     monkeypatch.setattr(monitoring, "PUBLISHED_MONITORING_DIR", monitoring_dir)
-    monkeypatch.setattr(monitoring, "RESULTS_PATH", monitoring_dir / "published_layer_monitoring.csv")
-    monkeypatch.setattr(monitoring, "SUMMARY_PATH", monitoring_dir / "published_layer_monitoring.json")
+    monkeypatch.setattr(
+        monitoring, "RESULTS_PATH", monitoring_dir / "published_layer_monitoring.csv"
+    )
+    monkeypatch.setattr(
+        monitoring, "SUMMARY_PATH", monitoring_dir / "published_layer_monitoring.json"
+    )
     monkeypatch.setattr(monitoring, "DOCS_DIR", docs_dir)
-    monkeypatch.setattr(monitoring, "REPORT_PATH", docs_dir / "published_layer_monitoring.md")
+    monkeypatch.setattr(
+        monitoring, "REPORT_PATH", docs_dir / "published_layer_monitoring.md"
+    )
 
     results = monitoring.run_monitoring(max_freshness_hours=999)
     monitoring.save_results(results)
@@ -57,9 +63,13 @@ def test_run_monitoring_and_save_outputs(tmp_path: Path, monkeypatch) -> None:
     assert (docs_dir / "published_layer_monitoring.md").exists()
 
 
-def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(tmp_path: Path, monkeypatch) -> None:
+def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(
+    tmp_path: Path, monkeypatch
+) -> None:
     parquet_path = tmp_path / "fact_orders_dashboard.parquet"
-    incomplete_df = build_published_df().drop(columns=["seller_delay_rate", "order_purchase_timestamp"])
+    incomplete_df = build_published_df().drop(
+        columns=["seller_delay_rate", "order_purchase_timestamp"]
+    )
     incomplete_df.to_parquet(parquet_path, index=False)
 
     monkeypatch.setattr(monitoring, "PUBLISHED_PARQUET_PATH", parquet_path)
@@ -68,8 +78,13 @@ def test_run_monitoring_returns_failed_checks_when_schema_is_incomplete(tmp_path
 
     by_check = {result.check_name: result for result in results}
     assert by_check["published_expected_schema"].status == "FAIL"
-    assert by_check["published_critical_nulls__order_purchase_timestamp"].status == "FAIL"
-    assert by_check["published_critical_nulls__order_purchase_timestamp"].metric_value == "missing_column"
+    assert (
+        by_check["published_critical_nulls__order_purchase_timestamp"].status == "FAIL"
+    )
+    assert (
+        by_check["published_critical_nulls__order_purchase_timestamp"].metric_value
+        == "missing_column"
+    )
     assert by_check["published_semantic_coverage_schema"].status == "FAIL"
 
 
@@ -77,7 +92,9 @@ def test_build_alert_payload_contains_failed_checks_only() -> None:
     payload = monitoring.build_alert_payload(
         [
             monitoring.MonitoringCheckResult("check_pass", "PASS", 1, 0, "low", "ok"),
-            monitoring.MonitoringCheckResult("check_fail", "FAIL", 2, 0, "high", "broken"),
+            monitoring.MonitoringCheckResult(
+                "check_fail", "FAIL", 2, 0, "high", "broken"
+            ),
         ],
         environment="stage",
     )
@@ -107,7 +124,9 @@ def test_send_external_alert_posts_json_payload(monkeypatch) -> None:
         def raise_for_status() -> None:
             return None
 
-    def fake_post(url: str, json: dict[str, object], headers: dict[str, str], timeout: int) -> DummyResponse:
+    def fake_post(
+        url: str, json: dict[str, object], headers: dict[str, str], timeout: int
+    ) -> DummyResponse:
         captured["url"] = url
         captured["json"] = json
         captured["headers"] = headers
@@ -117,7 +136,11 @@ def test_send_external_alert_posts_json_payload(monkeypatch) -> None:
     monkeypatch.setattr(monitoring.requests, "post", fake_post)
 
     result = monitoring.send_external_alert(
-        [monitoring.MonitoringCheckResult("check_fail", "FAIL", 2, 0, "high", "broken")],
+        [
+            monitoring.MonitoringCheckResult(
+                "check_fail", "FAIL", 2, 0, "high", "broken"
+            )
+        ],
         webhook_url="https://alerts.example.com/hook",
         token="secret",
         environment="prod",
@@ -126,5 +149,8 @@ def test_send_external_alert_posts_json_payload(monkeypatch) -> None:
     assert result.delivered is True
     assert result.status_code == 202
     assert captured["url"] == "https://alerts.example.com/hook"
-    assert captured["headers"] == {"Content-Type": "application/json", "Authorization": "secret"}
+    assert captured["headers"] == {
+        "Content-Type": "application/json",
+        "Authorization": "secret",
+    }
     assert captured["timeout"] == 15

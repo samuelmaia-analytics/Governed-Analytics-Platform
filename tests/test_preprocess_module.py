@@ -11,7 +11,9 @@ def build_profile_frame() -> pd.DataFrame:
     return pd.DataFrame(
         {
             "Order_ID": ["o1", "o2", "o2"],
-            "Purchase_Timestamp": pd.to_datetime(["2018-01-01", "2018-01-02", "2018-01-02"]),
+            "Purchase_Timestamp": pd.to_datetime(
+                ["2018-01-01", "2018-01-02", "2018-01-02"]
+            ),
             "Price": [10.0, 20.0, 20.0],
             "Is_Delayed": [True, False, False],
             "Category": ["a", None, None],
@@ -45,7 +47,9 @@ def test_classification_profiles_and_duplicate_metrics() -> None:
     assert int(duplicate_profile.iloc[0]["duplicate_rows"]) == 2
 
 
-def test_save_standardized_table_and_profile_outputs(tmp_path: Path, monkeypatch) -> None:
+def test_save_standardized_table_and_profile_outputs(
+    tmp_path: Path, monkeypatch
+) -> None:
     standardized_dir = tmp_path / "standardized"
     profiling_dir = tmp_path / "profiling"
     monkeypatch.setattr(preprocess, "STANDARDIZED_OLIST_DIR", standardized_dir)
@@ -72,8 +76,8 @@ def test_profile_table_and_consolidated_outputs(tmp_path: Path, monkeypatch) -> 
     monkeypatch.setattr(preprocess, "STANDARDIZED_OLIST_DIR", tmp_path / "standardized")
     monkeypatch.setattr(preprocess, "PROFILING_DIR", tmp_path / "profiling")
 
-    profile, columns_profile, nulls_profile, keys_profile, duplicate_profile = preprocess.profile_table(
-        csv_path
+    profile, columns_profile, nulls_profile, keys_profile, duplicate_profile = (
+        preprocess.profile_table(csv_path)
     )
     preprocess.save_consolidated_tables(
         [profile],
@@ -100,13 +104,19 @@ def test_render_eda_summary_and_run_profiling(tmp_path: Path, monkeypatch) -> No
     csv_a = tmp_path / "orders.csv"
     csv_b = tmp_path / "customers.csv"
     build_profile_frame().to_csv(csv_a, index=False)
-    pd.DataFrame({"customer_id": ["c1"], "created_date": ["2018-01-01"]}).to_csv(csv_b, index=False)
+    pd.DataFrame({"customer_id": ["c1"], "created_date": ["2018-01-01"]}).to_csv(
+        csv_b, index=False
+    )
     monkeypatch.setattr(preprocess, "validate_expected_files", lambda: [csv_a, csv_b])
 
     profiles = preprocess.run_profiling()
     report = preprocess.render_eda_summary(
         profiles,
-        [preprocess.build_nulls_profile(preprocess.standardize_columns(build_profile_frame()), "orders")],
+        [
+            preprocess.build_nulls_profile(
+                preprocess.standardize_columns(build_profile_frame()), "orders"
+            )
+        ],
     )
 
     assert len(profiles) == 2

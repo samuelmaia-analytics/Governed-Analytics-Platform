@@ -75,7 +75,9 @@ def test_validate_privacy_controls_passes_for_compliant_published_table() -> Non
     contract = publish_dashboard.load_privacy_contract()
     policy = publish_dashboard.load_domain_policy(contract)
 
-    checks = publish_dashboard.validate_privacy_controls(published, contract, policy, source_df=source_df)
+    checks = publish_dashboard.validate_privacy_controls(
+        published, contract, policy, source_df=source_df
+    )
 
     assert checks
     assert all(check.status == "PASS" for check in checks)
@@ -88,7 +90,9 @@ def test_validate_privacy_controls_detects_forbidden_column_exposure() -> None:
     contract = publish_dashboard.load_privacy_contract()
     policy = publish_dashboard.load_domain_policy(contract)
 
-    checks = publish_dashboard.validate_privacy_controls(published, contract, policy, source_df=source_df)
+    checks = publish_dashboard.validate_privacy_controls(
+        published, contract, policy, source_df=source_df
+    )
 
     failed = {check.check_name for check in checks if check.status == "FAIL"}
     assert "forbidden_columns_absent" in failed
@@ -102,25 +106,46 @@ def test_validate_privacy_controls_detects_wrong_default_for_source_nulls() -> N
     contract = publish_dashboard.load_privacy_contract()
     policy = publish_dashboard.load_domain_policy(contract)
 
-    checks = publish_dashboard.validate_privacy_controls(published, contract, policy, source_df=source_df)
+    checks = publish_dashboard.validate_privacy_controls(
+        published, contract, policy, source_df=source_df
+    )
 
     failed = {check.check_name for check in checks if check.status == "FAIL"}
     assert "default_fill__order_status" in failed
 
 
-def test_save_outputs_save_report_and_run_publish_dashboard(tmp_path: Path, monkeypatch) -> None:
+def test_save_outputs_save_report_and_run_publish_dashboard(
+    tmp_path: Path, monkeypatch
+) -> None:
     output_dir = tmp_path / "published"
     docs_dir = tmp_path / "docs"
     quality_dir = tmp_path / "quality"
     contract_path = tmp_path / "privacy_governance.json"
-    contract_path.write_text(Path(publish_dashboard.PRIVACY_CONTRACT_PATH).read_text(encoding="utf-8"), encoding="utf-8")
+    contract_path.write_text(
+        Path(publish_dashboard.PRIVACY_CONTRACT_PATH).read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(publish_dashboard, "PUBLISHED_DASHBOARD_DIR", output_dir)
     monkeypatch.setattr(publish_dashboard, "DOCS_DIR", docs_dir)
     monkeypatch.setattr(publish_dashboard, "QUALITY_DIR", quality_dir)
-    monkeypatch.setattr(publish_dashboard, "PUBLISHED_PARQUET_PATH", output_dir / "fact_orders_dashboard.parquet")
-    monkeypatch.setattr(publish_dashboard, "PUBLISHED_CSV_PATH", output_dir / "fact_orders_dashboard.csv")
-    monkeypatch.setattr(publish_dashboard, "REPORT_PATH", docs_dir / "privacy_governance.md")
-    monkeypatch.setattr(publish_dashboard, "PRIVACY_RESULTS_PATH", quality_dir / "privacy_governance_results.csv")
+    monkeypatch.setattr(
+        publish_dashboard,
+        "PUBLISHED_PARQUET_PATH",
+        output_dir / "fact_orders_dashboard.parquet",
+    )
+    monkeypatch.setattr(
+        publish_dashboard,
+        "PUBLISHED_CSV_PATH",
+        output_dir / "fact_orders_dashboard.csv",
+    )
+    monkeypatch.setattr(
+        publish_dashboard, "REPORT_PATH", docs_dir / "privacy_governance.md"
+    )
+    monkeypatch.setattr(
+        publish_dashboard,
+        "PRIVACY_RESULTS_PATH",
+        quality_dir / "privacy_governance_results.csv",
+    )
     monkeypatch.setattr(publish_dashboard, "PRIVACY_CONTRACT_PATH", contract_path)
     monkeypatch.setattr(publish_dashboard, "load_internal_fact", build_source_df)
 
@@ -137,9 +162,14 @@ def test_save_outputs_save_report_and_run_publish_dashboard(tmp_path: Path, monk
     assert set(results_df["status"]) == {"PASS"}
 
 
-def test_run_publish_dashboard_fails_when_privacy_validation_breaks(tmp_path: Path, monkeypatch) -> None:
+def test_run_publish_dashboard_fails_when_privacy_validation_breaks(
+    tmp_path: Path, monkeypatch
+) -> None:
     contract_path = tmp_path / "privacy_governance.json"
-    contract_path.write_text(Path(publish_dashboard.PRIVACY_CONTRACT_PATH).read_text(encoding="utf-8"), encoding="utf-8")
+    contract_path.write_text(
+        Path(publish_dashboard.PRIVACY_CONTRACT_PATH).read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
     broken_df = build_source_df()
     broken_df["customer_city"] = ["sao paulo"]
 

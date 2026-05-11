@@ -28,7 +28,12 @@ class LineageEdge:
 
 def build_lineage_edges() -> list[LineageEdge]:
     return [
-        LineageEdge("data/raw/landing/olist/*.csv", "src/preprocess.py", "data/standardized/olist/*.parquet", "standardized"),
+        LineageEdge(
+            "data/raw/landing/olist/*.csv",
+            "src/preprocess.py",
+            "data/standardized/olist/*.parquet",
+            "standardized",
+        ),
         LineageEdge(
             "data/standardized/olist/*.parquet",
             "src/build_analytics.py",
@@ -80,7 +85,9 @@ def save_lineage_json(edges: list[LineageEdge]) -> Path:
         "lineage_version": "1.0.0",
         "edges": [asdict(edge) for edge in edges],
     }
-    LINEAGE_JSON_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    LINEAGE_JSON_PATH.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return LINEAGE_JSON_PATH
 
 
@@ -94,7 +101,9 @@ def render_lineage_report(edges: list[LineageEdge]) -> str:
         "| --- | --- | --- | --- |",
     ]
     for edge in edges:
-        lines.append(f"| `{edge.source}` | `{edge.transform}` | `{edge.output}` | `{edge.layer}` |")
+        lines.append(
+            f"| `{edge.source}` | `{edge.transform}` | `{edge.output}` | `{edge.layer}` |"
+        )
     return "\n".join(lines) + "\n"
 
 

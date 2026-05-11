@@ -17,8 +17,8 @@ from src.utils import ensure_directory
 try:
     import duckdb
 except ImportError as exc:  # pragma: no cover - depends on local environment
-    duckdb = None
-    DUCKDB_IMPORT_ERROR = exc
+    duckdb = None  # type: ignore[assignment]
+    DUCKDB_IMPORT_ERROR: ImportError | None = exc
 else:
     DUCKDB_IMPORT_ERROR = None
 
@@ -40,7 +40,9 @@ class QueryExecutionResult:
 
 def validate_inputs() -> list[Path]:
     if not ANALYTICS_TABLE_PATH.exists():
-        raise FileNotFoundError(f"Tabela analitica nao encontrada: {ANALYTICS_TABLE_PATH}")
+        raise FileNotFoundError(
+            f"Tabela analitica nao encontrada: {ANALYTICS_TABLE_PATH}"
+        )
 
     sql_files = sorted(QUERY_DIR.glob("*.sql"))
     if not sql_files:

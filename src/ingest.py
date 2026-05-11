@@ -48,7 +48,11 @@ def configure_logging() -> None:
 
 def detect_date_columns(path: Path) -> list[str]:
     header = pd.read_csv(path, nrows=0)
-    return [column for column in header.columns if "date" in column.lower() or "timestamp" in column.lower()]
+    return [
+        column
+        for column in header.columns
+        if "date" in column.lower() or "timestamp" in column.lower()
+    ]
 
 
 def load_csv(path: Path) -> tuple[pd.DataFrame, str, list[str]]:
@@ -62,10 +66,16 @@ def load_csv(path: Path) -> tuple[pd.DataFrame, str, list[str]]:
                 parse_dates=date_columns or None,
                 low_memory=False,
             )
-            LOGGER.info("Arquivo carregado com sucesso: %s | encoding=%s", path.name, encoding)
+            LOGGER.info(
+                "Arquivo carregado com sucesso: %s | encoding=%s", path.name, encoding
+            )
             return df, encoding, date_columns
         except UnicodeDecodeError:
-            LOGGER.warning("Falha de encoding em %s com %s. Tentando proximo fallback.", path.name, encoding)
+            LOGGER.warning(
+                "Falha de encoding em %s com %s. Tentando proximo fallback.",
+                path.name,
+                encoding,
+            )
         except ValueError as exc:
             if date_columns:
                 LOGGER.warning(
@@ -75,7 +85,9 @@ def load_csv(path: Path) -> tuple[pd.DataFrame, str, list[str]]:
                 )
                 for fallback_encoding in ENCODINGS_TO_TRY:
                     try:
-                        df = pd.read_csv(path, encoding=fallback_encoding, low_memory=False)
+                        df = pd.read_csv(
+                            path, encoding=fallback_encoding, low_memory=False
+                        )
                         LOGGER.info(
                             "Arquivo carregado sem parse de datas: %s | encoding=%s",
                             path.name,
@@ -98,14 +110,22 @@ def validate_expected_files() -> list[Path]:
     if not OLIST_RAW_DIR.exists():
         raise FileNotFoundError(f"Diretório não encontrado: {OLIST_RAW_DIR}")
 
-    missing_files = [file_name for file_name in EXPECTED_FILES if not (OLIST_RAW_DIR / file_name).exists()]
+    missing_files = [
+        file_name
+        for file_name in EXPECTED_FILES
+        if not (OLIST_RAW_DIR / file_name).exists()
+    ]
     discovered_files = sorted(OLIST_RAW_DIR.glob("*.csv"))
 
     if missing_files:
-        raise FileNotFoundError(f"Arquivos ausentes no dataset Olist: {', '.join(missing_files)}")
+        raise FileNotFoundError(
+            f"Arquivos ausentes no dataset Olist: {', '.join(missing_files)}"
+        )
 
     LOGGER.info("Todos os arquivos esperados foram encontrados.")
-    LOGGER.info("Arquivos localizados: %s", ", ".join(path.name for path in discovered_files))
+    LOGGER.info(
+        "Arquivos localizados: %s", ", ".join(path.name for path in discovered_files)
+    )
     return discovered_files
 
 
@@ -113,7 +133,9 @@ def summarize_dataset(path: Path) -> DatasetSummary:
     df, encoding, parsed_date_columns = load_csv(path)
     summary = DatasetSummary(
         file_name=path.name,
-        relative_path=str(path.relative_to(LANDING_DIR.parent.parent)).replace("\\", "/"),
+        relative_path=str(path.relative_to(LANDING_DIR.parent.parent)).replace(
+            "\\", "/"
+        ),
         rows=df.shape[0],
         columns_count=df.shape[1],
         columns=list(df.columns),
@@ -122,7 +144,9 @@ def summarize_dataset(path: Path) -> DatasetSummary:
         encoding=encoding,
     )
 
-    LOGGER.info("Resumo %s | shape=(%s, %s)", path.name, summary.rows, summary.columns_count)
+    LOGGER.info(
+        "Resumo %s | shape=(%s, %s)", path.name, summary.rows, summary.columns_count
+    )
     LOGGER.info("Colunas %s | %s", path.name, ", ".join(summary.columns))
     LOGGER.info(
         "Tipos %s | %s",
@@ -158,7 +182,9 @@ def render_inventory_markdown(summaries: list[DatasetSummary]) -> str:
                 "| --- | --- |",
             ]
         )
-        lines.extend(f"| `{column}` | `{summary.dtypes[column]}` |" for column in summary.columns)
+        lines.extend(
+            f"| `{column}` | `{summary.dtypes[column]}` |" for column in summary.columns
+        )
         lines.append("")
 
     return "\n".join(lines)

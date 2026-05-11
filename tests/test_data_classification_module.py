@@ -12,7 +12,9 @@ def test_build_classification_inventory_and_render_report() -> None:
     report = data_classification.render_report(df)
 
     assert not df.empty
-    assert {"asset", "column", "classification", "publication_allowed"}.issubset(df.columns)
+    assert {"asset", "column", "classification", "publication_allowed"}.issubset(
+        df.columns
+    )
     assert "Classificação de Dados" in report
     assert "`fact_orders_dashboard`" in report
 
@@ -27,7 +29,9 @@ def test_save_inventory_report_and_main(tmp_path: Path, monkeypatch) -> None:
         "CLASSIFICATION_PATH",
         catalog_dir / "data_classification_inventory.csv",
     )
-    monkeypatch.setattr(data_classification, "REPORT_PATH", docs_dir / "data_classification.md")
+    monkeypatch.setattr(
+        data_classification, "REPORT_PATH", docs_dir / "data_classification.md"
+    )
 
     df = data_classification.build_classification_inventory()
     inventory_path = data_classification.save_inventory(df)

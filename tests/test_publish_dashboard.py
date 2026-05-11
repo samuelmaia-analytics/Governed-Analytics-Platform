@@ -5,7 +5,9 @@ import pandas as pd
 from src.publish_dashboard import build_published_dashboard_table
 
 
-def test_build_published_dashboard_table_minimizes_sensitive_columns_and_pseudonymizes_keys() -> None:
+def test_build_published_dashboard_table_minimizes_sensitive_columns_and_pseudonymizes_keys() -> (
+    None
+):
     source_df = pd.DataFrame(
         {
             "order_id": ["order-1"],

@@ -33,9 +33,13 @@ def test_lgpd_classification_output_conforms_to_contract() -> None:
 
     result = classify_dataframe_columns(_sample_df())
     assert required_columns.issubset(set(result.columns))
-    assert set(result["lgpd_classification"]).issubset(set(enum_constraints["lgpd_classification"]))
+    assert set(result["lgpd_classification"]).issubset(
+        set(enum_constraints["lgpd_classification"])
+    )
     assert set(result["risk_level"]).issubset(set(enum_constraints["risk_level"]))
-    assert set(result["recommended_action"]).issubset(set(enum_constraints["recommended_action"]))
+    assert set(result["recommended_action"]).issubset(
+        set(enum_constraints["recommended_action"])
+    )
 
 
 def test_data_quality_output_conforms_to_contract() -> None:

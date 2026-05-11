@@ -173,7 +173,16 @@ def collect_assets() -> list[CatalogAsset]:
             True,
         ),
     ]
-    for path, zone, asset_type, description, grain, primary_key, source_assets, publication_ready in curated_specs:
+    for (
+        path,
+        zone,
+        asset_type,
+        description,
+        grain,
+        primary_key,
+        source_assets,
+        publication_ready,
+    ) in curated_specs:
         if path.exists():
             assets.append(
                 build_asset(
@@ -200,7 +209,16 @@ def collect_assets() -> list[CatalogAsset]:
             True,
         ),
     ]
-    for path, zone, asset_type, description, grain, primary_key, source_assets, publication_ready in published_specs:
+    for (
+        path,
+        zone,
+        asset_type,
+        description,
+        grain,
+        primary_key,
+        source_assets,
+        publication_ready,
+    ) in published_specs:
         if path.exists():
             assets.append(
                 build_asset(
@@ -297,7 +315,16 @@ def collect_assets() -> list[CatalogAsset]:
             True,
         ),
     ]
-    for path, zone, asset_type, description, grain, primary_key, source_assets, publication_ready in semantic_specs:
+    for (
+        path,
+        zone,
+        asset_type,
+        description,
+        grain,
+        primary_key,
+        source_assets,
+        publication_ready,
+    ) in semantic_specs:
         if path.exists():
             assets.append(
                 build_asset(
@@ -490,7 +517,9 @@ def save_outputs(assets: list[CatalogAsset]) -> tuple[Path, Path]:
     assets_df.to_csv(ASSET_INVENTORY_PATH, index=False)
 
     collection_payload = build_collection_payload(assets)
-    COLLECTION_PATH.write_text(json.dumps(collection_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    COLLECTION_PATH.write_text(
+        json.dumps(collection_payload, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     LOGGER.info("Manifesto de coleção salvo em %s", COLLECTION_PATH)
     LOGGER.info("Inventário de ativos salvo em %s", ASSET_INVENTORY_PATH)
     return COLLECTION_PATH, ASSET_INVENTORY_PATH
@@ -500,7 +529,10 @@ def render_report(assets: list[CatalogAsset]) -> str:
     assets_df = pd.DataFrame(asdict(asset) for asset in assets)
     zone_summary = (
         assets_df.groupby("zone", as_index=False)
-        .agg(total_assets=("asset_name", "count"), publishable_assets=("publication_ready", "sum"))
+        .agg(
+            total_assets=("asset_name", "count"),
+            publishable_assets=("publication_ready", "sum"),
+        )
         .sort_values("zone")
     )
 
@@ -526,9 +558,13 @@ def render_report(assets: list[CatalogAsset]) -> str:
         "| --- | ---: | ---: |",
     ]
     for row in zone_summary.itertuples(index=False):
-        lines.append(f"| `{row.zone}` | {int(row.total_assets)} | {int(row.publishable_assets)} |")
+        lines.append(
+            f"| `{row.zone}` | {int(row.total_assets)} | {int(row.publishable_assets)} |"
+        )
 
-    core_assets = assets_df[assets_df["publication_ready"]].sort_values(["zone", "asset_name"])
+    core_assets = assets_df[assets_df["publication_ready"]].sort_values(
+        ["zone", "asset_name"]
+    )
     lines.extend(
         [
             "",
@@ -539,7 +575,9 @@ def render_report(assets: list[CatalogAsset]) -> str:
         ]
     )
     for row in core_assets.itertuples(index=False):
-        lines.append(f"| `{row.asset_name}` | `{row.zone}` | `{row.asset_type}` | `{row.relative_path}` |")
+        lines.append(
+            f"| `{row.asset_name}` | `{row.zone}` | `{row.asset_type}` | `{row.relative_path}` |"
+        )
 
     lines.extend(
         [

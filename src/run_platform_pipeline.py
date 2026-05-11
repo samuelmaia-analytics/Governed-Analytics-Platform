@@ -86,25 +86,40 @@ class PipelineRunMetadata:
 
 PIPELINE_STEPS = [
     PipelineStep("inventory", "Valida os CSVs de origem e gera o inventário bruto."),
-    PipelineStep("profiling", "Promove a camada standardized e gera o profiling exploratório."),
-    PipelineStep("build", "Constrói a tabela analítica principal fact_orders_enriched."),
+    PipelineStep(
+        "profiling", "Promove a camada standardized e gera o profiling exploratório."
+    ),
+    PipelineStep(
+        "build", "Constrói a tabela analítica principal fact_orders_enriched."
+    ),
     PipelineStep("publish", "Publica a camada minimizada para consumo do dashboard."),
-    PipelineStep("semantic", "Materializa marts semânticos publicados para logística, seller e cohort."),
-    PipelineStep("classify", "Materializa o inventário de classificação de dados do projeto."),
-    PipelineStep("contracts", "Valida os contratos simples de schema das camadas principais."),
-    PipelineStep("business_rules", "Executa regras de negócio declaradas por contrato."),
+    PipelineStep(
+        "semantic",
+        "Materializa marts semânticos publicados para logística, seller e cohort.",
+    ),
+    PipelineStep(
+        "classify", "Materializa o inventário de classificação de dados do projeto."
+    ),
+    PipelineStep(
+        "contracts", "Valida os contratos simples de schema das camadas principais."
+    ),
+    PipelineStep(
+        "business_rules", "Executa regras de negócio declaradas por contrato."
+    ),
     PipelineStep("quality", "Executa os checks de qualidade e salva os relatórios."),
     PipelineStep("monitor", "Monitora freshness e qualidade da camada publicada."),
     PipelineStep("scorecards", "Publica scorecards de governança por dataset."),
     PipelineStep("lineage", "Gera lineage técnico automatizado do pipeline."),
     PipelineStep("catalog", "Materializa a coleção local e o inventário catalogável."),
-    PipelineStep("queries", "Executa as queries SQL e exporta os resultados tabulares."),
+    PipelineStep(
+        "queries", "Executa as queries SQL e exporta os resultados tabulares."
+    ),
     PipelineStep("screenshots", "Converte os resultados das queries em imagens PNG."),
     PipelineStep("bi", "Exporta os datasets auxiliares para Power BI."),
 ]
 PIPELINE_RESULTS_PATH = OPS_DIR / "operational_job_results.json"
 PIPELINE_REPORT_PATH = DOCS_DIR / "reports" / "operational_job_report.md"
-StepHandler = Callable[[], None]
+StepHandler = Callable[[], object]
 
 
 def _run_quality_step() -> None:
@@ -120,8 +135,17 @@ def _run_monitor_step() -> None:
     save_published_monitoring_report(results)
     published_df = load_published_monitoring_frame()
     history_df = load_governance_history()
-    freshness_result = next((item for item in results if item.check_name == "published_file_freshness_hours"), None)
-    freshness_status = "fresh" if freshness_result and freshness_result.status == "PASS" else "stale"
+    freshness_result = next(
+        (
+            item
+            for item in results
+            if item.check_name == "published_file_freshness_hours"
+        ),
+        None,
+    )
+    freshness_status = (
+        "fresh" if freshness_result and freshness_result.status == "PASS" else "stale"
+    )
     observability_checks = evaluate_governance_observability(
         expected_columns=EXPECTED_COLUMNS,
         observed_columns=list(published_df.columns),
@@ -130,8 +154,16 @@ def _run_monitor_step() -> None:
     )
     save_observability_results(observability_checks)
     failed_checks_count = int(sum(result.status == "FAIL" for result in results))
-    latest_quality_score = int(history_df["data_quality_score"].iloc[-1]) if "data_quality_score" in history_df.columns and not history_df.empty else max(0, 100 - (failed_checks_count * 10))
-    latest_privacy_risk = int(history_df["privacy_risk_score"].iloc[-1]) if "privacy_risk_score" in history_df.columns and not history_df.empty else 0
+    latest_quality_score = (
+        int(history_df["data_quality_score"].iloc[-1])
+        if "data_quality_score" in history_df.columns and not history_df.empty
+        else max(0, 100 - (failed_checks_count * 10))
+    )
+    latest_privacy_risk = (
+        int(history_df["privacy_risk_score"].iloc[-1])
+        if "privacy_risk_score" in history_df.columns and not history_df.empty
+        else 0
+    )
     publication_status = "Approved" if failed_checks_count == 0 else "Needs Review"
     save_publication_decision_artifact(
         dataset_name="fact_orders_dashboard",
@@ -175,7 +207,9 @@ STEP_HANDLERS: dict[str, StepHandler] = {
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Runner principal do pipeline analítico Olist.")
+    parser = argparse.ArgumentParser(
+        description="Runner principal do pipeline analítico Olist."
+    )
     parser.add_argument(
         "--steps",
         nargs="*",
@@ -226,7 +260,9 @@ def resolve_git_commit() -> str:
     return completed.stdout.strip() or "unknown"
 
 
-def build_run_metadata(started_at: datetime, completed_at: datetime) -> PipelineRunMetadata:
+def build_run_metadata(
+    started_at: datetime, completed_at: datetime
+) -> PipelineRunMetadata:
     return PipelineRunMetadata(
         run_id=started_at.strftime("run-%Y%m%dT%H%M%SZ"),
         started_at_utc=started_at.isoformat(),
@@ -279,7 +315,9 @@ def save_pipeline_execution_report(
     return PIPELINE_RESULTS_PATH, PIPELINE_REPORT_PATH
 
 
-def run_selected_steps(selected_steps: list[str], continue_on_error: bool = False) -> list[StepExecution]:
+def run_selected_steps(
+    selected_steps: list[str], continue_on_error: bool = False
+) -> list[StepExecution]:
     executions: list[StepExecution] = []
     failures: list[StepExecution] = []
     for step_name in selected_steps:
@@ -302,7 +340,9 @@ def run_selected_steps(selected_steps: list[str], continue_on_error: bool = Fals
                 raise
             continue
         elapsed = perf_counter() - started_at
-        executions.append(StepExecution(name=step_name, status="PASS", duration_seconds=elapsed))
+        executions.append(
+            StepExecution(name=step_name, status="PASS", duration_seconds=elapsed)
+        )
         LOGGER.info("Etapa concluída: %s | duração=%.2fs", step_name, elapsed)
     if failures and continue_on_error:
         failed_names = ", ".join(execution.name for execution in failures)
@@ -323,7 +363,9 @@ def main() -> None:
     started_at = datetime.now(UTC)
     executions: list[StepExecution] = []
     try:
-        executions = run_selected_steps(selected_steps, continue_on_error=args.continue_on_error)
+        executions = run_selected_steps(
+            selected_steps, continue_on_error=args.continue_on_error
+        )
     finally:
         completed_at = datetime.now(UTC)
         metadata = build_run_metadata(started_at, completed_at)

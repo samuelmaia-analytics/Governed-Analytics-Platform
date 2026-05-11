@@ -45,7 +45,9 @@ def _render_catalog_page(context: GovernanceAppContext, locale: str) -> None:
 
 
 def _render_lgpd_page(context: GovernanceAppContext, locale: str) -> None:
-    render_lgpd_privacy_risk(context.df, context.classification_df, context.risk_result, locale)
+    render_lgpd_privacy_risk(
+        context.df, context.classification_df, context.risk_result, locale
+    )
 
 
 def _render_quality_page(context: GovernanceAppContext, locale: str) -> None:
@@ -74,7 +76,9 @@ def main() -> None:
     locale = build_locale_selector()
     st.title(t("app_title", locale))
     st.caption(t("app_caption", locale))
-    st.caption("Language: English (US)" if locale == "en-US" else "Idioma: Português (Brasil)")
+    st.caption(
+        "Language: English (US)" if locale == "en-US" else "Idioma: Português (Brasil)"
+    )
 
     context = build_context(locale)
 

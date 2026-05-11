@@ -69,7 +69,9 @@ def test_validate_governance_contract_flags_misalignment() -> None:
 
 
 def test_render_validation_report_includes_table() -> None:
-    report = render_validation_report([GovernanceValidationResult(status="PASS", message="ok")])
+    report = render_validation_report(
+        [GovernanceValidationResult(status="PASS", message="ok")]
+    )
 
     assert "| Status | Mensagem |" in report
     assert "`PASS`" in report

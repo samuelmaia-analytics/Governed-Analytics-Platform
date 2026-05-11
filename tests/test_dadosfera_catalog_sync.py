@@ -48,7 +48,9 @@ class FakeDadosferaClient:
         )
         return {"id": asset_id}
 
-    def update_data_asset(self, asset_id: int, payload: dict[str, object]) -> dict[str, object]:
+    def update_data_asset(
+        self, asset_id: int, payload: dict[str, object]
+    ) -> dict[str, object]:
         self.updated_payloads.append((asset_id, payload))
         return {"id": asset_id}
 
@@ -130,7 +132,11 @@ def test_find_existing_asset_prefers_external_url_match() -> None:
 
     matched = find_existing_asset(existing_assets, asset)
 
-    assert matched == {"id": 2, "display_name": "App", "external_url": "https://example.com/app"}
+    assert matched == {
+        "id": 2,
+        "display_name": "App",
+        "external_url": "https://example.com/app",
+    }
 
 
 def test_sync_assets_creates_new_asset_and_updates_metadata() -> None:
@@ -146,7 +152,11 @@ def test_sync_assets_creates_new_asset_and_updates_metadata() -> None:
 
 def test_sync_assets_updates_existing_asset() -> None:
     asset = build_asset()
-    client = FakeDadosferaClient(existing_assets=[{"id": 7, "display_name": "App", "external_url": "https://example.com/app"}])
+    client = FakeDadosferaClient(
+        existing_assets=[
+            {"id": 7, "display_name": "App", "external_url": "https://example.com/app"}
+        ]
+    )
 
     results = sync_assets(client=client, assets=[asset], dry_run=False)
 
@@ -191,10 +201,20 @@ def test_extract_access_token_returns_none_when_missing() -> None:
 
 
 def test_build_sign_in_payloads_supports_username_email_and_mfa_variants() -> None:
-    payloads = build_sign_in_payloads(username="[email protected]", password="secret", totp="123456")
+    payloads = build_sign_in_payloads(
+        username="[email protected]", password="secret", totp="123456"
+    )
 
-    assert {"username": "[email protected]", "password": "secret", "totp": "123456"} in payloads
-    assert {"email": "[email protected]", "password": "secret", "mfaCode": "123456"} in payloads
+    assert {
+        "username": "[email protected]",
+        "password": "secret",
+        "totp": "123456",
+    } in payloads
+    assert {
+        "email": "[email protected]",
+        "password": "secret",
+        "mfaCode": "123456",
+    } in payloads
 
 
 def test_apply_auth_from_response_sets_bearer_headers() -> None:
@@ -235,7 +255,9 @@ def test_try_refresh_access_token_uses_refresh_endpoint() -> None:
 
 def test_sign_in_falls_back_to_legacy_signin_endpoint() -> None:
     class DummyResponse:
-        def __init__(self, status_code: int, body: dict[str, str] | None = None) -> None:
+        def __init__(
+            self, status_code: int, body: dict[str, str] | None = None
+        ) -> None:
             self.status_code = status_code
             self._body = body or {}
             self.headers: dict[str, str] = {}
@@ -282,7 +304,10 @@ def test_sign_in_falls_back_to_legacy_signin_endpoint() -> None:
 
 def test_raise_runtime_for_auth_response_includes_diagnostic_keys() -> None:
     try:
-        raise_runtime_for_auth_response({"message": "unauthorized", "error": "AUTH.UNAUTHORIZED"}, {"Content-Type": "application/json"})
+        raise_runtime_for_auth_response(
+            {"message": "unauthorized", "error": "AUTH.UNAUTHORIZED"},
+            {"Content-Type": "application/json"},
+        )
     except RuntimeError as exc:
         assert "Chaves recebidas: error, message" in str(exc)
         assert "Headers recebidos: content-type" in str(exc)
@@ -352,12 +377,19 @@ def test_catalog_client_raises_actionable_message_on_unauthorized() -> None:
 
     class DummySession:
         def __init__(self) -> None:
-            self.headers = {"Content-Type": "application/json", "Authorization": "token"}
+            self.headers = {
+                "Content-Type": "application/json",
+                "Authorization": "token",
+            }
 
-        def get(self, url: str, params: dict[str, object] | None = None, timeout: int = 60):  # type: ignore[override]
+        def get(
+            self, url: str, params: dict[str, object] | None = None, timeout: int = 60
+        ):  # type: ignore[override]
             return DummyResponse()
 
-    client = DadosferaMaestroClient(base_url="https://maestro.dadosfera.ai", access_token="token")
+    client = DadosferaMaestroClient(
+        base_url="https://maestro.dadosfera.ai", access_token="token"
+    )
     client.session = DummySession()  # type: ignore[assignment]
 
     try:
@@ -366,7 +398,9 @@ def test_catalog_client_raises_actionable_message_on_unauthorized() -> None:
         assert "Falha de autenticacao/autorizacao" in str(exc)
         assert "Valide escopo, expiracao e tenant do token" in str(exc)
     else:
-        raise AssertionError("Expected actionable RuntimeError for unauthorized catalog request")
+        raise AssertionError(
+            "Expected actionable RuntimeError for unauthorized catalog request"
+        )
 
 
 def test_raise_runtime_for_sign_in_failure_includes_body_and_header_keys() -> None:
@@ -384,7 +418,10 @@ def test_raise_runtime_for_sign_in_failure_includes_body_and_header_keys() -> No
             response_headers=response.headers,
         )
     except RuntimeError as exc:
-        assert "Autenticacao da Dadosfera falhou em `/auth/sign-in` com HTTP 401" in str(exc)
+        assert (
+            "Autenticacao da Dadosfera falhou em `/auth/sign-in` com HTTP 401"
+            in str(exc)
+        )
         assert "message" in str(exc)
         assert "code" in str(exc)
         assert "content-type" in str(exc)

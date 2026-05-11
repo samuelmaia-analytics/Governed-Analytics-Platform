@@ -58,7 +58,9 @@ def test_validate_workflow_contract_flags_trigger_misalignment(tmp_path: Path) -
 
 
 def test_render_workflow_policy_report_includes_table() -> None:
-    report = render_workflow_policy_report([WorkflowPolicyResult(status="PASS", message="ok")])
+    report = render_workflow_policy_report(
+        [WorkflowPolicyResult(status="PASS", message="ok")]
+    )
 
     assert "| Status | Mensagem |" in report
     assert "`PASS`" in report

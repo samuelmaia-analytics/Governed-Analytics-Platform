@@ -25,7 +25,9 @@ QUALITY_RESULTS_PATH = QUALITY_DIR / "fact_orders_enriched_quality_checks.csv"
 PRIVACY_RESULTS_PATH = QUALITY_DIR / "privacy_governance_results.csv"
 SCHEMA_CONTRACT_RESULTS_PATH = QUALITY_DIR / "schema_contract_results.csv"
 BUSINESS_RULE_RESULTS_PATH = QUALITY_DIR / "business_rule_results.csv"
-PUBLISHED_MONITORING_RESULTS_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv"
+PUBLISHED_MONITORING_RESULTS_PATH = (
+    PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv"
+)
 
 
 @dataclass(frozen=True)
@@ -90,29 +92,63 @@ def build_metrics() -> list[ScorecardMetric]:
     if not curated_quality.empty:
         score, total, failed = _score_from_checks(curated_quality)
         metrics.append(
-            ScorecardMetric("fact_orders_enriched", "data_quality", score, _status_from_score(score), str(QUALITY_RESULTS_PATH), total, failed)
+            ScorecardMetric(
+                "fact_orders_enriched",
+                "data_quality",
+                score,
+                _status_from_score(score),
+                str(QUALITY_RESULTS_PATH),
+                total,
+                failed,
+            )
         )
 
     business_rules = _read_csv(BUSINESS_RULE_RESULTS_PATH)
     if not business_rules.empty:
         score, total, failed = _score_from_checks(business_rules)
         metrics.append(
-            ScorecardMetric("fact_orders_enriched", "business_rules", score, _status_from_score(score), str(BUSINESS_RULE_RESULTS_PATH), total, failed)
+            ScorecardMetric(
+                "fact_orders_enriched",
+                "business_rules",
+                score,
+                _status_from_score(score),
+                str(BUSINESS_RULE_RESULTS_PATH),
+                total,
+                failed,
+            )
         )
 
     schema_contracts = _read_csv(SCHEMA_CONTRACT_RESULTS_PATH)
-    if not schema_contracts.empty and {"dataset_name", "status"}.issubset(schema_contracts.columns):
+    if not schema_contracts.empty and {"dataset_name", "status"}.issubset(
+        schema_contracts.columns
+    ):
         for dataset_name, slice_df in schema_contracts.groupby("dataset_name"):
             score, total, failed = _score_from_checks(slice_df)
             metrics.append(
-                ScorecardMetric(str(dataset_name), "schema_contracts", score, _status_from_score(score), str(SCHEMA_CONTRACT_RESULTS_PATH), total, failed)
+                ScorecardMetric(
+                    str(dataset_name),
+                    "schema_contracts",
+                    score,
+                    _status_from_score(score),
+                    str(SCHEMA_CONTRACT_RESULTS_PATH),
+                    total,
+                    failed,
+                )
             )
 
     privacy_results = _read_csv(PRIVACY_RESULTS_PATH)
     if not privacy_results.empty:
         score, total, failed = _score_from_checks(privacy_results)
         metrics.append(
-            ScorecardMetric("fact_orders_dashboard", "privacy_governance", score, _status_from_score(score), str(PRIVACY_RESULTS_PATH), total, failed)
+            ScorecardMetric(
+                "fact_orders_dashboard",
+                "privacy_governance",
+                score,
+                _status_from_score(score),
+                str(PRIVACY_RESULTS_PATH),
+                total,
+                failed,
+            )
         )
 
     published_monitoring = _read_csv(PUBLISHED_MONITORING_RESULTS_PATH)
@@ -141,14 +177,22 @@ def build_dataset_scorecards(metrics: list[ScorecardMetric]) -> list[DatasetScor
         by_dataset.setdefault(metric.dataset_name, []).append(metric)
     scorecards: list[DatasetScorecard] = []
     for dataset_name, dataset_metrics in sorted(by_dataset.items()):
-        score = round(sum(metric.score for metric in dataset_metrics) / len(dataset_metrics), 2)
-        scorecards.append(DatasetScorecard(dataset_name, score, _status_from_score(score)))
+        score = round(
+            sum(metric.score for metric in dataset_metrics) / len(dataset_metrics), 2
+        )
+        scorecards.append(
+            DatasetScorecard(dataset_name, score, _status_from_score(score))
+        )
     return scorecards
 
 
-def save_outputs(metrics: list[ScorecardMetric], scorecards: list[DatasetScorecard]) -> tuple[Path, Path]:
+def save_outputs(
+    metrics: list[ScorecardMetric], scorecards: list[DatasetScorecard]
+) -> tuple[Path, Path]:
     ensure_directory(PUBLISHED_MONITORING_DIR)
-    pd.DataFrame(asdict(metric) for metric in metrics).to_csv(SCORECARD_CSV_PATH, index=False)
+    pd.DataFrame(asdict(metric) for metric in metrics).to_csv(
+        SCORECARD_CSV_PATH, index=False
+    )
     SCORECARD_JSON_PATH.write_text(
         json.dumps(
             {
@@ -164,7 +208,9 @@ def save_outputs(metrics: list[ScorecardMetric], scorecards: list[DatasetScoreca
     return SCORECARD_CSV_PATH, SCORECARD_JSON_PATH
 
 
-def render_report(metrics: list[ScorecardMetric], scorecards: list[DatasetScorecard]) -> str:
+def render_report(
+    metrics: list[ScorecardMetric], scorecards: list[DatasetScorecard]
+) -> str:
     lines = [
         "# Governance Scorecards",
         "",
@@ -176,8 +222,18 @@ def render_report(metrics: list[ScorecardMetric], scorecards: list[DatasetScorec
         "| --- | ---: | --- |",
     ]
     for scorecard in scorecards:
-        lines.append(f"| `{scorecard.dataset_name}` | {scorecard.governance_score} | `{scorecard.status}` |")
-    lines.extend(["", "## Métricas por Dimensão", "", "| Dataset | Dimensão | Score | Falhas | Total Checks | Fonte |", "| --- | --- | ---: | ---: | ---: | --- |"])
+        lines.append(
+            f"| `{scorecard.dataset_name}` | {scorecard.governance_score} | `{scorecard.status}` |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Métricas por Dimensão",
+            "",
+            "| Dataset | Dimensão | Score | Falhas | Total Checks | Fonte |",
+            "| --- | --- | ---: | ---: | ---: | --- |",
+        ]
+    )
     for metric in metrics:
         lines.append(
             f"| `{metric.dataset_name}` | `{metric.dimension}` | {metric.score} | {metric.failed_checks} | {metric.total_checks} | `{Path(metric.source).as_posix()}` |"
@@ -185,7 +241,9 @@ def render_report(metrics: list[ScorecardMetric], scorecards: list[DatasetScorec
     return "\n".join(lines) + "\n"
 
 
-def save_report(metrics: list[ScorecardMetric], scorecards: list[DatasetScorecard]) -> Path:
+def save_report(
+    metrics: list[ScorecardMetric], scorecards: list[DatasetScorecard]
+) -> Path:
     ensure_directory(DOCS_DIR)
     REPORT_PATH.write_text(render_report(metrics, scorecards), encoding="utf-8")
     return REPORT_PATH
@@ -197,7 +255,11 @@ def main() -> None:
     scorecards = build_dataset_scorecards(metrics)
     save_outputs(metrics, scorecards)
     save_report(metrics, scorecards)
-    LOGGER.info("Governance scorecards gerados | datasets=%s dimensoes=%s", len(scorecards), len(metrics))
+    LOGGER.info(
+        "Governance scorecards gerados | datasets=%s dimensoes=%s",
+        len(scorecards),
+        len(metrics),
+    )
 
 
 if __name__ == "__main__":

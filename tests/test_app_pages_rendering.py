@@ -52,6 +52,9 @@ class _FakeContainer:
     def divider(self, *_args, **_kwargs) -> None:
         return None
 
+    def caption(self, *_args, **_kwargs) -> None:
+        return None
+
     def download_button(self, *_args, **_kwargs) -> None:
         return None
 
@@ -60,6 +63,19 @@ class _FakeContainer:
 
     def plotly_chart(self, *_args, **_kwargs) -> None:
         return None
+
+    def expander(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+        return _FakeContainer()
+
+    def tabs(self, tab_names):  # type: ignore[no-untyped-def]
+        return tuple(_FakeContainer() for _ in tab_names)
+
+    def selectbox(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+        options = _kwargs.get("options", _args[1] if len(_args) > 1 else [])
+        return options[0] if options else None
+
+    def slider(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+        return _kwargs.get("value", _kwargs.get("min_value", 0))
 
 
 class _FakeStreamlit(_FakeContainer):
@@ -78,6 +94,18 @@ class _FakeFigure:
 class _FakePlotlyExpress:
     @staticmethod
     def imshow(*_args, **_kwargs) -> _FakeFigure:  # type: ignore[no-untyped-def]
+        return _FakeFigure()
+
+    @staticmethod
+    def histogram(*_args, **_kwargs) -> _FakeFigure:  # type: ignore[no-untyped-def]
+        return _FakeFigure()
+
+    @staticmethod
+    def box(*_args, **_kwargs) -> _FakeFigure:  # type: ignore[no-untyped-def]
+        return _FakeFigure()
+
+    @staticmethod
+    def bar(*_args, **_kwargs) -> _FakeFigure:  # type: ignore[no-untyped-def]
         return _FakeFigure()
 
 
@@ -114,10 +142,14 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
             {"status": "FAIL", "severity": "high", "check_name": "block"},
         ]
     )
-    data_quality_page.render_data_quality(quality_results, quality_table, locale="en-US")  # type: ignore[arg-type]
+    data_quality_page.render_data_quality(
+        quality_results, quality_table, locale="en-US"
+    )  # type: ignore[arg-type]
 
     no_severity_table = pd.DataFrame([{"status": "PASS"}])
-    data_quality_page.render_data_quality(quality_results, no_severity_table, locale="pt-BR")  # type: ignore[arg-type]
+    data_quality_page.render_data_quality(
+        quality_results, no_severity_table, locale="pt-BR"
+    )  # type: ignore[arg-type]
 
 
 def test_render_lgpd_privacy_risk_with_and_without_metadata(monkeypatch) -> None:
@@ -150,14 +182,18 @@ def test_render_lgpd_privacy_risk_with_and_without_metadata(monkeypatch) -> None
         "apply_privacy_actions",
         lambda in_df, _class_df: (in_df.copy(), pd.DataFrame([{"action": "mask"}])),
     )
-    lgpd_page.render_lgpd_privacy_risk(df, classification_df, risk_result, locale="en-US")  # type: ignore[arg-type]
+    lgpd_page.render_lgpd_privacy_risk(
+        df, classification_df, risk_result, locale="en-US"
+    )  # type: ignore[arg-type]
 
     monkeypatch.setattr(
         lgpd_page,
         "apply_privacy_actions",
         lambda in_df, _class_df: (in_df.copy(), pd.DataFrame()),
     )
-    lgpd_page.render_lgpd_privacy_risk(df, classification_df, risk_result, locale="pt-BR")  # type: ignore[arg-type]
+    lgpd_page.render_lgpd_privacy_risk(
+        df, classification_df, risk_result, locale="pt-BR"
+    )  # type: ignore[arg-type]
 
 
 def test_render_eda_with_empty_and_non_empty_profiles(monkeypatch) -> None:
@@ -173,12 +209,18 @@ def test_render_eda_with_empty_and_non_empty_profiles(monkeypatch) -> None:
     eda_page.render_eda(df, locale="pt-BR")  # type: ignore[arg-type]
 
 
-def test_render_executive_overview_and_governance_report(monkeypatch, tmp_path: Path) -> None:
+def test_render_executive_overview_and_governance_report(
+    monkeypatch, tmp_path: Path
+) -> None:
     monkeypatch.setattr(executive_overview_page, "st", _FakeStreamlit())
-    monkeypatch.setattr(executive_overview_page, "render_metric_cards", lambda _metrics: None)
 
     df = pd.DataFrame({"a": [1], "b": [2]})
-    classification_df = pd.DataFrame({"lgpd_classification": ["personal_data", "non_personal"]})
+    classification_df = pd.DataFrame(
+        {
+            "lgpd_classification": ["personal_data", "non_personal"],
+            "recommended_action": ["mask", "keep"],
+        }
+    )
     risk_result = {
         "score": 15,
         "total_score": 15,

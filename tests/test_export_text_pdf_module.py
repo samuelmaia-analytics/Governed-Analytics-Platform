@@ -27,7 +27,11 @@ def test_write_pdf_and_main(tmp_path: Path, monkeypatch) -> None:
     assert output_path.exists()
     assert output_path.read_bytes().startswith(b"%PDF-1.4")
 
-    monkeypatch.setattr(export_text_pdf.sys, "argv", ["export_text_pdf.py", str(input_path), str(output_path)])
+    monkeypatch.setattr(
+        export_text_pdf.sys,
+        "argv",
+        ["export_text_pdf.py", str(input_path), str(output_path)],
+    )
     export_text_pdf.main()
 
     monkeypatch.setattr(export_text_pdf.sys, "argv", ["export_text_pdf.py"])

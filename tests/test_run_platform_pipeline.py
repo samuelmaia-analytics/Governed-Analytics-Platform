@@ -59,17 +59,25 @@ def test_main_runs_selected_pipeline(monkeypatch) -> None:
 
     monkeypatch.setattr(pipeline, "parse_args", lambda: Args())
     monkeypatch.setattr(pipeline, "configure_logging", lambda: calls.append("logging"))
-    monkeypatch.setattr(type(pipeline.PATHS), "validate", lambda self: calls.append("validate"))
-    monkeypatch.setattr(pipeline, "resolve_steps", lambda steps: ["build"] if steps == ["build"] else [])
+    monkeypatch.setattr(
+        type(pipeline.PATHS), "validate", lambda self: calls.append("validate")
+    )
+    monkeypatch.setattr(
+        pipeline, "resolve_steps", lambda steps: ["build"] if steps == ["build"] else []
+    )
     monkeypatch.setattr(
         pipeline,
         "run_selected_steps",
-        lambda steps, continue_on_error=False: calls.append(f"run:{','.join(steps)}:{continue_on_error}") or [],
+        lambda steps, continue_on_error=False: (
+            calls.append(f"run:{','.join(steps)}:{continue_on_error}") or []
+        ),
     )
     monkeypatch.setattr(
         pipeline,
         "save_pipeline_execution_report",
-        lambda selected_steps, executions, metadata: calls.append(f"report:{metadata.run_id}"),
+        lambda selected_steps, executions, metadata: calls.append(
+            f"report:{metadata.run_id}"
+        ),
     )
     monkeypatch.setattr(
         pipeline,

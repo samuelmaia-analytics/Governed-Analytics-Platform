@@ -18,7 +18,9 @@ class FakeQueryResult:
 
 class FakeConnection:
     def __init__(self, df: pd.DataFrame | None = None) -> None:
-        self.df = df if df is not None else pd.DataFrame({"metric": [1], "value": [10.0]})
+        self.df = (
+            df if df is not None else pd.DataFrame({"metric": [1], "value": [10.0]})
+        )
         self.executed_sql: list[str] = []
         self.closed = False
 
@@ -46,7 +48,9 @@ def test_validate_inputs_returns_sorted_sql_files(tmp_path: Path, monkeypatch) -
     assert [path.name for path in sql_files] == ["01_query.sql", "02_query.sql"]
 
 
-def test_validate_inputs_raises_when_sql_directory_is_empty(tmp_path: Path, monkeypatch) -> None:
+def test_validate_inputs_raises_when_sql_directory_is_empty(
+    tmp_path: Path, monkeypatch
+) -> None:
     table_path = tmp_path / "fact.parquet"
     query_dir = tmp_path / "sql"
     table_path.write_text("placeholder", encoding="utf-8")
@@ -61,13 +65,17 @@ def test_validate_inputs_raises_when_sql_directory_is_empty(tmp_path: Path, monk
 
 def test_connect_raises_clear_error_when_duckdb_is_missing(monkeypatch) -> None:
     monkeypatch.setattr(analytics_queries, "duckdb", None)
-    monkeypatch.setattr(analytics_queries, "DUCKDB_IMPORT_ERROR", ImportError("missing duckdb"))
+    monkeypatch.setattr(
+        analytics_queries, "DUCKDB_IMPORT_ERROR", ImportError("missing duckdb")
+    )
 
     with pytest.raises(ImportError):
         analytics_queries.connect()
 
 
-def test_execute_query_exports_csv_and_returns_metadata(tmp_path: Path, monkeypatch) -> None:
+def test_execute_query_exports_csv_and_returns_metadata(
+    tmp_path: Path, monkeypatch
+) -> None:
     output_dir = tmp_path / "out"
     sql_path = tmp_path / "monthly_revenue.sql"
     sql_path.write_text("select 1 as metric, 2 as value", encoding="utf-8")
@@ -92,14 +100,18 @@ def test_execute_query_rejects_empty_sql_file(tmp_path: Path) -> None:
         analytics_queries.execute_query(FakeConnection(), sql_path)
 
 
-def test_run_queries_executes_all_sql_files_and_closes_connection(tmp_path: Path, monkeypatch) -> None:
+def test_run_queries_executes_all_sql_files_and_closes_connection(
+    tmp_path: Path, monkeypatch
+) -> None:
     query_a = tmp_path / "01_a.sql"
     query_b = tmp_path / "02_b.sql"
     query_a.write_text("select 1 as metric", encoding="utf-8")
     query_b.write_text("select 2 as metric", encoding="utf-8")
     connection = FakeConnection()
 
-    monkeypatch.setattr(analytics_queries, "validate_inputs", lambda: [query_a, query_b])
+    monkeypatch.setattr(
+        analytics_queries, "validate_inputs", lambda: [query_a, query_b]
+    )
     monkeypatch.setattr(analytics_queries, "connect", lambda: connection)
     monkeypatch.setattr(analytics_queries, "OUTPUT_DIR", tmp_path / "out")
 
@@ -109,7 +121,9 @@ def test_run_queries_executes_all_sql_files_and_closes_connection(tmp_path: Path
     assert connection.closed is True
 
 
-def test_save_execution_manifest_persists_normalized_paths(tmp_path: Path, monkeypatch) -> None:
+def test_save_execution_manifest_persists_normalized_paths(
+    tmp_path: Path, monkeypatch
+) -> None:
     output_dir = tmp_path / "out"
     monkeypatch.setattr(analytics_queries, "OUTPUT_DIR", output_dir)
 

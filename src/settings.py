@@ -10,7 +10,9 @@ DEFAULT_DADOSFERA_PIPELINE_LIST_ENDPOINT = "/platform/pipelines"
 DEFAULT_DADOSFERA_PIPELINE_CREATE_ENDPOINT = "/platform/pipeline"
 DEFAULT_DADOSFERA_PIPELINE_GET_ENDPOINT_TEMPLATE = "/platform/pipeline/{pipeline_id}"
 DEFAULT_DADOSFERA_PIPELINE_RUN_ENDPOINT = "/platform/pipeline/execute"
-DEFAULT_DADOSFERA_PIPELINE_RUNS_ENDPOINT_TEMPLATE = "/platform/pipeline/{pipeline_id}/pipeline_run"
+DEFAULT_DADOSFERA_PIPELINE_RUNS_ENDPOINT_TEMPLATE = (
+    "/platform/pipeline/{pipeline_id}/pipeline_run"
+)
 
 
 def env_flag(name: str, default: bool = False) -> bool:
@@ -66,7 +68,9 @@ class OpenAISettings:
 
     def validate_credentials(self) -> None:
         if not self.enabled:
-            raise RuntimeError("Integrações OpenAI estão desabilitadas. Defina OPENAI_ENABLED=true para habilitar.")
+            raise RuntimeError(
+                "Integrações OpenAI estão desabilitadas. Defina OPENAI_ENABLED=true para habilitar."
+            )
         if not self.api_key:
             raise RuntimeError("OPENAI_API_KEY não configurada.")
 
@@ -84,19 +88,30 @@ def load_app_settings() -> AppSettings:
         logging=LoggingSettings(format=os.getenv("LOG_FORMAT", "text").strip().lower()),
         dadosfera=DadosferaSettings(
             enabled=env_flag("DADOSFERA_ENABLED", default=False),
-            base_url=os.getenv("DADOSFERA_MAESTRO_BASE_URL", DEFAULT_DADOSFERA_BASE_URL),
+            base_url=os.getenv(
+                "DADOSFERA_MAESTRO_BASE_URL", DEFAULT_DADOSFERA_BASE_URL
+            ),
             access_token=os.getenv("DADOSFERA_ACCESS_TOKEN") or None,
             api_token=os.getenv("DADOSFERA_API_TOKEN") or None,
             username=os.getenv("DADOSFERA_USERNAME") or None,
             password=os.getenv("DADOSFERA_PASSWORD") or None,
             totp=os.getenv("DADOSFERA_TOTP") or None,
-            list_endpoint=os.getenv("DADOSFERA_PIPELINE_LIST_ENDPOINT", DEFAULT_DADOSFERA_PIPELINE_LIST_ENDPOINT),
-            create_endpoint=os.getenv("DADOSFERA_PIPELINE_CREATE_ENDPOINT", DEFAULT_DADOSFERA_PIPELINE_CREATE_ENDPOINT),
+            list_endpoint=os.getenv(
+                "DADOSFERA_PIPELINE_LIST_ENDPOINT",
+                DEFAULT_DADOSFERA_PIPELINE_LIST_ENDPOINT,
+            ),
+            create_endpoint=os.getenv(
+                "DADOSFERA_PIPELINE_CREATE_ENDPOINT",
+                DEFAULT_DADOSFERA_PIPELINE_CREATE_ENDPOINT,
+            ),
             get_endpoint_template=os.getenv(
                 "DADOSFERA_PIPELINE_GET_ENDPOINT_TEMPLATE",
                 DEFAULT_DADOSFERA_PIPELINE_GET_ENDPOINT_TEMPLATE,
             ),
-            run_endpoint=os.getenv("DADOSFERA_PIPELINE_RUN_ENDPOINT", DEFAULT_DADOSFERA_PIPELINE_RUN_ENDPOINT),
+            run_endpoint=os.getenv(
+                "DADOSFERA_PIPELINE_RUN_ENDPOINT",
+                DEFAULT_DADOSFERA_PIPELINE_RUN_ENDPOINT,
+            ),
             runs_endpoint_template=os.getenv(
                 "DADOSFERA_PIPELINE_RUNS_ENDPOINT_TEMPLATE",
                 DEFAULT_DADOSFERA_PIPELINE_RUNS_ENDPOINT_TEMPLATE,

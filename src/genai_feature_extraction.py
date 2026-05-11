@@ -45,7 +45,12 @@ REFERENCE_OUTPUTS = {
         ],
         "security_features": ["RFID shielding technology"],
         "aesthetic_signals": ["variety of dashing colors", "sleek", "elegant"],
-        "target_use_cases": ["movie-watching", "video-chatting", "makeup", "carry cards"],
+        "target_use_cases": [
+            "movie-watching",
+            "video-chatting",
+            "makeup",
+            "carry cards",
+        ],
         "summary": "Wallet-style phone case with mirror, card slots, RFID shielding and kickstand for Samsung Galaxy S8 Plus.",
     }
 }
@@ -81,7 +86,9 @@ def call_openai(prompt: str, model: str) -> dict[str, Any]:
     openai_settings.validate_credentials()
     api_key = openai_settings.api_key
     if api_key is None:  # pragma: no cover - defensive branch
-        raise RuntimeError("OPENAI_API_KEY não encontrada. Use --mode reference ou configure a chave.")
+        raise RuntimeError(
+            "OPENAI_API_KEY não encontrada. Use --mode reference ou configure a chave."
+        )
 
     payload = {
         "model": model,
@@ -124,7 +131,9 @@ def extract_features(df: pd.DataFrame, mode: str, model: str) -> list[Extraction
         if mode == "reference":
             features = REFERENCE_OUTPUTS.get(row.source_id)
             if features is None:
-                raise KeyError(f"Não existe saída de referência para source_id={row.source_id}.")
+                raise KeyError(
+                    f"Não existe saída de referência para source_id={row.source_id}."
+                )
             extraction_mode = "reference"
             model_name = "reference_output"
         else:
@@ -157,7 +166,9 @@ def flatten_results(results: list[ExtractionResult]) -> pd.DataFrame:
                 "material": features.get("material"),
                 "compatibility": " | ".join(features.get("compatibility", [])),
                 "quality_signals": " | ".join(features.get("quality_signals", [])),
-                "functional_features": " | ".join(features.get("functional_features", [])),
+                "functional_features": " | ".join(
+                    features.get("functional_features", [])
+                ),
                 "security_features": " | ".join(features.get("security_features", [])),
                 "aesthetic_signals": " | ".join(features.get("aesthetic_signals", [])),
                 "target_use_cases": " | ".join(features.get("target_use_cases", [])),
@@ -185,7 +196,9 @@ def write_jsonl(results: list[ExtractionResult], path: Path) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Extrai features estruturadas de texto desestruturado.")
+    parser = argparse.ArgumentParser(
+        description="Extrai features estruturadas de texto desestruturado."
+    )
     parser.add_argument(
         "--input",
         type=Path,

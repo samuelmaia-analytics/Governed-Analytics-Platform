@@ -8,9 +8,15 @@ import src.run_platform_pipeline as pipeline
 def test_run_selected_steps_executes_requested_functions_in_order(monkeypatch) -> None:
     called_steps: list[str] = []
 
-    monkeypatch.setitem(pipeline.STEP_HANDLERS, "inventory", lambda: called_steps.append("inventory"))
-    monkeypatch.setitem(pipeline.STEP_HANDLERS, "build", lambda: called_steps.append("build"))
-    monkeypatch.setitem(pipeline.STEP_HANDLERS, "publish", lambda: called_steps.append("publish"))
+    monkeypatch.setitem(
+        pipeline.STEP_HANDLERS, "inventory", lambda: called_steps.append("inventory")
+    )
+    monkeypatch.setitem(
+        pipeline.STEP_HANDLERS, "build", lambda: called_steps.append("build")
+    )
+    monkeypatch.setitem(
+        pipeline.STEP_HANDLERS, "publish", lambda: called_steps.append("publish")
+    )
 
     pipeline.run_selected_steps(["inventory", "build", "publish"])
 
@@ -20,7 +26,9 @@ def test_run_selected_steps_executes_requested_functions_in_order(monkeypatch) -
 def test_run_selected_steps_executes_semantic_and_monitor_steps(monkeypatch) -> None:
     called_steps: list[str] = []
 
-    monkeypatch.setitem(pipeline.STEP_HANDLERS, "semantic", lambda: called_steps.append("semantic"))
+    monkeypatch.setitem(
+        pipeline.STEP_HANDLERS, "semantic", lambda: called_steps.append("semantic")
+    )
 
     def monitor_handler() -> None:
         called_steps.append("monitor")
@@ -53,17 +61,27 @@ def test_run_selected_steps_executes_quality_flow(monkeypatch) -> None:
     ]
 
 
-def test_run_selected_steps_raises_immediately_without_continue_on_error(monkeypatch) -> None:
-    monkeypatch.setitem(pipeline.STEP_HANDLERS, "publish", lambda: (_ for _ in ()).throw(RuntimeError("publish failed")))
+def test_run_selected_steps_raises_immediately_without_continue_on_error(
+    monkeypatch,
+) -> None:
+    monkeypatch.setitem(
+        pipeline.STEP_HANDLERS,
+        "publish",
+        lambda: (_ for _ in ()).throw(RuntimeError("publish failed")),
+    )
 
     with pytest.raises(RuntimeError, match="publish failed"):
         pipeline.run_selected_steps(["publish"])
 
 
-def test_run_selected_steps_collects_failures_when_continue_on_error_enabled(monkeypatch) -> None:
+def test_run_selected_steps_collects_failures_when_continue_on_error_enabled(
+    monkeypatch,
+) -> None:
     called_steps: list[str] = []
 
-    monkeypatch.setitem(pipeline.STEP_HANDLERS, "build", lambda: called_steps.append("build"))
+    monkeypatch.setitem(
+        pipeline.STEP_HANDLERS, "build", lambda: called_steps.append("build")
+    )
 
     def failing_publish() -> None:
         called_steps.append("publish")
@@ -71,7 +89,9 @@ def test_run_selected_steps_collects_failures_when_continue_on_error_enabled(mon
 
     monkeypatch.setitem(pipeline.STEP_HANDLERS, "publish", failing_publish)
 
-    with pytest.raises(RuntimeError, match="Pipeline finalizado com falhas nas etapas: publish"):
+    with pytest.raises(
+        RuntimeError, match="Pipeline finalizado com falhas nas etapas: publish"
+    ):
         pipeline.run_selected_steps(["build", "publish"], continue_on_error=True)
 
     assert called_steps == ["build", "publish"]

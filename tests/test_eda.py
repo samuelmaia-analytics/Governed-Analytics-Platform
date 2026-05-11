@@ -18,7 +18,9 @@ def _build_df() -> pd.DataFrame:
         {
             "revenue": [10.0, 12.0, 1000.0, 11.0],
             "status": ["ok", "ok", "warn", None],
-            "event_date": pd.to_datetime(["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04"]),
+            "event_date": pd.to_datetime(
+                ["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04"]
+            ),
         }
     )
 

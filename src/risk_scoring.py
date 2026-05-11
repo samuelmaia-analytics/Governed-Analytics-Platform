@@ -33,7 +33,9 @@ def _risk_level_from_score(score: int) -> RiskLevel:
     return "high"
 
 
-def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: int) -> PrivacyRiskResult:
+def calculate_privacy_risk_score(
+    classification_df: pd.DataFrame, total_rows: int
+) -> PrivacyRiskResult:
     if classification_df.empty:
         return {
             "score": 0,
@@ -44,7 +46,9 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
             "components": {"empty_dataset": 0},
             "score_components": {"empty_dataset": 0},
             "per_component_points": {"empty_dataset": 0},
-            "component_explanations": {"empty_dataset": "No classified columns were provided."},
+            "component_explanations": {
+                "empty_dataset": "No classified columns were provided."
+            },
             "publication_recommendation": "approved",
             "recommendations": ["Validate the dataset schema before publishing."],
         }
@@ -55,7 +59,9 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
     indirect_count = _coerce_int(class_counts.get("indirect_identifier", 0))
 
     critical_df = classification_df[
-        classification_df["lgpd_classification"].isin(["personal_data", "sensitive_personal_data"])
+        classification_df["lgpd_classification"].isin(
+            ["personal_data", "sensitive_personal_data"]
+        )
     ].copy()
     null_penalty = 0
     if "null_pct" in classification_df.columns and not critical_df.empty:
@@ -63,10 +69,14 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
         null_penalty = min(15, int(round(critical_null_avg * 0.2)))
 
     direct_identifier_bonus = 0
-    direct_hint = classification_df["column_name"].astype(str).str.contains(
-        "cpf|email|phone|telefone|document|nome|name|cnpj",
-        case=False,
-        regex=True,
+    direct_hint = (
+        classification_df["column_name"]
+        .astype(str)
+        .str.contains(
+            "cpf|email|phone|telefone|document|nome|name|cnpj",
+            case=False,
+            regex=True,
+        )
     )
     if bool(direct_hint.any()):
         direct_identifier_bonus = 15
@@ -108,7 +118,9 @@ def calculate_privacy_risk_score(classification_df: pd.DataFrame, total_rows: in
             "Maintain data dictionary and ownership metadata updated.",
         ]
     if risk_level == "high":
-        recommendations.append("Block publication until masking/anonymization controls are implemented.")
+        recommendations.append(
+            "Block publication until masking/anonymization controls are implemented."
+        )
 
     summary = (
         f"Dataset with {personal_count} personal, {sensitive_count} sensitive and "

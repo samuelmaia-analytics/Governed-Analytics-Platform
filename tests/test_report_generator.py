@@ -21,7 +21,12 @@ def _sample_df() -> pd.DataFrame:
 def test_generate_markdown_reports_creates_expected_files(tmp_path: Path) -> None:
     paths = generate_markdown_reports(_sample_df(), docs_dir=tmp_path)
 
-    assert set(paths.keys()) == {"data_dictionary", "lgpd_controls", "data_quality_report", "lgpd_ripd_sample"}
+    assert set(paths.keys()) == {
+        "data_dictionary",
+        "lgpd_controls",
+        "data_quality_report",
+        "lgpd_ripd_sample",
+    }
     for path in paths.values():
         assert path.exists()
 
@@ -35,7 +40,9 @@ def test_generated_lgpd_controls_contains_required_sections(tmp_path: Path) -> N
     assert "## Governance Recommendations" in content
 
 
-def test_generated_data_quality_report_contains_risks_and_next_steps(tmp_path: Path) -> None:
+def test_generated_data_quality_report_contains_risks_and_next_steps(
+    tmp_path: Path,
+) -> None:
     paths = generate_markdown_reports(_sample_df(), docs_dir=tmp_path)
     content = paths["data_quality_report"].read_text(encoding="utf-8")
 

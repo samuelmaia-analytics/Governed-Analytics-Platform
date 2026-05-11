@@ -13,10 +13,14 @@ from src.risk_scoring import calculate_privacy_risk_score
 from src.utils import ensure_directory
 
 DEFAULT_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "governance_history.csv"
-DEFAULT_PUBLICATION_DECISION_PATH = PUBLISHED_MONITORING_DIR / "publication_decision.json"
+DEFAULT_PUBLICATION_DECISION_PATH = (
+    PUBLISHED_MONITORING_DIR / "publication_decision.json"
+)
 
 
-def _compute_warning_and_critical_failures(quality_result: DataQualityResult) -> tuple[int, int]:
+def _compute_warning_and_critical_failures(
+    quality_result: DataQualityResult,
+) -> tuple[int, int]:
     checks = quality_result.get("checks", [])
     if not isinstance(checks, list):
         return 0, 0
@@ -52,7 +56,9 @@ def append_governance_history(
     run_identifier = run_id or str(uuid4())
     execution_timestamp = datetime.now(timezone.utc).isoformat()
     failed_rules_count = int(quality_result["failed_checks_count"])
-    warning_rules_count, critical_rules_count = _compute_warning_and_critical_failures(quality_result)
+    warning_rules_count, critical_rules_count = _compute_warning_and_critical_failures(
+        quality_result
+    )
     total_rows_value = int(total_rows)
     duplicate_rows_value = int(quality_result.get("duplicate_rows", 0))
     data_quality_score = max(0, 100 - (failed_rules_count * 10))
@@ -61,8 +67,15 @@ def append_governance_history(
     null_rate = 0.0
     null_pct_by_column = quality_result.get("null_pct_by_column", {})
     if isinstance(null_pct_by_column, dict) and null_pct_by_column:
-        null_rate = float(sum(float(value) for value in null_pct_by_column.values()) / len(null_pct_by_column))
-    duplicate_rate = 0.0 if total_rows_value == 0 else float((duplicate_rows_value / total_rows_value) * 100)
+        null_rate = float(
+            sum(float(value) for value in null_pct_by_column.values())
+            / len(null_pct_by_column)
+        )
+    duplicate_rate = (
+        0.0
+        if total_rows_value == 0
+        else float((duplicate_rows_value / total_rows_value) * 100)
+    )
 
     row = {
         # New observability fields
@@ -142,13 +155,19 @@ def save_publication_decision_artifact(
     output_path: Path = DEFAULT_PUBLICATION_DECISION_PATH,
 ) -> Path:
     ensure_directory(output_path.parent)
-    status_normalized = publication_status.strip() if publication_status else "Needs Review"
+    status_normalized = (
+        publication_status.strip() if publication_status else "Needs Review"
+    )
     if status_normalized == "Approved":
-        decision_reason = "All quality and privacy checks are within configured thresholds."
+        decision_reason = (
+            "All quality and privacy checks are within configured thresholds."
+        )
     elif status_normalized == "Blocked":
         decision_reason = "Blocking governance conditions were detected and publication must be stopped."
     else:
-        decision_reason = "One or more controls require manual review before publication."
+        decision_reason = (
+            "One or more controls require manual review before publication."
+        )
     payload = {
         "dataset": dataset_name,
         "status": status_normalized,
@@ -158,5 +177,7 @@ def save_publication_decision_artifact(
         "timestamp_utc": timestamp_utc,
         "decision_reason": decision_reason,
     }
-    output_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    output_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     return output_path

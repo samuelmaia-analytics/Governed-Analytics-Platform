@@ -26,7 +26,10 @@ def test_detects_cpf_as_personal_data() -> None:
 def test_detects_health_as_sensitive_personal_data() -> None:
     df = pd.DataFrame({"saude_status": ["monitorado"]})
     result = classify_dataframe_columns(df)
-    assert _class_of(result, "saude_status")["lgpd_classification"] == "sensitive_personal_data"
+    assert (
+        _class_of(result, "saude_status")["lgpd_classification"]
+        == "sensitive_personal_data"
+    )
 
 
 def test_classifies_revenue_as_non_personal() -> None:
@@ -38,7 +41,11 @@ def test_classifies_revenue_as_non_personal() -> None:
 def test_returns_coherent_recommended_action() -> None:
     df = pd.DataFrame({"customer_email": ["ana@example.com"], "revenue": [100.0]})
     result = classify_dataframe_columns(df)
-    assert _class_of(result, "customer_email")["recommended_action"] in {"mask", "review", "anonymize"}
+    assert _class_of(result, "customer_email")["recommended_action"] in {
+        "mask",
+        "review",
+        "anonymize",
+    }
     assert _class_of(result, "revenue")["recommended_action"] == "keep"
 
 

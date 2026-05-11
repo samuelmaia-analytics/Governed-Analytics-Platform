@@ -41,7 +41,11 @@ def validate_input_files() -> list[Path]:
             "Execute primeiro o runner das queries analiticas."
         )
 
-    csv_files = sorted(path for path in QUERY_RESULTS_DIR.glob("*.csv") if path.name != "query_execution_manifest.csv")
+    csv_files = sorted(
+        path
+        for path in QUERY_RESULTS_DIR.glob("*.csv")
+        if path.name != "query_execution_manifest.csv"
+    )
     if not csv_files:
         raise FileNotFoundError(f"Nenhum CSV encontrado em: {QUERY_RESULTS_DIR}")
 
