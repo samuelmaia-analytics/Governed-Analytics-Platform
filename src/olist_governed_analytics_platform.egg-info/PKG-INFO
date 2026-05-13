@@ -2,7 +2,7 @@ Metadata-Version: 2.4
 Name: olist-governed-analytics-platform
 Version: 0.1.0
 Summary: Governed analytics platform with LGPD privacy classification, data quality controls, schema contracts, audit reports, and Streamlit executive interface.
-Requires-Python: >=3.11
+Requires-Python: <3.14,>=3.11
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: pandas<3.1,>=2.2
@@ -19,12 +19,16 @@ Requires-Dist: python-dotenv<2,>=1.0
 Requires-Dist: PyYAML<7,>=6
 Requires-Dist: jinja2<4,>=3.1
 Requires-Dist: requests<3,>=2.32
+Requires-Dist: fastapi<1,>=0.116
+Requires-Dist: uvicorn<1,>=0.35
 Provides-Extra: dev
 Requires-Dist: pytest<10,>=9; extra == "dev"
 Requires-Dist: pytest-cov<8,>=7; extra == "dev"
+Requires-Dist: httpx<1,>=0.28; extra == "dev"
 Requires-Dist: ruff<0.16,>=0.12; extra == "dev"
 Requires-Dist: mypy<1.21,>=1.18; extra == "dev"
 Requires-Dist: playwright; extra == "dev"
+Requires-Dist: dbt-duckdb<2,>=1.8; extra == "dev"
 Dynamic: license-file
 
 # Governed Analytics Platform
@@ -76,16 +80,17 @@ the app consumes the published layer (`data/published/dashboard`) instead of the
 
 ```mermaid
 flowchart LR
-    A[Raw Data] --> B[src/data_loader.py]
-    B --> C[src/lgpd_classifier.py]
-    B --> D[src/data_quality.py]
-    C --> E[src/risk_scoring.py]
-    D --> F[src/report_generator.py]
+    A[Raw CSV] --> B[ingest & standardize]
+    B --> C[enrich & build analytics]
+    C --> D[LGPD classification]
+    C --> E[data quality checks]
+    D --> F[privacy risk score]
     E --> F
-    B --> G[app/main.py]
-    C --> G
-    D --> G
-    E --> G
+    F --> G{publication gate}
+    G -->|Approved| H[published layer]
+    G -->|Blocked / Needs Review| I[governance report]
+    H --> J[Streamlit executive app]
+    I --> J
 ```
 
 ## Implemented vs Simulated
@@ -175,17 +180,70 @@ make app
 - The Streamlit interface is expected to consume published/governed outputs for executive use.
 - See: `docs/technical_review.md` and `docs/production_readiness.md`.
 
+## Screenshots
+
+| Executive Overview | Governance Control Center |
+|---|---|
+| ![Executive Overview](assets/screenshots/executive_overview_v3.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
+
+| LGPD & Privacy Risk | Data Quality |
+|---|---|
+| ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
+
 ## Streamlit Executive App
 
 Main pages:
 
-- Executive Overview
-- Data Catalog
-- LGPD & Privacy Risk
-- Data Quality
-- EDA
-- Governance Report
-- Governance Control Center
+| Page | What it shows |
+| --- | --- |
+| Executive Overview | Key metrics with trend deltas, data freshness, LGPD-suppressed columns |
+| Data Catalog | Searchable column inventory with LGPD classification filter |
+| LGPD & Privacy Risk | Risk score, classification breakdown, privacy transformation preview |
+| Data Quality | Quality checks, null profile, severity distribution |
+| EDA | Statistical overview, narrative insights, and statistical tests |
+| Revenue Analytics | Monthly revenue trend, category Pareto, cohort ticket, top sellers |
+| Seller Performance | Seller ranking, volume-tier distribution, and delivery SLA metrics |
+| Cohort Retention | Cohort retention heatmap and average ticket heatmap |
+| GenAI Insights | Product-text feature extraction outputs and category inventory |
+| Governance Report | Rendered governance markdown reports with raw view |
+| Governance Control Center | Publication gate, rationale, snapshot history trends |
+| Snowflake Explorer | Browse Snowflake tables and run read-only queries |
+
+## FastAPI Endpoints
+
+Governance and Snowflake data can be consumed via REST API:
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Health check |
+| `GET` | `/api/v1/governance/status` | Publication gate status and quality scores |
+| `GET` | `/api/v1/snowflake/health` | Snowflake connection status |
+| `GET` | `/api/v1/snowflake/tables` | List tables in the configured schema |
+| `POST` | `/api/v1/snowflake/query` | Execute a read-only SELECT query |
+
+Run locally:
+
+```bash
+uvicorn src.api:app --reload --port 8000
+```
+
+Interactive docs available at `http://localhost:8000/docs` (Swagger UI) and `http://localhost:8000/redoc`.
+
+## Snowflake Configuration
+
+Add to your `.env` to enable Snowflake integration:
+
+```env
+SNOWFLAKE_ACCOUNT=your-account
+SNOWFLAKE_USER=your-user
+SNOWFLAKE_PASSWORD=your-password
+SNOWFLAKE_WAREHOUSE=your-warehouse
+SNOWFLAKE_DATABASE=your-database
+SNOWFLAKE_SCHEMA=your-schema
+SNOWFLAKE_ROLE=PUBLIC
+```
+
+The Streamlit app and API degrade gracefully when these variables are absent.
 
 ## Main Structure
 
@@ -198,15 +256,6 @@ Main pages:
 | `tests/` | Automated tests |
 | `.github/workflows/` | CI/CD |
 | `powerbi/` | BI export artifacts |
-
-## Recruiter Notes
-
-Strong interview discussion artifact for:
-
-- Analytics Engineer
-- Data Engineer
-- Data Governance / Data Platform profiles
-- Senior Data Analyst roles with ownership scope
 
 ## Links
 

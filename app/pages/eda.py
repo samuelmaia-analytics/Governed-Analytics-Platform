@@ -17,10 +17,12 @@ from src.eda import (
 try:
     from src.eda import generate_storytelling_insights, run_statistical_tests
 except ImportError:
-    def generate_storytelling_insights(_df: pd.DataFrame) -> list[str]:
+    def generate_storytelling_insights(df: pd.DataFrame) -> list[str]:
+        _ = df
         return []
 
-    def run_statistical_tests(_df: pd.DataFrame) -> pd.DataFrame:
+    def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
+        _ = df
         return pd.DataFrame()
 
 

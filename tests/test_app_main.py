@@ -53,6 +53,7 @@ def test_main_entrypoints_are_callable() -> None:
     assert callable(main_module._render_genai_page)
     assert callable(main_module._render_report_page)
     assert callable(main_module._render_control_center_page)
+    assert callable(main_module._render_snowflake_page)
 
 
 def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
@@ -113,8 +114,11 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
     monkeypatch.setattr(
         main_module, "_render_control_center_page", lambda _context, _locale: None
     )
+    monkeypatch.setattr(
+        main_module, "_render_snowflake_page", lambda _context, _locale: None
+    )
 
     main_module.main()
 
-    assert calls.count("page") == 11
+    assert calls.count("page") == 12
     assert "navigation_run" in calls

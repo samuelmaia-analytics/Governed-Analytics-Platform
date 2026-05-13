@@ -2,6 +2,7 @@ LICENSE
 README.md
 pyproject.toml
 src/__init__.py
+src/api.py
 src/build_analytics.py
 src/business_rule_validation.py
 src/catalog.py
@@ -13,6 +14,7 @@ src/data_classification.py
 src/data_loader.py
 src/data_quality.py
 src/data_quality_rules.py
+src/duckdb_engine.py
 src/eda.py
 src/enrich.py
 src/export_power_bi.py
@@ -46,6 +48,7 @@ src/run_platform_pipeline.py
 src/schema_contracts.py
 src/semantic_layer.py
 src/settings.py
+src/snowflake_connector.py
 src/utils.py
 src/workflow_policy_validation.py
 src/olist_governed_analytics_platform.egg-info/PKG-INFO
@@ -53,6 +56,8 @@ src/olist_governed_analytics_platform.egg-info/SOURCES.txt
 src/olist_governed_analytics_platform.egg-info/dependency_links.txt
 src/olist_governed_analytics_platform.egg-info/requires.txt
 src/olist_governed_analytics_platform.egg-info/top_level.txt
+tests/test_api.py
+tests/test_api_snowflake.py
 tests/test_app_main.py
 tests/test_app_pages_rendering.py
 tests/test_build_analytics.py
@@ -70,7 +75,9 @@ tests/test_data_loader.py
 tests/test_data_quality.py
 tests/test_data_quality_rules.py
 tests/test_dataset_contracts.py
+tests/test_duckdb_engine.py
 tests/test_eda.py
+tests/test_enrich.py
 tests/test_export_power_bi.py
 tests/test_export_query_result_images_module.py
 tests/test_export_text_pdf_module.py
@@ -108,4 +115,5 @@ tests/test_run_platform_pipeline_execution.py
 tests/test_schema_contracts.py
 tests/test_semantic_layer.py
 tests/test_settings.py
+tests/test_snowflake_connector.py
 tests/test_workflow_policy_validation.py

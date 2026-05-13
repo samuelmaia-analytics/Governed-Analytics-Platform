@@ -12,10 +12,14 @@ python-dotenv<2,>=1.0
 PyYAML<7,>=6
 jinja2<4,>=3.1
 requests<3,>=2.32
+fastapi<1,>=0.116
+uvicorn<1,>=0.35
 
 [dev]
 pytest<10,>=9
 pytest-cov<8,>=7
+httpx<1,>=0.28
 ruff<0.16,>=0.12
 mypy<1.21,>=1.18
 playwright
+dbt-duckdb<2,>=1.8

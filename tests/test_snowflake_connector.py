@@ -7,7 +7,6 @@ import pytest
 
 from src.snowflake_connector import SnowflakeConfig, SnowflakeConnector, _is_write_query
 
-
 _SNOWFLAKE_ENVS = {
     "SNOWFLAKE_ACCOUNT": "test_account",
     "SNOWFLAKE_USER": "test_user",
@@ -110,7 +109,7 @@ def test_health_check_success() -> None:
 
 def test_health_check_failure() -> None:
     connector = SnowflakeConnector(_make_config())
-    with patch("snowflake.connector.connect", side_effect=Exception("connection refused")):
+    with patch.object(SnowflakeConnector, "connect", side_effect=Exception("connection refused")):
         result = connector.health_check()
     assert result["status"] == "error"
     assert "connection refused" in result["detail"]
@@ -150,7 +149,11 @@ def test_list_tables_empty() -> None:
 def test_context_manager_closes_connection() -> None:
     connector = SnowflakeConnector(_make_config())
     mock_conn = MagicMock()
-    with patch("snowflake.connector.connect", return_value=mock_conn):
+
+    def _fake_connect(self: SnowflakeConnector) -> None:
+        self._conn = mock_conn
+
+    with patch.object(SnowflakeConnector, "connect", _fake_connect):
         with connector:
             pass
     mock_conn.close.assert_called_once()

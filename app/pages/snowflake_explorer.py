@@ -3,7 +3,11 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from src.snowflake_connector import SnowflakeConfig, get_snowflake_connector, _is_write_query
+from src.snowflake_connector import (
+    SnowflakeConfig,
+    _is_write_query,
+    get_snowflake_connector,
+)
 
 
 def render_snowflake_explorer(locale: str) -> None:
