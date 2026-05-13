@@ -97,6 +97,16 @@ Fronteira chave: o app consome a camada publicada (`data/published/dashboard`), 
 - Execução local reproduzível com quality gates.
 - Comunicação executiva de risco, qualidade e prontidão para publicação.
 
+## Screenshots
+
+| Visão Executiva | Central de Controles |
+|---|---|
+| ![Executive Overview](assets/screenshots/executive_overview_v3.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
+
+| LGPD e Risco de Privacidade | Qualidade de Dados |
+|---|---|
+| ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
+
 ## App Streamlit Executivo
 
 Páginas principais:
@@ -133,6 +143,8 @@ Execução local:
 ```bash
 uvicorn src.api:app --reload --port 8000
 ```
+
+Documentação interativa disponível em `http://localhost:8000/docs` (Swagger UI) e `http://localhost:8000/redoc`.
 
 ## Configuração Snowflake
 

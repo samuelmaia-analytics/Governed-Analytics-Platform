@@ -147,6 +147,16 @@ make app
 - The Streamlit interface is expected to consume published/governed outputs for executive use.
 - See: `docs/technical_review.md` and `docs/production_readiness.md`.
 
+## Screenshots
+
+| Executive Overview | Governance Control Center |
+|---|---|
+| ![Executive Overview](assets/screenshots/executive_overview_v3.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
+
+| LGPD & Privacy Risk | Data Quality |
+|---|---|
+| ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
+
 ## Streamlit Executive App
 
 Main pages:
@@ -183,6 +193,8 @@ Run locally:
 ```bash
 uvicorn src.api:app --reload --port 8000
 ```
+
+Interactive docs available at `http://localhost:8000/docs` (Swagger UI) and `http://localhost:8000/redoc`.
 
 ## Snowflake Configuration
 
