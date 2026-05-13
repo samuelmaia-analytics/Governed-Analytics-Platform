@@ -114,19 +114,41 @@ Páginas principais:
 | GenAI Insights | Saída de extração de features de texto de produto |
 | Relatório de Governança | Relatórios markdown renderizados com visão raw |
 | Central de Controles | Publication gate, racional de decisão, tendências históricas de governança |
+| Snowflake Explorer | Navegação por tabelas Snowflake e execução de consultas somente leitura |
 
-## Endpoint FastAPI
+## Endpoints FastAPI
 
-O status de governança também está disponível via API:
+Governança e dados Snowflake disponíveis via REST API:
 
-- `GET /health`
-- `GET /api/v1/governance/status`
+| Método | Caminho | Descrição |
+| --- | --- | --- |
+| `GET` | `/health` | Health check |
+| `GET` | `/api/v1/governance/status` | Status do publication gate e scores de qualidade |
+| `GET` | `/api/v1/snowflake/health` | Status da conexão Snowflake |
+| `GET` | `/api/v1/snowflake/tables` | Lista tabelas do schema configurado |
+| `POST` | `/api/v1/snowflake/query` | Executa uma consulta SELECT somente leitura |
 
 Execução local:
 
 ```bash
 uvicorn src.api:app --reload --port 8000
 ```
+
+## Configuração Snowflake
+
+Adicione ao seu `.env` para habilitar a integração Snowflake:
+
+```env
+SNOWFLAKE_ACCOUNT=sua-conta
+SNOWFLAKE_USER=seu-usuario
+SNOWFLAKE_PASSWORD=sua-senha
+SNOWFLAKE_WAREHOUSE=seu-warehouse
+SNOWFLAKE_DATABASE=seu-banco
+SNOWFLAKE_SCHEMA=seu-schema
+SNOWFLAKE_ROLE=PUBLIC
+```
+
+O app Streamlit e a API operam normalmente mesmo sem essas variáveis configuradas.
 
 ## Estrutura Principal
 

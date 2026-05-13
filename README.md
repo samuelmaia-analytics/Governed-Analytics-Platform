@@ -164,19 +164,41 @@ Main pages:
 | GenAI Insights | Product-text feature extraction outputs and category inventory |
 | Governance Report | Rendered governance markdown reports with raw view |
 | Governance Control Center | Publication gate, rationale, snapshot history trends |
+| Snowflake Explorer | Browse Snowflake tables and run read-only queries |
 
-## FastAPI Endpoint
+## FastAPI Endpoints
 
-Governance status can also be consumed via API:
+Governance and Snowflake data can be consumed via REST API:
 
-- `GET /health`
-- `GET /api/v1/governance/status`
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/health` | Health check |
+| `GET` | `/api/v1/governance/status` | Publication gate status and quality scores |
+| `GET` | `/api/v1/snowflake/health` | Snowflake connection status |
+| `GET` | `/api/v1/snowflake/tables` | List tables in the configured schema |
+| `POST` | `/api/v1/snowflake/query` | Execute a read-only SELECT query |
 
 Run locally:
 
 ```bash
 uvicorn src.api:app --reload --port 8000
 ```
+
+## Snowflake Configuration
+
+Add to your `.env` to enable Snowflake integration:
+
+```env
+SNOWFLAKE_ACCOUNT=your-account
+SNOWFLAKE_USER=your-user
+SNOWFLAKE_PASSWORD=your-password
+SNOWFLAKE_WAREHOUSE=your-warehouse
+SNOWFLAKE_DATABASE=your-database
+SNOWFLAKE_SCHEMA=your-schema
+SNOWFLAKE_ROLE=PUBLIC
+```
+
+The Streamlit app and API degrade gracefully when these variables are absent.
 
 ## Main Structure
 

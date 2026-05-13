@@ -6,9 +6,11 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
 from src.config import PUBLISHED_MONITORING_DIR
+from src.snowflake_connector import _is_write_query, get_snowflake_connector
 
 PUBLICATION_DECISION_PATH = PUBLISHED_MONITORING_DIR / "publication_decision.json"
 SCHEMA_CONTRACT_RESULTS_PATH = Path("data/curated/quality/schema_contract_results.csv")
@@ -88,4 +90,40 @@ def governance_status() -> dict[str, Any]:
         "timestamp_utc": decision.get(
             "timestamp_utc", datetime.now(timezone.utc).isoformat()
         ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Snowflake endpoints
+# ---------------------------------------------------------------------------
+
+
+class _QueryRequest(BaseModel):
+    sql: str
+
+
+@app.get("/api/v1/snowflake/health")
+def snowflake_health() -> dict[str, Any]:
+    connector = get_snowflake_connector()
+    result = connector.health_check()
+    connector.close()
+    return result
+
+
+@app.get("/api/v1/snowflake/tables")
+def snowflake_tables() -> list[dict[str, str]]:
+    with get_snowflake_connector() as connector:
+        return connector.list_tables()
+
+
+@app.post("/api/v1/snowflake/query")
+def snowflake_query(request: _QueryRequest) -> dict[str, Any]:
+    if _is_write_query(request.sql):
+        raise HTTPException(status_code=400, detail="Only SELECT queries are allowed.")
+    with get_snowflake_connector() as connector:
+        df = connector.query(request.sql)
+    return {
+        "columns": list(df.columns),
+        "rows": df.to_dict(orient="records"),
+        "row_count": len(df),
     }

@@ -22,6 +22,7 @@ from app.pages.governance_control_center import (
     render_governance_control_center,  # noqa: E402
 )
 from app.pages.governance_report import render_governance_report  # noqa: E402
+from app.pages.snowflake_explorer import render_snowflake_explorer  # noqa: E402
 from app.pages.genai_insights import render_genai_insights  # noqa: E402
 from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk  # noqa: E402
 from app.pages.revenue_analytics import render_revenue_analytics  # noqa: E402
@@ -91,6 +92,10 @@ def _render_control_center_page(context: GovernanceAppContext, locale: str) -> N
         context.quality_results,
         locale,
     )
+
+
+def _render_snowflake_page(_context: GovernanceAppContext, locale: str) -> None:
+    render_snowflake_explorer(locale)
 
 
 def main() -> None:
@@ -170,6 +175,12 @@ def main() -> None:
             title=t("nav_control_center", locale),
             icon=":material/admin_panel_settings:",
             url_path="governance-control-center",
+        ),
+        st.Page(
+            lambda: _render_snowflake_page(context, locale),
+            title="Snowflake Explorer",
+            icon=":material/database:",
+            url_path="snowflake-explorer",
         ),
     ]
     navigation = st.navigation(pages=pages, position="top")
