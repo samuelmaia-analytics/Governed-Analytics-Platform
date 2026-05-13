@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 import src.build_analytics as build_analytics
+from src.duckdb_engine import execute_query
 
 
 def test_to_snake_case_and_standardize_columns_handle_mixed_input() -> None:
@@ -220,6 +221,9 @@ def test_render_report_save_report_and_run_build_return_artifacts(
         build_analytics, "FACT_CSV_PATH", analytics_dir / "fact_orders_enriched.csv"
     )
     monkeypatch.setattr(
+        build_analytics, "FACT_DUCKDB_PATH", analytics_dir / "governance.duckdb"
+    )
+    monkeypatch.setattr(
         build_analytics, "REPORT_PATH", docs_dir / "fact_orders_enriched.md"
     )
     monkeypatch.setattr(build_analytics, "build_fact_orders_enriched", lambda: fact_df)
@@ -230,4 +234,10 @@ def test_render_report_save_report_and_run_build_return_artifacts(
     assert "fact_orders_enriched" in report
     assert artifacts.parquet_path.exists()
     assert artifacts.csv_path.exists()
+    assert artifacts.duckdb_path.exists()
     assert artifacts.report_path.exists()
+    persisted = execute_query(
+        "SELECT COUNT(*) AS total_rows FROM fact_orders_enriched",
+        db_path=artifacts.duckdb_path,
+    )
+    assert int(persisted.loc[0, "total_rows"]) == len(fact_df)

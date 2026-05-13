@@ -24,7 +24,7 @@ else:
 
 
 LOGGER = logging.getLogger(__name__)
-ANALYTICS_TABLE_PATH = ANALYTICS_DIR / "fact_orders_enriched.parquet"
+ANALYTICS_DB_PATH = ANALYTICS_DIR / "governance.duckdb"
 QUERY_DIR = SQL_DIR / "analytics"
 OUTPUT_DIR = QUERY_RESULTS_DIR
 
@@ -39,10 +39,8 @@ class QueryExecutionResult:
 
 
 def validate_inputs() -> list[Path]:
-    if not ANALYTICS_TABLE_PATH.exists():
-        raise FileNotFoundError(
-            f"Tabela analitica nao encontrada: {ANALYTICS_TABLE_PATH}"
-        )
+    if not ANALYTICS_DB_PATH.exists():
+        raise FileNotFoundError(f"Base analitica DuckDB nao encontrada: {ANALYTICS_DB_PATH}")
 
     sql_files = sorted(QUERY_DIR.glob("*.sql"))
     if not sql_files:
@@ -58,16 +56,7 @@ def connect() -> duckdb.DuckDBPyConnection:
             "Instale com `pip install duckdb` ou `uv sync`."
         ) from DUCKDB_IMPORT_ERROR
 
-    connection = duckdb.connect(database=":memory:")
-    parquet_path = str(ANALYTICS_TABLE_PATH).replace("\\", "/").replace("'", "''")
-    connection.execute(
-        f"""
-        CREATE OR REPLACE VIEW fact_orders_enriched AS
-        SELECT *
-        FROM read_parquet('{parquet_path}')
-        """
-    )
-    return connection
+    return duckdb.connect(database=str(ANALYTICS_DB_PATH))
 
 
 def execute_query(

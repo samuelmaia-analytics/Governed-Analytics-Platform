@@ -33,14 +33,14 @@ class FakeConnection:
 
 
 def test_validate_inputs_returns_sorted_sql_files(tmp_path: Path, monkeypatch) -> None:
-    table_path = tmp_path / "fact.parquet"
+    table_path = tmp_path / "governance.duckdb"
     query_dir = tmp_path / "sql"
     table_path.write_text("placeholder", encoding="utf-8")
     query_dir.mkdir()
     (query_dir / "02_query.sql").write_text("select 2", encoding="utf-8")
     (query_dir / "01_query.sql").write_text("select 1", encoding="utf-8")
 
-    monkeypatch.setattr(analytics_queries, "ANALYTICS_TABLE_PATH", table_path)
+    monkeypatch.setattr(analytics_queries, "ANALYTICS_DB_PATH", table_path)
     monkeypatch.setattr(analytics_queries, "QUERY_DIR", query_dir)
 
     sql_files = analytics_queries.validate_inputs()
@@ -51,12 +51,12 @@ def test_validate_inputs_returns_sorted_sql_files(tmp_path: Path, monkeypatch) -
 def test_validate_inputs_raises_when_sql_directory_is_empty(
     tmp_path: Path, monkeypatch
 ) -> None:
-    table_path = tmp_path / "fact.parquet"
+    table_path = tmp_path / "governance.duckdb"
     query_dir = tmp_path / "sql"
     table_path.write_text("placeholder", encoding="utf-8")
     query_dir.mkdir()
 
-    monkeypatch.setattr(analytics_queries, "ANALYTICS_TABLE_PATH", table_path)
+    monkeypatch.setattr(analytics_queries, "ANALYTICS_DB_PATH", table_path)
     monkeypatch.setattr(analytics_queries, "QUERY_DIR", query_dir)
 
     with pytest.raises(FileNotFoundError):
@@ -71,6 +71,25 @@ def test_connect_raises_clear_error_when_duckdb_is_missing(monkeypatch) -> None:
 
     with pytest.raises(ImportError):
         analytics_queries.connect()
+
+
+def test_connect_uses_duckdb_database_file(tmp_path: Path, monkeypatch) -> None:
+    db_path = tmp_path / "governance.duckdb"
+    db_path.write_text("", encoding="utf-8")
+    captured: dict[str, str] = {}
+
+    class FakeDuckDB:
+        @staticmethod
+        def connect(database: str):  # type: ignore[no-untyped-def]
+            captured["database"] = database
+            return FakeConnection()
+
+    monkeypatch.setattr(analytics_queries, "ANALYTICS_DB_PATH", db_path)
+    monkeypatch.setattr(analytics_queries, "duckdb", FakeDuckDB())
+
+    analytics_queries.connect()
+
+    assert captured["database"] == str(db_path)
 
 
 def test_execute_query_exports_csv_and_returns_metadata(

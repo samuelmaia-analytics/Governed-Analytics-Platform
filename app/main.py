@@ -26,6 +26,7 @@ from app.pages.genai_insights import render_genai_insights  # noqa: E402
 from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk  # noqa: E402
 from app.pages.revenue_analytics import render_revenue_analytics  # noqa: E402
 from app.pages.seller_performance import render_seller_performance  # noqa: E402
+from src.duckdb_engine import get_duckdb_version  # noqa: E402
 
 st.set_page_config(
     page_title="Governed Analytics Platform",
@@ -99,6 +100,7 @@ def main() -> None:
     st.caption(
         "Language: English (US)" if locale == "en-US" else "Idioma: Português (Brasil)"
     )
+    st.caption(f"DuckDB: {get_duckdb_version()}")
 
     context = build_context(locale)
 

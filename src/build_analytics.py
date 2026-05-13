@@ -12,6 +12,7 @@ if __package__ is None or __package__ == "":
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from src.config import ANALYTICS_DIR, DOCS_DIR, LANDING_DIR, STANDARDIZED_DIR
+from src.duckdb_engine import write_dataframe
 from src.ingest import configure_logging, load_csv
 from src.quality import validate_not_empty
 from src.utils import ensure_directory
@@ -21,6 +22,8 @@ OLIST_LANDING_DIR = LANDING_DIR / "olist"
 STANDARDIZED_OLIST_DIR = STANDARDIZED_DIR / "olist"
 FACT_PARQUET_PATH = ANALYTICS_DIR / "fact_orders_enriched.parquet"
 FACT_CSV_PATH = ANALYTICS_DIR / "fact_orders_enriched.csv"
+FACT_DUCKDB_PATH = ANALYTICS_DIR / "governance.duckdb"
+FACT_DUCKDB_TABLE = "fact_orders_enriched"
 REPORT_PATH = DOCS_DIR / "fact_orders_enriched.md"
 
 
@@ -29,6 +32,7 @@ class BuildArtifacts:
     fact_table: pd.DataFrame
     parquet_path: Path
     csv_path: Path
+    duckdb_path: Path
     report_path: Path
 
 
@@ -417,12 +421,19 @@ def build_fact_orders_enriched() -> pd.DataFrame:
     return fact_table
 
 
-def save_outputs(fact_table: pd.DataFrame) -> tuple[Path, Path]:
+def save_outputs(fact_table: pd.DataFrame) -> tuple[Path, Path, Path]:
     ensure_directory(ANALYTICS_DIR)
     fact_table.to_parquet(FACT_PARQUET_PATH, index=False)
     fact_table.to_csv(FACT_CSV_PATH, index=False)
-    LOGGER.info("Saidas salvas em %s e %s", FACT_PARQUET_PATH, FACT_CSV_PATH)
-    return FACT_PARQUET_PATH, FACT_CSV_PATH
+    duckdb_path = write_dataframe(fact_table, FACT_DUCKDB_TABLE, FACT_DUCKDB_PATH)
+    LOGGER.info(
+        "Saidas salvas em %s, %s e %s::%s",
+        FACT_PARQUET_PATH,
+        FACT_CSV_PATH,
+        duckdb_path,
+        FACT_DUCKDB_TABLE,
+    )
+    return FACT_PARQUET_PATH, FACT_CSV_PATH, duckdb_path
 
 
 def render_report(fact_table: pd.DataFrame) -> str:
@@ -498,12 +509,13 @@ def save_report(fact_table: pd.DataFrame) -> Path:
 
 def run_build() -> BuildArtifacts:
     fact_table = build_fact_orders_enriched()
-    parquet_path, csv_path = save_outputs(fact_table)
+    parquet_path, csv_path, duckdb_path = save_outputs(fact_table)
     report_path = save_report(fact_table)
     return BuildArtifacts(
         fact_table=fact_table,
         parquet_path=parquet_path,
         csv_path=csv_path,
+        duckdb_path=duckdb_path,
         report_path=report_path,
     )
 

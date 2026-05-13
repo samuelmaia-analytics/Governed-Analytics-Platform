@@ -1,0 +1,16 @@
+pandas>=2.2,<3.1
+numpy>=1.26,<3
+streamlit==1.56.0
+altair==6.1.0
+plotly>=5.24,<7
+matplotlib>=3.8,<4
+seaborn>=0.13,<1
+duckdb>=1.1,<2
+pyarrow>=17,<25
+openpyxl>=3.1,<4
+python-dotenv>=1.0,<2
+PyYAML>=6,<7
+jinja2>=3.1,<4
+requests>=2.32,<3
+fastapi>=0.116,<1
+uvicorn>=0.35,<1
