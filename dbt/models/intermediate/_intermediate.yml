@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: int_payments_aggregated
+    description: >
+      Pagamentos agregados por order_id. Remove a multiplicidade de linhas
+      antes do join com order_items para evitar duplicação artificial de itens.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: total_payment_value
+        tests: [not_null]
+      - name: payment_count
+        tests: [not_null]
+
+  - name: int_reviews_aggregated
+    description: >
+      Avaliações consolidadas por order_id com nota média, nota max/min
+      e flag de existência de comentário.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: review_score_mean
+        tests: [not_null]
+
+  - name: int_seller_metrics
+    description: >
+      Métricas de desempenho operacional por seller: volume de pedidos,
+      tempo médio de entrega, taxa de atraso e segmento de volume.
+    columns:
+      - name: seller_id
+        tests: [unique, not_null]
+      - name: seller_volume_tier
+        tests:
+          - not_null
+          - accepted_values:
+              values: [long_tail, scaled, core, strategic]
+
+  - name: int_customer_cohort
+    description: >
+      Atributos de cohort e recorrência por order_id + customer_unique_id.
+      Habilita análise de retenção, sequência de compra e cohort mensal.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_unique_id
+        tests: [not_null]
+      - name: customer_order_sequence
+        tests: [not_null]
+      - name: cohort_order_month_number
+        tests: [not_null]

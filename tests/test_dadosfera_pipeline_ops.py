@@ -324,6 +324,12 @@ def test_build_client_from_args_uses_settings(monkeypatch) -> None:
 
 def test_main_list_command_prints_response(monkeypatch, capsys) -> None:
     class DummyClient:
+        def __enter__(self) -> DummyClient:
+            return self
+
+        def __exit__(self, *_: object) -> None:
+            pass
+
         @staticmethod
         def sign_in() -> None:
             return None
@@ -354,6 +360,12 @@ def test_main_deploy_command_reuses_existing_pipeline(
     definition_path.write_text(json.dumps({"name": "olist-pipeline"}), encoding="utf-8")
 
     class DummyClient:
+        def __enter__(self) -> DummyClient:
+            return self
+
+        def __exit__(self, *_: object) -> None:
+            pass
+
         @staticmethod
         def sign_in() -> None:
             return None

@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(awk '{print $NF}')"
+      "Bash(awk '{print $NF}')",
+      "Bash(python -m pytest tests/test_dadosfera_pipeline_ops.py tests/test_schema_contracts.py tests/test_publication_gate.py tests/test_business_rule_validation.py tests/test_lgpd_policy.py tests/test_lgpd_classifier.py tests/test_run_platform_pipeline.py -v --tb=short)",
+      "Bash(.venv/Scripts/python -m pytest tests/test_dadosfera_pipeline_ops.py tests/test_schema_contracts.py tests/test_publication_gate.py tests/test_business_rule_validation.py tests/test_lgpd_policy.py tests/test_lgpd_classifier.py tests/test_run_platform_pipeline.py -v --tb=short)",
+      "Bash(cmd.exe /c \"cd /d \\\\\"C:\\\\Users\\\\samue\\\\PycharmProjects\\\\Governed Analytics Platform\\\\\" && .venv\\\\Scripts\\\\python -m pytest tests/test_dadosfera_pipeline_ops.py tests/test_schema_contracts.py tests/test_publication_gate.py tests/test_business_rule_validation.py tests/test_lgpd_policy.py tests/test_lgpd_classifier.py tests/test_run_platform_pipeline.py -v --tb=short 2>&1\")",
+      "Read(//usr/**)",
+      "Read(//usr/local/**)",
+      "Read(//proc/**)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_dadosfera_pipeline_ops.py tests/test_schema_contracts.py tests/test_publication_gate.py tests/test_business_rule_validation.py tests/test_lgpd_policy.py tests/test_lgpd_classifier.py tests/test_run_platform_pipeline.py -v --tb=short)"
     ]
   }
 }

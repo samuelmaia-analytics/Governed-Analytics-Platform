@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import json
+
+import pytest
+
+import src.governance_validation as gv
 from src.governance_validation import (
     GovernanceValidationResult,
     render_validation_report,
@@ -75,3 +80,37 @@ def test_render_validation_report_includes_table() -> None:
 
     assert "| Status | Mensagem |" in report
     assert "`PASS`" in report
+
+
+def test_main_passes_with_aligned_contract(tmp_path, monkeypatch, capsys) -> None:
+    contract = {
+        "branches": [
+            {"name": "develop", "deployment_environment": "dev", "deployment_branch": "streamlit-dev"},
+            {"name": "release", "deployment_environment": "stage", "deployment_branch": "streamlit-stage"},
+            {"name": "main", "deployment_environment": "prod", "deployment_branch": "streamlit-prod"},
+        ],
+        "environments": [
+            {"name": "streamlit-development", "target_environment": "dev", "deployment_branch": "streamlit-dev"},
+            {"name": "streamlit-staging", "target_environment": "stage", "deployment_branch": "streamlit-stage"},
+            {"name": "streamlit-production", "target_environment": "prod", "deployment_branch": "streamlit-prod"},
+        ],
+    }
+    contract_file = tmp_path / "governance.json"
+    contract_file.write_text(json.dumps(contract), encoding="utf-8")
+    monkeypatch.setattr("sys.argv", ["governance_validation.py", "--contract", str(contract_file)])
+
+    gv.main()
+
+    assert "PASS" in capsys.readouterr().out
+
+
+def test_main_exits_with_error_on_misaligned_contract(tmp_path, monkeypatch) -> None:
+    contract = {"branches": [{"name": "wrong", "deployment_environment": "prod", "deployment_branch": "x"}], "environments": []}
+    contract_file = tmp_path / "governance.json"
+    contract_file.write_text(json.dumps(contract), encoding="utf-8")
+    monkeypatch.setattr("sys.argv", ["governance_validation.py", "--contract", str(contract_file)])
+
+    with pytest.raises(SystemExit) as exc_info:
+        gv.main()
+
+    assert exc_info.value.code == 1

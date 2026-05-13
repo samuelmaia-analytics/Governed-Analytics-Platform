@@ -190,8 +190,7 @@ def _validate_prefixed_tokens(series: pd.Series, prefix: str) -> bool:
     non_null = series.dropna()
     if non_null.empty:
         return True
-    sample = non_null.head(100)
-    return all(isinstance(value, str) and value.startswith(prefix) for value in sample)
+    return all(isinstance(value, str) and value.startswith(prefix) for value in non_null)
 
 
 def validate_privacy_controls(
@@ -263,7 +262,7 @@ def validate_privacy_controls(
                 )
                 continue
             null_count = int(df[column].isna().sum())
-            has_default = bool((df[column] == default_value).any())
+            has_default = bool(df[column].eq(default_value).any())
             if source_df is not None and column in source_df.columns:
                 source_null_mask = source_df[column].isna()
                 default_applied = (

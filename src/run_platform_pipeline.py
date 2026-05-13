@@ -279,7 +279,7 @@ def save_pipeline_execution_report(
     metadata: PipelineRunMetadata,
 ) -> tuple[Path, Path]:
     ensure_directory(OPS_DIR)
-    ensure_directory(DOCS_DIR)
+    ensure_directory(PIPELINE_REPORT_PATH.parent)
     PIPELINE_RESULTS_PATH.write_text(
         json.dumps(
             {

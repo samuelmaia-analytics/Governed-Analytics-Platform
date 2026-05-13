@@ -1,0 +1,79 @@
+version: 2
+
+sources:
+  - name: olist_raw
+    description: >
+      Dataset público Olist de e-commerce brasileiro com pedidos, clientes,
+      produtos, sellers, pagamentos e avaliações.
+    tables:
+      - name: orders
+        description: "Pedidos com status e timestamps de ciclo de vida."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/olist_orders_dataset.csv',
+              AUTO_DETECT=true
+            )
+
+      - name: order_items
+        description: "Itens de pedido com preço, frete, seller e produto."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/olist_order_items_dataset.csv',
+              AUTO_DETECT=true
+            )
+
+      - name: customers
+        description: "Clientes com localização geográfica."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/olist_customers_dataset.csv',
+              AUTO_DETECT=true
+            )
+
+      - name: products
+        description: "Produtos com categoria e dimensões físicas."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/olist_products_dataset.csv',
+              AUTO_DETECT=true
+            )
+
+      - name: sellers
+        description: "Sellers com localização geográfica."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/olist_sellers_dataset.csv',
+              AUTO_DETECT=true
+            )
+
+      - name: payments
+        description: "Pagamentos por pedido com tipo, valor e parcelas."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/olist_order_payments_dataset.csv',
+              AUTO_DETECT=true
+            )
+
+      - name: reviews
+        description: "Avaliações de pedido com nota e comentário."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/olist_order_reviews_dataset.csv',
+              AUTO_DETECT=true
+            )
+
+      - name: category_translation
+        description: "Tradução das categorias de produto para inglês."
+        config:
+          external_location: >
+            read_csv_auto(
+              '{{ env_var("OLIST_RAW_PATH", "data/raw/landing/olist") }}/product_category_name_translation.csv',
+              AUTO_DETECT=true
+            )

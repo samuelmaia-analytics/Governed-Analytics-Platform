@@ -1,49 +1,40 @@
-# Mini RIPD Sample (LGPD-inspired)
+# Mini RIPD (LGPD-inspired)
 
-> Documento técnico simulado para portfólio.
-> Não substitui avaliação jurídica formal.
+> Documento simulado para portfólio. Não substitui avaliação jurídica formal.
 
-## Escopo
+- Data de geração: **2026-05-11**
+- Dataset avaliado: **fact_orders_dashboard**
+- Risco de privacidade: **high (100/100)**
+- Falhas de qualidade: **5**
 
-- Produto: Governed Analytics Platform
-- Dataset publicado: `fact_orders_dashboard`
-- Contexto: consumo executivo interno
+## Inventário de Tratamento (simulado)
 
-## Resumo da operação
+- Finalidade: Executive performance and governance monitoring
+- Base legal: legitimate_interest (simulated)
+- Controlador: Olist Governed Analytics (fictitious)
+- Operador: Analytics Platform Team (fictitious)
+- Encarregado (DPO): dpo@example.org (fictitious)
+- Retenção: 12 months in published layer, 24 months in curated internal layer (simulated)
 
-- classificação de colunas por sensibilidade;
-- score de risco explicável;
-- validação de qualidade antes da publicação;
-- minimização e pseudonimização na camada publicada.
+## Matriz de Risco
 
-## Inventário de tratamento (simulado)
+| risk_id | risk_event | probability | impact | severity | mitigation | evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| R1 | Leakage of direct or sensitive identifiers | Medium | High | Critical | Pseudonymize/remove sensitive fields before publication. | Classification inventory and publication checks. |
+| R2 | Re-identification through quasi-identifiers | Medium | Medium | Medium | Data minimization and aggregation in published layer. | Published schema and forbidden-columns validation. |
+| R3 | Publication with unresolved quality issues | High | Medium | High | Block/review publication when quality checks fail. | Failed checks count: 5. |
+| R4 | Missing legal and retention metadata | Medium | Medium | Medium | Maintain processing inventory and LGPD-inspired RIPD sample. | Governance docs and treatment inventory. |
+| R5 | Overexposure from broad published schema | Medium | High | High | Keep published layer minimized to executive use cases. | Published contract and schema checks. |
 
-| Campo | Valor |
-| --- | --- |
-| Finalidade | Executive performance and governance monitoring |
-| Base legal | legitimate_interest (simulated) |
-| Controlador | Olist Governed Analytics (fictitious) |
-| Operador | Analytics Platform Team (fictitious) |
-| Encarregado | dpo@example.org (fictitious) |
-| Retenção | 12 meses (published), 24 meses (curated) - simulated |
+## Controles Implementados
 
-## Matriz resumida de risco
-
-| Risco | Probabilidade | Impacto | Severidade | Mitigação |
-| --- | --- | --- | --- | --- |
-| Vazamento de identificadores | Média/Alta | Alta | Alta/Crítica | remoção/pseudonimização |
-| Reidentificação por quase-identificadores | Média | Média | Média/Alta | minimização e agregação |
-| Publicação com falhas de qualidade | Média | Média | Média/Alta | bloqueio/revisão por checks |
-
-## Controles implementados
-
-- contrato de governança de publicação;
-- validação de colunas proibidas e obrigatórias;
-- pseudonimização de chaves sensíveis;
-- decisão de publicação baseada em risco + qualidade.
+- Classificação de colunas com heurística + contrato YAML.
+- Score de risco explicável com recomendação de publicação.
+- Checks de qualidade integrados na decisão executiva.
+- Camada publicada minimizada e pseudonimizada.
 
 ## Limitações
 
-- amostra orientada a portfólio;
-- controles jurídicos e organizacionais não estão completos;
-- não representa certificação de conformidade LGPD.
+- Este RIPD é simulado para demonstração técnica.
+- Não representa conformidade jurídica automática com LGPD.
+- Requer validação com jurídico e segurança para dados pessoais reais.

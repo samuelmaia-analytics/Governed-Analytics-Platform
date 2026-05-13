@@ -52,6 +52,12 @@ def normalize_endpoint_path(path: str) -> str:
 
 
 class DadosferaPipelineClient:
+    def __enter__(self) -> DadosferaPipelineClient:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        self.session.close()
+
     def __init__(
         self,
         *,
@@ -420,9 +426,12 @@ def build_client_from_args(args: argparse.Namespace) -> DadosferaPipelineClient:
 def main() -> None:
     configure_logging()
     args = parse_args()
-    client = build_client_from_args(args)
-    client.sign_in()
+    with build_client_from_args(args) as client:
+        client.sign_in()
+        _dispatch(args, client)
 
+
+def _dispatch(args: argparse.Namespace, client: DadosferaPipelineClient) -> None:
     if args.command == "list":
         print(json.dumps(client.list_pipelines(), indent=2, ensure_ascii=False))
         return

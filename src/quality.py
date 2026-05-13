@@ -312,6 +312,18 @@ def check_dimension_join_coverage(df: pd.DataFrame) -> list[QualityCheckResult]:
         "seller_state",
         "payment_type_mode",
     ]:
+        if column not in df.columns:
+            results.append(
+                build_result(
+                    f"dimension_join_missing_pct__{column}",
+                    False,
+                    100.0,
+                    MAX_DIMENSION_JOIN_MISSING_PCT,
+                    "medium",
+                    f"Coluna `{column}` ausente da tabela.",
+                )
+            )
+            continue
         missing_pct = round(float(df[column].isna().mean() * 100), 2)
         results.append(
             build_result(

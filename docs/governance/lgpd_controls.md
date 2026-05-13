@@ -1,35 +1,53 @@
 # LGPD Controls
 
-- Generated at: **2026-05-03 20:54:28 UTC**
-- Risk score: **87 / 100**
+- Generated at: **2026-05-11 17:35:32 UTC**
+- Risk score: **100 / 100**
 - Risk level: **high**
 
 ## Dataset Summary
 
-- Total rows: **10**
-- Total columns: **16**
-- Risk summary: Dataset with 7 personal, 1 sensitive and 2 indirect identifier columns over 10 rows.
+- Total rows: **112650**
+- Total columns: **34**
+- Risk summary: Dataset with 13 personal, 0 sensitive and 2 indirect identifier columns over 112650 rows.
 
 ## LGPD Classification by Column
 
 | column_name | dtype | lgpd_classification | risk_level | recommended_action | reason |
 | --- | --- | --- | --- | --- | --- |
-| customer_id | object | personal_data | high | mask | Column name indicates personal data. No personal-data regex pattern matched sampled values. |
-| customer_name | object | personal_data | high | mask | Column name indicates personal data. No personal-data regex pattern matched sampled values. |
-| customer_email | object | personal_data | high | mask | Column name indicates personal data. Regex matched email pattern in sampled values. |
-| customer_phone | object | personal_data | high | mask | Column name indicates personal data. Regex matched phone pattern in sampled values. |
-| state | object | indirect_identifier | medium | review | Column name indicates indirect identification risk. No personal-data regex pattern matched sampled values. |
-| city | object | indirect_identifier | medium | review | Column name indicates indirect identification risk. No personal-data regex pattern matched sampled values. |
-| birth_date | object | personal_data | high | mask | Column name indicates personal data. No personal-data regex pattern matched sampled values. |
-| order_id | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| order_id | object | personal_data | high | mask | No personal-data indicators found in column name. Regex matched phone pattern in sampled values. |
+| order_item_id | int64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| customer_unique_id | object | personal_data | high | mask | No personal-data indicators found in column name. Regex matched phone pattern in sampled values. |
+| order_status | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| order_purchase_timestamp | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| order_delivered_customer_date | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| order_estimated_delivery_date | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
 | order_date | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
-| revenue | float64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
-| payment_method | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
-| status | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
-| marketing_consent | bool | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
-| last_login_ip | object | personal_data | high | mask | Column name indicates personal data. Regex matched IP pattern in sampled values. |
-| cpf | object | personal_data | high | remove | Column name indicates personal data. Regex matched CPF pattern in sampled values. |
-| saude_score | int64 | sensitive_personal_data | high | anonymize | Column name indicates sensitive data. No personal-data regex pattern matched sampled values. |
+| order_year | int64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| order_month | int64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| purchase_cohort_month | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| cohort_order_month_number | int64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| customer_order_sequence | int64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| is_first_order | bool | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| seller_key | object | personal_data | high | mask | No personal-data indicators found in column name. Regex matched phone pattern in sampled values. |
+| seller_volume_tier | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| seller_order_count | int64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| seller_avg_delivery_days | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched CNPJ pattern in sampled values. |
+| seller_delay_rate | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched phone pattern in sampled values. |
+| delivery_time_days | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched CNPJ pattern in sampled values. |
+| seller_dispatch_time_days | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched CNPJ pattern in sampled values. |
+| carrier_delivery_time_days | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched CNPJ pattern in sampled values. |
+| estimated_delay_days | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched CNPJ pattern in sampled values. |
+| is_delayed | bool | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| price | float64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| freight_value | float64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| freight_to_price_ratio | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched CNPJ pattern in sampled values. |
+| total_item_value | float64 | personal_data | high | mask | No personal-data indicators found in column name. Regex matched CNPJ pattern in sampled values. |
+| payment_type_mode | object | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| review_score_mean | float64 | non_personal | low | keep | No personal-data indicators found in column name. No personal-data regex pattern matched sampled values. |
+| product_category_name | object | personal_data | high | mask | Column name indicates personal data. No personal-data regex pattern matched sampled values. |
+| product_category_name_english | object | personal_data | high | mask | Column name indicates personal data. No personal-data regex pattern matched sampled values. |
+| customer_state | object | indirect_identifier | medium | review | Column name indicates indirect identification risk. No personal-data regex pattern matched sampled values. |
+| seller_state | object | indirect_identifier | medium | review | Column name indicates indirect identification risk. No personal-data regex pattern matched sampled values. |
 
 ## Governance Recommendations
 

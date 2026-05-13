@@ -1,9 +1,9 @@
 {
   "dataset": "fact_orders_dashboard",
-  "status": "Approved",
-  "quality_score": 100,
-  "privacy_risk_score": 22,
-  "failed_checks": 0,
-  "timestamp_utc": "2026-05-11T11:51:25.652494+00:00",
-  "decision_reason": "All quality and privacy checks are within configured thresholds."
+  "status": "Needs Review",
+  "quality_score": 90,
+  "privacy_risk_score": 35,
+  "failed_checks": 1,
+  "timestamp_utc": "2026-05-11T17:38:53.613017+00:00",
+  "decision_reason": "One or more controls require manual review before publication."
 }

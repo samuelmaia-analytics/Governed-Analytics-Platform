@@ -75,7 +75,7 @@ def matches_expected_type(series: pd.Series, expected_type: str) -> bool:
         non_null = series.dropna()
         return non_null.empty or all(
             hasattr(value, "year") and hasattr(value, "month") and hasattr(value, "day")
-            for value in non_null.head(50)
+            for value in non_null
         )
     raise ValueError(f"Tipo esperado desconhecido: {expected_type}")
 
