@@ -1223,7 +1223,7 @@ requires-dist = [
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28,<1" },
     { name = "jinja2", specifier = ">=3.1,<4" },
     { name = "matplotlib", specifier = ">=3.8,<4" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.18,<1.21" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.18,<2.2" },
     { name = "numpy", specifier = ">=1.26,<3" },
     { name = "openpyxl", specifier = ">=3.1,<4" },
     { name = "pandas", specifier = ">=2.2,<3.1" },

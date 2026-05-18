@@ -26,7 +26,7 @@ Requires-Dist: pytest<10,>=9; extra == "dev"
 Requires-Dist: pytest-cov<8,>=7; extra == "dev"
 Requires-Dist: httpx<1,>=0.28; extra == "dev"
 Requires-Dist: ruff<0.16,>=0.12; extra == "dev"
-Requires-Dist: mypy<1.21,>=1.18; extra == "dev"
+Requires-Dist: mypy<2.2,>=1.18; extra == "dev"
 Requires-Dist: playwright; extra == "dev"
 Requires-Dist: dbt-duckdb<2,>=1.8; extra == "dev"
 Dynamic: license-file
