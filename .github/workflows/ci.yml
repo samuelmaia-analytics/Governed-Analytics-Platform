@@ -86,14 +86,14 @@ jobs:
         run: uv run pytest --cov=app --cov-report=xml:coverage-app.xml --cov-report=
 
       - name: Upload global coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
           use_oidc: true
           fail_ci_if_error: true
 
       - name: Upload src coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage-src.xml
           flags: src
@@ -101,7 +101,7 @@ jobs:
           fail_ci_if_error: true
 
       - name: Upload app coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage-app.xml
           flags: app
