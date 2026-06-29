@@ -1,0 +1,57 @@
+{
+  "name": "Governed Analytics Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python scripts/register_pipeline_log.py --pipeline-name governed_analytics_pipeline --status failed --message \"n8n workflow execution failed\" --source n8n_error_handler --config config/pipeline_config.yml"
+      },
+      "id": "register-error-log",
+      "name": "Register Error Log",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        280,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Register Error Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "governed-analytics-error-handler-v1",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "name": "governance"
+    },
+    {
+      "name": "error-handling"
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "name": "Governed Analytics Pipeline Orchestration",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "daily-schedule",
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python scripts/run_governance_pipeline.py --config config/pipeline_config.yml"
+      },
+      "id": "run-governance-pipeline",
+      "name": "Run Governance Pipeline",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        280,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python scripts/run_data_quality.py --config config/pipeline_config.yml"
+      },
+      "id": "run-data-quality",
+      "name": "Run Data Quality",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        560,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python scripts/run_lgpd_classification.py --config config/pipeline_config.yml"
+      },
+      "id": "run-lgpd-classification",
+      "name": "Run LGPD Classification",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        840,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python scripts/run_privacy_risk_score.py --config config/pipeline_config.yml"
+      },
+      "id": "run-privacy-risk-score",
+      "name": "Run Privacy Risk Score",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python scripts/generate_governance_docs.py --config config/pipeline_config.yml"
+      },
+      "id": "generate-governance-docs",
+      "name": "Generate Governance Docs",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python scripts/register_pipeline_log.py --pipeline-name governed_analytics_pipeline --status success --message \"n8n workflow completed\" --source n8n --config config/pipeline_config.yml"
+      },
+      "id": "register-success-log",
+      "name": "Register Success Log",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        80
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run Governance Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Schedule": {
+      "main": [
+        [
+          {
+            "node": "Run Governance Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Governance Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Run Data Quality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Data Quality": {
+      "main": [
+        [
+          {
+            "node": "Run LGPD Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run LGPD Classification": {
+      "main": [
+        [
+          {
+            "node": "Run Privacy Risk Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Privacy Risk Score": {
+      "main": [
+        [
+          {
+            "node": "Generate Governance Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Governance Docs": {
+      "main": [
+        [
+          {
+            "node": "Register Success Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "governed-analytics-pipeline-v1",
+  "triggerCount": 2,
+  "tags": [
+    {
+      "name": "governance"
+    },
+    {
+      "name": "analytics-engineering"
+    }
+  ]
+}

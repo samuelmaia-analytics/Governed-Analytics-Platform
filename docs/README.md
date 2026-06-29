@@ -36,6 +36,7 @@ Estrutura de documentação reorganizada para leitura rápida e manutenção:
 | API | [../src/api.py](../src/api.py) |
 | Governança | [governance/privacy_governance.md](governance/privacy_governance.md) |
 | Operação | [operations/release_runbook.md](operations/release_runbook.md) |
+| Automação n8n | [n8n_automation.md](n8n_automation.md) |
 | Relatórios | [reports/data_quality_report.md](reports/data_quality_report.md) |
 | Histórico | [legacy/00_planejamento.md](legacy/00_planejamento.md) |
 

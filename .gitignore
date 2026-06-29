@@ -2,6 +2,7 @@
 .venv/
 __pycache__/
 .pytest_cache/
+pytest-cache-files-*/
 .ruff_cache/
 .coverage
 coverage.xml
@@ -12,6 +13,10 @@ htmlcov/
 .env
 .env.*
 !.env.example
+
+# Runtime logs
+logs/*
+!logs/.gitkeep
 
 # Keep raw data delivered with the case
 !data/raw/

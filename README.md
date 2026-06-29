@@ -70,7 +70,7 @@ flowchart LR
 | Analytical modeling | dbt |
 | Quality & governance | pytest · data contracts (YAML) · Ruff · mypy |
 | Delivery | Streamlit · Power BI · FastAPI |
-| CI/CD | GitHub Actions · Codecov |
+| CI/CD & orchestration | GitHub Actions · Codecov · n8n |
 | Cloud | Snowflake (optional) |
 
 ## How to run locally
@@ -135,6 +135,16 @@ uvicorn src.api:app --reload --port 8000
 # Swagger UI: http://localhost:8000/docs
 ```
 
+## n8n orchestration
+
+The repository includes an optional n8n automation layer for orchestration only. It triggers the existing Python pipeline wrappers and keeps processing logic in `src/`, SQL, and dbt.
+
+```bash
+python scripts/run_governance_pipeline.py --config config/pipeline_config.yml
+```
+
+Importable workflows are available in `workflows/n8n/`. Operational details are documented in [docs/n8n_automation.md](docs/n8n_automation.md).
+
 ## Snowflake configuration
 
 Add to `.env` to enable Snowflake integration (app degrades gracefully without it):
@@ -160,6 +170,8 @@ SNOWFLAKE_ROLE=PUBLIC
 | `docs/` | Technical and executive documentation |
 | `tests/` | Automated tests |
 | `.github/workflows/` | CI/CD pipelines |
+| `workflows/n8n/` | Optional n8n orchestration workflows |
+| `config/` | Pipeline orchestration configuration |
 | `powerbi/` | Power BI export artifacts |
 
 ## Screenshots

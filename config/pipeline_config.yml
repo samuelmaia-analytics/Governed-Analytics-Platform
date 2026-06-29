@@ -1,0 +1,35 @@
+project:
+  name: governed_analytics_platform
+  default_environment: local
+
+pipeline:
+  default_steps:
+    - inventory
+    - profiling
+    - build
+    - publish
+    - semantic
+    - classify
+    - contracts
+    - business_rules
+    - quality
+    - monitor
+    - scorecards
+    - lineage
+    - catalog
+    - queries
+    - screenshots
+    - bi
+  continue_on_error: false
+
+datasets:
+  governance_sample_path: data/samples/sample_governance_dataset.csv
+  lgpd_classification_output_path: logs/lgpd_classification_runtime.csv
+  privacy_risk_output_path: logs/privacy_risk_score.json
+
+reports:
+  docs_dir: docs
+
+logging:
+  log_dir: logs
+  pipeline_log_path: logs/pipeline_runs.jsonl
