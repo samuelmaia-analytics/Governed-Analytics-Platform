@@ -2,17 +2,6 @@
   "name": "Governed Analytics Pipeline Orchestration",
   "nodes": [
     {
-      "parameters": {},
-      "id": "manual-trigger",
-      "name": "Manual Trigger",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        0,
-        0
-      ]
-    },
-    {
       "parameters": {
         "rule": {
           "interval": [
@@ -23,39 +12,111 @@
           ]
         }
       },
-      "id": "daily-schedule",
-      "name": "Daily Schedule",
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
         0,
-        180
-      ]
+        0
+      ],
+      "notes": "Adjust the interval in n8n according to the target operating cadence."
     },
     {
       "parameters": {
-        "command": "python scripts/run_governance_pipeline.py --config config/pipeline_config.yml"
+        "assignments": {
+          "assignments": [
+            {
+              "id": "pipeline-name",
+              "name": "pipeline_name",
+              "value": "governed_analytics_pipeline",
+              "type": "string"
+            },
+            {
+              "id": "environment",
+              "name": "environment",
+              "value": "local",
+              "type": "string"
+            },
+            {
+              "id": "config-path",
+              "name": "config_path",
+              "value": "config/pipeline_config.yml",
+              "type": "string"
+            },
+            {
+              "id": "input-dataset",
+              "name": "input_dataset_path",
+              "value": "data/samples/sample_governance_dataset.csv",
+              "type": "string"
+            },
+            {
+              "id": "execution-source",
+              "name": "execution_source",
+              "value": "n8n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
       },
-      "id": "run-governance-pipeline",
-      "name": "Run Governance Pipeline",
+      "id": "set-execution-metadata",
+      "name": "Set Execution Metadata",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        260,
+        0
+      ],
+      "notes": "Centralizes values used by command nodes. Keep secrets out of this workflow file."
+    },
+    {
+      "parameters": {
+        "command": "python -c \"from pathlib import Path; path=Path('data/samples/sample_governance_dataset.csv'); print('dataset_exists=true' if path.exists() else 'dataset_exists=false')\""
+      },
+      "id": "check-input-dataset",
+      "name": "Check Input Dataset",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        280,
-        80
-      ]
+        520,
+        0
+      ],
+      "notes": "Checks that the sample governance dataset is available before running the governed pipeline steps."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.stdout }}",
+              "operation": "contains",
+              "value2": "dataset_exists=true"
+            }
+          ]
+        }
+      },
+      "id": "input-dataset-exists",
+      "name": "Input Dataset Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        780,
+        0
+      ],
+      "notes": "True branch continues the pipeline. False branch stops execution; configure the error workflow for alerting."
     },
     {
       "parameters": {
         "command": "python scripts/run_data_quality.py --config config/pipeline_config.yml"
       },
-      "id": "run-data-quality",
-      "name": "Run Data Quality",
+      "id": "run-data-quality-checks",
+      "name": "Run Data Quality Checks",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        560,
-        80
+        1040,
+        -120
       ]
     },
     {
@@ -67,21 +128,21 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        840,
-        80
+        1300,
+        -120
       ]
     },
     {
       "parameters": {
         "command": "python scripts/run_privacy_risk_score.py --config config/pipeline_config.yml"
       },
-      "id": "run-privacy-risk-score",
-      "name": "Run Privacy Risk Score",
+      "id": "run-privacy-risk-scoring",
+      "name": "Run Privacy Risk Scoring",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1120,
-        80
+        1560,
+        -120
       ]
     },
     {
@@ -93,59 +154,95 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1400,
-        80
+        1820,
+        -120
       ]
     },
     {
       "parameters": {
-        "command": "python scripts/register_pipeline_log.py --pipeline-name governed_analytics_pipeline --status success --message \"n8n workflow completed\" --source n8n --config config/pipeline_config.yml"
+        "command": "python scripts/register_pipeline_log.py --pipeline-name governed_analytics_pipeline --status success --message \"n8n governed analytics workflow completed\" --source n8n --config config/pipeline_config.yml"
       },
-      "id": "register-success-log",
-      "name": "Register Success Log",
+      "id": "register-execution-log",
+      "name": "Register Execution Log",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        1680,
-        80
+        2080,
+        -120
       ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "guildId": "PLACEHOLDER_DISCORD_GUILD_ID",
+        "channelId": "PLACEHOLDER_DISCORD_CHANNEL_ID",
+        "content": "Governed Analytics Pipeline completed successfully. Review generated logs and governance artifacts in the repository."
+      },
+      "id": "send-success-alert",
+      "name": "Send Success Alert",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        2340,
+        -120
+      ],
+      "credentials": {
+        "discordBotApi": {
+          "id": "PLACEHOLDER_DISCORD_CREDENTIAL_ID",
+          "name": "PLACEHOLDER - Discord Bot Credential"
+        }
+      },
+      "notes": "Placeholder alert node. Replace guild/channel IDs and attach real n8n credentials inside n8n. Do not commit real credentials."
     }
   ],
   "connections": {
-    "Manual Trigger": {
+    "Schedule Trigger": {
       "main": [
         [
           {
-            "node": "Run Governance Pipeline",
+            "node": "Set Execution Metadata",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Daily Schedule": {
+    "Set Execution Metadata": {
       "main": [
         [
           {
-            "node": "Run Governance Pipeline",
+            "node": "Check Input Dataset",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Run Governance Pipeline": {
+    "Check Input Dataset": {
       "main": [
         [
           {
-            "node": "Run Data Quality",
+            "node": "Input Dataset Exists?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Run Data Quality": {
+    "Input Dataset Exists?": {
+      "main": [
+        [
+          {
+            "node": "Run Data Quality Checks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Run Data Quality Checks": {
       "main": [
         [
           {
@@ -160,14 +257,14 @@
       "main": [
         [
           {
-            "node": "Run Privacy Risk Score",
+            "node": "Run Privacy Risk Scoring",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Run Privacy Risk Score": {
+    "Run Privacy Risk Scoring": {
       "main": [
         [
           {
@@ -182,7 +279,18 @@
       "main": [
         [
           {
-            "node": "Register Success Log",
+            "node": "Register Execution Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register Execution Log": {
+      "main": [
+        [
+          {
+            "node": "Send Success Alert",
             "type": "main",
             "index": 0
           }
@@ -191,18 +299,22 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "errorWorkflow": "Governed Analytics Error Handler"
   },
   "staticData": null,
   "pinData": {},
-  "versionId": "governed-analytics-pipeline-v1",
-  "triggerCount": 2,
+  "versionId": "governed-analytics-pipeline-orchestration-template-v2",
+  "triggerCount": 1,
   "tags": [
     {
       "name": "governance"
     },
     {
       "name": "analytics-engineering"
+    },
+    {
+      "name": "n8n-template"
     }
   ]
 }

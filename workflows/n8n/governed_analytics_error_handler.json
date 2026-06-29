@@ -10,20 +10,94 @@
       "position": [
         0,
         0
-      ]
+      ],
+      "notes": "Attach this workflow as the error workflow for Governed Analytics Pipeline Orchestration."
     },
     {
       "parameters": {
-        "command": "python scripts/register_pipeline_log.py --pipeline-name governed_analytics_pipeline --status failed --message \"n8n workflow execution failed\" --source n8n_error_handler --config config/pipeline_config.yml"
+        "assignments": {
+          "assignments": [
+            {
+              "id": "pipeline-name",
+              "name": "pipeline_name",
+              "value": "governed_analytics_pipeline",
+              "type": "string"
+            },
+            {
+              "id": "error-source",
+              "name": "error_source",
+              "value": "n8n_error_handler",
+              "type": "string"
+            },
+            {
+              "id": "error-workflow",
+              "name": "failed_workflow",
+              "value": "={{ $json.workflow.name || 'unknown_workflow' }}",
+              "type": "string"
+            },
+            {
+              "id": "error-node",
+              "name": "failed_node",
+              "value": "={{ $json.execution.lastNodeExecuted || 'unknown_node' }}",
+              "type": "string"
+            },
+            {
+              "id": "error-message",
+              "name": "error_message",
+              "value": "={{ $json.execution.error.message || 'n8n workflow execution failed' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extract-error-metadata",
+      "name": "Extract Error Metadata",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        0
+      ],
+      "notes": "Normalizes n8n error payload fields before logging and alerting."
+    },
+    {
+      "parameters": {
+        "command": "python scripts/register_pipeline_log.py --pipeline-name governed_analytics_pipeline --status failed --message \"n8n governed analytics workflow failed\" --source n8n_error_handler --config config/pipeline_config.yml"
       },
       "id": "register-error-log",
       "name": "Register Error Log",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        280,
+        560,
         0
-      ]
+      ],
+      "notes": "Records a failure entry in logs/pipeline_runs.jsonl through the project wrapper script."
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "guildId": "PLACEHOLDER_DISCORD_GUILD_ID",
+        "channelId": "PLACEHOLDER_DISCORD_CHANNEL_ID",
+        "content": "Governed Analytics Pipeline failed. Check n8n execution details and logs/pipeline_runs.jsonl. Failed workflow: {{$json.failed_workflow}}. Failed node: {{$json.failed_node}}."
+      },
+      "id": "send-error-alert",
+      "name": "Send Error Alert",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        840,
+        0
+      ],
+      "credentials": {
+        "discordBotApi": {
+          "id": "PLACEHOLDER_DISCORD_CREDENTIAL_ID",
+          "name": "PLACEHOLDER - Discord Bot Credential"
+        }
+      },
+      "notes": "Placeholder alert node. Replace placeholders and attach real credentials inside n8n only."
     }
   ],
   "connections": {
@@ -31,7 +105,29 @@
       "main": [
         [
           {
+            "node": "Extract Error Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Error Metadata": {
+      "main": [
+        [
+          {
             "node": "Register Error Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register Error Log": {
+      "main": [
+        [
+          {
+            "node": "Send Error Alert",
             "type": "main",
             "index": 0
           }
@@ -44,7 +140,7 @@
   },
   "staticData": null,
   "pinData": {},
-  "versionId": "governed-analytics-error-handler-v1",
+  "versionId": "governed-analytics-error-handler-template-v2",
   "triggerCount": 1,
   "tags": [
     {
@@ -52,6 +148,9 @@
     },
     {
       "name": "error-handling"
+    },
+    {
+      "name": "n8n-template"
     }
   ]
 }
