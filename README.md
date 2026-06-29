@@ -105,6 +105,34 @@ make app
 
 ## Streamlit app pages
 
+The repository now includes a root-level Streamlit entrypoint focused on
+automation visibility:
+
+```bash
+streamlit run app.py
+```
+
+This interface is designed for executive and technical review after the n8n
+automation layer was added. It does not execute n8n directly. Instead, it reads
+existing artifacts from `data/`, `logs/`, `contracts/`, `docs/`, and
+`workflows/n8n/` and shows clear fallback messages when a file has not been
+generated yet.
+
+Root multipage dashboard:
+
+| Page | What it shows |
+|---|---|
+| Overview | Project summary, key governance metrics, last execution status, technologies, and architecture |
+| Data Quality | Quality report checks, success/warning/error indicators, and residual issue visibility |
+| LGPD Risk | LGPD classification inventory, privacy risk score, score components, and recommendations |
+| Data Contracts | Schema contract results, business rule results, and versioned contract files |
+| Pipeline Logs | Execution history from `logs/pipeline_execution_logs.csv`, latest status, and status charts |
+| n8n Automation | Workflow flow, available JSON templates, node inventory, and importability evidence |
+| Governance Docs | Markdown documentation browser, highlighting `docs/n8n_automation.md` |
+
+The existing modular Streamlit application under `app/main.py` remains available
+and keeps the broader analytical pages:
+
 | Page | What it shows |
 |---|---|
 | Executive Overview | Key metrics, trend deltas, data freshness, LGPD-suppressed columns |
