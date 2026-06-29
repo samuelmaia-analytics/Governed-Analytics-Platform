@@ -28,12 +28,17 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     config = load_config(PROJECT_ROOT / args.config)
+    paths_config = config.get("paths", {})
+    data_input_dir = str(paths_config.get("data_input", "data/"))
     input_path = PROJECT_ROOT / (
         args.input_path
         or config.get("datasets", {}).get("governance_sample_path", "")
+        or str(Path(data_input_dir) / "samples" / "sample_governance_dataset.csv")
     )
     docs_dir = PROJECT_ROOT / (
-        args.docs_dir or config.get("reports", {}).get("docs_dir", "docs")
+        args.docs_dir
+        or config.get("reports", {}).get("docs_dir", "")
+        or str(paths_config.get("docs", "docs"))
     )
     df = pd.read_csv(input_path)
     generated_paths = generate_markdown_reports(df, docs_dir=docs_dir)

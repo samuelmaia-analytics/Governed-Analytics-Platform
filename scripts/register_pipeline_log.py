@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -23,9 +24,11 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     config = load_config(PROJECT_ROOT / args.config)
-    log_path = PROJECT_ROOT / config.get("logging", {}).get(
-        "pipeline_log_path", "logs/pipeline_runs.jsonl"
+    logging_config = config.get("logging", {})
+    log_path = PROJECT_ROOT / logging_config.get(
+        "pipeline_log_path", logging_config.get("file", "logs/pipeline_runs.jsonl")
     )
+    log_format = str(logging_config.get("format", "jsonl")).lower()
     log_path.parent.mkdir(parents=True, exist_ok=True)
     record = {
         "timestamp_utc": datetime.now(UTC).isoformat(),
@@ -34,9 +37,22 @@ def main() -> None:
         "message": args.message,
         "source": args.source,
     }
-    with log_path.open("a", encoding="utf-8") as file:
-        file.write(json.dumps(record, ensure_ascii=False) + "\n")
-    print(json.dumps({"status": "success", "log_path": str(log_path), "record": record}, ensure_ascii=False))
+    if log_format == "csv":
+        write_header = not log_path.exists() or log_path.stat().st_size == 0
+        with log_path.open("a", encoding="utf-8", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=list(record))
+            if write_header:
+                writer.writeheader()
+            writer.writerow(record)
+    else:
+        with log_path.open("a", encoding="utf-8") as file:
+            file.write(json.dumps(record, ensure_ascii=False) + "\n")
+    print(
+        json.dumps(
+            {"status": "success", "log_path": str(log_path), "record": record},
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":

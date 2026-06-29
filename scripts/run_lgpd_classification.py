@@ -30,14 +30,18 @@ def main() -> None:
     args = parse_args()
     config = load_config(PROJECT_ROOT / args.config)
     dataset_config = config.get("datasets", {})
+    paths_config = config.get("paths", {})
+    data_input_dir = str(paths_config.get("data_input", "data/"))
     input_path = PROJECT_ROOT / (
-        args.input_path or dataset_config.get("governance_sample_path", "")
+        args.input_path
+        or dataset_config.get("governance_sample_path", "")
+        or str(Path(data_input_dir) / "samples" / "sample_governance_dataset.csv")
     )
     output_path = PROJECT_ROOT / (
         args.output_path
         or dataset_config.get(
             "lgpd_classification_output_path",
-            "data/curated/catalog/lgpd_classification_runtime.csv",
+            "logs/lgpd_classification_runtime.csv",
         )
     )
     df = pd.read_csv(input_path)
