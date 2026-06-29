@@ -135,15 +135,38 @@ uvicorn src.api:app --reload --port 8000
 # Swagger UI: http://localhost:8000/docs
 ```
 
-## n8n orchestration
+## n8n Workflow Automation
 
-The repository includes an optional n8n automation layer for orchestration only. It triggers the existing Python pipeline wrappers and keeps processing logic in `src/`, SQL, and dbt.
+n8n was added to demonstrate how a governed analytics project can be orchestrated by an external automation tool without moving business logic out of the codebase. The Python modules, SQL assets, dbt models, contracts, and Streamlit app remain the source of truth; n8n only coordinates when those components run.
 
-```bash
-python scripts/run_governance_pipeline.py --config config/pipeline_config.yml
+In this project, n8n is responsible for scheduling, execution metadata, command orchestration, error routing, and optional alerts. It calls lightweight Python wrappers in `scripts/`, and those wrappers call the implemented logic in `src/`. This keeps the automation layer visible for portfolio review while preserving reproducibility through code.
+
+Importable workflow templates are available in `workflows/n8n/`:
+
+```text
+workflows/n8n/governed_analytics_pipeline.json
+workflows/n8n/governed_analytics_error_handler.json
 ```
 
-Importable workflows are available in `workflows/n8n/`. Operational details are documented in [docs/n8n_automation.md](docs/n8n_automation.md).
+To import them, open n8n, choose **Import from File**, import both JSON files, then review command paths, schedule cadence, and placeholder alert credentials before activation. The alert nodes intentionally use placeholders only; real credentials must be configured inside n8n and never committed.
+
+The same automation can be executed manually from the repository root:
+
+```bash
+python scripts/run_data_quality.py --config config/pipeline_config.yml
+python scripts/run_lgpd_classification.py --config config/pipeline_config.yml
+python scripts/run_privacy_risk_score.py --config config/pipeline_config.yml
+python scripts/generate_governance_docs.py --config config/pipeline_config.yml
+python scripts/register_pipeline_log.py --status success --message "manual run" --source manual
+```
+
+n8n calls these scripts through `Execute Command` nodes. The main workflow checks the input dataset, runs quality, LGPD classification, privacy risk scoring, documentation generation, registers the execution log, and sends a success alert. The error workflow starts from an `Error Trigger`, extracts failure metadata, registers an error log, and sends an error alert.
+
+Logs are configured in `config/pipeline_config.yml` and written to `logs/pipeline_execution_logs.csv`. Runtime logs and generated n8n outputs are ignored by Git; only `logs/.gitkeep` is versioned. Alerts are disabled by default in configuration and represented as placeholders in the workflow templates.
+
+Current limitations: the workflows assume n8n can execute shell commands from the repository root, local credentials are not bundled, and alert delivery requires manual credential setup in n8n. The data quality wrapper also expects the analytical dataset to exist when validating the full curated layer.
+
+Next steps include adding environment-specific n8n variables, replacing placeholder alerts with a configured channel, adding webhook-triggered execution, and capturing screenshots of imported n8n workflows as portfolio evidence. Full operational details are documented in [docs/n8n_automation.md](docs/n8n_automation.md).
 
 ## Snowflake configuration
 
