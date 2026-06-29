@@ -63,9 +63,11 @@ def _freshness_status(path: Path) -> str:
         return "fresh"
     metric_value = pd.to_numeric(row.get("metric_value"), errors="coerce")
     threshold = pd.to_numeric(row.get("threshold"), errors="coerce")
-    if pd.notna(metric_value) and pd.notna(threshold) and float(metric_value) <= float(
-        threshold
-    ) * 1.5:
+    if (
+        pd.notna(metric_value)
+        and pd.notna(threshold)
+        and float(metric_value) <= float(threshold) * 1.5
+    ):
         return "warning"
     return "stale"
 
@@ -86,7 +88,9 @@ def governance_status() -> dict[str, Any]:
         "failed_checks": int(decision.get("failed_checks", 0)),
         "schema_contract_status": _schema_contract_status(SCHEMA_CONTRACT_RESULTS_PATH),
         "freshness_status": _freshness_status(PUBLISHED_MONITORING_RESULTS_PATH),
-        "decision_reason": decision.get("decision_reason", "No decision artifact found."),
+        "decision_reason": decision.get(
+            "decision_reason", "No decision artifact found."
+        ),
         "timestamp_utc": decision.get(
             "timestamp_utc", datetime.now(timezone.utc).isoformat()
         ),

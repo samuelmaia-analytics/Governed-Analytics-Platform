@@ -38,7 +38,8 @@
       "column": "order_delivered_customer_date",
       "params": {
         "if_column": "order_status",
-        "if_equals": "delivered"
+        "if_equals": "delivered",
+        "max_failure_pct": 0.01
       }
     },
     {

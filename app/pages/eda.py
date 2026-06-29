@@ -17,6 +17,7 @@ from src.eda import (
 try:
     from src.eda import generate_storytelling_insights, run_statistical_tests
 except ImportError:
+
     def generate_storytelling_insights(df: pd.DataFrame) -> list[str]:
         _ = df
         return []
@@ -29,9 +30,7 @@ except ImportError:
 def _render_overview(df: pd.DataFrame, locale: Locale) -> None:
     is_en = locale == LOCALE_EN_US
     insights = generate_storytelling_insights(df)
-    st.markdown(
-        "**Narrative Insights**" if is_en else "**Insights Narrativos**"
-    )
+    st.markdown("**Narrative Insights**" if is_en else "**Insights Narrativos**")
     if insights:
         for insight in insights:
             st.write(f"- {insight}")

@@ -40,7 +40,9 @@ class QueryExecutionResult:
 
 def validate_inputs() -> list[Path]:
     if not ANALYTICS_DB_PATH.exists():
-        raise FileNotFoundError(f"Base analitica DuckDB nao encontrada: {ANALYTICS_DB_PATH}")
+        raise FileNotFoundError(
+            f"Base analitica DuckDB nao encontrada: {ANALYTICS_DB_PATH}"
+        )
 
     sql_files = sorted(QUERY_DIR.glob("*.sql"))
     if not sql_files:

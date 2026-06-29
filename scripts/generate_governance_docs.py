@@ -46,9 +46,7 @@ def main() -> None:
         "status": "success",
         "input_path": str(input_path),
         "docs_dir": str(docs_dir),
-        "generated_paths": {
-            name: str(path) for name, path in generated_paths.items()
-        },
+        "generated_paths": {name: str(path) for name, path in generated_paths.items()},
     }
     print(json.dumps(payload, ensure_ascii=False))
 

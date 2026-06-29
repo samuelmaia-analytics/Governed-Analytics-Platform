@@ -312,7 +312,9 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
     )
     revenue_page.render_revenue_analytics(df, locale="pt-BR")  # type: ignore[arg-type]
 
-    monkeypatch.setattr(revenue_page, "_load_semantic_slice", lambda _path: pd.DataFrame())
+    monkeypatch.setattr(
+        revenue_page, "_load_semantic_slice", lambda _path: pd.DataFrame()
+    )
     revenue_page.render_revenue_analytics(df, locale="en-US")  # type: ignore[arg-type]
 
 
@@ -381,9 +383,7 @@ def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
 def test_load_genai_features_drops_empty_rows(tmp_path: Path, monkeypatch) -> None:
     csv_path = tmp_path / "product_text_features.csv"
     csv_path.write_text(
-        "source_id;title;category\n"
-        "phone_case_001;Phone Case;Accessories\n"
-        ";;\n",
+        "source_id;title;category\n" "phone_case_001;Phone Case;Accessories\n" ";;\n",
         encoding="utf-8",
     )
     monkeypatch.setattr(genai_page, "GENAI_FEATURES_PATH", csv_path)

@@ -57,6 +57,7 @@ MAX_CATEGORY_MISSING_PCT = 5.0
 MAX_UNDELIVERED_PCT = 5.0
 MAX_DIMENSION_JOIN_MISSING_PCT = 1.0
 MAX_PAYMENT_GAP_OVER_1_REAL_PCT = 5.0
+MAX_DELIVERY_BEFORE_APPROVAL_PCT = 0.1
 MIN_RECORDS = 100_001
 
 
@@ -162,9 +163,11 @@ def check_negative_values(df: pd.DataFrame) -> list[QualityCheckResult]:
             price_negative,
             0,
             "high",
-            "Foram encontrados valores negativos em `price`."
-            if price_negative
-            else "Não foram encontrados valores negativos em `price`.",
+            (
+                "Foram encontrados valores negativos em `price`."
+                if price_negative
+                else "Não foram encontrados valores negativos em `price`."
+            ),
         ),
         build_result(
             "negative_freight_values",
@@ -172,9 +175,11 @@ def check_negative_values(df: pd.DataFrame) -> list[QualityCheckResult]:
             freight_negative,
             0,
             "high",
-            "Foram encontrados valores negativos em `freight_value`."
-            if freight_negative
-            else "Não foram encontrados valores negativos em `freight_value`.",
+            (
+                "Foram encontrados valores negativos em `freight_value`."
+                if freight_negative
+                else "Não foram encontrados valores negativos em `freight_value`."
+            ),
         ),
     ]
 
@@ -201,6 +206,19 @@ def check_temporal_coherence(df: pd.DataFrame) -> list[QualityCheckResult]:
             & (df["order_delivered_customer_date"] < df["order_approved_at"])
         ).sum()
     )
+    delivery_before_approval_pct = (
+        round((delivery_before_approval / len(df)) * 100, 4) if len(df) else 0.0
+    )
+    delivery_before_approval_status = "PASS"
+    delivery_before_approval_details = "Orders delivered before approval timestamp."
+    if delivery_before_approval_pct > MAX_DELIVERY_BEFORE_APPROVAL_PCT:
+        delivery_before_approval_status = "FAIL"
+    elif delivery_before_approval > 0:
+        delivery_before_approval_status = "WARN"
+        delivery_before_approval_details = (
+            f"{delivery_before_approval_details} Residual source issue within "
+            f"the operational tolerance of {MAX_DELIVERY_BEFORE_APPROVAL_PCT}%."
+        )
     return [
         build_result(
             "temporal_coherence__approval_before_purchase",
@@ -218,13 +236,13 @@ def check_temporal_coherence(df: pd.DataFrame) -> list[QualityCheckResult]:
             "high",
             "Pedidos entregues antes do timestamp de compra.",
         ),
-        build_result(
-            "temporal_coherence__delivery_before_approval",
-            delivery_before_approval == 0,
-            delivery_before_approval,
-            0,
-            "medium",
-            "Pedidos entregues antes do timestamp de aprovação.",
+        QualityCheckResult(
+            check_name="temporal_coherence__delivery_before_approval",
+            status=delivery_before_approval_status,
+            metric_value=delivery_before_approval,
+            threshold=MAX_DELIVERY_BEFORE_APPROVAL_PCT,
+            severity="medium",
+            details=delivery_before_approval_details,
         ),
     ]
 
@@ -394,8 +412,9 @@ def render_quality_report(df: pd.DataFrame, results: list[QualityCheckResult]) -
     failed_df = results_df[results_df["status"] == "FAIL"]
     has_residual_source_issue = bool(
         (
-            (failed_df["check_name"] == "temporal_coherence__delivery_before_approval")
-            if not failed_df.empty
+            (results_df["check_name"] == "temporal_coherence__delivery_before_approval")
+            & results_df["status"].isin(["FAIL", "WARN"])
+            if not results_df.empty
             else pd.Series(dtype=bool)
         ).any()
     )

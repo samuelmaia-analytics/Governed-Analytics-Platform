@@ -60,8 +60,13 @@ def _render_monthly_revenue(df: pd.DataFrame, locale: Locale) -> None:
         monthly,
         x="order_year_month",
         y="revenue",
-        title="Evolução Mensal da Receita" if not is_en else "Monthly Revenue Evolution",
-        labels={"order_year_month": "Ano-Mês" if not is_en else "Year-Month", "revenue": "Receita" if not is_en else "Revenue"},
+        title="Evolução Mensal da Receita"
+        if not is_en
+        else "Monthly Revenue Evolution",
+        labels={
+            "order_year_month": "Ano-Mês" if not is_en else "Year-Month",
+            "revenue": "Receita" if not is_en else "Revenue",
+        },
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
     st.plotly_chart(fig, use_container_width=True)
@@ -69,9 +74,10 @@ def _render_monthly_revenue(df: pd.DataFrame, locale: Locale) -> None:
 
 def _render_category_pareto(category_slice: pd.DataFrame, locale: Locale) -> None:
     is_en = locale == LOCALE_EN_US
-    if category_slice.empty or not {"product_category_name_english", "revenue"}.issubset(
-        category_slice.columns
-    ):
+    if category_slice.empty or not {
+        "product_category_name_english",
+        "revenue",
+    }.issubset(category_slice.columns):
         st.info(
             "Slice de categoria indisponível."
             if not is_en
@@ -111,15 +117,27 @@ def _render_category_pareto(category_slice: pd.DataFrame, locale: Locale) -> Non
         else f"Top {pareto_cutoff} categories account for ~80% of revenue."
     )
     st.dataframe(
-        category[["category", "revenue", "cum_pct"]]
-        .rename(columns={"category": "Categoria" if not is_en else "Category", "revenue": "Receita" if not is_en else "Revenue", "cum_pct": "Cumulativo %" if not is_en else "Cumulative %"}),
+        category[["category", "revenue", "cum_pct"]].rename(
+            columns={
+                "category": "Categoria" if not is_en else "Category",
+                "revenue": "Receita" if not is_en else "Revenue",
+                "cum_pct": "Cumulativo %" if not is_en else "Cumulative %",
+            }
+        ),
         width="stretch",
     )
 
 
-def _render_cohort_ticket_and_retention(cohort_slice: pd.DataFrame, locale: Locale) -> None:
+def _render_cohort_ticket_and_retention(
+    cohort_slice: pd.DataFrame, locale: Locale
+) -> None:
     is_en = locale == LOCALE_EN_US
-    required = {"purchase_cohort_month", "cohort_order_month_number", "customers", "avg_ticket"}
+    required = {
+        "purchase_cohort_month",
+        "cohort_order_month_number",
+        "customers",
+        "avg_ticket",
+    }
     if cohort_slice.empty or not required.issubset(cohort_slice.columns):
         st.info(
             "Slice de cohort indisponível."
@@ -195,7 +213,10 @@ def _render_top_sellers(df: pd.DataFrame, locale: Locale) -> None:
         x="seller_key",
         y="total_item_value",
         title="Top Sellers por Receita" if not is_en else "Top Sellers by Revenue",
-        labels={"seller_key": "Seller", "total_item_value": "Receita" if not is_en else "Revenue"},
+        labels={
+            "seller_key": "Seller",
+            "total_item_value": "Receita" if not is_en else "Revenue",
+        },
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-35)
     st.plotly_chart(fig, use_container_width=True)
@@ -209,7 +230,12 @@ def render_revenue_analytics(df: pd.DataFrame, locale: Locale) -> None:
     cohort_slice = _load_semantic_slice(COHORT_SLICE_PATH)
 
     tab_evolution, tab_pareto, tab_cohort, tab_sellers = st.tabs(
-        ["Evolução / Evolution", "Pareto Categorias / Category Pareto", "Cohort", "Top Sellers"]
+        [
+            "Evolução / Evolution",
+            "Pareto Categorias / Category Pareto",
+            "Cohort",
+            "Top Sellers",
+        ]
     )
     with tab_evolution:
         _render_monthly_revenue(df, locale)

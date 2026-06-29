@@ -20,7 +20,9 @@ from src.utils import ensure_directory
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="n8n wrapper for privacy risk scoring.")
+    parser = argparse.ArgumentParser(
+        description="n8n wrapper for privacy risk scoring."
+    )
     parser.add_argument("--config", default="config/pipeline_config.yml")
     parser.add_argument("--input-path")
     parser.add_argument("--output-path")

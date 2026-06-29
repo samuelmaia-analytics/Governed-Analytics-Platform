@@ -13,8 +13,12 @@ APP_URL = "http://127.0.0.1:8501"
 
 def wait_for_dashboard(page: Page) -> None:
     page.goto(APP_URL, wait_until="networkidle")
-    expect(page.get_by_text("Executive Commerce Analytics")).to_be_visible(timeout=60_000)
-    expect(page.get_by_role("heading", name="Filtros Globais")).to_be_visible(timeout=60_000)
+    expect(page.get_by_text("Executive Commerce Analytics")).to_be_visible(
+        timeout=60_000
+    )
+    expect(page.get_by_role("heading", name="Filtros Globais")).to_be_visible(
+        timeout=60_000
+    )
     time.sleep(2)
 
 
@@ -50,20 +54,40 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
-        page = browser.new_page(viewport={"width": 1600, "height": 1400}, device_scale_factor=1.25)
+        page = browser.new_page(
+            viewport={"width": 1600, "height": 1400}, device_scale_factor=1.25
+        )
         wait_for_dashboard(page)
 
         save_overview(page)
         save_kpis(page)
 
         click_nav(page, "Tempo", "Tendência, sazonalidade e ritmo operacional")
-        save_section(page, "Tendência, sazonalidade e ritmo operacional", "03_temporal.png")
+        save_section(
+            page, "Tendência, sazonalidade e ritmo operacional", "03_temporal.png"
+        )
 
-        click_nav(page, "Categorias", "Quais categorias sustentam resultado, risco e oportunidade")
-        save_section(page, "Quais categorias sustentam resultado, risco e oportunidade", "04_categories.png")
+        click_nav(
+            page,
+            "Categorias",
+            "Quais categorias sustentam resultado, risco e oportunidade",
+        )
+        save_section(
+            page,
+            "Quais categorias sustentam resultado, risco e oportunidade",
+            "04_categories.png",
+        )
 
-        click_nav(page, "Regional", "Quais UFs geram mais valor e onde o desempenho perde eficiência")
-        save_section(page, "Quais UFs geram mais valor e onde o desempenho perde eficiência", "05_geography.png")
+        click_nav(
+            page,
+            "Regional",
+            "Quais UFs geram mais valor e onde o desempenho perde eficiência",
+        )
+        save_section(
+            page,
+            "Quais UFs geram mais valor e onde o desempenho perde eficiência",
+            "05_geography.png",
+        )
 
         browser.close()
 

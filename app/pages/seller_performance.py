@@ -67,7 +67,11 @@ def render_seller_performance(locale: Locale) -> None:
     m1.metric("Sellers", int(filtered["seller_key"].nunique()))
     m2.metric(
         "Orders",
-        int(pd.to_numeric(filtered["seller_order_count"], errors="coerce").fillna(0).sum()),
+        int(
+            pd.to_numeric(filtered["seller_order_count"], errors="coerce")
+            .fillna(0)
+            .sum()
+        ),
     )
     m3.metric(
         "Avg Delay Rate",
@@ -121,9 +125,10 @@ def render_seller_performance(locale: Locale) -> None:
         st.plotly_chart(fig_sla, use_container_width=True)
 
     ranking = filtered.copy()
-    ranking["estimated_revenue"] = (
-        pd.to_numeric(ranking["avg_ticket"], errors="coerce").fillna(0)
-        * pd.to_numeric(ranking["seller_order_count"], errors="coerce").fillna(0)
+    ranking["estimated_revenue"] = pd.to_numeric(
+        ranking["avg_ticket"], errors="coerce"
+    ).fillna(0) * pd.to_numeric(ranking["seller_order_count"], errors="coerce").fillna(
+        0
     )
     ranking = ranking.sort_values("estimated_revenue", ascending=False).head(20)
 

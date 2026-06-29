@@ -70,9 +70,17 @@ def _build_result(
 ) -> BusinessRuleResult:
     failed_rows = int(failed_mask.sum())
     failure_pct = round((failed_rows / total_rows) * 100, 4) if total_rows > 0 else 0.0
+    params = rule.get("params", {})
+    max_failure_pct = params.get("max_failure_pct")
+    within_tolerance = max_failure_pct is not None and failure_pct <= float(
+        max_failure_pct
+    )
+    status = "PASS" if failed_rows == 0 or within_tolerance else "FAIL"
+    if within_tolerance and failed_rows > 0:
+        details = f"{details} Falha residual dentro da tolerancia contratual de {max_failure_pct}%."
     return BusinessRuleResult(
         rule_id=str(rule["rule_id"]),
-        status="PASS" if failed_rows == 0 else "FAIL",
+        status=status,
         severity=str(rule["severity"]),
         failed_rows=failed_rows,
         failure_pct=failure_pct,

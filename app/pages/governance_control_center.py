@@ -41,7 +41,10 @@ def _load_schema_contract_status() -> tuple[Literal["passed", "failed"], str | N
     try:
         checks_df = pd.read_csv(SCHEMA_CONTRACT_RESULTS_PATH)
     except Exception:
-        return "passed", "Schema contract results could not be parsed; assumed 'passed'."
+        return (
+            "passed",
+            "Schema contract results could not be parsed; assumed 'passed'.",
+        )
     if checks_df.empty or "status" not in checks_df.columns:
         return "passed", "Schema contract results are empty/invalid; assumed 'passed'."
     has_failures = checks_df["status"].astype(str).str.upper().eq("FAIL").any()
@@ -54,15 +57,24 @@ def _load_freshness_status() -> tuple[Literal["fresh", "warning", "stale"], str 
     try:
         checks_df = pd.read_csv(PUBLISHED_MONITORING_RESULTS_PATH)
     except Exception:
-        return "fresh", "Published monitoring file could not be parsed; assumed 'fresh'."
+        return (
+            "fresh",
+            "Published monitoring file could not be parsed; assumed 'fresh'.",
+        )
     if checks_df.empty or "check_name" not in checks_df.columns:
-        return "fresh", "Published monitoring checks are empty/invalid; assumed 'fresh'."
+        return (
+            "fresh",
+            "Published monitoring checks are empty/invalid; assumed 'fresh'.",
+        )
 
     freshness_rows = checks_df[
         checks_df["check_name"].astype(str) == "published_file_freshness_hours"
     ]
     if freshness_rows.empty:
-        return "fresh", "Freshness check not found in monitoring results; assumed 'fresh'."
+        return (
+            "fresh",
+            "Freshness check not found in monitoring results; assumed 'fresh'.",
+        )
 
     freshness_row = freshness_rows.iloc[-1]
     status = str(freshness_row.get("status", "")).upper()
@@ -71,9 +83,11 @@ def _load_freshness_status() -> tuple[Literal["fresh", "warning", "stale"], str 
 
     metric_value = pd.to_numeric(freshness_row.get("metric_value"), errors="coerce")
     threshold = pd.to_numeric(freshness_row.get("threshold"), errors="coerce")
-    if pd.notna(metric_value) and pd.notna(threshold) and float(metric_value) <= float(
-        threshold
-    ) * 1.5:
+    if (
+        pd.notna(metric_value)
+        and pd.notna(threshold)
+        and float(metric_value) <= float(threshold) * 1.5
+    ):
         return "warning", None
     return "stale", None
 

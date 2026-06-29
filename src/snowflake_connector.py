@@ -41,7 +41,16 @@ class SnowflakeConfig:
         )
 
 
-_WRITE_PREFIXES = ("INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER", "TRUNCATE", "MERGE")
+_WRITE_PREFIXES = (
+    "INSERT",
+    "UPDATE",
+    "DELETE",
+    "DROP",
+    "CREATE",
+    "ALTER",
+    "TRUNCATE",
+    "MERGE",
+)
 
 
 def _is_write_query(sql: str) -> bool:

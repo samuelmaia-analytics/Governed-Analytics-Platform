@@ -22,7 +22,11 @@ def _load_genai_features() -> pd.DataFrame:
                 for col in ["source_id", "title", "category"]:
                     if col in cleaned.columns:
                         cleaned[col] = cleaned[col].replace("", pd.NA)
-                key_cols = [col for col in ["source_id", "title", "category"] if col in cleaned.columns]
+                key_cols = [
+                    col
+                    for col in ["source_id", "title", "category"]
+                    if col in cleaned.columns
+                ]
                 if key_cols:
                     cleaned = cleaned.dropna(subset=key_cols, how="all")
                 return cleaned.reset_index(drop=True)
@@ -44,16 +48,26 @@ def render_genai_insights(locale: Locale) -> None:
         )
         return
 
-    total_items = int(features_df["source_id"].nunique()) if "source_id" in features_df.columns else len(features_df)
-    total_categories = int(features_df["category"].nunique()) if "category" in features_df.columns else 0
+    total_items = (
+        int(features_df["source_id"].nunique())
+        if "source_id" in features_df.columns
+        else len(features_df)
+    )
+    total_categories = (
+        int(features_df["category"].nunique())
+        if "category" in features_df.columns
+        else 0
+    )
     extraction_mode = (
         str(features_df["extraction_mode"].mode().iloc[0])
-        if "extraction_mode" in features_df.columns and not features_df["extraction_mode"].dropna().empty
+        if "extraction_mode" in features_df.columns
+        and not features_df["extraction_mode"].dropna().empty
         else "unknown"
     )
     model_name = (
         str(features_df["model_name"].mode().iloc[0])
-        if "model_name" in features_df.columns and not features_df["model_name"].dropna().empty
+        if "model_name" in features_df.columns
+        and not features_df["model_name"].dropna().empty
         else "unknown"
     )
 

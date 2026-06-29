@@ -154,7 +154,7 @@ def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
         variance = float((centered**2).mean())
         if variance == 0:
             continue
-        skew = float(((centered**3).mean()) / (variance ** 1.5))
+        skew = float(((centered**3).mean()) / (variance**1.5))
         kurt = float(((centered**4).mean()) / (variance**2))
         jb_stat = (n / 6.0) * (skew**2 + ((kurt - 3.0) ** 2) / 4.0)
         # For chi-square(df=2), survival function is exp(-x/2).

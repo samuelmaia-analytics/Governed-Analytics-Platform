@@ -17,9 +17,17 @@ APP_URL = "http://127.0.0.1:8501"
 
 PAGE_TARGETS: list[tuple[str, list[str], str]] = [
     ("", ["Executive Summary", "Resumo Executivo"], "executive_overview.png"),
-    ("lgpd-privacy-risk", ["LGPD & Privacy Risk", "LGPD e Risco de Privacidade"], "lgpd_privacy_risk.png"),
+    (
+        "lgpd-privacy-risk",
+        ["LGPD & Privacy Risk", "LGPD e Risco de Privacidade"],
+        "lgpd_privacy_risk.png",
+    ),
     ("data-quality", ["Data Quality", "Qualidade de Dados"], "data_quality.png"),
-    ("governance-control-center", ["Governance Control Center", "Central de Controles de Governança"], "governance_control_center.png"),
+    (
+        "governance-control-center",
+        ["Governance Control Center", "Central de Controles de Governança"],
+        "governance_control_center.png",
+    ),
 ]
 
 PRIVACY_PREVIEW_ANCHORS = [
@@ -83,7 +91,9 @@ def wait_for_app_ready(timeout_seconds: int = 120) -> None:
         except URLError:
             pass
         time.sleep(1)
-    raise TimeoutError(f"Streamlit app did not become ready at {APP_URL} within {timeout_seconds} seconds.")
+    raise TimeoutError(
+        f"Streamlit app did not become ready at {APP_URL} within {timeout_seconds} seconds."
+    )
 
 
 def goto_page(page: Page, url_path: str) -> None:
@@ -103,7 +113,9 @@ def dismiss_page_not_found_modal(page: Page) -> None:
         pass
 
 
-def ensure_any_text(page: Page, candidates: list[str], timeout_ms: int = 12_000) -> bool:
+def ensure_any_text(
+    page: Page, candidates: list[str], timeout_ms: int = 12_000
+) -> bool:
     for text in candidates:
         try:
             if page.get_by_text(text).first.is_visible(timeout=timeout_ms):
@@ -133,7 +145,9 @@ def try_capture_privacy_preview(page: Page) -> None:
                 return
         except PlaywrightTimeoutError:
             continue
-    print("[WARN] Privacy Transformation Preview section not found; skipping optional screenshot.")
+    print(
+        "[WARN] Privacy Transformation Preview section not found; skipping optional screenshot."
+    )
 
 
 def main() -> int:
@@ -199,7 +213,9 @@ def main() -> int:
     if generated_now:
         print(f"[OK] Newly generated in this run: {len(generated_now)}")
     else:
-        print("[WARN] No brand-new files were created; existing screenshots were refreshed.")
+        print(
+            "[WARN] No brand-new files were created; existing screenshots were refreshed."
+        )
     update_readme_screenshots_section()
     return 0
 

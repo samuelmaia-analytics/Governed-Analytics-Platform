@@ -78,9 +78,7 @@ def render_cohort_retention(locale: Locale) -> None:
         text_auto=".1f",
         aspect="auto",
         color_continuous_scale="Blues",
-        title="Ticket Médio por Cohort"
-        if not is_en
-        else "Average Ticket by Cohort",
+        title="Ticket Médio por Cohort" if not is_en else "Average Ticket by Cohort",
     )
     st.plotly_chart(fig_ticket, use_container_width=True)
 

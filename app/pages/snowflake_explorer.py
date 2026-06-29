@@ -29,7 +29,9 @@ def render_snowflake_explorer(locale: str) -> None:
     )
 
     tab_tables, tab_query = st.tabs(
-        ["Tables", "Query Runner"] if locale == "en-US" else ["Tabelas", "Consultas SQL"]
+        ["Tables", "Query Runner"]
+        if locale == "en-US"
+        else ["Tabelas", "Consultas SQL"]
     )
 
     with tab_tables:
@@ -40,7 +42,11 @@ def render_snowflake_explorer(locale: str) -> None:
                 if tables:
                     st.dataframe(pd.DataFrame(tables), use_container_width=True)
                 else:
-                    st.info("No tables found." if locale == "en-US" else "Nenhuma tabela encontrada.")
+                    st.info(
+                        "No tables found."
+                        if locale == "en-US"
+                        else "Nenhuma tabela encontrada."
+                    )
             except Exception as exc:
                 st.error(f"Failed to list tables: {exc}")
 

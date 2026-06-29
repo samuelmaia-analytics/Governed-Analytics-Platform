@@ -31,7 +31,9 @@ def _configured_steps(config: dict[str, object]) -> list[str] | None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="n8n wrapper for the governed pipeline.")
+    parser = argparse.ArgumentParser(
+        description="n8n wrapper for the governed pipeline."
+    )
     parser.add_argument("--config", default="config/pipeline_config.yml")
     parser.add_argument("--steps", nargs="*", help="Optional explicit pipeline steps.")
     parser.add_argument("--continue-on-error", action="store_true")
@@ -41,7 +43,9 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     config = load_config(PROJECT_ROOT / args.config)
-    configured_continue = bool(config.get("pipeline", {}).get("continue_on_error", False))
+    configured_continue = bool(
+        config.get("pipeline", {}).get("continue_on_error", False)
+    )
     continue_on_error = args.continue_on_error or configured_continue
     selected_steps = resolve_steps(args.steps or _configured_steps(config))
 
@@ -56,7 +60,7 @@ def main() -> None:
         executions = run_selected_steps(
             selected_steps, continue_on_error=continue_on_error
         )
-    except Exception as exc:
+    except BaseException as exc:
         status = "failed"
         error_message = str(exc)
         raise

@@ -78,7 +78,9 @@ def test_snowflake_query_select(monkeypatch: pytest.MonkeyPatch) -> None:
     mock = _mock_connector(query_df=df)
     monkeypatch.setattr(api, "get_snowflake_connector", lambda: mock)
     client = TestClient(api.app)
-    response = client.post("/api/v1/snowflake/query", json={"sql": "SELECT * FROM orders"})
+    response = client.post(
+        "/api/v1/snowflake/query", json={"sql": "SELECT * FROM orders"}
+    )
     assert response.status_code == 200
     payload = response.json()
     assert payload["row_count"] == 2
@@ -86,13 +88,16 @@ def test_snowflake_query_select(monkeypatch: pytest.MonkeyPatch) -> None:
     assert payload["rows"][0]["id"] == 1
 
 
-@pytest.mark.parametrize("sql", [
-    "DELETE FROM orders",
-    "INSERT INTO t VALUES (1)",
-    "UPDATE t SET x=1",
-    "DROP TABLE t",
-    "TRUNCATE TABLE t",
-])
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "DELETE FROM orders",
+        "INSERT INTO t VALUES (1)",
+        "UPDATE t SET x=1",
+        "DROP TABLE t",
+        "TRUNCATE TABLE t",
+    ],
+)
 def test_snowflake_query_rejects_write(sql: str) -> None:
     client = TestClient(api.app)
     response = client.post("/api/v1/snowflake/query", json={"sql": sql})

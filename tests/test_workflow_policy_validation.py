@@ -85,15 +85,24 @@ def test_main_passes_with_aligned_contract(tmp_path: Path, monkeypatch, capsys) 
         encoding="utf-8",
     )
     contract = {
-        "workflows": [{"name": "CI", "path": ".github/workflows/ci.yml", "push_branches": ["main"]}]
+        "workflows": [
+            {
+                "name": "CI",
+                "path": ".github/workflows/ci.yml",
+                "push_branches": ["main"],
+            }
+        ]
     }
     contract_file = tmp_path / "release_governance.json"
     contract_file.write_text(json.dumps(contract), encoding="utf-8")
 
-    monkeypatch.setattr("sys.argv", ["workflow_policy_validation.py", "--contract", str(contract_file)])
+    monkeypatch.setattr(
+        "sys.argv", ["workflow_policy_validation.py", "--contract", str(contract_file)]
+    )
     original_validate = wpv.validate_workflow_contract
     monkeypatch.setattr(
-        wpv, "validate_workflow_contract",
+        wpv,
+        "validate_workflow_contract",
         lambda c, root_dir=tmp_path: original_validate(c, root_dir=tmp_path),
     )
 
@@ -103,11 +112,15 @@ def test_main_passes_with_aligned_contract(tmp_path: Path, monkeypatch, capsys) 
 
 
 def test_main_exits_on_misaligned_workflow(tmp_path: Path, monkeypatch) -> None:
-    contract = {"workflows": [{"name": "CI", "path": ".github/workflows/nonexistent.yml"}]}
+    contract = {
+        "workflows": [{"name": "CI", "path": ".github/workflows/nonexistent.yml"}]
+    }
     contract_file = tmp_path / "release_governance.json"
     contract_file.write_text(json.dumps(contract), encoding="utf-8")
 
-    monkeypatch.setattr("sys.argv", ["workflow_policy_validation.py", "--contract", str(contract_file)])
+    monkeypatch.setattr(
+        "sys.argv", ["workflow_policy_validation.py", "--contract", str(contract_file)]
+    )
     monkeypatch.setattr(wpv, "ROOT_DIR", tmp_path)
 
     with pytest.raises(SystemExit) as exc_info:

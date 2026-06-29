@@ -39,6 +39,8 @@ def write_dataframe(
     resolved_path = ensure_database_parent_dir(db_path)
     with duckdb.connect(str(resolved_path)) as connection:
         connection.register("input_df", dataframe)
-        connection.execute(f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM input_df")
+        connection.execute(
+            f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM input_df"
+        )
         connection.unregister("input_df")
     return resolved_path

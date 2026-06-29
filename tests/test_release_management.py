@@ -51,10 +51,14 @@ def test_main_writes_github_output_file(tmp_path, monkeypatch) -> None:
         "sys.argv",
         [
             "release_management.py",
-            "--target-environment", "prod",
-            "--source-ref", "refs/heads/main",
-            "--source-branch", "main",
-            "--github-output", str(output_file),
+            "--target-environment",
+            "prod",
+            "--source-ref",
+            "refs/heads/main",
+            "--source-branch",
+            "main",
+            "--github-output",
+            str(output_file),
         ],
     )
 

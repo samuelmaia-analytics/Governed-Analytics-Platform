@@ -72,7 +72,9 @@ def _render_revenue_page(context: GovernanceAppContext, locale: str) -> None:
     render_revenue_analytics(context.df, locale)
 
 
-def _render_seller_performance_page(_context: GovernanceAppContext, locale: str) -> None:
+def _render_seller_performance_page(
+    _context: GovernanceAppContext, locale: str
+) -> None:
     render_seller_performance(locale)
 
 

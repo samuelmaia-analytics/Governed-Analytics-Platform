@@ -85,8 +85,12 @@ def test_run_quality_checks_and_render_report_include_residual_note() -> None:
 
     results = quality.run_quality_checks(df)
     report = quality.render_quality_report(df, results)
+    residual = {result.check_name: result for result in results}[
+        "temporal_coherence__delivery_before_approval"
+    ]
 
     assert len(results) >= 10
+    assert residual.status in {"FAIL", "WARN"}
     assert "Nota sobre a Falha Residual" in report
 
 

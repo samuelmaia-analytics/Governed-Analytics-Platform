@@ -28,7 +28,9 @@ def _make_config() -> SnowflakeConfig:
     )
 
 
-def _connector_with_mock_conn(mock_cursor_data: pd.DataFrame | None = None) -> tuple[SnowflakeConnector, MagicMock]:
+def _connector_with_mock_conn(
+    mock_cursor_data: pd.DataFrame | None = None,
+) -> tuple[SnowflakeConnector, MagicMock]:
     connector = SnowflakeConnector(_make_config())
     mock_conn = MagicMock()
     mock_cursor = MagicMock()
@@ -69,26 +71,32 @@ def test_config_missing_env(monkeypatch: pytest.MonkeyPatch) -> None:
 # --- _is_write_query ---
 
 
-@pytest.mark.parametrize("sql", [
-    "DELETE FROM orders",
-    "INSERT INTO t VALUES (1)",
-    "UPDATE t SET x=1",
-    "DROP TABLE t",
-    "CREATE TABLE t (id INT)",
-    "ALTER TABLE t ADD col INT",
-    "TRUNCATE TABLE t",
-    "MERGE INTO t USING s ON ...",
-])
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "DELETE FROM orders",
+        "INSERT INTO t VALUES (1)",
+        "UPDATE t SET x=1",
+        "DROP TABLE t",
+        "CREATE TABLE t (id INT)",
+        "ALTER TABLE t ADD col INT",
+        "TRUNCATE TABLE t",
+        "MERGE INTO t USING s ON ...",
+    ],
+)
 def test_is_write_query_true(sql: str) -> None:
     assert _is_write_query(sql) is True
 
 
-@pytest.mark.parametrize("sql", [
-    "SELECT * FROM orders",
-    "select id from t",
-    "  SELECT 1",
-    "WITH cte AS (SELECT 1) SELECT * FROM cte",
-])
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT * FROM orders",
+        "select id from t",
+        "  SELECT 1",
+        "WITH cte AS (SELECT 1) SELECT * FROM cte",
+    ],
+)
 def test_is_write_query_false(sql: str) -> None:
     assert _is_write_query(sql) is False
 
@@ -109,7 +117,9 @@ def test_health_check_success() -> None:
 
 def test_health_check_failure() -> None:
     connector = SnowflakeConnector(_make_config())
-    with patch.object(SnowflakeConnector, "connect", side_effect=Exception("connection refused")):
+    with patch.object(
+        SnowflakeConnector, "connect", side_effect=Exception("connection refused")
+    ):
         result = connector.health_check()
     assert result["status"] == "error"
     assert "connection refused" in result["detail"]

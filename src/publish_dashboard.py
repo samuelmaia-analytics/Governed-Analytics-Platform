@@ -190,7 +190,9 @@ def _validate_prefixed_tokens(series: pd.Series, prefix: str) -> bool:
     non_null = series.dropna()
     if non_null.empty:
         return True
-    return all(isinstance(value, str) and value.startswith(prefix) for value in non_null)
+    return all(
+        isinstance(value, str) and value.startswith(prefix) for value in non_null
+    )
 
 
 def validate_privacy_controls(

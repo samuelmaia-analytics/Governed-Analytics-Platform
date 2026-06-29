@@ -130,9 +130,9 @@ class _FakeStreamlit(_FakeContainer):
         return False
 
 
-def _sample_inputs() -> tuple[
-    pd.DataFrame, pd.DataFrame, dict[str, object], dict[str, object]
-]:
+def _sample_inputs() -> (
+    tuple[pd.DataFrame, pd.DataFrame, dict[str, object], dict[str, object]]
+):
     df = pd.DataFrame(
         {
             "order_id": ["o1", "o2"],
@@ -236,7 +236,9 @@ def test_render_governance_control_center_with_history(monkeypatch) -> None:
     )
 
 
-def test_load_schema_contract_status_from_real_results(tmp_path: Path, monkeypatch) -> None:
+def test_load_schema_contract_status_from_real_results(
+    tmp_path: Path, monkeypatch
+) -> None:
     path = tmp_path / "schema_contract_results.csv"
     pd.DataFrame(
         [
@@ -251,7 +253,9 @@ def test_load_schema_contract_status_from_real_results(tmp_path: Path, monkeypat
     assert note is None
 
 
-def test_load_freshness_status_from_monitoring_results(tmp_path: Path, monkeypatch) -> None:
+def test_load_freshness_status_from_monitoring_results(
+    tmp_path: Path, monkeypatch
+) -> None:
     path = tmp_path / "published_layer_monitoring.csv"
     pd.DataFrame(
         [
@@ -297,5 +301,8 @@ def test_evaluate_publication_gate_uses_critical_failures_from_severity() -> Non
         quality_results=quality_result,  # type: ignore[arg-type]
     )
     assert gate_result.decision == "Blocked"
-    assert any("Critical rule failures detected: 1." in reason for reason in gate_result.reasons)
+    assert any(
+        "Critical rule failures detected: 1." in reason
+        for reason in gate_result.reasons
+    )
     assert not any("Critical rule failures fallback" in note for note in fallback_notes)

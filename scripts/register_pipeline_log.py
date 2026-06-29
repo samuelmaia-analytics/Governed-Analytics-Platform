@@ -15,7 +15,9 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Register a pipeline execution log.")
     parser.add_argument("--config", default="config/pipeline_config.yml")
     parser.add_argument("--pipeline-name", default="governed_analytics_pipeline")
-    parser.add_argument("--status", required=True, choices=["success", "failed", "warning"])
+    parser.add_argument(
+        "--status", required=True, choices=["success", "failed", "warning"]
+    )
     parser.add_argument("--message", default="")
     parser.add_argument("--source", default="manual")
     return parser.parse_args()
