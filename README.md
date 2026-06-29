@@ -227,6 +227,8 @@ SNOWFLAKE_ROLE=PUBLIC
 
 ## Screenshots
 
+Current screenshots already versioned in `assets/screenshots/`:
+
 | Executive Overview | Governance Control Center |
 |---|---|
 | ![Executive Overview](assets/screenshots/executive_overview_v3.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
@@ -234,6 +236,20 @@ SNOWFLAKE_ROLE=PUBLIC
 | LGPD & Privacy Risk | Data Quality |
 |---|---|
 | ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
+
+Recommended next screenshots for the n8n automation update:
+
+| Suggested capture | Purpose |
+|---|---|
+| `streamlit_overview_n8n.png` | Root `app.py` overview with pipeline status, artifact availability, and n8n workflow count |
+| `streamlit_pipeline_logs.png` | Pipeline log history from `logs/pipeline_execution_logs.csv` |
+| `streamlit_n8n_automation.png` | n8n workflow inventory and node-level visibility |
+| `streamlit_governance_docs.png` | Documentation browser highlighting `docs/n8n_automation.md` |
+| `n8n_pipeline_workflow_imported.png` | Imported n8n orchestration workflow in the n8n UI |
+| `n8n_error_handler_imported.png` | Imported n8n error handler workflow in the n8n UI |
+
+These images are intentionally listed as capture targets until screenshots are
+generated and saved under `assets/screenshots/`.
 
 ## Links
 

@@ -107,6 +107,19 @@ Fronteira chave: o app consome a camada publicada (`data/published/dashboard`), 
 |---|---|
 | ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
 
+Proximos screenshots recomendados para evidenciar a evolucao com n8n:
+
+| Captura sugerida | Objetivo |
+|---|---|
+| `streamlit_overview_n8n.png` | Visao geral do `app.py` com status do pipeline, disponibilidade de artefatos e quantidade de workflows n8n |
+| `streamlit_pipeline_logs.png` | Historico de execucoes vindo de `logs/pipeline_execution_logs.csv` |
+| `streamlit_n8n_automation.png` | Inventario dos workflows n8n e detalhes dos nodes |
+| `streamlit_governance_docs.png` | Browser de documentacao destacando `docs/n8n_automation.md` |
+| `n8n_pipeline_workflow_imported.png` | Workflow principal importado na interface do n8n |
+| `n8n_error_handler_imported.png` | Workflow de erro importado na interface do n8n |
+
+Essas imagens ficam como alvos de captura ate serem geradas e salvas em `assets/screenshots/`.
+
 ## App Streamlit Executivo
 
 Páginas principais:
