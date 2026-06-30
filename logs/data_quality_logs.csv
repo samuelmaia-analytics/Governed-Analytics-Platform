@@ -1,0 +1,4 @@
+execution_id,dataset_name,check_name,status,severity,affected_rows,rule_description,created_at
+exec-20260630-001,fact_orders_enriched,not_null_order_id,PASS,low,0,Order identifier must not be null,2026-06-30T09:05:12Z
+exec-20260630-001,fact_orders_enriched,delivery_date_not_future,PASS,medium,0,Delivery date must not be in the future,2026-06-30T09:05:14Z
+exec-20260630-002,fact_orders_dashboard,review_score_range,WARN,medium,12,Review score should be between 1 and 5,2026-06-30T14:22:41Z

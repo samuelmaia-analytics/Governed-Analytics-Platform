@@ -1,0 +1,4 @@
+execution_id,pipeline_name,step_name,started_at,finished_at,status,duration_seconds,rows_processed,records_rejected,quality_score,lgpd_risk_score,error_message,environment,triggered_by
+exec-20260630-001,governed_analytics_pipeline,full_run,2026-06-30T09:00:00Z,2026-06-30T09:08:20Z,SUCCESS,500,98412,0,96,22,,local_portfolio,manual_demo
+exec-20260630-002,governed_analytics_pipeline,data_quality,2026-06-30T14:20:00Z,2026-06-30T14:26:00Z,WARNING,360,98412,12,86,48,Review score range warning exceeded monitoring threshold,local_portfolio,scheduled_simulation
+exec-20260630-003,governed_analytics_pipeline,publication_gate,2026-06-30T16:35:00Z,2026-06-30T16:40:30Z,FAILED,330,98412,235,72,67,Critical checks failed before publication,local_portfolio,manual_demo

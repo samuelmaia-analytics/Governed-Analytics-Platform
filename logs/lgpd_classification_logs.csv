@@ -1,0 +1,4 @@
+execution_id,dataset_name,column_name,lgpd_category,is_sensitive,risk_level,recommendation,created_at
+exec-20260630-001,fact_orders_enriched,customer_city,indirect_identifier,false,medium,review aggregation before publication,2026-06-30T09:06:03Z
+exec-20260630-001,fact_orders_enriched,customer_key,pseudonymous_identifier,false,medium,keep pseudonymized key only,2026-06-30T09:06:04Z
+exec-20260630-002,fact_orders_dashboard,total_item_value,non_personal,false,low,keep for executive analytics,2026-06-30T14:23:05Z

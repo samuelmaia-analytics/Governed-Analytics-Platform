@@ -50,6 +50,14 @@ Quarantine isolates records or files blocked by quality, LGPD, contract, or
 publication controls. Details are documented in
 `docs/data_lake_layers.md`.
 
+## Operational Logs and Observability
+
+The repository includes controlled CSV log examples under `logs/` for pipeline
+execution, data quality, LGPD classification, publication gate decisions, and
+operational errors. These files demonstrate how a governed analytics platform can
+support auditability, troubleshooting, and interview review without storing real
+sensitive data. Details are documented in `docs/operational_logs.md`.
+
 ## Implemented vs Simulated
 
 ### Implemented

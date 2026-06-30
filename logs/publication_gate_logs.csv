@@ -1,0 +1,4 @@
+execution_id,dataset_name,quality_score,lgpd_risk_score,critical_issues,decision,reason,created_at
+exec-20260630-001,fact_orders_dashboard,96,22,0,Approved,Published layer passed quality and privacy thresholds,2026-06-30T09:08:20Z
+exec-20260630-002,fact_orders_dashboard,86,48,0,Needs Review,Medium quality warning requires data owner review before promotion,2026-06-30T14:25:33Z
+exec-20260630-003,fact_orders_dashboard,72,67,2,Blocked,Critical quality issues and elevated LGPD risk prevent publication,2026-06-30T16:40:11Z

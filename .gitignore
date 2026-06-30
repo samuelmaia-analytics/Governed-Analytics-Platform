@@ -17,6 +17,11 @@ htmlcov/
 # Runtime logs
 logs/*
 !logs/.gitkeep
+!logs/pipeline_execution_logs.csv
+!logs/data_quality_logs.csv
+!logs/lgpd_classification_logs.csv
+!logs/publication_gate_logs.csv
+!logs/error_logs.csv
 
 # Keep raw data delivered with the case
 !data/raw/
