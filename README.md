@@ -58,6 +58,14 @@ operational errors. These files demonstrate how a governed analytics platform ca
 support auditability, troubleshooting, and interview review without storing real
 sensitive data. Details are documented in `docs/operational_logs.md`.
 
+## Publication Gate
+
+The project includes a CLI publication gate that records dataset publication
+decisions in `data/gold/publication_decisions.csv`. It evaluates quality score,
+LGPD risk score, and critical issues to classify a dataset as `Approved`,
+`Needs Review`, or `Blocked`. Usage and rules are documented in
+`docs/publication_gate.md`.
+
 ## Implemented vs Simulated
 
 ### Implemented

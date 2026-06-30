@@ -1,0 +1,4 @@
+execution_id,dataset_name,quality_score,lgpd_risk_score,critical_issues,decision,reason,approved_by,approved_at
+pubgate-20260630T221351520744Z,olist_orders,92,45,0,Approved,"Publication approved because quality, LGPD risk, and critical issue thresholds passed.",publication_gate_cli,2026-06-30T22:13:51.520775+00:00
+pubgate-20260630T221351596839Z,olist_customers,75,70,0,Needs Review,Publication requires manual review because quality or LGPD risk is in the review range.,,
+pubgate-20260630T221351661369Z,olist_payments,60,85,2,Blocked,"Publication blocked because quality, privacy risk, or critical issues breached hard thresholds.",,
