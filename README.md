@@ -96,6 +96,14 @@ Athena, Redshift, Macie, CloudWatch, SNS, EventBridge, Step Functions, App
 Runner, CloudFront, Route 53, IAM, KMS and FinOps services. The full reference is
 documented in `docs/aws_architecture.md`.
 
+## Cost Governance and FinOps
+
+AWS cost governance notes are documented in `docs/aws_cost_estimation.md`,
+covering high-impact services, Athena vs Redshift, Glue vs EMR, CloudWatch
+retention, S3 lifecycle policies, AWS Budgets, Cost Explorer, Trusted Advisor,
+Pricing Calculator and real-world cost risks. A practical checklist is available
+in `docs/finops_checklist.md`.
+
 ## Implemented vs Simulated
 
 ### Implemented
