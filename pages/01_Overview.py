@@ -6,18 +6,74 @@ from pages._shared import (
     DATA_CLASSIFICATION_PATH,
     PIPELINE_LOG_PATH,
     PRIVACY_RISK_PATH,
-    PUBLICATION_DECISION_PATH,
-    PUBLISHED_MONITORING_PATH,
+    PROJECT_ROOT,
     QUALITY_CHECKS_PATH,
+    SCHEMA_CONTRACT_RESULTS_PATH,
     WORKFLOWS_DIR,
     count_statuses,
     format_datetime,
-    read_first_csv,
-    read_first_json,
-    read_schema_contract_results,
+    read_csv_safe,
+    read_json_safe,
+    read_text_safe,
     relative_path,
     render_file_warning,
 )
+
+PUBLISHED_MONITORING_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/published_layer_monitoring.csv"
+)
+PUBLICATION_DECISION_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/publication_decision.json"
+)
+SCHEMA_CONTRACT_REPORT_PATH = PROJECT_ROOT / "docs/reports/schema_contract_report.md"
+
+
+def _read_first_csv(paths):
+    for path in paths:
+        df = read_csv_safe(path)
+        if not df.empty:
+            return df, path
+    return read_csv_safe(PROJECT_ROOT / "__missing__.csv"), None
+
+
+def _read_first_json(paths):
+    for path in paths:
+        payload = read_json_safe(path)
+        if payload:
+            return payload, path
+    return {}, None
+
+
+def _read_schema_contract_results():
+    df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
+    if not df.empty:
+        return df, SCHEMA_CONTRACT_RESULTS_PATH
+
+    content = read_text_safe(SCHEMA_CONTRACT_REPORT_PATH)
+    rows = []
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("| `"):
+            continue
+        cells = [
+            cell.strip().strip("`").strip("*")
+            for cell in stripped.strip("|").split("|")
+        ]
+        if len(cells) < 4:
+            continue
+        dataset, check_name, status = cells[:3]
+        rows.append(
+            {
+                "dataset_name": dataset,
+                "check_name": check_name,
+                "status": status,
+                "details": " | ".join(cells[3:]),
+            }
+        )
+
+    import pandas as pd
+
+    return pd.DataFrame(rows), SCHEMA_CONTRACT_REPORT_PATH if rows else None
 
 st.set_page_config(page_title="Overview | Governed Analytics", layout="wide")
 
@@ -34,11 +90,11 @@ st.markdown(
     """
 )
 
-logs_df, _ = read_first_csv([PIPELINE_LOG_PATH])
-quality_df, quality_source = read_first_csv([QUALITY_CHECKS_PATH, PUBLISHED_MONITORING_PATH])
-classification_df, _ = read_first_csv([DATA_CLASSIFICATION_PATH])
-contracts_df, contracts_source = read_schema_contract_results()
-risk_payload, risk_source = read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
+logs_df, _ = _read_first_csv([PIPELINE_LOG_PATH])
+quality_df, quality_source = _read_first_csv([QUALITY_CHECKS_PATH, PUBLISHED_MONITORING_PATH])
+classification_df, _ = _read_first_csv([DATA_CLASSIFICATION_PATH])
+contracts_df, contracts_source = _read_schema_contract_results()
+risk_payload, risk_source = _read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
 workflows = sorted(WORKFLOWS_DIR.glob("*.json")) if WORKFLOWS_DIR.exists() else []
 
 latest_status = "N/A"

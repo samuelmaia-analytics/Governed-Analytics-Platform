@@ -6,21 +6,30 @@ import streamlit as st
 
 from pages._shared import (
     DATA_CLASSIFICATION_PATH,
-    GOVERNANCE_SCORECARDS_PATH,
     PIPELINE_LOG_PATH,
     PRIVACY_RISK_PATH,
-    PUBLICATION_DECISION_PATH,
-    PUBLISHED_MONITORING_PATH,
+    PROJECT_ROOT,
     QUALITY_CHECKS_PATH,
-    WORKFLOWS_DIR,
+    SCHEMA_CONTRACT_RESULTS_PATH,
     count_statuses,
     file_status,
     format_datetime,
-    read_first_csv,
-    read_first_json,
-    read_schema_contract_results,
+    read_csv_safe,
+    read_json_safe,
     render_file_warning,
 )
+
+PUBLISHED_MONITORING_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/published_layer_monitoring.csv"
+)
+GOVERNANCE_SCORECARDS_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/governance_scorecards.csv"
+)
+PUBLICATION_DECISION_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/publication_decision.json"
+)
+SCHEMA_CONTRACT_REPORT_PATH = PROJECT_ROOT / "docs/reports/schema_contract_report.md"
+WORKFLOWS_DIR = PROJECT_ROOT / "workflows/n8n"
 
 st.set_page_config(
     page_title="Governed Analytics Platform",
@@ -29,10 +38,59 @@ st.set_page_config(
 )
 
 
+def _read_first_csv(paths: list[Path]):
+    for path in paths:
+        df = read_csv_safe(path)
+        if not df.empty:
+            return df, path
+    return read_csv_safe(Path("__missing__.csv")), None
+
+
+def _read_first_json(paths: list[Path]):
+    for path in paths:
+        payload = read_json_safe(path)
+        if payload:
+            return payload, path
+    return {}, None
+
+
+def _read_schema_contract_results():
+    df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
+    if not df.empty:
+        return df, SCHEMA_CONTRACT_RESULTS_PATH
+
+    if not SCHEMA_CONTRACT_REPORT_PATH.exists():
+        return df, None
+
+    rows = []
+    for line in SCHEMA_CONTRACT_REPORT_PATH.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("| `"):
+            continue
+        cells = [
+            cell.strip().strip("`").strip("*")
+            for cell in stripped.strip("|").split("|")
+        ]
+        if len(cells) < 4:
+            continue
+        dataset, check_name, status = cells[:3]
+        rows.append(
+            {
+                "dataset_name": dataset,
+                "check_name": check_name,
+                "status": status,
+                "details": " | ".join(cells[3:]),
+            }
+        )
+    import pandas as pd
+
+    return pd.DataFrame(rows), SCHEMA_CONTRACT_REPORT_PATH if rows else None
+
+
 def _latest_pipeline_status() -> tuple[str, str]:
-    logs, _ = read_first_csv([PIPELINE_LOG_PATH])
+    logs, _ = _read_first_csv([PIPELINE_LOG_PATH])
     if logs.empty:
-        decision, _ = read_first_json([PUBLICATION_DECISION_PATH])
+        decision, _ = _read_first_json([PUBLICATION_DECISION_PATH])
         if decision:
             return (
                 str(decision.get("status", "review")).upper(),
@@ -48,7 +106,7 @@ def _latest_pipeline_status() -> tuple[str, str]:
 
 
 def _quality_summary() -> tuple[int, int, int]:
-    checks, _ = read_first_csv([QUALITY_CHECKS_PATH, PUBLISHED_MONITORING_PATH])
+    checks, _ = _read_first_csv([QUALITY_CHECKS_PATH, PUBLISHED_MONITORING_PATH])
     if checks.empty or "status" not in checks.columns:
         return 0, 0, 0
     counts = count_statuses(checks, "status")
@@ -72,9 +130,9 @@ def main() -> None:
 
     pipeline_status, pipeline_timestamp = _latest_pipeline_status()
     pass_count, warn_count, fail_count = _quality_summary()
-    classification_df, _ = read_first_csv([DATA_CLASSIFICATION_PATH])
-    risk_payload, _ = read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
-    contracts_df, _ = read_schema_contract_results()
+    classification_df, _ = _read_first_csv([DATA_CLASSIFICATION_PATH])
+    risk_payload, _ = _read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
+    contracts_df, _ = _read_schema_contract_results()
     workflows = sorted(WORKFLOWS_DIR.glob("*.json")) if WORKFLOWS_DIR.exists() else []
 
     col1, col2, col3, col4 = st.columns(4)

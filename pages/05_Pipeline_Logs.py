@@ -5,13 +5,17 @@ import streamlit as st
 
 from pages._shared import (
     PIPELINE_LOG_PATH,
-    PUBLICATION_DECISION_PATH,
+    PROJECT_ROOT,
     count_statuses,
     format_datetime,
     read_csv_safe,
     read_json_safe,
     relative_path,
     render_file_warning,
+)
+
+PUBLICATION_DECISION_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/publication_decision.json"
 )
 
 st.set_page_config(page_title="Pipeline Logs | Governed Analytics", layout="wide")

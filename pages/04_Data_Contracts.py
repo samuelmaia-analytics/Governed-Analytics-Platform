@@ -7,19 +7,57 @@ import streamlit as st
 from pages._shared import (
     BUSINESS_RULE_RESULTS_PATH,
     CONTRACTS_DIR,
+    PROJECT_ROOT,
+    SCHEMA_CONTRACT_RESULTS_PATH,
     count_statuses,
     read_csv_safe,
-    read_schema_contract_results,
+    read_text_safe,
     relative_path,
     render_file_warning,
 )
+
+SCHEMA_CONTRACT_REPORT_PATH = PROJECT_ROOT / "docs/reports/schema_contract_report.md"
+
+
+def _read_schema_contract_results():
+    df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
+    if not df.empty:
+        return df, SCHEMA_CONTRACT_RESULTS_PATH
+
+    content = read_text_safe(SCHEMA_CONTRACT_REPORT_PATH)
+    rows = []
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("| `"):
+            continue
+        cells = [
+            cell.strip().strip("`").strip("*")
+            for cell in stripped.strip("|").split("|")
+        ]
+        if len(cells) < 4:
+            continue
+        dataset, check_name, status = cells[:3]
+        rows.append(
+            {
+                "dataset_name": dataset,
+                "layer": "",
+                "check_name": check_name,
+                "status": status,
+                "details": " | ".join(cells[3:]),
+            }
+        )
+
+    import pandas as pd
+
+    return pd.DataFrame(rows), SCHEMA_CONTRACT_REPORT_PATH if rows else None
+
 
 st.set_page_config(page_title="Data Contracts | Governed Analytics", layout="wide")
 
 st.title("Data Contracts")
 st.caption("Schema contract and business rule validation evidence.")
 
-schema_df, schema_source = read_schema_contract_results()
+schema_df, schema_source = _read_schema_contract_results()
 business_df = read_csv_safe(BUSINESS_RULE_RESULTS_PATH)
 
 

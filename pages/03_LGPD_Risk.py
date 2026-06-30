@@ -6,12 +6,25 @@ import streamlit as st
 from pages._shared import (
     DATA_CLASSIFICATION_PATH,
     PRIVACY_RISK_PATH,
-    PUBLICATION_DECISION_PATH,
+    PROJECT_ROOT,
     read_csv_safe,
-    read_first_json,
+    read_json_safe,
     relative_path,
     render_file_warning,
 )
+
+PUBLICATION_DECISION_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/publication_decision.json"
+)
+
+
+def _read_first_json(paths):
+    for path in paths:
+        payload = read_json_safe(path)
+        if payload:
+            return payload, path
+    return {}, None
+
 
 st.set_page_config(page_title="LGPD Risk | Governed Analytics", layout="wide")
 
@@ -21,7 +34,7 @@ st.caption(
 )
 
 classification_df = read_csv_safe(DATA_CLASSIFICATION_PATH)
-risk_payload, risk_source = read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
+risk_payload, risk_source = _read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
 
 if risk_payload:
     if risk_source and risk_source != PRIVACY_RISK_PATH:
