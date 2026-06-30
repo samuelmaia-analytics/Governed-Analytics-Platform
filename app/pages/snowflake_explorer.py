@@ -40,7 +40,7 @@ def render_snowflake_explorer(locale: str) -> None:
                 with get_snowflake_connector() as conn:
                     tables = conn.list_tables()
                 if tables:
-                    st.dataframe(pd.DataFrame(tables), use_container_width=True)
+                    st.dataframe(pd.DataFrame(tables), width="stretch")
                 else:
                     st.info(
                         "No tables found."
@@ -67,7 +67,7 @@ def render_snowflake_explorer(locale: str) -> None:
                 try:
                     with get_snowflake_connector() as conn:
                         df = conn.query(sql)
-                    st.dataframe(df, use_container_width=True)
+                    st.dataframe(df, width="stretch")
                     st.caption(
                         f"{len(df):,} rows returned"
                         if locale == "en-US"

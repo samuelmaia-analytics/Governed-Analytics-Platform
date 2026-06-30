@@ -142,7 +142,7 @@ def _render_column_analysis(df: pd.DataFrame, locale: Locale) -> None:
                 marginal="rug",
             )
             fig_hist.update_layout(margin=dict(l=20, r=20, t=40, b=20))
-            st.plotly_chart(fig_hist, use_container_width=True)
+            st.plotly_chart(fig_hist, width="stretch")
         with tab_box:
             fig_box = px.box(
                 df,
@@ -151,7 +151,7 @@ def _render_column_analysis(df: pd.DataFrame, locale: Locale) -> None:
                 points="outliers",
             )
             fig_box.update_layout(margin=dict(l=20, r=20, t=40, b=20))
-            st.plotly_chart(fig_box, use_container_width=True)
+            st.plotly_chart(fig_box, width="stretch")
 
         st.markdown(
             "**Resumo Estatístico**" if not is_en else "**Statistical Summary**"
@@ -168,7 +168,7 @@ def _render_column_analysis(df: pd.DataFrame, locale: Locale) -> None:
             title=f"{'Distribuição temporal de' if not is_en else 'Temporal distribution of'} {column}",
         )
         fig_ts.update_layout(margin=dict(l=20, r=20, t=40, b=20))
-        st.plotly_chart(fig_ts, use_container_width=True)
+        st.plotly_chart(fig_ts, width="stretch")
 
     else:
         top_n = st.slider(
@@ -189,7 +189,7 @@ def _render_column_analysis(df: pd.DataFrame, locale: Locale) -> None:
             color_continuous_scale="Blues",
         )
         fig_bar.update_layout(margin=dict(l=20, r=20, t=40, b=20), showlegend=False)
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, width="stretch")
 
         st.markdown(
             f"**Top {top_n} valores mais frequentes**"

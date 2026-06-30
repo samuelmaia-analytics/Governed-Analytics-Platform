@@ -101,7 +101,7 @@ def _render_operational_readiness_section(locale: Locale) -> None:
                     for layer in layer_status
                 ]
             ),
-            use_container_width=True,
+            width="stretch",
         )
         st.markdown(
             "\n".join(

@@ -99,7 +99,7 @@ def render_seller_performance(locale: Locale) -> None:
             title="Distribuição por Tier" if not is_en else "Tier Distribution",
         )
         fig_tier.update_layout(showlegend=False, margin=dict(l=20, r=20, t=40, b=20))
-        st.plotly_chart(fig_tier, use_container_width=True)
+        st.plotly_chart(fig_tier, width="stretch")
 
     with chart_right:
         sla = (
@@ -122,7 +122,7 @@ def render_seller_performance(locale: Locale) -> None:
             labels={"avg_delay_rate": "Delay Rate (%)"},
         )
         fig_sla.update_layout(margin=dict(l=20, r=20, t=40, b=20))
-        st.plotly_chart(fig_sla, use_container_width=True)
+        st.plotly_chart(fig_sla, width="stretch")
 
     ranking = filtered.copy()
     ranking["estimated_revenue"] = pd.to_numeric(

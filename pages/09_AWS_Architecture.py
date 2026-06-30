@@ -118,7 +118,7 @@ if ARCHITECTURE_IMAGE_PATH.exists():
     st.image(
         str(ARCHITECTURE_IMAGE_PATH),
         caption=f"Source: {relative_path(ARCHITECTURE_IMAGE_PATH)}",
-        use_container_width=True,
+        width="stretch",
     )
 else:
     st.warning(

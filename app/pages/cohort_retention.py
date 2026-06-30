@@ -65,7 +65,7 @@ def render_cohort_retention(locale: Locale) -> None:
         if not is_en
         else "Cohort Retention Matrix (%)",
     )
-    st.plotly_chart(fig_retention, use_container_width=True)
+    st.plotly_chart(fig_retention, width="stretch")
 
     ticket_pivot = cohort_df.pivot_table(
         index="purchase_cohort_month",
@@ -80,7 +80,7 @@ def render_cohort_retention(locale: Locale) -> None:
         color_continuous_scale="Blues",
         title="Ticket Médio por Cohort" if not is_en else "Average Ticket by Cohort",
     )
-    st.plotly_chart(fig_ticket, use_container_width=True)
+    st.plotly_chart(fig_ticket, width="stretch")
 
     st.dataframe(
         retention[

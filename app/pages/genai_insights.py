@@ -103,7 +103,7 @@ def render_genai_insights(locale: Locale) -> None:
                 else "Extracted Category Distribution",
             )
             fig.update_layout(showlegend=False, margin=dict(l=20, r=20, t=40, b=20))
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
     st.markdown("**Feature Inventory**" if is_en else "**Inventário de Features**")
     st.dataframe(features_df, width="stretch")

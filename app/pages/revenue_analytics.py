@@ -69,7 +69,7 @@ def _render_monthly_revenue(df: pd.DataFrame, locale: Locale) -> None:
         },
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def _render_category_pareto(category_slice: pd.DataFrame, locale: Locale) -> None:
@@ -110,7 +110,7 @@ def _render_category_pareto(category_slice: pd.DataFrame, locale: Locale) -> Non
         else "Revenue Pareto by Category (Top 15)",
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-35)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     st.caption(
         f"As top {pareto_cutoff} categorias concentram ~80% da receita."
         if not is_en
@@ -167,7 +167,7 @@ def _render_cohort_ticket_and_retention(
         if not is_en
         else "Average Ticket by Cohort (Heatmap)",
     )
-    st.plotly_chart(fig_ticket, use_container_width=True)
+    st.plotly_chart(fig_ticket, width="stretch")
 
     baseline = cohort_df[cohort_df["cohort_order_month_number"] == 0][
         ["purchase_cohort_month", "customers"]
@@ -189,7 +189,7 @@ def _render_cohort_ticket_and_retention(
         color_continuous_scale="Teal",
         title="Retenção por Cohort (%)" if not is_en else "Cohort Retention (%)",
     )
-    st.plotly_chart(fig_retention, use_container_width=True)
+    st.plotly_chart(fig_retention, width="stretch")
 
 
 def _render_top_sellers(df: pd.DataFrame, locale: Locale) -> None:
@@ -219,7 +219,7 @@ def _render_top_sellers(df: pd.DataFrame, locale: Locale) -> None:
         },
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-35)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def render_revenue_analytics(df: pd.DataFrame, locale: Locale) -> None:
