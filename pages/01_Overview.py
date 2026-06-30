@@ -75,8 +75,6 @@ def _read_schema_contract_results():
 
     return pd.DataFrame(rows), SCHEMA_CONTRACT_REPORT_PATH if rows else None
 
-st.set_page_config(page_title="Overview | Governed Analytics", layout="wide")
-
 st.title("Governed Analytics Platform")
 st.caption(
     "Executive overview for governance, privacy, contracts, automation, and documentation."

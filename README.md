@@ -138,8 +138,9 @@ Root multipage dashboard:
 | n8n Automation | Workflow flow, available JSON templates, node inventory, and importability evidence |
 | Governance Docs | Markdown documentation browser, highlighting `docs/n8n_automation.md` |
 
-Shared Streamlit helpers live in `streamlit_shared.py`, outside `pages/`, so
-the multipage sidebar lists only user-facing pages.
+The root `app.py` uses explicit Streamlit navigation, so the sidebar lists only
+the seven user-facing pages above. Shared helpers live in `streamlit_shared.py`,
+outside `pages/`, and are not exposed as a page.
 
 The existing modular Streamlit application under `app/main.py` remains available
 and keeps the broader analytical pages:

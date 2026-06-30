@@ -9,8 +9,6 @@ from streamlit_shared import (
     render_file_warning,
 )
 
-st.set_page_config(page_title="n8n Automation | Governed Analytics", layout="wide")
-
 st.title("n8n Automation")
 st.caption("Visibility into workflow templates without executing n8n from Streamlit.")
 

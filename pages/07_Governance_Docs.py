@@ -10,8 +10,6 @@ from streamlit_shared import (
     render_file_warning,
 )
 
-st.set_page_config(page_title="Governance Docs | Governed Analytics", layout="wide")
-
 st.title("Governance Docs")
 st.caption("Browse generated and versioned Markdown documentation.")
 

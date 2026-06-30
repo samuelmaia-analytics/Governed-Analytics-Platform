@@ -18,8 +18,6 @@ PUBLICATION_DECISION_PATH = (
     PROJECT_ROOT / "data/published/monitoring/publication_decision.json"
 )
 
-st.set_page_config(page_title="Pipeline Logs | Governed Analytics", layout="wide")
-
 st.title("Pipeline Logs")
 st.caption(
     "Execution history registered by local scripts or n8n command orchestration."

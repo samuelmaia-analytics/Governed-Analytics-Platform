@@ -26,8 +26,6 @@ def _read_first_json(paths):
     return {}, None
 
 
-st.set_page_config(page_title="LGPD Risk | Governed Analytics", layout="wide")
-
 st.title("LGPD Risk")
 st.caption(
     "Classification inventory and privacy risk scoring from generated artifacts."
