@@ -42,6 +42,11 @@ def main() -> None:
             title="Governance Docs",
             icon=":material/article:",
         ),
+        st.Page(
+            "pages/08_Operational_Health.py",
+            title="Operational Health",
+            icon=":material/vital_signs:",
+        ),
     ]
     selected_page = st.navigation(pages)
     selected_page.run()
