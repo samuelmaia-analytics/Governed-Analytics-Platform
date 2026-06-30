@@ -88,6 +88,14 @@ types, nullability, uniqueness, quality rules, LGPD classification, privacy
 requirements, and publication policies for raw, silver, gold, and customer
 privacy controls. Details are documented in `docs/data_contracts.md`.
 
+## AWS Reference Architecture
+
+The root Streamlit app includes an AWS Architecture page with a proposed
+production-style design for S3, Glue, Glue Data Catalog, Lake Formation, Kinesis,
+Athena, Redshift, Macie, CloudWatch, SNS, EventBridge, Step Functions, App
+Runner, CloudFront, Route 53, IAM, KMS and FinOps services. The full reference is
+documented in `docs/aws_architecture.md`.
+
 ## Implemented vs Simulated
 
 ### Implemented
@@ -192,9 +200,10 @@ Root multipage dashboard:
 | n8n Automation | Workflow flow, available JSON templates, node inventory, and importability evidence |
 | Governance Docs | Markdown documentation browser, highlighting `docs/n8n_automation.md` |
 | Operational Health | Pipeline health KPIs, failures, warnings, processed/rejected records, score averages, and execution history |
+| AWS Architecture | Proposed AWS reference architecture, service mapping, governance, security, observability, and FinOps controls |
 
 The root `app.py` uses explicit Streamlit navigation, so the sidebar lists only
-the eight user-facing pages above. Shared helpers live in `streamlit_shared.py`,
+the nine user-facing pages above. Shared helpers live in `streamlit_shared.py`,
 outside `pages/`, and are not exposed as a page.
 
 The existing modular Streamlit application under `app/main.py` remains available

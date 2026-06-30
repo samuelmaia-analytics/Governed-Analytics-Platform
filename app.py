@@ -47,6 +47,11 @@ def main() -> None:
             title="Operational Health",
             icon=":material/vital_signs:",
         ),
+        st.Page(
+            "pages/09_AWS_Architecture.py",
+            title="AWS Architecture",
+            icon=":material/cloud:",
+        ),
     ]
     selected_page = st.navigation(pages)
     selected_page.run()
