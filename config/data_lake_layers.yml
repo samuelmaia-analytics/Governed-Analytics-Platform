@@ -1,0 +1,83 @@
+lakehouse:
+  name: local_governed_data_lake
+  storage_mode: local_filesystem
+  production_claim: production_inspired_portfolio_simulation
+  description: >
+    Local Data Lake layout used to simulate governed promotion from raw
+    ingestion to curated and published analytical assets.
+
+layers:
+  bronze:
+    label: Bronze
+    paths:
+      - data/raw/landing
+      - data/external
+    purpose: Preserve source-aligned files and externally supplied samples.
+    allowed_formats:
+      - csv
+      - json
+      - jsonl
+    governance_controls:
+      - source_inventory
+      - immutable_raw_boundary
+      - no_manual_pii_enrichment
+    promotion_rule: Promote only through ingestion and standardization code.
+    owner_role: Data Engineering
+    sensitivity_default: internal
+
+  silver:
+    label: Silver
+    paths:
+      - data/standardized
+      - data/staging
+    purpose: Store standardized, profiled, and validation-ready analytical inputs.
+    allowed_formats:
+      - csv
+      - parquet
+      - json
+    governance_controls:
+      - schema_contract_validation
+      - profiling
+      - lgpd_classification
+    promotion_rule: Promote only after schema and quality checks have evidence.
+    owner_role: Analytics Engineering
+    sensitivity_default: confidential
+
+  gold:
+    label: Gold
+    paths:
+      - data/curated
+      - data/published
+    purpose: Store governed analytical marts, semantic slices, and publication evidence.
+    allowed_formats:
+      - csv
+      - parquet
+      - json
+      - markdown
+    governance_controls:
+      - data_quality_gate
+      - privacy_risk_score
+      - publication_gate
+      - monitoring_snapshot
+    promotion_rule: Publish only when LGPD, quality, and contract gates are explainable.
+    owner_role: Data Product Owner
+    sensitivity_default: restricted_until_published
+
+  quarantine:
+    label: Quarantine
+    paths:
+      - data/quarantine
+    purpose: Isolate rejected records, failed validation extracts, and unsafe publication candidates.
+    allowed_formats:
+      - csv
+      - json
+      - parquet
+      - txt
+    governance_controls:
+      - rejection_reason
+      - remediation_owner
+      - retention_review
+      - no_streamlit_consumption
+    promotion_rule: Reprocess only after remediation evidence is recorded.
+    owner_role: Data Governance
+    sensitivity_default: restricted

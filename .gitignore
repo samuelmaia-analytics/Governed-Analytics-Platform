@@ -30,6 +30,9 @@ data/standardized/*
 data/staging/*
 !data/staging/.gitkeep
 
+data/quarantine/*
+!data/quarantine/.gitkeep
+
 data/curated/*
 !data/curated/.gitkeep
 !data/curated/catalog/
