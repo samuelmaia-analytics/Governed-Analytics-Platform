@@ -1,0 +1,74 @@
+dataset: silver_orders
+layer: silver
+owner: analytics_engineering
+description: Cleaned and standardized orders dataset ready for validation and enrichment.
+primary_key: order_id
+refresh_frequency: daily_simulated
+columns:
+  - name: order_id
+    type: string
+    nullable: false
+    unique: true
+  - name: customer_key
+    type: string
+    nullable: false
+    unique: false
+  - name: order_status
+    type: string
+    nullable: false
+    unique: false
+  - name: purchase_date
+    type: date
+    nullable: false
+    unique: false
+  - name: delivery_date
+    type: date
+    nullable: true
+    unique: false
+  - name: delivery_time_days
+    type: numeric
+    nullable: true
+    unique: false
+data_types:
+  order_id: string
+  customer_key: string
+  order_status: string
+  purchase_date: date
+  delivery_date: date
+  delivery_time_days: numeric
+nullable:
+  order_id: false
+  customer_key: false
+  order_status: false
+  purchase_date: false
+  delivery_date: true
+  delivery_time_days: true
+uniqueness:
+  primary_key_must_be_unique: true
+  duplicate_tolerance_percent: 0
+quality_rules:
+  - no_duplicate_primary_key
+  - not_null_required_fields
+  - valid_order_status
+  - delivery_date_after_purchase_date
+  - non_negative_delivery_time_days
+privacy:
+  lgpd_classification: moderate_risk
+  contains_personal_data: true
+  masking_required: true
+  notes: Customer identifiers must remain pseudonymized before promotion.
+lgpd_classification:
+  order_id: non_personal
+  customer_key: pseudonymous_identifier
+  order_status: non_personal
+  purchase_date: indirect_identifier
+  delivery_date: indirect_identifier
+  delivery_time_days: non_personal
+publication_policy:
+  direct_publication_allowed: false
+  allowed_if_quality_score_min: 90
+  allowed_if_lgpd_risk_score_max: 60
+  requires_publication_gate: true
+publication:
+  allowed_if_quality_score_min: 90
+  allowed_if_lgpd_risk_score_max: 60

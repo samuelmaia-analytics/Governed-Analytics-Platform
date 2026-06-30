@@ -1,0 +1,66 @@
+dataset: raw_orders
+layer: bronze
+owner: data_engineering
+description: Source-aligned Olist orders extract preserved for ingestion and lineage.
+primary_key: order_id
+refresh_frequency: on_demand
+columns:
+  - name: order_id
+    type: string
+    nullable: false
+    unique: true
+  - name: customer_id
+    type: string
+    nullable: false
+    unique: false
+  - name: order_status
+    type: string
+    nullable: false
+    unique: false
+  - name: order_purchase_timestamp
+    type: timestamp
+    nullable: false
+    unique: false
+  - name: order_delivered_customer_date
+    type: timestamp
+    nullable: true
+    unique: false
+data_types:
+  order_id: string
+  customer_id: string
+  order_status: string
+  order_purchase_timestamp: timestamp
+  order_delivered_customer_date: timestamp
+nullable:
+  order_id: false
+  customer_id: false
+  order_status: false
+  order_purchase_timestamp: false
+  order_delivered_customer_date: true
+uniqueness:
+  primary_key_must_be_unique: true
+  duplicate_tolerance_percent: 0
+quality_rules:
+  - no_duplicate_primary_key
+  - not_null_required_fields
+  - valid_order_status
+  - no_future_purchase_timestamp
+privacy:
+  lgpd_classification: moderate_risk
+  contains_personal_data: true
+  masking_required: false
+  notes: Raw layer is internal and must not be consumed directly by dashboards.
+lgpd_classification:
+  order_id: non_personal
+  customer_id: pseudonymous_identifier
+  order_status: non_personal
+  order_purchase_timestamp: indirect_identifier
+  order_delivered_customer_date: indirect_identifier
+publication_policy:
+  direct_publication_allowed: false
+  allowed_if_quality_score_min: 95
+  allowed_if_lgpd_risk_score_max: 50
+  requires_publication_gate: true
+publication:
+  allowed_if_quality_score_min: 95
+  allowed_if_lgpd_risk_score_max: 50

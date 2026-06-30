@@ -81,6 +81,13 @@ failure scenarios. The alert strategy in `docs/alerts_strategy.md` explains how
 these messages could be routed through SNS, e-mail, Slack, Discord, Telegram, or
 n8n in a real deployment, without committing credentials or active webhooks.
 
+## Data Contracts
+
+Governed YAML contracts under `contracts/` document expected schemas, data
+types, nullability, uniqueness, quality rules, LGPD classification, privacy
+requirements, and publication policies for raw, silver, gold, and customer
+privacy controls. Details are documented in `docs/data_contracts.md`.
+
 ## Implemented vs Simulated
 
 ### Implemented

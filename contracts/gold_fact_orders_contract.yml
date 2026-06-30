@@ -1,0 +1,76 @@
+dataset: gold_fact_orders
+layer: gold
+owner: analytics_engineering
+description: Governed fact table for order analytics and executive consumption.
+primary_key: order_id
+refresh_frequency: daily_simulated
+columns:
+  - name: order_id
+    type: string
+    nullable: false
+    unique: true
+  - name: customer_key
+    type: string
+    nullable: false
+    unique: false
+  - name: order_status
+    type: string
+    nullable: false
+    unique: false
+  - name: order_value
+    type: numeric
+    nullable: false
+    unique: false
+    min_value: 0
+  - name: freight_value
+    type: numeric
+    nullable: false
+    unique: false
+    min_value: 0
+  - name: order_year_month
+    type: string
+    nullable: false
+    unique: false
+data_types:
+  order_id: string
+  customer_key: string
+  order_status: string
+  order_value: numeric
+  freight_value: numeric
+  order_year_month: string
+nullable:
+  order_id: false
+  customer_key: false
+  order_status: false
+  order_value: false
+  freight_value: false
+  order_year_month: false
+uniqueness:
+  primary_key_must_be_unique: true
+  duplicate_tolerance_percent: 0
+quality_rules:
+  - no_duplicate_primary_key
+  - not_null_required_fields
+  - valid_order_status
+  - non_negative_order_value
+  - non_negative_freight_value
+privacy:
+  lgpd_classification: low_to_moderate_risk
+  contains_personal_data: false
+  masking_required: false
+  notes: Dataset must expose pseudonymous or aggregated customer attributes only.
+lgpd_classification:
+  order_id: non_personal
+  customer_key: pseudonymous_identifier
+  order_status: non_personal
+  order_value: non_personal
+  freight_value: non_personal
+  order_year_month: non_personal
+publication_policy:
+  direct_publication_allowed: true
+  allowed_if_quality_score_min: 90
+  allowed_if_lgpd_risk_score_max: 60
+  requires_publication_gate: true
+publication:
+  allowed_if_quality_score_min: 90
+  allowed_if_lgpd_risk_score_max: 60

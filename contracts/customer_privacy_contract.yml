@@ -1,0 +1,70 @@
+dataset: customer_privacy_controls
+layer: governance
+owner: data_governance
+description: Privacy contract for customer-related identifiers and publication controls.
+primary_key: customer_key
+refresh_frequency: reviewed_per_release
+columns:
+  - name: customer_id
+    type: string
+    nullable: false
+    unique: true
+  - name: customer_key
+    type: string
+    nullable: false
+    unique: true
+  - name: customer_city
+    type: string
+    nullable: true
+    unique: false
+  - name: customer_state
+    type: string
+    nullable: true
+    unique: false
+  - name: customer_zip_code_prefix
+    type: string
+    nullable: true
+    unique: false
+data_types:
+  customer_id: string
+  customer_key: string
+  customer_city: string
+  customer_state: string
+  customer_zip_code_prefix: string
+nullable:
+  customer_id: false
+  customer_key: false
+  customer_city: true
+  customer_state: true
+  customer_zip_code_prefix: true
+uniqueness:
+  customer_id_unique_in_internal_layers: true
+  customer_key_unique_in_published_layers: true
+quality_rules:
+  - not_null_customer_identifiers
+  - customer_key_must_be_pseudonymized
+  - remove_direct_customer_id_before_publication
+  - aggregate_low_volume_geographies
+privacy:
+  lgpd_classification: high_risk
+  contains_personal_data: true
+  masking_required: true
+  pseudonymization_required: true
+  direct_identifier_publication_allowed: false
+lgpd_classification:
+  customer_id: personal_data
+  customer_key: pseudonymous_identifier
+  customer_city: indirect_identifier
+  customer_state: indirect_identifier
+  customer_zip_code_prefix: indirect_identifier
+publication_policy:
+  direct_publication_allowed: false
+  allowed_if_quality_score_min: 95
+  allowed_if_lgpd_risk_score_max: 45
+  requires_publication_gate: true
+  forbidden_columns:
+    - customer_id
+    - customer_zip_code_prefix
+publication:
+  allowed_if_quality_score_min: 95
+  allowed_if_lgpd_risk_score_max: 45
