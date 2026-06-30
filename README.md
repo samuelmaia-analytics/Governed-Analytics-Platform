@@ -66,6 +66,14 @@ LGPD risk score, and critical issues to classify a dataset as `Approved`,
 `Needs Review`, or `Blocked`. Usage and rules are documented in
 `docs/publication_gate.md`.
 
+## Operational Documentation
+
+Operational procedures are documented in `docs/runbook.md`, including local
+execution, pipeline reruns, log validation, failure handling, and presentation
+checks. Data lineage is documented in `docs/data_lineage.md`, from Olist CSV
+sources through Bronze, Silver, Gold, Publication Gate, Streamlit, dashboards,
+and APIs.
+
 ## Implemented vs Simulated
 
 ### Implemented
