@@ -111,7 +111,7 @@ Proximos screenshots recomendados para evidenciar a evolucao com n8n:
 
 | Captura sugerida | Objetivo |
 |---|---|
-| `streamlit_overview_n8n.png` | Visao geral do `app.py` com status do pipeline, disponibilidade de artefatos e quantidade de workflows n8n |
+| `streamlit_overview_n8n.png` | App principal `app/main.py` e pagina n8n Automation com disponibilidade de artefatos e quantidade de workflows n8n |
 | `streamlit_pipeline_logs.png` | Historico de execucoes vindo de `logs/pipeline_execution_logs.csv` |
 | `streamlit_n8n_automation.png` | Inventario dos workflows n8n e detalhes dos nodes |
 | `streamlit_governance_docs.png` | Browser de documentacao destacando `docs/n8n_automation.md` |
@@ -121,6 +121,12 @@ Proximos screenshots recomendados para evidenciar a evolucao com n8n:
 Essas imagens ficam como alvos de captura ate serem geradas e salvas em `assets/screenshots/`.
 
 ## App Streamlit Executivo
+
+Para o deploy publico no Streamlit Cloud, use **Main file path: `app/main.py`**.
+Esse e o app analitico principal e agora tambem inclui a pagina **n8n Automation**.
+
+Use **Main file path: `app.py`** apenas se o objetivo for publicar a interface
+menor de evidencias de governanca/n8n.
 
 Páginas principais:
 
@@ -137,6 +143,7 @@ Páginas principais:
 | GenAI Insights | Saída de extração de features de texto de produto |
 | Relatório de Governança | Relatórios markdown renderizados com visão raw |
 | Central de Controles | Publication gate, racional de decisão, tendências históricas de governança |
+| n8n Automation | Templates versionados de workflows n8n, status de artefatos, finalidade da automacao e documentacao |
 | Snowflake Explorer | Navegação por tabelas Snowflake e execução de consultas somente leitura |
 
 ## Endpoints FastAPI
@@ -240,3 +247,4 @@ Artefato forte para discussão em entrevistas de:
 - Streamlit app: <https://governed-analytics-platform.streamlit.app/>
 - Repositório: <https://github.com/samuelmaia-analytics/Governed-Analytics-Platform>
 - Índice técnico: [docs/README.md](docs/README.md)
+

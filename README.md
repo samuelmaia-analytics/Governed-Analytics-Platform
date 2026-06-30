@@ -261,7 +261,7 @@ Recommended next screenshots for the n8n automation update:
 
 | Suggested capture | Purpose |
 |---|---|
-| `streamlit_overview_n8n.png` | Root `app.py` overview with pipeline status, artifact availability, and n8n workflow count |
+| `streamlit_overview_n8n.png` | `app/main.py` overview and n8n Automation page with artifact availability and workflow count |
 | `streamlit_pipeline_logs.png` | Pipeline log history from `logs/pipeline_execution_logs.csv` |
 | `streamlit_n8n_automation.png` | n8n workflow inventory and node-level visibility |
 | `streamlit_governance_docs.png` | Documentation browser highlighting `docs/n8n_automation.md` |
