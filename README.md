@@ -125,7 +125,7 @@ Root multipage dashboard:
 | Overview | Project summary, key governance metrics, last execution status, technologies, and architecture |
 | Data Quality | Quality report checks, success/warning/error indicators, and residual issue visibility |
 | LGPD Risk | LGPD classification inventory, privacy risk score, score components, and recommendations |
-| Data Contracts | Schema contract results, business rule results, and versioned contract files |
+| Data Contracts | Schema contract results with expected-vs-actual field comparison, business rule results, and versioned contract files |
 | Pipeline Logs | Execution history from `logs/pipeline_execution_logs.csv`, latest status, and status charts |
 | n8n Automation | Workflow flow, available JSON templates, node inventory, and importability evidence |
 | Governance Docs | Markdown documentation browser, highlighting `docs/n8n_automation.md` |

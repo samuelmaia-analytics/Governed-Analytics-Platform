@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 import streamlit as st
 
 from pages._shared import (
@@ -20,6 +22,30 @@ st.caption("Schema contract and business rule validation evidence.")
 schema_df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
 business_df = read_csv_safe(BUSINESS_RULE_RESULTS_PATH)
 
+
+def _schema_comparison_rows() -> list[dict[str, str]]:
+    if schema_df.empty or "details" not in schema_df.columns:
+        return []
+
+    rows = []
+    pattern = re.compile(r"Esperado=(?P<expected>[^|]+)\|\s*atual=(?P<actual>.+)")
+    for _, row in schema_df.iterrows():
+        details = str(row.get("details", ""))
+        match = pattern.search(details)
+        if not match:
+            continue
+        rows.append(
+            {
+                "dataset": str(row.get("dataset_name", "")),
+                "layer": str(row.get("layer", "")),
+                "field_check": str(row.get("check_name", "")),
+                "expected": match.group("expected").strip(),
+                "actual": match.group("actual").strip(),
+                "status": str(row.get("status", "")),
+            }
+        )
+    return rows
+
 st.subheader("Schema contract checks")
 if schema_df.empty:
     render_file_warning(
@@ -32,6 +58,17 @@ else:
     col1.metric("Checks", len(schema_df))
     col2.metric("Passed", counts.get("PASS", 0))
     col3.metric("Failed", counts.get("FAIL", 0))
+
+    comparison_rows = _schema_comparison_rows()
+    if comparison_rows:
+        st.markdown("Expected vs actual field types extracted from contract details.")
+        st.dataframe(comparison_rows, width="stretch", hide_index=True)
+    else:
+        st.info(
+            "No expected-vs-actual field type details were found in the current "
+            "schema contract artifact."
+        )
+
     st.dataframe(schema_df, width="stretch", hide_index=True)
 
 st.subheader("Business rule checks")
