@@ -11,6 +11,7 @@ from streamlit_shared import (
     read_csv_safe,
     read_json_safe,
     relative_path,
+    render_artifact_diagnostics,
     render_file_warning,
 )
 
@@ -27,30 +28,32 @@ logs_df = read_csv_safe(PIPELINE_LOG_PATH)
 
 if logs_df.empty:
     decision = read_json_safe(PUBLICATION_DECISION_PATH)
-    if not decision:
-        render_file_warning(
-            PIPELINE_LOG_PATH,
-            "Run `python scripts/register_pipeline_log.py` or the n8n workflow to create history.",
-        )
-        st.stop()
-
-    st.info(
-        "Runtime execution logs were not found. Showing the latest versioned "
-        f"publication decision from `{relative_path(PUBLICATION_DECISION_PATH)}`."
+    render_file_warning(
+        PIPELINE_LOG_PATH,
+        "Run `python scripts/register_pipeline_log.py` or the n8n workflow to create history.",
     )
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Latest status", str(decision.get("status", "review")).upper())
-    col2.metric("Dataset", decision.get("dataset", "N/A"))
-    col3.metric("Quality score", decision.get("quality_score", "N/A"))
-    col4.metric("Privacy risk score", decision.get("privacy_risk_score", "N/A"))
+    if decision:
+        st.subheader("Versioned publication evidence")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Publication status", str(decision.get("status", "N/A")).upper())
+        col2.metric("Dataset", decision.get("dataset", "N/A"))
+        col3.metric("Quality score", decision.get("quality_score", "N/A"))
+        col4.metric("Privacy risk score", decision.get("privacy_risk_score", "N/A"))
 
-    if decision.get("timestamp_utc"):
-        st.caption(f"Timestamp: {format_datetime(decision.get('timestamp_utc'))}")
-    if decision.get("decision_reason"):
-        st.warning(str(decision["decision_reason"]))
-
-    st.subheader("Publication decision payload")
-    st.json(decision)
+        if decision.get("timestamp_utc"):
+            st.caption(f"Timestamp: {format_datetime(decision.get('timestamp_utc'))}")
+        if decision.get("decision_reason"):
+            st.warning(str(decision["decision_reason"]))
+        st.caption(
+            f"Source: `{relative_path(PUBLICATION_DECISION_PATH)}`. This is "
+            "publication evidence, not a pipeline execution log."
+        )
+    else:
+        render_file_warning(
+            PUBLICATION_DECISION_PATH,
+            "Generate publication monitoring evidence to populate this section.",
+        )
+    render_artifact_diagnostics()
     st.stop()
 
 latest = logs_df.tail(1).iloc[0]
@@ -92,3 +95,5 @@ if status_counts:
 
 st.subheader("Execution log table")
 st.dataframe(logs_df.sort_index(ascending=False), width="stretch", hide_index=True)
+
+render_artifact_diagnostics()

@@ -16,6 +16,7 @@ from streamlit_shared import (
     read_json_safe,
     read_text_safe,
     relative_path,
+    render_artifact_diagnostics,
     render_file_warning,
 )
 
@@ -88,44 +89,50 @@ st.markdown(
     """
 )
 
-logs_df, _ = _read_first_csv([PIPELINE_LOG_PATH])
-quality_df, quality_source = _read_first_csv([QUALITY_CHECKS_PATH, PUBLISHED_MONITORING_PATH])
+logs_df = read_csv_safe(PIPELINE_LOG_PATH)
+quality_df = read_csv_safe(QUALITY_CHECKS_PATH)
+published_monitoring_df = read_csv_safe(PUBLISHED_MONITORING_PATH)
 classification_df, _ = _read_first_csv([DATA_CLASSIFICATION_PATH])
 contracts_df, contracts_source = _read_schema_contract_results()
-risk_payload, risk_source = _read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
+risk_payload = read_json_safe(PRIVACY_RISK_PATH)
+publication_decision = read_json_safe(PUBLICATION_DECISION_PATH)
 workflows = sorted(WORKFLOWS_DIR.glob("*.json")) if WORKFLOWS_DIR.exists() else []
 
-latest_status = "N/A"
+latest_status = "Pipeline artifact missing"
 latest_time = "No execution log found"
 if not logs_df.empty:
     latest = logs_df.tail(1).iloc[0]
     latest_status = str(latest.get("status", "unknown")).upper()
     latest_time = format_datetime(latest.get("timestamp_utc", ""))
-elif risk_payload:
-    latest_status = str(risk_payload.get("status", "review")).upper()
-    latest_time = format_datetime(risk_payload.get("timestamp_utc", ""))
 
 quality_counts = count_statuses(quality_df)
 contract_counts = count_statuses(contracts_df)
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Pipeline status", latest_status)
-col2.metric("Quality failures", quality_counts.get("FAIL", 0))
+col2.metric(
+    "Quality failures",
+    quality_counts.get("FAIL", 0) if not quality_df.empty else "Artifact missing",
+)
 col3.metric("LGPD fields", len(classification_df) if not classification_df.empty else 0)
 col4.metric("n8n workflows", len(workflows))
 
 col5, col6, col7 = st.columns(3)
-privacy_score = risk_payload.get("score", risk_payload.get("privacy_risk_score", "N/A"))
-risk_level = risk_payload.get("risk_level", risk_payload.get("status", "N/A"))
+privacy_score = risk_payload.get("score", "Artifact missing")
+risk_level = risk_payload.get("risk_level", "Artifact missing")
 col5.metric("Privacy score", privacy_score)
-col6.metric("Risk / publication status", str(risk_level).upper())
+col6.metric("Risk level", str(risk_level).upper())
 col7.metric("Contract failures", contract_counts.get("FAIL", 0))
 
 source_notes = []
-if quality_source:
-    source_notes.append(f"Quality source: `{relative_path(quality_source)}`")
-if risk_source:
-    source_notes.append(f"Risk/status source: `{relative_path(risk_source)}`")
+if not quality_df.empty:
+    source_notes.append(f"Quality source: `{relative_path(QUALITY_CHECKS_PATH)}`")
+elif not published_monitoring_df.empty:
+    source_notes.append(
+        f"Published monitoring evidence: `{relative_path(PUBLISHED_MONITORING_PATH)}`"
+    )
+if risk_payload:
+    source_notes.append(f"Privacy risk source: `{relative_path(PRIVACY_RISK_PATH)}`")
 if contracts_source:
     source_notes.append(f"Contracts source: `{relative_path(contracts_source)}`")
 if source_notes:
@@ -133,37 +140,40 @@ if source_notes:
 
 st.subheader("Last execution")
 if logs_df.empty:
-    if risk_payload:
-        st.info(
-            "Runtime pipeline logs were not found. The latest available "
-            "publication decision is shown instead."
-        )
-        exec_col1, exec_col2, exec_col3 = st.columns(3)
-        exec_col1.metric("Decision status", latest_status)
-        exec_col2.metric("Dataset", risk_payload.get("dataset", "N/A"))
-        exec_col3.metric(
-            "Decision timestamp",
-            latest_time or "N/A",
-        )
-
-        decision_reason = str(risk_payload.get("decision_reason", "")).strip()
-        if decision_reason:
-            st.warning(decision_reason)
-
-        st.caption(
-            f"Fallback source: `{relative_path(PUBLICATION_DECISION_PATH)}`. "
-            "This is versioned governance evidence, not a fresh n8n execution log."
-        )
-    else:
-        render_file_warning(
-            PIPELINE_LOG_PATH,
-            "Run `scripts/register_pipeline_log.py` or the n8n workflow to populate it.",
-        )
+    render_file_warning(
+        PIPELINE_LOG_PATH,
+        "Run `scripts/register_pipeline_log.py` or the n8n workflow to populate it.",
+    )
 else:
     st.dataframe(
         logs_df.tail(5).sort_index(ascending=False), width="stretch", hide_index=True
     )
     st.caption(f"Most recent timestamp: {latest_time}")
+
+if publication_decision:
+    st.subheader("Versioned publication evidence")
+    pub_col1, pub_col2, pub_col3, pub_col4 = st.columns(4)
+    pub_col1.metric("Publication status", publication_decision.get("status", "N/A"))
+    pub_col2.metric("Dataset", publication_decision.get("dataset", "N/A"))
+    pub_col3.metric("Quality score", publication_decision.get("quality_score", "N/A"))
+    pub_col4.metric(
+        "Privacy risk score",
+        publication_decision.get("privacy_risk_score", "N/A"),
+    )
+    decision_reason = str(publication_decision.get("decision_reason", "")).strip()
+    if decision_reason:
+        st.warning(decision_reason)
+    st.caption(
+        f"Source: `{relative_path(PUBLICATION_DECISION_PATH)}`. This is versioned "
+        "publication evidence, not a fresh pipeline execution."
+    )
+else:
+    render_file_warning(
+        PUBLICATION_DECISION_PATH,
+        "Generate publication monitoring evidence to populate this section.",
+    )
+
+render_artifact_diagnostics()
 
 st.subheader("Architecture in one view")
 st.markdown(

@@ -112,6 +112,13 @@ automation visibility:
 streamlit run app.py
 ```
 
+For Streamlit Cloud, use **Main file path: `app.py`** when the public deploy
+should present governance, LGPD, contracts, pipeline evidence, n8n visibility,
+and generated documentation. This is not the full analytical dashboard.
+
+If the public deploy should present the broader analytical dashboard instead,
+use **Main file path: `app/main.py`**.
+
 This interface is designed for executive and technical review after the n8n
 automation layer was added. It does not execute n8n directly. Instead, it reads
 existing artifacts from `data/`, `logs/`, `contracts/`, `docs/`, and

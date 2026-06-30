@@ -10,6 +10,7 @@ from streamlit_shared import (
     read_csv_safe,
     read_json_safe,
     relative_path,
+    render_artifact_diagnostics,
     render_file_warning,
 )
 
@@ -18,34 +19,21 @@ PUBLICATION_DECISION_PATH = (
 )
 
 
-def _read_first_json(paths):
-    for path in paths:
-        payload = read_json_safe(path)
-        if payload:
-            return payload, path
-    return {}, None
-
-
 st.title("LGPD Risk")
 st.caption(
     "Classification inventory and privacy risk scoring from generated artifacts."
 )
 
 classification_df = read_csv_safe(DATA_CLASSIFICATION_PATH)
-risk_payload, risk_source = _read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
+risk_payload = read_json_safe(PRIVACY_RISK_PATH)
+publication_decision = read_json_safe(PUBLICATION_DECISION_PATH)
 
 if risk_payload:
-    if risk_source and risk_source != PRIVACY_RISK_PATH:
-        st.info(
-            "The runtime privacy risk artifact was not found. Showing the "
-            f"versioned publication decision from `{relative_path(risk_source)}`."
-        )
-
     col1, col2, col3 = st.columns(3)
-    privacy_score = risk_payload.get("score", risk_payload.get("privacy_risk_score", "N/A"))
+    privacy_score = risk_payload.get("score", "N/A")
     risk_level = risk_payload.get("risk_level", risk_payload.get("status", "N/A"))
     col1.metric("Privacy risk score", privacy_score)
-    col2.metric("Risk / publication status", str(risk_level).upper())
+    col2.metric("Risk level", str(risk_level).upper())
     col3.metric(
         "Publication recommendation",
         str(risk_payload.get("publication_recommendation", "N/A")).upper(),
@@ -75,6 +63,22 @@ else:
     render_file_warning(
         PRIVACY_RISK_PATH,
         "Run `python scripts/run_privacy_risk_score.py` to generate the risk artifact.",
+    )
+
+if publication_decision:
+    st.subheader("Versioned publication evidence")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Publication status", publication_decision.get("status", "N/A"))
+    col2.metric("Dataset", publication_decision.get("dataset", "N/A"))
+    col3.metric(
+        "Published privacy score",
+        publication_decision.get("privacy_risk_score", "N/A"),
+    )
+    if publication_decision.get("decision_reason"):
+        st.warning(str(publication_decision["decision_reason"]))
+    st.caption(
+        f"Source: `{relative_path(PUBLICATION_DECISION_PATH)}`. This does not "
+        "replace the runtime privacy risk artifact."
     )
 
 st.subheader("LGPD classification")
@@ -112,3 +116,5 @@ else:
         risk_counts = display_df["risk"].fillna("unknown").value_counts().reset_index()
         risk_counts.columns = ["risk", "count"]
         st.bar_chart(risk_counts.set_index("risk"))
+
+render_artifact_diagnostics()

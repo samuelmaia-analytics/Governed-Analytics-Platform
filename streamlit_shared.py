@@ -8,7 +8,7 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 QUALITY_CHECKS_PATH = (
     PROJECT_ROOT / "data/curated/quality/fact_orders_enriched_quality_checks.csv"
@@ -37,6 +37,20 @@ PUBLICATION_DECISION_PATH = (
 DOCS_DIR = PROJECT_ROOT / "docs"
 WORKFLOWS_DIR = PROJECT_ROOT / "workflows/n8n"
 CONTRACTS_DIR = PROJECT_ROOT / "contracts"
+
+EXPECTED_ARTIFACTS = {
+    "Quality checks": QUALITY_CHECKS_PATH,
+    "Published monitoring": PUBLISHED_MONITORING_PATH,
+    "Governance scorecards": GOVERNANCE_SCORECARDS_PATH,
+    "LGPD classification": DATA_CLASSIFICATION_PATH,
+    "Schema contract results": SCHEMA_CONTRACT_RESULTS_PATH,
+    "Pipeline logs": PIPELINE_LOG_PATH,
+    "Privacy risk score": PRIVACY_RISK_PATH,
+    "Publication decision": PUBLICATION_DECISION_PATH,
+    "Docs directory": DOCS_DIR,
+    "n8n workflows directory": WORKFLOWS_DIR,
+    "Contracts directory": CONTRACTS_DIR,
+}
 
 
 @st.cache_data(show_spinner=False)
@@ -137,16 +151,47 @@ def file_status(label: str, path: Path) -> dict[str, Any]:
     return {
         "artifact": label,
         "path": relative_path(path),
-        "status": "available" if exists else "missing",
+        "status": "available" if exists else "artifact not found",
         "size_bytes": size,
     }
 
 
 def render_file_warning(path: Path, guidance: str) -> None:
-    st.info(
-        f"`{relative_path(path)}` was not found. {guidance} "
-        "The dashboard is using a safe fallback and no synthetic evidence is shown."
+    st.warning(
+        f"Pipeline artifact missing: `{relative_path(path)}`. {guidance} "
+        "No synthetic or mock data is shown."
     )
+
+
+def artifact_diagnostics_rows() -> list[dict[str, Any]]:
+    return [
+        {
+            "artifact": "PROJECT_ROOT",
+            "path": PROJECT_ROOT.as_posix(),
+            "exists": PROJECT_ROOT.exists(),
+            "size_bytes": 0,
+            "relative_path": ".",
+        },
+        *[
+            {
+                "artifact": label,
+                "path": path.as_posix(),
+                "exists": path.exists(),
+                "size_bytes": path.stat().st_size if path.exists() and path.is_file() else 0,
+                "relative_path": relative_path(path),
+            }
+            for label, path in EXPECTED_ARTIFACTS.items()
+        ],
+    ]
+
+
+def render_artifact_diagnostics() -> None:
+    with st.expander("Artifact diagnostics", expanded=False):
+        st.caption(
+            "Resolved local paths and file availability. No secrets or environment "
+            "variables are displayed."
+        )
+        st.dataframe(artifact_diagnostics_rows(), width="stretch", hide_index=True)
 
 
 def count_statuses(df: pd.DataFrame, column: str = "status") -> dict[str, int]:
