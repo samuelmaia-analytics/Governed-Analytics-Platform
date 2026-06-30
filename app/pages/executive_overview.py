@@ -51,7 +51,7 @@ def _render_operational_readiness_section(locale: Locale) -> None:
     st.subheader(
         "Production-Style Readiness"
         if is_en
-        else "Prontidao operacional simulada"
+        else "Prontidão operacional simulada"
     )
 
     layer_status = summarize_layer_status()

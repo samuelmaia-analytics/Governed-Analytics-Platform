@@ -5,6 +5,8 @@
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
+[![App Principal](https://img.shields.io/badge/App_Principal-app%2Fmain.py-FF4B4B?logo=streamlit&logoColor=white)](app/main.py)
+[![Licença](https://img.shields.io/github/license/samuelmaia-analytics/Governed-Analytics-Platform)](LICENSE)
 
 **Idioma:** [English](README.md) | `Português`
 
@@ -107,26 +109,26 @@ Fronteira chave: o app consome a camada publicada (`data/published/dashboard`), 
 |---|---|
 | ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
 
-Proximos screenshots recomendados para evidenciar a evolucao com n8n:
+Próximos screenshots recomendados para evidenciar a evolução com n8n:
 
 | Captura sugerida | Objetivo |
 |---|---|
-| `streamlit_overview_n8n.png` | App principal `app/main.py` e pagina n8n Automation com disponibilidade de artefatos e quantidade de workflows n8n |
-| `streamlit_pipeline_logs.png` | Historico de execucoes vindo de `logs/pipeline_execution_logs.csv` |
-| `streamlit_n8n_automation.png` | Inventario dos workflows n8n e detalhes dos nodes |
-| `streamlit_governance_docs.png` | Browser de documentacao destacando `docs/n8n_automation.md` |
+| `streamlit_overview_n8n.png` | App principal `app/main.py` e página n8n Automation com disponibilidade de artefatos e quantidade de workflows n8n |
+| `streamlit_pipeline_logs.png` | Histórico de execuções vindo de `logs/pipeline_execution_logs.csv` |
+| `streamlit_n8n_automation.png` | Inventário dos workflows n8n e detalhes dos nodes |
+| `streamlit_governance_docs.png` | Browser de documentação destacando `docs/n8n_automation.md` |
 | `n8n_pipeline_workflow_imported.png` | Workflow principal importado na interface do n8n |
 | `n8n_error_handler_imported.png` | Workflow de erro importado na interface do n8n |
 
-Essas imagens ficam como alvos de captura ate serem geradas e salvas em `assets/screenshots/`.
+Essas imagens ficam como alvos de captura até serem geradas e salvas em `assets/screenshots/`.
 
 ## App Streamlit Executivo
 
-Para o deploy publico no Streamlit Cloud, use **Main file path: `app/main.py`**.
-Esse e o app analitico principal e agora tambem inclui a pagina **n8n Automation**.
+Para o deploy público no Streamlit Cloud, use **Main file path: `app/main.py`**.
+Esse é o app analítico principal e agora também inclui a página **n8n Automation**.
 
 Use **Main file path: `app.py`** apenas se o objetivo for publicar a interface
-menor de evidencias de governanca/n8n.
+menor de evidências de governança/n8n.
 
 Páginas principais:
 
@@ -143,7 +145,7 @@ Páginas principais:
 | GenAI Insights | Saída de extração de features de texto de produto |
 | Relatório de Governança | Relatórios markdown renderizados com visão raw |
 | Central de Controles | Publication gate, racional de decisão, tendências históricas de governança |
-| n8n Automation | Templates versionados de workflows n8n, status de artefatos, finalidade da automacao e documentacao |
+| n8n Automation | Templates versionados de workflows n8n, status de artefatos, finalidade da automação e documentação |
 | Snowflake Explorer | Navegação por tabelas Snowflake e execução de consultas somente leitura |
 
 ## Endpoints FastAPI

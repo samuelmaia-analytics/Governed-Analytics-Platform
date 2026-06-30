@@ -16,7 +16,7 @@ LAYERS = [
         "services": "S3 landing, Kinesis",
     },
     {
-        "layer": "Ingestao",
+        "layer": "Ingestão",
         "description": "Scheduled or event-driven ingestion into controlled landing zones.",
         "services": "EventBridge, Step Functions, Glue",
     },
@@ -31,7 +31,7 @@ LAYERS = [
         "services": "Glue, Athena, Redshift",
     },
     {
-        "layer": "Governanca",
+        "layer": "Governança",
         "description": "Catalog, access control, publication gate and privacy checks.",
         "services": "Glue Data Catalog, Lake Formation, Macie",
     },
@@ -46,7 +46,7 @@ LAYERS = [
         "services": "CloudWatch, SNS",
     },
     {
-        "layer": "Seguranca",
+        "layer": "Segurança",
         "description": "Least privilege, encryption, private access and key management.",
         "services": "IAM, KMS, Lake Formation",
     },
@@ -95,11 +95,11 @@ GUARANTEES = [
         "approach": "Published Gold datasets, Athena workgroups, Redshift marts, CloudFront and App Runner reduce serving latency.",
     },
     {
-        "capability": "Seguranca",
+        "capability": "Segurança",
         "approach": "IAM least privilege, KMS encryption, Lake Formation permissions and Macie discovery protect sensitive data.",
     },
     {
-        "capability": "Governanca",
+        "capability": "Governança",
         "approach": "Glue Catalog, contracts, publication gate and LGPD checks make promotion decisions auditable.",
     },
     {
