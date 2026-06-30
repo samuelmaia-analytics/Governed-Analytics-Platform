@@ -104,6 +104,12 @@ retention, S3 lifecycle policies, AWS Budgets, Cost Explorer, Trusted Advisor,
 Pricing Calculator and real-world cost risks. A practical checklist is available
 in `docs/finops_checklist.md`.
 
+## Roadmap
+
+The planned evolution of the project is documented in `ROADMAP.md`, covering the
+local governed platform, n8n automation, Data Lake layers, AWS reference
+architecture and production readiness.
+
 ## Implemented vs Simulated
 
 ### Implemented
