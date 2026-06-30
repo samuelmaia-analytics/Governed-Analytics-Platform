@@ -53,11 +53,13 @@ def test_main_entrypoints_are_callable() -> None:
     assert callable(main_module._render_genai_page)
     assert callable(main_module._render_report_page)
     assert callable(main_module._render_control_center_page)
+    assert callable(main_module._render_n8n_automation_page)
     assert callable(main_module._render_snowflake_page)
 
 
 def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
     calls: list[str] = []
+    url_paths: list[str] = []
 
     class FakeNavigation:
         def run(self) -> None:
@@ -73,8 +75,9 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
             calls.append("caption")
 
         @staticmethod
-        def Page(fn, **_kwargs):  # type: ignore[no-untyped-def]
+        def Page(fn, **kwargs):  # type: ignore[no-untyped-def]
             calls.append("page")
+            url_paths.append(str(kwargs.get("url_path", "")))
             return fn
 
         @staticmethod
@@ -117,10 +120,14 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
         main_module, "_render_control_center_page", lambda _context, _locale: None
     )
     monkeypatch.setattr(
+        main_module, "_render_n8n_automation_page", lambda _context, _locale: None
+    )
+    monkeypatch.setattr(
         main_module, "_render_snowflake_page", lambda _context, _locale: None
     )
 
     main_module.main()
 
-    assert calls.count("page") == 12
+    assert calls.count("page") == 13
+    assert "n8n-automation" in url_paths
     assert "navigation_run" in calls
