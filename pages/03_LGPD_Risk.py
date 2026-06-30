@@ -6,8 +6,10 @@ import streamlit as st
 from pages._shared import (
     DATA_CLASSIFICATION_PATH,
     PRIVACY_RISK_PATH,
+    PUBLICATION_DECISION_PATH,
     read_csv_safe,
-    read_json_safe,
+    read_first_json,
+    relative_path,
     render_file_warning,
 )
 
@@ -19,12 +21,20 @@ st.caption(
 )
 
 classification_df = read_csv_safe(DATA_CLASSIFICATION_PATH)
-risk_payload = read_json_safe(PRIVACY_RISK_PATH)
+risk_payload, risk_source = read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
 
 if risk_payload:
+    if risk_source and risk_source != PRIVACY_RISK_PATH:
+        st.info(
+            "The runtime privacy risk artifact was not found. Showing the "
+            f"versioned publication decision from `{relative_path(risk_source)}`."
+        )
+
     col1, col2, col3 = st.columns(3)
-    col1.metric("Privacy risk score", risk_payload.get("score", "N/A"))
-    col2.metric("Risk level", str(risk_payload.get("risk_level", "N/A")).upper())
+    privacy_score = risk_payload.get("score", risk_payload.get("privacy_risk_score", "N/A"))
+    risk_level = risk_payload.get("risk_level", risk_payload.get("status", "N/A"))
+    col1.metric("Privacy risk score", privacy_score)
+    col2.metric("Risk / publication status", str(risk_level).upper())
     col3.metric(
         "Publication recommendation",
         str(risk_payload.get("publication_recommendation", "N/A")).upper(),
@@ -32,6 +42,8 @@ if risk_payload:
 
     if risk_payload.get("summary"):
         st.info(str(risk_payload["summary"]))
+    elif risk_payload.get("decision_reason"):
+        st.info(str(risk_payload["decision_reason"]))
 
     components = (
         risk_payload.get("score_components") or risk_payload.get("components") or {}

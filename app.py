@@ -6,16 +6,19 @@ import streamlit as st
 
 from pages._shared import (
     DATA_CLASSIFICATION_PATH,
+    GOVERNANCE_SCORECARDS_PATH,
     PIPELINE_LOG_PATH,
     PRIVACY_RISK_PATH,
+    PUBLICATION_DECISION_PATH,
+    PUBLISHED_MONITORING_PATH,
     QUALITY_CHECKS_PATH,
-    SCHEMA_CONTRACT_RESULTS_PATH,
     WORKFLOWS_DIR,
     count_statuses,
     file_status,
     format_datetime,
-    read_csv_safe,
-    read_json_safe,
+    read_first_csv,
+    read_first_json,
+    read_schema_contract_results,
     render_file_warning,
 )
 
@@ -27,8 +30,15 @@ st.set_page_config(
 
 
 def _latest_pipeline_status() -> tuple[str, str]:
-    logs = read_csv_safe(PIPELINE_LOG_PATH)
+    logs, _ = read_first_csv([PIPELINE_LOG_PATH])
     if logs.empty:
+        decision, _ = read_first_json([PUBLICATION_DECISION_PATH])
+        if decision:
+            return (
+                str(decision.get("status", "review")).upper(),
+                format_datetime(decision.get("timestamp_utc", ""))
+                or "Publication decision timestamp not available",
+            )
         return "Not available", "No execution log was found."
 
     latest = logs.tail(1).iloc[0]
@@ -38,7 +48,7 @@ def _latest_pipeline_status() -> tuple[str, str]:
 
 
 def _quality_summary() -> tuple[int, int, int]:
-    checks = read_csv_safe(QUALITY_CHECKS_PATH)
+    checks, _ = read_first_csv([QUALITY_CHECKS_PATH, PUBLISHED_MONITORING_PATH])
     if checks.empty or "status" not in checks.columns:
         return 0, 0, 0
     counts = count_statuses(checks, "status")
@@ -62,9 +72,9 @@ def main() -> None:
 
     pipeline_status, pipeline_timestamp = _latest_pipeline_status()
     pass_count, warn_count, fail_count = _quality_summary()
-    classification_df = read_csv_safe(DATA_CLASSIFICATION_PATH)
-    risk_payload = read_json_safe(PRIVACY_RISK_PATH)
-    contracts_df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
+    classification_df, _ = read_first_csv([DATA_CLASSIFICATION_PATH])
+    risk_payload, _ = read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
+    contracts_df, _ = read_schema_contract_results()
     workflows = sorted(WORKFLOWS_DIR.glob("*.json")) if WORKFLOWS_DIR.exists() else []
 
     col1, col2, col3, col4 = st.columns(4)
@@ -80,8 +90,10 @@ def main() -> None:
     col4.metric("n8n workflows", len(workflows))
 
     col5, col6, col7 = st.columns(3)
-    col5.metric("Privacy risk score", risk_payload.get("score", "N/A"))
-    col6.metric("Risk level", str(risk_payload.get("risk_level", "N/A")).upper())
+    privacy_score = risk_payload.get("score", risk_payload.get("privacy_risk_score", "N/A"))
+    risk_level = risk_payload.get("risk_level", risk_payload.get("status", "N/A"))
+    col5.metric("Privacy risk score", privacy_score)
+    col6.metric("Risk / publication status", str(risk_level).upper())
     contract_counts = (
         count_statuses(contracts_df, "status") if not contracts_df.empty else {}
     )
@@ -121,9 +133,11 @@ def main() -> None:
     st.subheader("Artifact availability")
     status_rows = [
         file_status("Quality checks", QUALITY_CHECKS_PATH),
+        file_status("Published monitoring fallback", PUBLISHED_MONITORING_PATH),
         file_status("LGPD classification", DATA_CLASSIFICATION_PATH),
         file_status("Privacy risk score", PRIVACY_RISK_PATH),
-        file_status("Schema contracts", SCHEMA_CONTRACT_RESULTS_PATH),
+        file_status("Publication decision fallback", PUBLICATION_DECISION_PATH),
+        file_status("Governance scorecards", GOVERNANCE_SCORECARDS_PATH),
         file_status("Pipeline logs", PIPELINE_LOG_PATH),
         file_status("n8n workflows directory", WORKFLOWS_DIR),
         file_status("n8n automation docs", Path("docs/n8n_automation.md")),

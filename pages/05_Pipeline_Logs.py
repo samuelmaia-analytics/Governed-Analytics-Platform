@@ -5,9 +5,12 @@ import streamlit as st
 
 from pages._shared import (
     PIPELINE_LOG_PATH,
+    PUBLICATION_DECISION_PATH,
     count_statuses,
     format_datetime,
     read_csv_safe,
+    read_json_safe,
+    relative_path,
     render_file_warning,
 )
 
@@ -21,10 +24,31 @@ st.caption(
 logs_df = read_csv_safe(PIPELINE_LOG_PATH)
 
 if logs_df.empty:
-    render_file_warning(
-        PIPELINE_LOG_PATH,
-        "Run `python scripts/register_pipeline_log.py` or the n8n workflow to create history.",
+    decision = read_json_safe(PUBLICATION_DECISION_PATH)
+    if not decision:
+        render_file_warning(
+            PIPELINE_LOG_PATH,
+            "Run `python scripts/register_pipeline_log.py` or the n8n workflow to create history.",
+        )
+        st.stop()
+
+    st.info(
+        "Runtime execution logs were not found. Showing the latest versioned "
+        f"publication decision from `{relative_path(PUBLICATION_DECISION_PATH)}`."
     )
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Latest status", str(decision.get("status", "review")).upper())
+    col2.metric("Dataset", decision.get("dataset", "N/A"))
+    col3.metric("Quality score", decision.get("quality_score", "N/A"))
+    col4.metric("Privacy risk score", decision.get("privacy_risk_score", "N/A"))
+
+    if decision.get("timestamp_utc"):
+        st.caption(f"Timestamp: {format_datetime(decision.get('timestamp_utc'))}")
+    if decision.get("decision_reason"):
+        st.warning(str(decision["decision_reason"]))
+
+    st.subheader("Publication decision payload")
+    st.json(decision)
     st.stop()
 
 latest = logs_df.tail(1).iloc[0]

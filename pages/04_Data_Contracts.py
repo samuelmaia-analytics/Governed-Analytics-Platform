@@ -7,9 +7,9 @@ import streamlit as st
 from pages._shared import (
     BUSINESS_RULE_RESULTS_PATH,
     CONTRACTS_DIR,
-    SCHEMA_CONTRACT_RESULTS_PATH,
     count_statuses,
     read_csv_safe,
+    read_schema_contract_results,
     relative_path,
     render_file_warning,
 )
@@ -19,7 +19,7 @@ st.set_page_config(page_title="Data Contracts | Governed Analytics", layout="wid
 st.title("Data Contracts")
 st.caption("Schema contract and business rule validation evidence.")
 
-schema_df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
+schema_df, schema_source = read_schema_contract_results()
 business_df = read_csv_safe(BUSINESS_RULE_RESULTS_PATH)
 
 
@@ -49,10 +49,13 @@ def _schema_comparison_rows() -> list[dict[str, str]]:
 st.subheader("Schema contract checks")
 if schema_df.empty:
     render_file_warning(
-        SCHEMA_CONTRACT_RESULTS_PATH,
+        CONTRACTS_DIR,
         "Run the contracts step in the pipeline to generate schema validation results.",
     )
 else:
+    if schema_source:
+        st.caption(f"Source: `{relative_path(schema_source)}`")
+
     counts = count_statuses(schema_df)
     col1, col2, col3 = st.columns(3)
     col1.metric("Checks", len(schema_df))

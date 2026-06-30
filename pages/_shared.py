@@ -13,17 +13,27 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 QUALITY_CHECKS_PATH = (
     PROJECT_ROOT / "data/curated/quality/fact_orders_enriched_quality_checks.csv"
 )
+PUBLISHED_MONITORING_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/published_layer_monitoring.csv"
+)
+GOVERNANCE_SCORECARDS_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/governance_scorecards.csv"
+)
 DATA_CLASSIFICATION_PATH = (
     PROJECT_ROOT / "data/curated/catalog/data_classification_inventory.csv"
 )
 SCHEMA_CONTRACT_RESULTS_PATH = (
     PROJECT_ROOT / "data/curated/quality/schema_contract_results.csv"
 )
+SCHEMA_CONTRACT_REPORT_PATH = PROJECT_ROOT / "docs/reports/schema_contract_report.md"
 BUSINESS_RULE_RESULTS_PATH = (
     PROJECT_ROOT / "data/curated/quality/business_rule_results.csv"
 )
 PIPELINE_LOG_PATH = PROJECT_ROOT / "logs/pipeline_execution_logs.csv"
 PRIVACY_RISK_PATH = PROJECT_ROOT / "logs/privacy_risk_score.json"
+PUBLICATION_DECISION_PATH = (
+    PROJECT_ROOT / "data/published/monitoring/publication_decision.json"
+)
 DOCS_DIR = PROJECT_ROOT / "docs"
 WORKFLOWS_DIR = PROJECT_ROOT / "workflows/n8n"
 CONTRACTS_DIR = PROJECT_ROOT / "contracts"
@@ -62,6 +72,56 @@ def read_text_safe(path: Path) -> str:
     except Exception as exc:  # pragma: no cover - visible in Streamlit runtime
         st.warning(f"Could not read `{path.as_posix()}`: {exc}")
         return ""
+
+
+def read_first_csv(paths: list[Path]) -> tuple[pd.DataFrame, Path | None]:
+    for path in paths:
+        df = read_csv_safe(path)
+        if not df.empty:
+            return df, path
+    return pd.DataFrame(), None
+
+
+def read_first_json(paths: list[Path]) -> tuple[dict[str, Any], Path | None]:
+    for path in paths:
+        payload = read_json_safe(path)
+        if payload:
+            return payload, path
+    return {}, None
+
+
+def read_schema_contract_results() -> tuple[pd.DataFrame, Path | None]:
+    csv_df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
+    if not csv_df.empty:
+        return csv_df, SCHEMA_CONTRACT_RESULTS_PATH
+
+    content = read_text_safe(SCHEMA_CONTRACT_REPORT_PATH)
+    if not content:
+        return pd.DataFrame(), None
+
+    rows: list[dict[str, str]] = []
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("| `"):
+            continue
+        cells = [
+            cell.strip().strip("`").strip("*")
+            for cell in stripped.strip("|").split("|")
+        ]
+        if len(cells) < 4:
+            continue
+        dataset, check_name, status = cells[:3]
+        details = " | ".join(cells[3:])
+        rows.append(
+            {
+                "dataset_name": dataset,
+                "layer": "",
+                "check_name": check_name,
+                "status": status,
+                "details": details,
+            }
+        )
+    return pd.DataFrame(rows), SCHEMA_CONTRACT_REPORT_PATH if rows else None
 
 
 def relative_path(path: Path) -> str:

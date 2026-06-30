@@ -6,13 +6,16 @@ from pages._shared import (
     DATA_CLASSIFICATION_PATH,
     PIPELINE_LOG_PATH,
     PRIVACY_RISK_PATH,
+    PUBLICATION_DECISION_PATH,
+    PUBLISHED_MONITORING_PATH,
     QUALITY_CHECKS_PATH,
-    SCHEMA_CONTRACT_RESULTS_PATH,
     WORKFLOWS_DIR,
     count_statuses,
     format_datetime,
-    read_csv_safe,
-    read_json_safe,
+    read_first_csv,
+    read_first_json,
+    read_schema_contract_results,
+    relative_path,
     render_file_warning,
 )
 
@@ -31,11 +34,11 @@ st.markdown(
     """
 )
 
-logs_df = read_csv_safe(PIPELINE_LOG_PATH)
-quality_df = read_csv_safe(QUALITY_CHECKS_PATH)
-classification_df = read_csv_safe(DATA_CLASSIFICATION_PATH)
-contracts_df = read_csv_safe(SCHEMA_CONTRACT_RESULTS_PATH)
-risk_payload = read_json_safe(PRIVACY_RISK_PATH)
+logs_df, _ = read_first_csv([PIPELINE_LOG_PATH])
+quality_df, quality_source = read_first_csv([QUALITY_CHECKS_PATH, PUBLISHED_MONITORING_PATH])
+classification_df, _ = read_first_csv([DATA_CLASSIFICATION_PATH])
+contracts_df, contracts_source = read_schema_contract_results()
+risk_payload, risk_source = read_first_json([PRIVACY_RISK_PATH, PUBLICATION_DECISION_PATH])
 workflows = sorted(WORKFLOWS_DIR.glob("*.json")) if WORKFLOWS_DIR.exists() else []
 
 latest_status = "N/A"
@@ -44,6 +47,9 @@ if not logs_df.empty:
     latest = logs_df.tail(1).iloc[0]
     latest_status = str(latest.get("status", "unknown")).upper()
     latest_time = format_datetime(latest.get("timestamp_utc", ""))
+elif risk_payload:
+    latest_status = str(risk_payload.get("status", "review")).upper()
+    latest_time = format_datetime(risk_payload.get("timestamp_utc", ""))
 
 quality_counts = count_statuses(quality_df)
 contract_counts = count_statuses(contracts_df)
@@ -55,16 +61,41 @@ col3.metric("LGPD fields", len(classification_df) if not classification_df.empty
 col4.metric("n8n workflows", len(workflows))
 
 col5, col6, col7 = st.columns(3)
-col5.metric("Privacy score", risk_payload.get("score", "N/A"))
-col6.metric("Risk level", str(risk_payload.get("risk_level", "N/A")).upper())
+privacy_score = risk_payload.get("score", risk_payload.get("privacy_risk_score", "N/A"))
+risk_level = risk_payload.get("risk_level", risk_payload.get("status", "N/A"))
+col5.metric("Privacy score", privacy_score)
+col6.metric("Risk / publication status", str(risk_level).upper())
 col7.metric("Contract failures", contract_counts.get("FAIL", 0))
+
+source_notes = []
+if quality_source:
+    source_notes.append(f"Quality source: `{relative_path(quality_source)}`")
+if risk_source:
+    source_notes.append(f"Risk/status source: `{relative_path(risk_source)}`")
+if contracts_source:
+    source_notes.append(f"Contracts source: `{relative_path(contracts_source)}`")
+if source_notes:
+    st.caption(" | ".join(source_notes))
 
 st.subheader("Last execution")
 if logs_df.empty:
-    render_file_warning(
-        PIPELINE_LOG_PATH,
-        "Run `scripts/register_pipeline_log.py` or the n8n workflow to populate it.",
-    )
+    if risk_payload:
+        st.info(
+            "Runtime pipeline logs were not found. The latest available "
+            "publication decision is shown instead."
+        )
+        st.write(
+            {
+                "status": latest_status,
+                "timestamp_utc": latest_time,
+                "decision_reason": risk_payload.get("decision_reason", ""),
+            }
+        )
+    else:
+        render_file_warning(
+            PIPELINE_LOG_PATH,
+            "Run `scripts/register_pipeline_log.py` or the n8n workflow to populate it.",
+        )
 else:
     st.dataframe(
         logs_df.tail(5).sort_index(ascending=False), width="stretch", hide_index=True

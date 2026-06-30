@@ -118,6 +118,14 @@ existing artifacts from `data/`, `logs/`, `contracts/`, `docs/`, and
 `workflows/n8n/` and shows clear fallback messages when a file has not been
 generated yet.
 
+For portfolio deployment, some runtime artifacts are intentionally not committed
+(`logs/*` and generated curated quality outputs). When those files are absent,
+the app uses versioned governance evidence such as
+`data/published/monitoring/publication_decision.json`,
+`data/published/monitoring/published_layer_monitoring.csv`, and
+`docs/reports/schema_contract_report.md`. The UI labels the source so the
+dashboard does not present fallback evidence as a fresh pipeline execution.
+
 Root multipage dashboard:
 
 | Page | What it shows |
