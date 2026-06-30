@@ -41,6 +41,15 @@ flowchart LR
 - Improves trust with explicit publication status (`Approved`, `Needs Review`, `Blocked`).
 - Accelerates technical review with reproducible governance evidence.
 
+## Governed Data Lake Layers
+
+The local Data Lake includes explicit Bronze, Silver, Gold, and Quarantine
+folders under `data/`. Bronze preserves raw inputs, Silver represents cleaned and
+standardized data, Gold represents governed data ready for consumption, and
+Quarantine isolates records or files blocked by quality, LGPD, contract, or
+publication controls. Details are documented in
+`docs/data_lake_layers.md`.
+
 ## Implemented vs Simulated
 
 ### Implemented
