@@ -112,12 +112,12 @@ automation visibility:
 streamlit run app.py
 ```
 
-For Streamlit Cloud, use **Main file path: `app.py`** when the public deploy
-should present governance, LGPD, contracts, pipeline evidence, n8n visibility,
-and generated documentation. This is not the full analytical dashboard.
+For Streamlit Cloud, use **Main file path: `app/main.py`** when the public deploy
+should present the full analytical dashboard. The modular app now also includes
+the **n8n Automation** page for workflow visibility.
 
-If the public deploy should present the broader analytical dashboard instead,
-use **Main file path: `app/main.py`**.
+Use **Main file path: `app.py`** only when the public deploy should present the
+smaller governance/n8n evidence interface.
 
 This interface is designed for executive and technical review after the n8n
 automation layer was added. It does not execute n8n directly. Instead, it reads
@@ -165,6 +165,7 @@ and keeps the broader analytical pages:
 | GenAI Insights | Product-text feature extraction outputs and category inventory |
 | Governance Report | Rendered governance markdown reports with raw view |
 | Governance Control Center | Publication gate, rationale, snapshot history trends |
+| n8n Automation | Versioned n8n workflow templates, artifact status, automation purpose, and documentation status |
 | Snowflake Explorer | Browse Snowflake tables and run read-only queries |
 
 ## FastAPI endpoints

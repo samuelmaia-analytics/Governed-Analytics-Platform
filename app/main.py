@@ -25,6 +25,7 @@ from app.pages.governance_report import render_governance_report  # noqa: E402
 from app.pages.snowflake_explorer import render_snowflake_explorer  # noqa: E402
 from app.pages.genai_insights import render_genai_insights  # noqa: E402
 from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk  # noqa: E402
+from app.pages.n8n_automation import render_n8n_automation  # noqa: E402
 from app.pages.revenue_analytics import render_revenue_analytics  # noqa: E402
 from app.pages.seller_performance import render_seller_performance  # noqa: E402
 from src.duckdb_engine import get_duckdb_version  # noqa: E402
@@ -98,6 +99,12 @@ def _render_control_center_page(context: GovernanceAppContext, locale: str) -> N
 
 def _render_snowflake_page(_context: GovernanceAppContext, locale: str) -> None:
     render_snowflake_explorer(locale)
+
+
+def _render_n8n_automation_page(
+    _context: GovernanceAppContext, _locale: str
+) -> None:
+    render_n8n_automation()
 
 
 def main() -> None:
@@ -177,6 +184,12 @@ def main() -> None:
             title=t("nav_control_center", locale),
             icon=":material/admin_panel_settings:",
             url_path="governance-control-center",
+        ),
+        st.Page(
+            lambda: _render_n8n_automation_page(context, locale),
+            title="n8n Automation",
+            icon=":material/account_tree:",
+            url_path="n8n-automation",
         ),
         st.Page(
             lambda: _render_snowflake_page(context, locale),
