@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from scripts.run_publication_gate import evaluate_publication_gate
 from src.publication_gate import evaluate_publication_readiness
 
 
@@ -141,3 +142,30 @@ def test_returned_object_contains_required_fields() -> None:
     assert hasattr(result, "severity")
     assert hasattr(result, "reasons")
     assert hasattr(result, "required_actions")
+
+
+def test_cli_publication_gate_rules_cover_approved_review_and_blocked() -> None:
+    assert (
+        evaluate_publication_gate(
+            quality_score=92,
+            lgpd_risk_score=45,
+            critical_issues=0,
+        )[0]
+        == "Approved"
+    )
+    assert (
+        evaluate_publication_gate(
+            quality_score=75,
+            lgpd_risk_score=70,
+            critical_issues=0,
+        )[0]
+        == "Needs Review"
+    )
+    assert (
+        evaluate_publication_gate(
+            quality_score=60,
+            lgpd_risk_score=85,
+            critical_issues=2,
+        )[0]
+        == "Blocked"
+    )

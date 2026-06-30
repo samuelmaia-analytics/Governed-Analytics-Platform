@@ -1,0 +1,4 @@
+order_id,customer_id,customer_email,customer_cpf,customer_phone,customer_name,customer_address,customer_birth_date,health_status,biometric_hash,order_status,order_date,revenue
+ORD-001,CUST-001,customer001@example.test,111.222.333-44,11999990000,Ana Example,Street One 10,1990-01-01,not_collected,biohash001,delivered,2024-01-10,120.50
+ORD-002,CUST-002,customer002@example.test,222.333.444-55,11999990001,Beto Example,Street Two 20,1985-02-02,not_collected,biohash002,shipped,2024-01-11,89.90
+ORD-003,CUST-003,customer003@example.test,333.444.555-66,11999990002,Cris Example,Street Three 30,1979-03-03,not_collected,biohash003,processing,2024-01-12,240.00

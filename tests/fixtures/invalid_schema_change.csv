@@ -1,0 +1,4 @@
+order_identifier,customer_id,customer_email,order_status,order_date,revenue
+ORD-001,CUST-001,customer001@example.test,delivered,2024-01-10,120.50
+ORD-002,CUST-002,customer002@example.test,shipped,2024-01-11,89.90
+ORD-003,CUST-003,customer003@example.test,processing,2024-01-12,240.00
