@@ -140,12 +140,21 @@ if logs_df.empty:
             "Runtime pipeline logs were not found. The latest available "
             "publication decision is shown instead."
         )
-        st.write(
-            {
-                "status": latest_status,
-                "timestamp_utc": latest_time,
-                "decision_reason": risk_payload.get("decision_reason", ""),
-            }
+        exec_col1, exec_col2, exec_col3 = st.columns(3)
+        exec_col1.metric("Decision status", latest_status)
+        exec_col2.metric("Dataset", risk_payload.get("dataset", "N/A"))
+        exec_col3.metric(
+            "Decision timestamp",
+            latest_time or "N/A",
+        )
+
+        decision_reason = str(risk_payload.get("decision_reason", "")).strip()
+        if decision_reason:
+            st.warning(decision_reason)
+
+        st.caption(
+            f"Fallback source: `{relative_path(PUBLICATION_DECISION_PATH)}`. "
+            "This is versioned governance evidence, not a fresh n8n execution log."
         )
     else:
         render_file_warning(

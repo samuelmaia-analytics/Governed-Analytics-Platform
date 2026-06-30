@@ -16,6 +16,7 @@ from pages._shared import (
     format_datetime,
     read_csv_safe,
     read_json_safe,
+    relative_path,
     render_file_warning,
 )
 
@@ -166,9 +167,29 @@ def main() -> None:
             "Run the pipeline or register an execution log to populate this section.",
         )
     else:
-        st.success(
-            f"Latest recorded execution: {pipeline_status} at {pipeline_timestamp}"
-        )
+        decision, decision_source = _read_first_json([PUBLICATION_DECISION_PATH])
+        if decision and pipeline_status == str(decision.get("status", "")).upper():
+            st.info(
+                "Runtime pipeline logs were not found. The latest available "
+                "publication decision is shown instead."
+            )
+            exec_col1, exec_col2, exec_col3 = st.columns(3)
+            exec_col1.metric("Decision status", pipeline_status)
+            exec_col2.metric("Dataset", decision.get("dataset", "N/A"))
+            exec_col3.metric("Decision timestamp", pipeline_timestamp)
+
+            decision_reason = str(decision.get("decision_reason", "")).strip()
+            if decision_reason:
+                st.warning(decision_reason)
+            if decision_source:
+                st.caption(
+                    f"Fallback source: `{relative_path(decision_source)}`. "
+                    "This is versioned governance evidence, not a fresh n8n execution log."
+                )
+        else:
+            st.success(
+                f"Latest recorded execution: {pipeline_status} at {pipeline_timestamp}"
+            )
 
     st.subheader("Architecture")
     st.markdown(
