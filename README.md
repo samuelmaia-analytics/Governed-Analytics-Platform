@@ -78,7 +78,7 @@ and APIs.
 
 Operational alert examples are versioned in `alerts/` for success, warning, and
 failure scenarios. The alert strategy in `docs/alerts_strategy.md` explains how
-these messages could be routed through SNS, e-mail, Slack, Discord, Telegram, or
+these messages could be routed through SNS, email, Slack, Discord, Telegram, or
 n8n in a real deployment, without committing credentials or active webhooks.
 
 ## Data Contracts
@@ -90,10 +90,10 @@ privacy controls. Details are documented in `docs/data_contracts.md`.
 
 ## AWS Reference Architecture
 
-The root Streamlit app includes an AWS Architecture page with a proposed
+The auxiliary root Streamlit app includes an AWS Architecture page with a proposed
 production-style design for S3, Glue, Glue Data Catalog, Lake Formation, Kinesis,
 Athena, Redshift, Macie, CloudWatch, SNS, EventBridge, Step Functions, App
-Runner, CloudFront, Route 53, IAM, KMS and FinOps services. The full reference is
+Runner, CloudFront, Route 53, IAM, KMS, and FinOps services. The full reference is
 documented in `docs/aws_architecture.md`.
 
 ## Cost Governance and FinOps
@@ -108,7 +108,7 @@ in `docs/finops_checklist.md`.
 
 The planned evolution of the project is documented in `ROADMAP.md`, covering the
 local governed platform, n8n automation, Data Lake layers, AWS reference
-architecture and production readiness.
+architecture, and production readiness.
 
 ## Implemented vs Simulated
 
@@ -174,21 +174,27 @@ make app
 
 ## Streamlit app pages
 
-The repository now includes a root-level Streamlit entrypoint focused on
-automation visibility:
+The main Streamlit application is the modular dashboard under `app/main.py`:
+
+```bash
+streamlit run app/main.py
+```
+
+The repository also includes a root-level auxiliary Streamlit entrypoint focused
+on automation and governance evidence:
 
 ```bash
 streamlit run app.py
 ```
 
-For Streamlit Cloud, use **Main file path: `app/main.py`** when the public deploy
-should present the full analytical dashboard. The modular app now also includes
+For Streamlit Cloud, use **Main file path: `app/main.py`** for the public deploy
+that presents the full analytical dashboard. The modular app now also includes
 the **n8n Automation** page for workflow visibility.
 
 Use **Main file path: `app.py`** only when the public deploy should present the
-smaller governance/n8n evidence interface.
+smaller auxiliary governance/n8n evidence interface.
 
-This interface is designed for executive and technical review after the n8n
+The auxiliary root interface is designed for executive and technical review after the n8n
 automation layer was added. It does not execute n8n directly. Instead, it reads
 existing artifacts from `data/`, `logs/`, `contracts/`, `docs/`, and
 `workflows/n8n/` and shows clear fallback messages when a file has not been
@@ -202,7 +208,7 @@ the app uses versioned governance evidence such as
 `docs/reports/schema_contract_report.md`. The UI labels the source so the
 dashboard does not present fallback evidence as a fresh pipeline execution.
 
-Root multipage dashboard:
+Auxiliary root multipage dashboard:
 
 | Page | What it shows |
 |---|---|
@@ -216,12 +222,12 @@ Root multipage dashboard:
 | Operational Health | Pipeline health KPIs, failures, warnings, processed/rejected records, score averages, and execution history |
 | AWS Architecture | Proposed AWS reference architecture, service mapping, governance, security, observability, and FinOps controls |
 
-The root `app.py` uses explicit Streamlit navigation, so the sidebar lists only
+The auxiliary root `app.py` uses explicit Streamlit navigation, so the sidebar lists only
 the nine user-facing pages above. Shared helpers live in `streamlit_shared.py`,
 outside `pages/`, and are not exposed as a page.
 
-The existing modular Streamlit application under `app/main.py` remains available
-and keeps the broader analytical pages:
+The main modular Streamlit application under `app/main.py` keeps the broader
+analytical pages:
 
 | Page | What it shows |
 |---|---|
