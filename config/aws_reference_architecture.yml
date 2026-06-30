@@ -1,0 +1,99 @@
+architecture:
+  name: aws_governed_analytics_reference
+  status: reference_architecture_not_provisioned
+  portfolio_boundary: >
+    Target AWS design for a production-inspired portfolio project. No cloud
+    resources are created by this repository.
+
+accounts:
+  dev:
+    purpose: Development and portfolio validation.
+    monthly_budget_usd: 25
+  prod:
+    purpose: Production-like target account for future deployment patterns.
+    monthly_budget_usd: 75
+
+services:
+  storage:
+    aws_service: Amazon S3
+    local_equivalent:
+      - data/raw/landing
+      - data/standardized
+      - data/curated
+      - data/published
+      - data/quarantine
+    controls:
+      - bucket_versioning
+      - block_public_access
+      - sse_s3_or_kms_encryption
+      - lifecycle_to_infrequent_access
+
+  catalog:
+    aws_service: AWS Glue Data Catalog
+    local_equivalent:
+      - contracts/catalog
+      - data/curated/catalog
+    controls:
+      - table_ownership_tags
+      - classification_tags
+      - schema_change_review
+
+  processing:
+    aws_service: AWS Glue or Amazon ECS Fargate
+    local_equivalent:
+      - src
+      - scripts
+      - dbt
+    controls:
+      - least_privilege_task_role
+      - parameterized_runtime_config
+      - retry_and_failure_notifications
+
+  query:
+    aws_service: Amazon Athena
+    local_equivalent:
+      - src/duckdb_engine.py
+      - sql
+    controls:
+      - workgroup_query_limits
+      - published_layer_only_access
+      - query_result_retention
+
+  orchestration:
+    aws_service: Amazon EventBridge and Step Functions
+    local_equivalent:
+      - workflows/n8n
+      - scripts/register_pipeline_log.py
+    controls:
+      - explicit_failure_state
+      - operational_log_registration
+      - manual_approval_before_publication
+
+  observability:
+    aws_service: Amazon CloudWatch
+    local_equivalent:
+      - logs
+      - data/published/monitoring
+    controls:
+      - structured_logs
+      - publication_gate_alarm
+      - cost_anomaly_alarm
+
+cost_controls:
+  required_tags:
+    - project
+    - environment
+    - owner
+    - cost_center
+    - data_classification
+  guardrails:
+    - name: monthly_budget
+      control: Configure AWS Budgets per account and alert at 50, 80, and 100 percent.
+    - name: athena_scan_limit
+      control: Use Athena workgroup bytes-scanned limits and query published partitions only.
+    - name: storage_lifecycle
+      control: Transition non-current raw and quarantine objects to cheaper classes.
+    - name: idle_compute_shutdown
+      control: Prefer serverless or scheduled compute; avoid always-on clusters for the portfolio scope.
+    - name: log_retention
+      control: Set retention windows for operational logs and generated query outputs.
