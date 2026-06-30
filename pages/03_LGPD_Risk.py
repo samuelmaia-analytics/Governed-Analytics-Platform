@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from pages._shared import (
+from streamlit_shared import (
     DATA_CLASSIFICATION_PATH,
     PRIVACY_RISK_PATH,
     PROJECT_ROOT,

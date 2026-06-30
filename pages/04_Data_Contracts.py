@@ -4,7 +4,7 @@ import re
 
 import streamlit as st
 
-from pages._shared import (
+from streamlit_shared import (
     BUSINESS_RULE_RESULTS_PATH,
     CONTRACTS_DIR,
     PROJECT_ROOT,

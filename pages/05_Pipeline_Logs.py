@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from pages._shared import (
+from streamlit_shared import (
     PIPELINE_LOG_PATH,
     PROJECT_ROOT,
     count_statuses,

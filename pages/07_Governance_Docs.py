@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from pages._shared import (
+from streamlit_shared import (
     DOCS_DIR,
     markdown_files,
     read_text_safe,

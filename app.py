@@ -4,7 +4,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from pages._shared import (
+from streamlit_shared import (
     DATA_CLASSIFICATION_PATH,
     PIPELINE_LOG_PATH,
     PRIVACY_RISK_PATH,

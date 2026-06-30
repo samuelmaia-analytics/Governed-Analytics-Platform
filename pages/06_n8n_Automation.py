@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from pages._shared import (
+from streamlit_shared import (
     WORKFLOWS_DIR,
     read_json_safe,
     relative_path,
