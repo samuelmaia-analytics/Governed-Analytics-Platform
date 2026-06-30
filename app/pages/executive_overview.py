@@ -7,7 +7,9 @@ import pandas as pd
 import streamlit as st
 
 from app.i18n import LOCALE_EN_US, Locale
+from src.cloud_reference import summarize_cost_controls
 from src.config import PUBLISHED_MONITORING_DIR
+from src.data_lake_layers import summarize_layer_status
 from src.governance_types import DataQualityResult, PrivacyRiskResult
 
 GOVERNANCE_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "governance_history.csv"
@@ -42,6 +44,71 @@ def _data_freshness(path: Path = DEFAULT_PUBLISHED_DATASET) -> str | None:
         return f"{int(age_hours)}h"
     days = int(age_hours / 24)
     return f"{days}d"
+
+
+def _render_operational_readiness_section(locale: Locale) -> None:
+    is_en = locale == LOCALE_EN_US
+    st.subheader(
+        "Production-Style Readiness"
+        if is_en
+        else "Prontidao operacional simulada"
+    )
+
+    layer_status = summarize_layer_status()
+    ready_layers = sum(1 for layer in layer_status if layer["ready"])
+    cost_summary = summarize_cost_controls()
+
+    readiness_col1, readiness_col2, readiness_col3 = st.columns(3)
+    with readiness_col1:
+        st.metric(
+            "Data Lake Layers" if is_en else "Camadas do Data Lake",
+            f"{ready_layers} / {len(layer_status)}",
+        )
+    with readiness_col2:
+        st.metric(
+            "Cost Guardrails" if is_en else "Guardrails de custo",
+            cost_summary["guardrail_count"],
+        )
+    with readiness_col3:
+        st.metric(
+            "Cloud Status" if is_en else "Status cloud",
+            "Reference only"
+            if not cost_summary["is_provisioned"]
+            else "Provisioned",
+        )
+
+    st.caption(
+        "AWS is documented as a reference architecture; no cloud resources or credentials are bundled."
+        if is_en
+        else "AWS esta documentada como arquitetura de referencia; nenhum recurso cloud ou credencial e incluido."
+    )
+
+    with st.expander(
+        "Layer and cost control details"
+        if is_en
+        else "Detalhes de camadas e controle de custo"
+    ):
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "layer": layer["layer"],
+                        "ready": layer["ready"],
+                        "paths": layer["path_count"],
+                        "owner_role": layer["owner_role"],
+                        "sensitivity": layer["sensitivity_default"],
+                    }
+                    for layer in layer_status
+                ]
+            ),
+            use_container_width=True,
+        )
+        st.markdown(
+            "\n".join(
+                f"- `{guardrail['name']}`: {guardrail['control']}"
+                for guardrail in cost_summary["guardrails"]
+            )
+        )
 
 
 def render_executive_overview(
@@ -180,3 +247,6 @@ def render_executive_overview(
             if not is_en
             else "Save a snapshot in the Control Center to enable trend comparisons."
         )
+
+    st.divider()
+    _render_operational_readiness_section(locale)
