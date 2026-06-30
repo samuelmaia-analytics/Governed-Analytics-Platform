@@ -74,6 +74,13 @@ checks. Data lineage is documented in `docs/data_lineage.md`, from Olist CSV
 sources through Bronze, Silver, Gold, Publication Gate, Streamlit, dashboards,
 and APIs.
 
+## Alerts and Incident Response
+
+Operational alert examples are versioned in `alerts/` for success, warning, and
+failure scenarios. The alert strategy in `docs/alerts_strategy.md` explains how
+these messages could be routed through SNS, e-mail, Slack, Discord, Telegram, or
+n8n in a real deployment, without committing credentials or active webhooks.
+
 ## Implemented vs Simulated
 
 ### Implemented
