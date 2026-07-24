@@ -14,6 +14,11 @@ htmlcov/
 .env.*
 !.env.example
 
+# Local development configuration
+AGENTS.md
+AGENTS.local.md
+.codex/
+
 # Runtime logs
 logs/*
 !logs/.gitkeep
