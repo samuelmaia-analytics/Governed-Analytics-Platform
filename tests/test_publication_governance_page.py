@@ -143,7 +143,9 @@ def test_render_publication_governance_explains_diagnostic_authority(
         info=lambda value: calls.append(("info", value)),
         subheader=lambda value: calls.append(("subheader", value)),
         columns=lambda count: [FakeColumn() for _ in range(count)],
-        expander=lambda *_args, **_kwargs: nullcontext(),
+        expander=lambda label, **_kwargs: (
+            calls.append(("expander", label)) or nullcontext()
+        ),
         markdown=lambda value: calls.append(("markdown", value)),
         code=lambda value: calls.append(("code", value)),
     )
@@ -178,41 +180,142 @@ def test_render_publication_governance_explains_diagnostic_authority(
 
     page.render_publication_governance(snapshot)
 
-    assert ("warning", page.DIAGNOSTIC_NOTICE) in calls
-    assert ("info", "Residual evaluation is less restrictive") in calls
+    assert ("caption", page.DIAGNOSTIC_NOTICE) in calls
+    assert ("info", "A avaliação residual é menos restritiva") in calls
     assert any(
-        kind == "success" and "Authoritative decision: Approved" in value
+        kind == "info"
+        and value == "Decisão histórica registrada e preservada como referência auditável."
         for kind, value in calls
     )
     assert any(
-        "historical decision remains the publication authority" in value
+        "Visão auditável das decisões de publicação" in value
         for kind, value in calls
         if kind == "markdown"
     )
     assert any(
-        metric["label"] == "Sensitive data protection"
-        and metric["value"] == "Protected — 16/16 privacy controls passed"
+        metric["label"] == "Decisão histórica registrada"
+        and metric["value"] == "Approved"
         for group in metric_groups
         for metric in group
     )
     assert any(
-        metric["label"] == "Execution provenance"
-        and metric["value"] == "Evidence linked to the same execution"
+        metric["label"] == "Proteção de dados sensíveis"
+        and metric["value"]
+        == "Protegido — 16/16 controles de privacidade aprovados"
         for group in metric_groups
         for metric in group
     )
     assert any(
-        metric["label"] == "Content provenance"
-        and metric["value"] == "Dataset fingerprint recorded"
+        metric["label"] == "Provenance de execução"
+        and metric["value"] == "Evidências vinculadas à mesma execução"
         for group in metric_groups
         for metric in group
     )
     assert any(
-        metric["label"] == "Diagnostic / Shadow · residual"
+        metric["label"] == "Provenance de conteúdo"
+        and metric["value"] == "Fingerprint do dataset registrado"
+        for group in metric_groups
+        for metric in group
+    )
+    assert any(
+        metric["label"] == "Diagnóstico shadow · residual"
         and metric["value"] == "53 → Approved / Low"
         for group in metric_groups
         for metric in group
     )
+    assert any(
+        metric["label"] == "Monitoramento" and metric["value"] == "1/1 PASS"
+        for group in metric_groups
+        for metric in group
+    )
+    assert ("expander", "Detalhes técnicos e evidências") in calls
+    assert ("code", "source-sha256") in calls
+    assert ("code", "published-sha256") in calls
+    assert snapshot.historical_decision == "Approved"
+
+
+def test_render_missing_evidence_uses_neutral_executive_fallbacks(
+    monkeypatch,
+) -> None:
+    calls: list[tuple[str, str]] = []
+    metric_groups: list[list[dict[str, str]]] = []
+    fake_st = SimpleNamespace(
+        header=lambda value: calls.append(("header", value)),
+        caption=lambda value: calls.append(("caption", value)),
+        warning=lambda value: calls.append(("warning", value)),
+        success=lambda value: calls.append(("success", value)),
+        info=lambda value: calls.append(("info", value)),
+        subheader=lambda value: calls.append(("subheader", value)),
+        expander=lambda label, **_kwargs: (
+            calls.append(("expander", label)) or nullcontext()
+        ),
+        markdown=lambda value: calls.append(("markdown", value)),
+        code=lambda value: calls.append(("code", value)),
+    )
+    monkeypatch.setattr(page, "st", fake_st)
+    monkeypatch.setattr(
+        page,
+        "render_metric_cards",
+        lambda metrics, **_kwargs: metric_groups.append(metrics),
+    )
+    unavailable = page.CheckSummary(0, 0, 0, 0)
+    snapshot = page.PublicationGovernanceSnapshot(
+        run_id="Unavailable",
+        historical_decision="Unavailable",
+        shadow_decision="Unavailable",
+        shadow_severity="Unavailable",
+        residual_decision="Unavailable",
+        residual_severity="Unavailable",
+        inherent_score=None,
+        residual_score=None,
+        divergence_type="unavailable",
+        sensitive_data_protected=None,
+        privacy=unavailable,
+        schema=unavailable,
+        business=unavailable,
+        quality=unavailable,
+        monitoring=page.CheckSummary(12, 0, 0, 12),
+        execution_provenance="Unavailable or mismatched",
+        content_provenance="Unavailable or mismatched",
+        source_fingerprint="Unavailable",
+        published_fingerprint="Unavailable",
+    )
+
+    page.render_publication_governance(snapshot)
+
+    metrics = [metric for group in metric_groups for metric in group]
+    metric_values = [metric["value"] for metric in metrics]
+    assert {metric["label"]: metric["value"] for metric in metrics} == {
+        "Decisão histórica registrada": page.EVIDENCE_NOT_PERSISTED,
+        "Score inherent": "Não persistido",
+        "Score residual": "Não persistido",
+        "Proteção de dados sensíveis": "Evidência não persistida",
+        "Controles de privacidade": page.VALIDATIONS_DEMONSTRATED,
+        "Contratos de esquema": page.VALIDATIONS_DEMONSTRATED,
+        "Regras de negócio": page.VALIDATIONS_DEMONSTRATED,
+        "Qualidade dos dados": page.VALIDATIONS_DEMONSTRATED,
+        "Monitoramento": "12/12 PASS",
+        "Provenance de execução": "Evidência não persistida",
+        "Provenance de conteúdo": "Evidência não persistida",
+    }
+    assert "0/0 PASS" not in metric_values
+    assert "None" not in metric_values
+    assert "Approved" not in metric_values
+    assert page.EVIDENCE_NOT_PERSISTED in [
+        value for kind, value in calls if kind == "info"
+    ]
+    assert not any(
+        "None → Unavailable / Unavailable" in value
+        for kind, value in calls
+        if kind in {"info", "warning", "subheader"}
+    )
+    assert any(
+        "None → Unavailable / Unavailable" in value
+        for kind, value in calls
+        if kind == "caption"
+    )
+    assert ("expander", "Detalhes técnicos e evidências") in calls
+    assert snapshot.historical_decision == "Unavailable"
 
 
 def test_missing_artifacts_are_reported_as_unavailable(tmp_path: Path) -> None:
