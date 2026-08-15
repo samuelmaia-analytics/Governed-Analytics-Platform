@@ -18,6 +18,73 @@ def _load_semantic_slice(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
+def _format_brl(value: float) -> str:
+    formatted = f"{value:,.2f}"
+    return f"R$ {formatted.replace(',', '_').replace('.', ',').replace('_', '.')}"
+
+
+def _render_executive_kpis(df: pd.DataFrame) -> None:
+    revenue = (
+        float(pd.to_numeric(df["total_item_value"], errors="coerce").sum())
+        if "total_item_value" in df.columns
+        else None
+    )
+    order_count = (
+        int(df["order_id"].nunique(dropna=True)) if "order_id" in df.columns else None
+    )
+    average_ticket = (
+        revenue / order_count
+        if revenue is not None and order_count is not None and order_count > 0
+        else None
+    )
+    active_sellers = (
+        int(df["seller_key"].nunique(dropna=True))
+        if "seller_key" in df.columns
+        else None
+    )
+
+    revenue_col, orders_col, ticket_col, sellers_col = st.columns(4)
+    revenue_col.metric(
+        "Receita total", _format_brl(revenue) if revenue is not None else "Não disponível"
+    )
+    orders_col.metric(
+        "Pedidos", f"{order_count:,}" if order_count is not None else "Não disponível"
+    )
+    ticket_col.metric(
+        "Ticket médio",
+        _format_brl(average_ticket)
+        if average_ticket is not None
+        else "Não disponível",
+    )
+    sellers_col.metric(
+        "Sellers ativos",
+        f"{active_sellers:,}" if active_sellers is not None else "Não disponível",
+    )
+
+    st.markdown("### Leitura executiva")
+    if (
+        revenue is not None
+        and order_count is not None
+        and average_ticket is not None
+        and active_sellers is not None
+    ):
+        st.markdown(
+            f"- A base analisada reúne **{_format_brl(revenue)}** em receita, "
+            f"distribuída entre **{order_count:,} pedidos** e "
+            f"**{active_sellers:,} sellers ativos**.\n"
+            f"- O ticket médio observado no período é de "
+            f"**{_format_brl(average_ticket)}**.\n"
+            "- As análises abaixo detalham evolução temporal, concentração por "
+            "categoria, cohorts e contribuição dos sellers."
+        )
+    else:
+        st.markdown(
+            "- As análises abaixo detalham evolução temporal da receita, "
+            "concentração por categoria, comportamento por cohort e desempenho "
+            "dos sellers."
+        )
+
+
 def _render_monthly_revenue(df: pd.DataFrame, locale: Locale) -> None:
     is_en = locale == LOCALE_EN_US
     if "total_item_value" not in df.columns:
@@ -56,16 +123,19 @@ def _render_monthly_revenue(df: pd.DataFrame, locale: Locale) -> None:
     )
     monthly = monthly.rename(columns={"total_item_value": "revenue"})
     monthly = monthly.sort_values("order_year_month")
+    st.subheader("Evolução mensal da receita")
+    st.caption(
+        "Permite visualizar crescimento, sazonalidade e mudanças de nível de "
+        "receita ao longo do período."
+    )
     fig = px.bar(
         monthly,
         x="order_year_month",
         y="revenue",
-        title="Evolução Mensal da Receita"
-        if not is_en
-        else "Monthly Revenue Evolution",
+        title="Evolução mensal da receita",
         labels={
-            "order_year_month": "Ano-Mês" if not is_en else "Year-Month",
-            "revenue": "Receita" if not is_en else "Revenue",
+            "order_year_month": "Ano-mês",
+            "revenue": "Receita",
         },
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
@@ -101,29 +171,30 @@ def _render_category_pareto(category_slice: pd.DataFrame, locale: Locale) -> Non
     pareto_cutoff = int((category["cum_pct"] <= 80).sum())
     pareto_cutoff = max(1, pareto_cutoff)
 
+    st.subheader("Concentração de receita por categoria")
     fig = px.bar(
         category.head(15),
         x="category",
         y="revenue",
-        title="Pareto de Receita por Categoria (Top 15)"
-        if not is_en
-        else "Revenue Pareto by Category (Top 15)",
+        title="Concentração de receita por categoria",
+        labels={"category": "Categoria", "revenue": "Receita"},
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-35)
     st.plotly_chart(fig, width="stretch")
     st.caption(
-        f"As top {pareto_cutoff} categorias concentram ~80% da receita."
-        if not is_en
-        else f"Top {pareto_cutoff} categories account for ~80% of revenue."
+        f"As principais {pareto_cutoff} categorias concentram aproximadamente "
+        "80% da receita."
     )
+    display_category = category[["category", "revenue", "cum_pct"]].rename(
+        columns={
+            "category": "Categoria",
+            "revenue": "Receita",
+            "cum_pct": "Cumulativo %",
+        }
+    )
+    display_category["Receita"] = display_category["Receita"].map(_format_brl)
     st.dataframe(
-        category[["category", "revenue", "cum_pct"]].rename(
-            columns={
-                "category": "Categoria" if not is_en else "Category",
-                "revenue": "Receita" if not is_en else "Revenue",
-                "cum_pct": "Cumulativo %" if not is_en else "Cumulative %",
-            }
-        ),
+        display_category,
         width="stretch",
     )
 
@@ -152,6 +223,11 @@ def _render_cohort_ticket_and_retention(
         cohort_df["cohort_order_month_number"], errors="coerce"
     ).fillna(0)
 
+    st.caption(
+        "A análise de cohort mostra como ticket médio e retenção evoluem ao "
+        "longo dos meses após a primeira compra."
+    )
+
     ticket_pivot = cohort_df.pivot_table(
         index="purchase_cohort_month",
         columns="cohort_order_month_number",
@@ -163,9 +239,12 @@ def _render_cohort_ticket_and_retention(
         text_auto=".1f",
         aspect="auto",
         color_continuous_scale="Blues",
-        title="Ticket Médio por Cohort (Heatmap)"
-        if not is_en
-        else "Average Ticket by Cohort (Heatmap)",
+        title="Ticket médio por cohort",
+        labels={
+            "x": "Meses desde a primeira compra",
+            "y": "Cohort de aquisição",
+            "color": "Ticket médio",
+        },
     )
     st.plotly_chart(fig_ticket, width="stretch")
 
@@ -187,7 +266,12 @@ def _render_cohort_ticket_and_retention(
         text_auto=".1f",
         aspect="auto",
         color_continuous_scale="Teal",
-        title="Retenção por Cohort (%)" if not is_en else "Cohort Retention (%)",
+        title="Retenção por cohort (%)",
+        labels={
+            "x": "Meses desde a primeira compra",
+            "y": "Cohort de aquisição",
+            "color": "Retenção (%)",
+        },
     )
     st.plotly_chart(fig_retention, width="stretch")
 
@@ -208,14 +292,19 @@ def _render_top_sellers(df: pd.DataFrame, locale: Locale) -> None:
         .sort_values("total_item_value", ascending=False)
         .head(15)
     )
+    st.subheader("Top sellers por receita")
+    st.caption(
+        "Ranking dos sellers com maior contribuição para a receita no período "
+        "analisado."
+    )
     fig = px.bar(
         sellers,
         x="seller_key",
         y="total_item_value",
-        title="Top Sellers por Receita" if not is_en else "Top Sellers by Revenue",
+        title="Top sellers por receita",
         labels={
             "seller_key": "Seller",
-            "total_item_value": "Receita" if not is_en else "Revenue",
+            "total_item_value": "Receita",
         },
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-35)
@@ -224,15 +313,24 @@ def _render_top_sellers(df: pd.DataFrame, locale: Locale) -> None:
 
 def render_revenue_analytics(df: pd.DataFrame, locale: Locale) -> None:
     is_en = locale == LOCALE_EN_US
-    st.subheader("Revenue Analytics")
+    st.title("Business Insights")
+    st.markdown(
+        "Visão executiva de receita, concentração por categoria, comportamento "
+        "de clientes e desempenho de sellers."
+    )
+    st.caption(
+        "Os indicadores apresentados são derivados do dataset demonstrativo "
+        "utilizado no projeto de portfólio."
+    )
+    _render_executive_kpis(df)
 
     category_slice = _load_semantic_slice(CATEGORY_SLICE_PATH)
     cohort_slice = _load_semantic_slice(COHORT_SLICE_PATH)
 
     tab_evolution, tab_pareto, tab_cohort, tab_sellers = st.tabs(
         [
-            "Evolução / Evolution",
-            "Pareto Categorias / Category Pareto",
+            "Evolução da receita",
+            "Pareto por categoria",
             "Cohort",
             "Top Sellers",
         ]
