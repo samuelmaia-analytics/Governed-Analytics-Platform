@@ -543,6 +543,7 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
     markdown_calls: list[str] = []
     plot_calls: list[tuple[str, pd.DataFrame, dict[str, object]]] = []
     displayed_frames: list[pd.DataFrame] = []
+    dataframe_options: list[dict[str, object]] = []
 
     class CapturingContainer(_FakeContainer):
         def metric(self, label: str, value: object, **_kwargs) -> None:
@@ -568,8 +569,9 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
             tabs.extend(tab_names)
             return tuple(CapturingContainer() for _ in tab_names)
 
-        def dataframe(self, frame: pd.DataFrame, **_kwargs) -> None:
+        def dataframe(self, frame: pd.DataFrame, **kwargs: object) -> None:
             displayed_frames.append(frame.copy())
+            dataframe_options.append(kwargs)
 
     class CapturingPlotlyExpress:
         @staticmethod
@@ -598,7 +600,11 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
         {
             "order_id": ["o1", "o1", "o2"],
             "order_year_month": ["2024-01", "2024-01", "2024-02"],
-            "seller_key": ["s1", "s2", "s1"],
+            "seller_key": [
+                "seller_id_1a2b3c4d5e6f7g8h",
+                "seller_id_8h7g6f5e4d3c2b1a",
+                "seller_id_1a2b3c4d5e6f7g8h",
+            ],
             "total_item_value": [100.0, 120.0, 200.0],
         }
     )
@@ -654,16 +660,21 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
     monthly_plot = next(
         (frame, kwargs)
         for kind, frame, kwargs in plot_calls
-        if kind == "bar" and kwargs["title"] == "Evolução mensal da receita"
+        if kind == "bar" and kwargs["x"] == "order_year_month"
     )
     assert monthly_plot[0]["revenue"].tolist() == [220.0, 200.0]
+    assert "title" not in monthly_plot[1]
     assert monthly_plot[1]["labels"] == {
         "order_year_month": "Ano-mês",
         "revenue": "Receita",
     }
-    assert {kwargs["title"] for _, _, kwargs in plot_calls} == {
-        "Evolução mensal da receita",
-        "Concentração de receita por categoria",
+    category_plot = next(
+        (frame, kwargs)
+        for kind, frame, kwargs in plot_calls
+        if kind == "bar" and kwargs["x"] == "category"
+    )
+    assert "title" not in category_plot[1]
+    assert {kwargs["title"] for _, _, kwargs in plot_calls if "title" in kwargs} == {
         "Ticket médio por cohort",
         "Retenção por cohort (%)",
         "Top sellers por receita",
@@ -674,6 +685,21 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
         "Cumulativo %",
     ]
     assert displayed_frames[0]["Receita"].tolist() == ["R$ 500,00", "R$ 300,00"]
+    assert dataframe_options[0]["hide_index"] is True
+    seller_plot = next(
+        (frame, kwargs)
+        for kind, frame, kwargs in plot_calls
+        if kind == "bar" and kwargs["x"] == "seller_label"
+    )
+    assert seller_plot[0]["seller_key"].tolist() == [
+        "seller_id_1a2b3c4d5e6f7g8h",
+        "seller_id_8h7g6f5e4d3c2b1a",
+    ]
+    assert seller_plot[0]["seller_label"].tolist() == ["…5e6f7g8h", "…4d3c2b1a"]
+    assert seller_plot[1]["hover_data"] == {
+        "seller_key": True,
+        "seller_label": False,
+    }
     pd.testing.assert_frame_equal(df, original_df)
     pd.testing.assert_frame_equal(category_slice, original_category_slice)
     pd.testing.assert_frame_equal(cohort_slice, original_cohort_slice)
