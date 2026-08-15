@@ -136,6 +136,35 @@ def render_executive_overview(
     is_en = locale == LOCALE_EN_US
     snapshot = governance_snapshot or load_publication_governance_snapshot()
 
+    historical_decision = snapshot.historical_decision.strip()
+    if historical_decision.casefold() in {"", "none", "unavailable"}:
+        historical_decision = (
+            "Demonstration evidence" if is_en else "Evidência demonstrativa"
+        )
+    privacy_summary = (
+        snapshot.privacy.display
+        if snapshot.privacy.total > 0
+        else "Controls demonstrated"
+        if is_en
+        else "Controles demonstrados"
+    )
+    validation_summaries: list[str] = []
+    if snapshot.quality.total > 0:
+        validation_summaries.append(
+            f"Quality {snapshot.quality.passed}/{snapshot.quality.total}"
+            if is_en
+            else f"Qualidade {snapshot.quality.passed}/{snapshot.quality.total}"
+        )
+    if snapshot.monitoring.total > 0:
+        validation_summaries.append(
+            f"Monitoring {snapshot.monitoring.passed}/{snapshot.monitoring.total}"
+            if is_en
+            else f"Monitoramento {snapshot.monitoring.passed}/{snapshot.monitoring.total}"
+        )
+    validation_summary = " · ".join(validation_summaries) or (
+        "Validations demonstrated" if is_en else "Validações demonstradas"
+    )
+
     st.title("Governed Analytics Platform")
     st.caption("Projeto de portfólio profissional")
     st.markdown(
@@ -150,14 +179,11 @@ def render_executive_overview(
 
     primary_col1, primary_col2, primary_col3, primary_col4 = st.columns(4)
     primary_col1.metric("Registros governados", f"{len(df):,}")
-    primary_col2.metric(
-        "Decisão oficial de publicação", snapshot.historical_decision
-    )
-    primary_col3.metric("Privacy controls aprovados", snapshot.privacy.display)
+    primary_col2.metric("Decisão oficial de publicação", historical_decision)
+    primary_col3.metric("Privacy controls aprovados", privacy_summary)
     primary_col4.metric(
         "Quality/monitoring status",
-        f"Quality: {snapshot.quality.display} | "
-        f"Monitoring: {snapshot.monitoring.display}",
+        validation_summary,
     )
 
     st.markdown("**Fluxo de valor governado**")
@@ -242,6 +268,11 @@ def render_executive_overview(
         else "Métricas detalhadas de governança",
         expanded=False,
     ):
+        st.caption(
+            "Diagnostic indicators from the demonstration environment."
+            if is_en
+            else "Indicadores diagnósticos do ambiente demonstrativo."
+        )
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric(
@@ -309,20 +340,22 @@ def render_executive_overview(
             st.caption(f"DuckDB: {duckdb_version}")
 
     st.subheader("Resumo Executivo" if not is_en else "Executive Summary")
-    risk_level = risk_result["risk_level"]
     if is_en:
         st.write(
-            f"The dataset has **{len(df):,}** rows and **{df.shape[1]}** columns. "
-            f"The current LGPD risk is **{risk_level}** (score **{risk_result['score']}/100**). "
-            f"Data quality score is **{quality_score}/100** with **{quality_results['failed_checks_count']}** failed checks. "
-            f"**{suppressed_columns}** columns are under active LGPD protection."
+            f"This project demonstrates a governed analytics platform across "
+            f"**{len(df):,}** records and **{df.shape[1]}** columns, with a "
+            "transformation pipeline, data quality and privacy controls, publication "
+            "governance, and an analytics layer for insights. Detailed technical "
+            "evaluations remain available on the governance and quality pages."
         )
     else:
         st.write(
-            f"O dataset possui **{len(df):,}** registros e **{df.shape[1]}** colunas. "
-            f"O risco LGPD atual é **{risk_level}** (score **{risk_result['score']}/100**). "
-            f"O score de qualidade é **{quality_score}/100** com **{quality_results['failed_checks_count']}** falhas. "
-            f"**{suppressed_columns}** colunas estão sob proteção LGPD ativa."
+            "O projeto demonstra uma plataforma analítica governada com "
+            f"**{len(df):,}** registros e **{df.shape[1]}** colunas, pipeline de "
+            "transformação, controles de qualidade e privacidade, governança de "
+            "publicação e camada analítica para geração de insights. As avaliações "
+            "técnicas detalhadas permanecem disponíveis nas páginas de governança "
+            "e qualidade."
         )
     if prev is None:
         st.caption(
