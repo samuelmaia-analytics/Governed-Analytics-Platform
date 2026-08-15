@@ -169,7 +169,53 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
 
 
 def test_render_lgpd_privacy_risk_with_and_without_metadata(monkeypatch) -> None:
-    monkeypatch.setattr(lgpd_page, "st", _FakeStreamlit())
+    titles: list[str] = []
+    subtitles: list[str] = []
+    captions: list[str] = []
+    markdown_calls: list[str] = []
+    info_calls: list[str] = []
+    write_calls: list[str] = []
+    metrics: list[tuple[str, object]] = []
+    tab_groups: list[list[str]] = []
+    expanders: list[str] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def subheader(self, value: str) -> None:
+            subtitles.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def info(self, value: str) -> None:
+            info_calls.append(value)
+
+        def write(self, value: str) -> None:
+            write_calls.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def tabs(self, tab_names):  # type: ignore[no-untyped-def]
+            tab_groups.append(list(tab_names))
+            return tuple(CapturingContainer() for _ in tab_names)
+
+        def expander(
+            self, label: str, **_kwargs
+        ) -> CapturingContainer:
+            expanders.append(label)
+            return CapturingContainer()
+
+    monkeypatch.setattr(lgpd_page, "st", CapturingStreamlit())
 
     df = pd.DataFrame({"email": ["a@x.com"], "v": [1]})
     classification_df = pd.DataFrame(
@@ -180,18 +226,25 @@ def test_render_lgpd_privacy_risk_with_and_without_metadata(monkeypatch) -> None
         }
     )
     risk_result = {
-        "score": 35,
-        "total_score": 35,
-        "risk_level": "medium",
+        "score": 100,
+        "total_score": 100,
+        "risk_level": "high",
         "explanation": "test",
         "summary": "test",
         "components": {"x": 1},
         "score_components": {"x": 1},
         "per_component_points": {"x": 1},
         "component_explanations": {"x": "test"},
-        "publication_recommendation": "needs_review",
-        "recommendations": ["review controls"],
+        "publication_recommendation": "blocked",
+        "recommendations": [
+            "Apply masking for direct identifiers in shared datasets.",
+            "Anonymize or remove sensitive columns from executive layers.",
+            "Review null patterns in critical personal-data columns.",
+            "Document legal basis and retention policy for personal data usage.",
+            "Block publication until masking/anonymization controls are implemented.",
+        ],
     }
+    original_recommendations = list(risk_result["recommendations"])
 
     monkeypatch.setattr(
         lgpd_page,
@@ -210,6 +263,33 @@ def test_render_lgpd_privacy_risk_with_and_without_metadata(monkeypatch) -> None
     lgpd_page.render_lgpd_privacy_risk(
         df, classification_df, risk_result, locale="pt-BR"
     )  # type: ignore[arg-type]
+
+    assert titles == ["Privacidade e Controles LGPD"] * 2
+    assert tab_groups[0] == [
+        "Score e risco",
+        "Classificações",
+        "Prévia de transformações",
+    ]
+    assert "Avaliação diagnóstica de privacidade" in subtitles
+    assert any("RIPD formal" in caption for caption in captions)
+    assert "### Como interpretar esta página" in markdown_calls
+    assert any("riscos elevados" in message for message in info_calls)
+    assert ("Score de risco de privacidade", "100 / 100") in metrics
+    assert ("Nível de risco", "ALTO") in metrics
+    assert ("Recomendação de publicação", "BLOQUEADO") in metrics
+    assert "Componentes técnicos do score" in expanders
+    assert "- Aplicar mascaramento aos identificadores diretos em datasets compartilhados." in write_calls
+    assert "- Anonimizar ou remover colunas sensíveis das camadas executivas." in write_calls
+    assert "- Revisar padrões de valores nulos em colunas críticas de dados pessoais." in write_calls
+    assert "- Documentar a base legal e a política de retenção para uso de dados pessoais." in write_calls
+    assert (
+        "- Bloquear a publicação até que os controles de mascaramento ou "
+        "anonimização estejam implementados."
+    ) in write_calls
+    assert risk_result["score"] == 100
+    assert risk_result["risk_level"] == "high"
+    assert risk_result["publication_recommendation"] == "blocked"
+    assert risk_result["recommendations"] == original_recommendations
 
 
 def test_render_eda_with_empty_and_non_empty_profiles(monkeypatch) -> None:
