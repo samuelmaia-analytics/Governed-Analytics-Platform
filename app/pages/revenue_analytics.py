@@ -23,6 +23,11 @@ def _format_brl(value: float) -> str:
     return f"R$ {formatted.replace(',', '_').replace('.', ',').replace('_', '.')}"
 
 
+def _shorten_seller_label(value: object) -> str:
+    seller_id = str(value)
+    return seller_id if len(seller_id) <= 12 else f"…{seller_id[-8:]}"
+
+
 def _render_executive_kpis(df: pd.DataFrame) -> None:
     revenue = (
         float(pd.to_numeric(df["total_item_value"], errors="coerce").sum())
@@ -132,7 +137,6 @@ def _render_monthly_revenue(df: pd.DataFrame, locale: Locale) -> None:
         monthly,
         x="order_year_month",
         y="revenue",
-        title="Evolução mensal da receita",
         labels={
             "order_year_month": "Ano-mês",
             "revenue": "Receita",
@@ -176,7 +180,6 @@ def _render_category_pareto(category_slice: pd.DataFrame, locale: Locale) -> Non
         category.head(15),
         x="category",
         y="revenue",
-        title="Concentração de receita por categoria",
         labels={"category": "Categoria", "revenue": "Receita"},
     )
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20), xaxis_tickangle=-35)
@@ -196,6 +199,7 @@ def _render_category_pareto(category_slice: pd.DataFrame, locale: Locale) -> Non
     st.dataframe(
         display_category,
         width="stretch",
+        hide_index=True,
     )
 
 
@@ -297,13 +301,17 @@ def _render_top_sellers(df: pd.DataFrame, locale: Locale) -> None:
         "Ranking dos sellers com maior contribuição para a receita no período "
         "analisado."
     )
+    seller_display = sellers.assign(
+        seller_label=sellers["seller_key"].map(_shorten_seller_label)
+    )
     fig = px.bar(
-        sellers,
-        x="seller_key",
+        seller_display,
+        x="seller_label",
         y="total_item_value",
         title="Top sellers por receita",
+        hover_data={"seller_key": True, "seller_label": False},
         labels={
-            "seller_key": "Seller",
+            "seller_label": "Seller",
             "total_item_value": "Receita",
         },
     )
