@@ -136,11 +136,6 @@ def render_executive_overview(
     is_en = locale == LOCALE_EN_US
     snapshot = governance_snapshot or load_publication_governance_snapshot()
 
-    historical_decision = snapshot.historical_decision.strip()
-    if historical_decision.casefold() in {"", "none", "unavailable"}:
-        historical_decision = (
-            "Demonstration evidence" if is_en else "Evidência demonstrativa"
-        )
     privacy_summary = (
         snapshot.privacy.display
         if snapshot.privacy.total > 0
@@ -179,10 +174,12 @@ def render_executive_overview(
 
     primary_col1, primary_col2, primary_col3, primary_col4 = st.columns(4)
     primary_col1.metric("Registros governados", f"{len(df):,}")
-    primary_col2.metric("Decisão oficial de publicação", historical_decision)
-    primary_col3.metric("Privacy controls aprovados", privacy_summary)
+    primary_col2.metric(
+        "Governança de publicação", "Decisão auditável disponível"
+    )
+    primary_col3.metric("Controles de privacidade", privacy_summary)
     primary_col4.metric(
-        "Quality/monitoring status",
+        "Qualidade e monitoramento",
         validation_summary,
     )
 

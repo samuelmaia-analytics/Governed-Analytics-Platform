@@ -331,7 +331,7 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
     checks = CheckSummary(1, 0, 0, 1)
     snapshot = PublicationGovernanceSnapshot(
         run_id="run-1",
-        historical_decision="Approved",
+        historical_decision="Needs Review",
         shadow_decision="Needs Review",
         shadow_severity="High",
         residual_decision="Approved",
@@ -392,10 +392,12 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
     )
     assert metrics[:4] == [
         ("Registros governados", "2"),
-        ("Decisão oficial de publicação", "Approved"),
-        ("Privacy controls aprovados", "16/16 PASS"),
-        ("Quality/monitoring status", "Qualidade 24/25 · Monitoramento 12/12"),
+        ("Governança de publicação", "Decisão auditável disponível"),
+        ("Controles de privacidade", "16/16 PASS"),
+        ("Qualidade e monitoramento", "Qualidade 24/25 · Monitoramento 12/12"),
     ]
+    assert all(value != "Needs Review" for _, value in metrics[:4])
+    assert snapshot.historical_decision == "Needs Review"
     assert any(
         kind == "write"
         and "plataforma analítica governada" in value
@@ -511,9 +513,9 @@ def test_portfolio_overview_uses_demonstration_fallbacks_without_evidence(
 
     assert metrics[:4] == [
         ("Registros governados", "2"),
-        ("Decisão oficial de publicação", "Evidência demonstrativa"),
-        ("Privacy controls aprovados", "Controles demonstrados"),
-        ("Quality/monitoring status", "Validações demonstradas"),
+        ("Governança de publicação", "Decisão auditável disponível"),
+        ("Controles de privacidade", "Controles demonstrados"),
+        ("Qualidade e monitoramento", "Validações demonstradas"),
     ]
     primary_values = {str(value) for _, value in metrics[:4]}
     assert "0/0 PASS" not in primary_values
