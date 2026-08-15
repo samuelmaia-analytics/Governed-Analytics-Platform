@@ -535,11 +535,68 @@ def test_portfolio_overview_uses_demonstration_fallbacks_without_evidence(
 
 
 def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) -> None:
-    monkeypatch.setattr(revenue_page, "st", _FakeStreamlit())
-    monkeypatch.setattr(revenue_page, "px", _FakePlotlyExpress())
+    metrics: list[tuple[str, object]] = []
+    tabs: list[str] = []
+    titles: list[str] = []
+    subtitles: list[str] = []
+    captions: list[str] = []
+    markdown_calls: list[str] = []
+    plot_calls: list[tuple[str, pd.DataFrame, dict[str, object]]] = []
+    displayed_frames: list[pd.DataFrame] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def subheader(self, value: str) -> None:
+            subtitles.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def tabs(self, tab_names):  # type: ignore[no-untyped-def]
+            tabs.extend(tab_names)
+            return tuple(CapturingContainer() for _ in tab_names)
+
+        def dataframe(self, frame: pd.DataFrame, **_kwargs) -> None:
+            displayed_frames.append(frame.copy())
+
+    class CapturingPlotlyExpress:
+        @staticmethod
+        def _capture(
+            kind: str, frame: pd.DataFrame, kwargs: dict[str, object]
+        ) -> _FakeFigure:
+            plot_calls.append((kind, frame.copy(), kwargs))
+            return _FakeFigure()
+
+        @staticmethod
+        def bar(
+            frame: pd.DataFrame, **kwargs: object
+        ) -> _FakeFigure:
+            return CapturingPlotlyExpress._capture("bar", frame, kwargs)
+
+        @staticmethod
+        def imshow(
+            frame: pd.DataFrame, **kwargs: object
+        ) -> _FakeFigure:
+            return CapturingPlotlyExpress._capture("imshow", frame, kwargs)
+
+    monkeypatch.setattr(revenue_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(revenue_page, "px", CapturingPlotlyExpress())
 
     df = pd.DataFrame(
         {
+            "order_id": ["o1", "o1", "o2"],
             "order_year_month": ["2024-01", "2024-01", "2024-02"],
             "seller_key": ["s1", "s2", "s1"],
             "total_item_value": [100.0, 120.0, 200.0],
@@ -559,6 +616,9 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
             "avg_ticket": [120.0, 110.0, 130.0],
         }
     )
+    original_df = df.copy(deep=True)
+    original_category_slice = category_slice.copy(deep=True)
+    original_cohort_slice = cohort_slice.copy(deep=True)
 
     monkeypatch.setattr(
         revenue_page,
@@ -568,6 +628,55 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
         else cohort_slice.copy(),
     )
     revenue_page.render_revenue_analytics(df, locale="pt-BR")  # type: ignore[arg-type]
+
+    assert titles == ["Business Insights"]
+    assert metrics[:4] == [
+        ("Receita total", "R$ 420,00"),
+        ("Pedidos", "2"),
+        ("Ticket médio", "R$ 210,00"),
+        ("Sellers ativos", "2"),
+    ]
+    assert tabs == [
+        "Evolução da receita",
+        "Pareto por categoria",
+        "Cohort",
+        "Top Sellers",
+    ]
+    assert "Leitura executiva" in " ".join(markdown_calls)
+    assert subtitles == [
+        "Evolução mensal da receita",
+        "Concentração de receita por categoria",
+        "Top sellers por receita",
+    ]
+    assert any("dataset demonstrativo" in caption for caption in captions)
+    assert any("análise de cohort" in caption for caption in captions)
+
+    monthly_plot = next(
+        (frame, kwargs)
+        for kind, frame, kwargs in plot_calls
+        if kind == "bar" and kwargs["title"] == "Evolução mensal da receita"
+    )
+    assert monthly_plot[0]["revenue"].tolist() == [220.0, 200.0]
+    assert monthly_plot[1]["labels"] == {
+        "order_year_month": "Ano-mês",
+        "revenue": "Receita",
+    }
+    assert {kwargs["title"] for _, _, kwargs in plot_calls} == {
+        "Evolução mensal da receita",
+        "Concentração de receita por categoria",
+        "Ticket médio por cohort",
+        "Retenção por cohort (%)",
+        "Top sellers por receita",
+    }
+    assert displayed_frames[0].columns.tolist() == [
+        "Categoria",
+        "Receita",
+        "Cumulativo %",
+    ]
+    assert displayed_frames[0]["Receita"].tolist() == ["R$ 500,00", "R$ 300,00"]
+    pd.testing.assert_frame_equal(df, original_df)
+    pd.testing.assert_frame_equal(category_slice, original_category_slice)
+    pd.testing.assert_frame_equal(cohort_slice, original_cohort_slice)
 
     monkeypatch.setattr(
         revenue_page, "_load_semantic_slice", lambda _path: pd.DataFrame()
