@@ -54,12 +54,14 @@ def test_main_entrypoints_are_callable() -> None:
     assert callable(main_module._render_report_page)
     assert callable(main_module._render_control_center_page)
     assert callable(main_module._render_n8n_automation_page)
+    assert callable(main_module._render_publication_governance_page)
     assert callable(main_module._render_snowflake_page)
 
 
 def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
     calls: list[str] = []
     url_paths: list[str] = []
+    navigation_titles: list[str] = []
 
     class FakeNavigation:
         def run(self) -> None:
@@ -78,15 +80,19 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
         def Page(fn, **kwargs):  # type: ignore[no-untyped-def]
             calls.append("page")
             url_paths.append(str(kwargs.get("url_path", "")))
-            return fn
+            return SimpleNamespace(
+                fn=fn,
+                title=str(kwargs.get("title", "")),
+                url_path=str(kwargs.get("url_path", "")),
+            )
 
         @staticmethod
-        def navigation(*_args, **_kwargs):  # type: ignore[no-untyped-def]
+        def navigation(*_args, **kwargs):  # type: ignore[no-untyped-def]
+            navigation_titles.extend(page.title for page in kwargs["pages"])
             return FakeNavigation()
 
     monkeypatch.setattr(main_module, "st", FakeStreamlit())
     monkeypatch.setattr(main_module, "build_locale_selector", lambda: "pt-BR")
-    monkeypatch.setattr(main_module, "t", lambda _key, _locale: "x")
     monkeypatch.setattr(main_module, "build_context", lambda _locale: SimpleNamespace())
     monkeypatch.setattr(
         main_module, "_render_executive_page", lambda _context, _locale: None
@@ -123,11 +129,33 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
         main_module, "_render_n8n_automation_page", lambda _context, _locale: None
     )
     monkeypatch.setattr(
+        main_module,
+        "_render_publication_governance_page",
+        lambda _context, _locale: None,
+    )
+    monkeypatch.setattr(
         main_module, "_render_snowflake_page", lambda _context, _locale: None
     )
 
     main_module.main()
 
-    assert calls.count("page") == 13
+    assert calls.count("page") == 14
     assert "n8n-automation" in url_paths
+    assert "publication-governance" in url_paths
+    assert navigation_titles == [
+        "Portfolio Overview",
+        "Business Insights",
+        "Publication Governance",
+        "Privacy & LGPD Controls",
+        "Data Quality",
+        "Seller Performance",
+        "Customer Retention",
+        "Data Catalog",
+        "Technical Analysis",
+        "Governance Evidence",
+        "Governance Lab",
+        "Automation & Orchestration",
+        "GenAI Experiment",
+        "Snowflake Integration",
+    ]
     assert "navigation_run" in calls

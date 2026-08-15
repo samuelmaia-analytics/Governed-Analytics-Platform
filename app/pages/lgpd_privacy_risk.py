@@ -44,16 +44,19 @@ def render_lgpd_privacy_risk(
 
         components = risk_result.get("score_components", {})
         if components:
-            st.markdown("**Score Components**" if is_en else "**Componentes do Score**")
-            st.dataframe(
-                pd.DataFrame(
-                    [
-                        {"component": key, "points": value}
-                        for key, value in components.items()
-                    ]
-                ),
-                width="stretch",
-            )
+            with st.expander(
+                "Score Components" if is_en else "Componentes do Score",
+                expanded=False,
+            ):
+                st.dataframe(
+                    pd.DataFrame(
+                        [
+                            {"component": key, "points": value}
+                            for key, value in components.items()
+                        ]
+                    ),
+                    width="stretch",
+                )
 
         st.markdown("**Recommendations**" if is_en else "**Recomendações**")
         for rec in risk_result["recommendations"]:

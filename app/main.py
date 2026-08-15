@@ -6,13 +6,14 @@ import sys
 from pathlib import Path
 
 import streamlit as st
+from streamlit.navigation.page import StreamlitPage
 
 PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from app.context import GovernanceAppContext, build_context  # noqa: E402
-from app.i18n import build_locale_selector, t  # noqa: E402
+from app.i18n import build_locale_selector  # noqa: E402
 from app.pages.data_catalog import render_data_catalog  # noqa: E402
 from app.pages.data_quality import render_data_quality  # noqa: E402
 from app.pages.cohort_retention import render_cohort_retention  # noqa: E402
@@ -26,6 +27,9 @@ from app.pages.snowflake_explorer import render_snowflake_explorer  # noqa: E402
 from app.pages.genai_insights import render_genai_insights  # noqa: E402
 from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk  # noqa: E402
 from app.pages.n8n_automation import render_n8n_automation  # noqa: E402
+from app.pages.publication_governance import (  # noqa: E402
+    render_publication_governance,
+)
 from app.pages.revenue_analytics import render_revenue_analytics  # noqa: E402
 from app.pages.seller_performance import render_seller_performance  # noqa: E402
 from src.duckdb_engine import get_duckdb_version  # noqa: E402
@@ -37,13 +41,21 @@ st.set_page_config(
 )
 
 
-def _render_executive_page(context: GovernanceAppContext, locale: str) -> None:
+def _render_executive_page(
+    context: GovernanceAppContext,
+    locale: str,
+    business_page: StreamlitPage | None = None,
+    governance_page: StreamlitPage | None = None,
+) -> None:
     render_executive_overview(
         context.df,
         context.classification_df,
         context.risk_result,
         context.quality_results,
         locale,
+        business_page=business_page,
+        governance_page=governance_page,
+        duckdb_version=get_duckdb_version(),
     )
 
 
@@ -107,93 +119,105 @@ def _render_n8n_automation_page(
     render_n8n_automation()
 
 
+def _render_publication_governance_page(
+    _context: GovernanceAppContext, _locale: str
+) -> None:
+    render_publication_governance()
+
+
 def main() -> None:
     locale = build_locale_selector()
-    st.title(t("app_title", locale))
-    st.caption(t("app_caption", locale))
-    st.caption(
-        "Language: English (US)" if locale == "en-US" else "Idioma: Português (Brasil)"
-    )
-    st.caption(f"DuckDB: {get_duckdb_version()}")
-
     context = build_context(locale)
 
+    business_page = st.Page(
+        lambda: _render_revenue_page(context, locale),
+        title="Business Insights",
+        icon=":material/paid:",
+        url_path="revenue-analytics",
+    )
+    governance_page = st.Page(
+        lambda: _render_publication_governance_page(context, locale),
+        title="Publication Governance",
+        icon=":material/account_tree:",
+        url_path="publication-governance",
+    )
     pages = [
         st.Page(
-            lambda: _render_executive_page(context, locale),
-            title=t("nav_executive", locale),
+            lambda: _render_executive_page(
+                context,
+                locale,
+                business_page=business_page,
+                governance_page=governance_page,
+            ),
+            title="Portfolio Overview",
             icon=":material/dashboard:",
             url_path="executive-overview",
         ),
-        st.Page(
-            lambda: _render_catalog_page(context, locale),
-            title=t("nav_catalog", locale),
-            icon=":material/table_view:",
-            url_path="data-catalog",
-        ),
+        business_page,
+        governance_page,
         st.Page(
             lambda: _render_lgpd_page(context, locale),
-            title=t("nav_lgpd", locale),
+            title="Privacy & LGPD Controls",
             icon=":material/policy:",
             url_path="lgpd-privacy-risk",
         ),
         st.Page(
             lambda: _render_quality_page(context, locale),
-            title=t("nav_quality", locale),
+            title="Data Quality",
             icon=":material/check_circle:",
             url_path="data-quality",
         ),
         st.Page(
-            lambda: _render_eda_page(context, locale),
-            title=t("nav_eda", locale),
-            icon=":material/monitoring:",
-            url_path="eda",
-        ),
-        st.Page(
-            lambda: _render_revenue_page(context, locale),
-            title=t("nav_revenue", locale),
-            icon=":material/paid:",
-            url_path="revenue-analytics",
-        ),
-        st.Page(
             lambda: _render_seller_performance_page(context, locale),
-            title=t("nav_seller_performance", locale),
+            title="Seller Performance",
             icon=":material/storefront:",
             url_path="seller-performance",
         ),
         st.Page(
             lambda: _render_cohort_retention_page(context, locale),
-            title=t("nav_cohort_retention", locale),
+            title="Customer Retention",
             icon=":material/grid_view:",
             url_path="cohort-retention",
         ),
         st.Page(
-            lambda: _render_genai_page(context, locale),
-            title=t("nav_genai", locale),
-            icon=":material/auto_awesome:",
-            url_path="genai-insights",
+            lambda: _render_catalog_page(context, locale),
+            title="Data Catalog",
+            icon=":material/table_view:",
+            url_path="data-catalog",
+        ),
+        st.Page(
+            lambda: _render_eda_page(context, locale),
+            title="Technical Analysis",
+            icon=":material/monitoring:",
+            url_path="eda",
         ),
         st.Page(
             lambda: _render_report_page(context, locale),
-            title=t("nav_report", locale),
+            title="Governance Evidence",
             icon=":material/description:",
             url_path="governance-report",
         ),
         st.Page(
             lambda: _render_control_center_page(context, locale),
-            title=t("nav_control_center", locale),
+            title="Governance Lab",
             icon=":material/admin_panel_settings:",
             url_path="governance-control-center",
         ),
         st.Page(
             lambda: _render_n8n_automation_page(context, locale),
-            title="n8n Automation",
+            title="Automation & Orchestration",
             icon=":material/account_tree:",
             url_path="n8n-automation",
         ),
         st.Page(
+            lambda: _render_genai_page(context, locale),
+            title="GenAI Experiment",
+            icon=":material/auto_awesome:",
+            url_path="genai-insights",
+        ),
+        st.Page(
             lambda: _render_snowflake_page(context, locale),
-            title="Snowflake Explorer",
+            title="Snowflake Integration",
             icon=":material/database:",
             url_path="snowflake-explorer",
         ),
