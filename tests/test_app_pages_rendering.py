@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
 
@@ -10,10 +11,15 @@ import app.pages.data_quality as data_quality_page
 import app.pages.eda as eda_page
 import app.pages.executive_overview as executive_overview_page
 import app.pages.genai_insights as genai_page
+import app.pages.governance_control_center as control_center_page
 import app.pages.governance_report as governance_report_page
 import app.pages.lgpd_privacy_risk as lgpd_page
 import app.pages.revenue_analytics as revenue_page
 import app.pages.seller_performance as seller_page
+from app.pages.publication_governance import (
+    CheckSummary,
+    PublicationGovernanceSnapshot,
+)
 
 
 class _FakeContainer:
@@ -24,6 +30,9 @@ class _FakeContainer:
         return False
 
     def metric(self, *_args, **_kwargs) -> None:
+        return None
+
+    def title(self, *_args, **_kwargs) -> None:
         return None
 
     def subheader(self, *_args, **_kwargs) -> None:
@@ -63,6 +72,9 @@ class _FakeContainer:
         return None
 
     def code(self, *_args, **_kwargs) -> None:
+        return None
+
+    def page_link(self, *_args, **_kwargs) -> None:
         return None
 
     def plotly_chart(self, *_args, **_kwargs) -> None:
@@ -274,6 +286,123 @@ def test_render_executive_overview_and_governance_report(
     governance_report_page.render_governance_report(
         {"existing": existing, "missing": missing},
         locale="en-US",  # type: ignore[arg-type]
+    )
+
+
+def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
+    monkeypatch,
+) -> None:
+    calls: list[tuple[str, str]] = []
+    metric_labels: list[str] = []
+    page_links: list[str] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, *_args, **_kwargs) -> None:
+            metric_labels.append(label)
+
+        def info(self, value: str) -> None:
+            calls.append(("info", value))
+
+        def success(self, value: str) -> None:
+            calls.append(("success", value))
+
+        def page_link(self, *_args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+            page_links.append(str(kwargs["label"]))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            calls.append(("title", value))
+
+        def caption(self, value: str) -> None:
+            calls.append(("caption", value))
+
+        def markdown(self, value: str) -> None:
+            calls.append(("markdown", value))
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def expander(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+            return CapturingContainer()
+
+    checks = CheckSummary(1, 0, 0, 1)
+    snapshot = PublicationGovernanceSnapshot(
+        run_id="run-1",
+        historical_decision="Approved",
+        shadow_decision="Needs Review",
+        shadow_severity="High",
+        residual_decision="Approved",
+        residual_severity="Low",
+        inherent_score=86,
+        residual_score=53,
+        divergence_type="residual_less_restrictive",
+        sensitive_data_protected=True,
+        privacy=CheckSummary(16, 0, 0, 16),
+        schema=checks,
+        business=checks,
+        quality=CheckSummary(24, 1, 0, 25),
+        monitoring=CheckSummary(12, 0, 0, 12),
+        execution_provenance="Valid · same run",
+        content_provenance="Recorded · same run",
+        source_fingerprint="source-sha256",
+        published_fingerprint="published-sha256",
+    )
+    monkeypatch.setattr(executive_overview_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(
+        executive_overview_page,
+        "_render_operational_readiness_section",
+        lambda _locale: None,
+    )
+
+    executive_overview_page.render_executive_overview(  # type: ignore[arg-type]
+        df=pd.DataFrame({"value": [1, 2]}),
+        classification_df=pd.DataFrame(
+            {
+                "lgpd_classification": ["non_personal"],
+                "recommended_action": ["keep"],
+            }
+        ),
+        risk_result={
+            "score": 15,
+            "risk_level": "low",
+            "recommendations": [],
+        },
+        quality_results={"failed_checks_count": 0},
+        locale="pt-BR",
+        business_page=SimpleNamespace(),
+        governance_page=SimpleNamespace(),
+        governance_snapshot=snapshot,
+        duckdb_version="1.0",
+    )
+
+    assert ("title", "Governed Analytics Platform") in calls
+    assert ("caption", "Projeto de portfólio profissional") in calls
+    assert any(
+        "transforma dados brutos" in value
+        for kind, value in calls
+        if kind == "markdown"
+    )
+    assert any(
+        "fins demonstrativos" in value
+        for kind, value in calls
+        if kind == "caption"
+    )
+    assert metric_labels[:4] == [
+        "Registros governados",
+        "Decisão oficial de publicação",
+        "Privacy controls aprovados",
+        "Quality/monitoring status",
+    ]
+    assert page_links == ["Explore Business Insights", "View Governance Decision"]
+    assert ("info", "Raw Data") in calls
+    assert ("success", "Trusted Analytics") in calls
+    assert any(
+        "github.com/samuelmaia-analytics" in value
+        for kind, value in calls
+        if kind == "markdown"
+    )
+    assert control_center_page.GOVERNANCE_LAB_NOTICE.startswith(
+        "Interactive diagnostic environment"
     )
 
 

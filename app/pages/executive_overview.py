@@ -5,8 +5,13 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from streamlit.navigation.page import StreamlitPage
 
 from app.i18n import LOCALE_EN_US, Locale
+from app.pages.publication_governance import (
+    PublicationGovernanceSnapshot,
+    load_publication_governance_snapshot,
+)
 from src.cloud_reference import summarize_cost_controls
 from src.config import PUBLISHED_MONITORING_DIR
 from src.data_lake_layers import summarize_layer_status
@@ -57,25 +62,12 @@ def _render_operational_readiness_section(locale: Locale) -> None:
     layer_status = summarize_layer_status()
     ready_layers = sum(1 for layer in layer_status if layer["ready"])
     cost_summary = summarize_cost_controls()
-
-    readiness_col1, readiness_col2, readiness_col3 = st.columns(3)
-    with readiness_col1:
-        st.metric(
-            "Data Lake Layers" if is_en else "Camadas do Data Lake",
-            f"{ready_layers} / {len(layer_status)}",
-        )
-    with readiness_col2:
-        st.metric(
-            "Cost Guardrails" if is_en else "Guardrails de custo",
-            cost_summary["guardrail_count"],
-        )
-    with readiness_col3:
-        st.metric(
-            "Cloud Status" if is_en else "Status cloud",
-            "Reference only"
-            if not cost_summary["is_provisioned"]
-            else "Provisioned",
-        )
+    guardrail_count = cost_summary["guardrail_count"]
+    guardrails = cost_summary["guardrails"]
+    if not isinstance(guardrail_count, int):
+        raise TypeError("guardrail_count must be an integer")
+    if not isinstance(guardrails, list):
+        raise TypeError("guardrails must be a list")
 
     st.caption(
         "AWS is documented as a reference architecture; no cloud resources or credentials are bundled."
@@ -84,10 +76,28 @@ def _render_operational_readiness_section(locale: Locale) -> None:
     )
 
     with st.expander(
-        "Layer and cost control details"
+        "Infrastructure, layers, and cost controls"
         if is_en
-        else "Detalhes de camadas e controle de custo"
+        else "Infraestrutura, camadas e controles de custo"
     ):
+        readiness_col1, readiness_col2, readiness_col3 = st.columns(3)
+        with readiness_col1:
+            st.metric(
+                "Data Lake Layers" if is_en else "Camadas do Data Lake",
+                f"{ready_layers} / {len(layer_status)}",
+            )
+        with readiness_col2:
+            st.metric(
+                "Cost Guardrails" if is_en else "Guardrails de custo",
+                guardrail_count,
+            )
+        with readiness_col3:
+            st.metric(
+                "Cloud Status" if is_en else "Status cloud",
+                "Reference only"
+                if not cost_summary["is_provisioned"]
+                else "Provisioned",
+            )
         st.dataframe(
             pd.DataFrame(
                 [
@@ -106,7 +116,7 @@ def _render_operational_readiness_section(locale: Locale) -> None:
         st.markdown(
             "\n".join(
                 f"- `{guardrail['name']}`: {guardrail['control']}"
-                for guardrail in cost_summary["guardrails"]
+                for guardrail in guardrails
             )
         )
 
@@ -117,8 +127,73 @@ def render_executive_overview(
     risk_result: PrivacyRiskResult,
     quality_results: DataQualityResult,
     locale: Locale,
+    *,
+    business_page: StreamlitPage | None = None,
+    governance_page: StreamlitPage | None = None,
+    governance_snapshot: PublicationGovernanceSnapshot | None = None,
+    duckdb_version: str | None = None,
 ) -> None:
     is_en = locale == LOCALE_EN_US
+    snapshot = governance_snapshot or load_publication_governance_snapshot()
+
+    st.title("Governed Analytics Platform")
+    st.caption("Projeto de portfólio profissional")
+    st.markdown(
+        "Uma plataforma analítica end-to-end que transforma dados brutos em "
+        "insights de negócio com qualidade, privacidade e decisões de publicação "
+        "auditáveis."
+    )
+    st.caption(
+        "Os dados e fluxos apresentados são utilizados para fins demonstrativos "
+        "e não representam uma operação empresarial em produção."
+    )
+
+    primary_col1, primary_col2, primary_col3, primary_col4 = st.columns(4)
+    primary_col1.metric("Registros governados", f"{len(df):,}")
+    primary_col2.metric(
+        "Decisão oficial de publicação", snapshot.historical_decision
+    )
+    primary_col3.metric("Privacy controls aprovados", snapshot.privacy.display)
+    primary_col4.metric(
+        "Quality/monitoring status",
+        f"Quality: {snapshot.quality.display} | "
+        f"Monitoring: {snapshot.monitoring.display}",
+    )
+
+    st.markdown("**Fluxo de valor governado**")
+    flow_columns = st.columns(4)
+    flow_columns[0].info("Raw Data")
+    flow_columns[1].info("Quality & Privacy Controls")
+    flow_columns[2].info("Publication Gate")
+    flow_columns[3].success("Trusted Analytics")
+    st.caption(
+        "Raw Data → Quality & Privacy Controls → Publication Gate → Trusted Analytics"
+    )
+
+    if business_page is not None and governance_page is not None:
+        cta_col1, cta_col2 = st.columns(2)
+        cta_col1.page_link(
+            business_page,
+            label="Explore Business Insights",
+            icon=":material/insights:",
+            width="stretch",
+        )
+        cta_col2.page_link(
+            governance_page,
+            label="View Governance Decision",
+            icon=":material/policy:",
+            width="stretch",
+        )
+
+    st.markdown(
+        "[GitHub](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform)"
+        " · [Architecture](https://github.com/samuelmaia-analytics/"
+        "Governed-Analytics-Platform/blob/main/docs/architecture/architecture.md)"
+        " · [Case study](https://github.com/samuelmaia-analytics/"
+        "Governed-Analytics-Platform/blob/main/docs/executive/case_study.md)"
+        " · [Executive documentation](https://github.com/samuelmaia-analytics/"
+        "Governed-Analytics-Platform/blob/main/docs/executive/executive_summary.md)"
+    )
     personal_fields = int(
         classification_df["lgpd_classification"]
         .isin(["personal_data", "sensitive_personal_data"])
@@ -155,75 +230,83 @@ def render_executive_overview(
             prev["failed_rules_count"]
         )
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric(
-            "Total de Colunas" if not is_en else "Total Columns",
-            df.shape[1],
-        )
-        st.metric(
-            "Campos Pessoais / Personal Fields" if not is_en else "Personal Fields",
-            personal_fields,
-        )
-    with col2:
-        st.metric(
-            "Score de Risco LGPD" if not is_en else "LGPD Risk Score",
-            f"{risk_result['score']} / 100",
-            delta=risk_delta,
-            delta_color="inverse",
-        )
-        st.metric(
-            "Score de Qualidade" if not is_en else "Data Quality Score",
-            f"{quality_score} / 100",
-            delta=quality_delta,
-        )
-    with col3:
-        st.metric(
-            "Falhas de Qualidade" if not is_en else "Quality Failures",
-            quality_results["failed_checks_count"],
-            delta=failures_delta,
-            delta_color="inverse",
-        )
-        st.metric(
-            "Status de Governança" if not is_en else "Governance Status",
-            status,
-        )
+    freshness = _data_freshness()
+    sensitive_count = int(
+        (classification_df["lgpd_classification"] == "sensitive_personal_data").sum()
+    )
 
     st.divider()
+    with st.expander(
+        "Detailed governance metrics"
+        if is_en
+        else "Métricas detalhadas de governança",
+        expanded=False,
+    ):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric(
+                "Total de Colunas" if not is_en else "Total Columns",
+                df.shape[1],
+            )
+            st.metric(
+                "Campos Pessoais" if not is_en else "Personal Fields",
+                personal_fields,
+            )
+        with col2:
+            st.metric(
+                "Score de Risco LGPD" if not is_en else "LGPD Risk Score",
+                f"{risk_result['score']} / 100",
+                delta=risk_delta,
+                delta_color="inverse",
+            )
+            st.metric(
+                "Score de Qualidade" if not is_en else "Data Quality Score",
+                f"{quality_score} / 100",
+                delta=quality_delta,
+            )
+        with col3:
+            st.metric(
+                "Falhas de Qualidade" if not is_en else "Quality Failures",
+                quality_results["failed_checks_count"],
+                delta=failures_delta,
+                delta_color="inverse",
+            )
+            st.metric(
+                "Status de Governança" if not is_en else "Governance Status",
+                status,
+            )
 
-    extra_col1, extra_col2, extra_col3 = st.columns(3)
-    freshness = _data_freshness()
-    with extra_col1:
-        st.metric(
-            "Freshness dos Dados" if not is_en else "Data Freshness",
-            freshness
-            if freshness
-            else (
-                "N/A — pipeline não executado"
+        extra_col1, extra_col2, extra_col3 = st.columns(3)
+        with extra_col1:
+            st.metric(
+                "Freshness dos Dados" if not is_en else "Data Freshness",
+                freshness
+                if freshness
+                else (
+                    "N/A — pipeline não executado"
+                    if not is_en
+                    else "N/A — pipeline not run"
+                ),
+            )
+        with extra_col2:
+            st.metric(
+                "Colunas Suprimidas (LGPD)"
                 if not is_en
-                else "N/A — pipeline not run"
-            ),
-        )
-    with extra_col2:
-        st.metric(
-            "Colunas Suprimidas (LGPD)" if not is_en else "Suppressed Columns (LGPD)",
-            suppressed_columns,
-            help=(
-                "Colunas com ação: anonimizar, remover ou pseudonimizar."
-                if not is_en
-                else "Columns with action: anonymize, remove or pseudonymize."
-            ),
-        )
-    with extra_col3:
-        sensitive_count = int(
-            (
-                classification_df["lgpd_classification"] == "sensitive_personal_data"
-            ).sum()
-        )
-        st.metric(
-            "Dados Sensíveis" if not is_en else "Sensitive Data Columns",
-            sensitive_count,
-        )
+                else "Suppressed Columns (LGPD)",
+                suppressed_columns,
+                help=(
+                    "Colunas com ação: anonimizar, remover ou pseudonimizar."
+                    if not is_en
+                    else "Columns with action: anonymize, remove or pseudonymize."
+                ),
+            )
+        with extra_col3:
+            st.metric(
+                "Dados Sensíveis" if not is_en else "Sensitive Data Columns",
+                sensitive_count,
+            )
+        if duckdb_version is not None:
+            st.caption(f"DuckDB: {duckdb_version}")
 
     st.subheader("Resumo Executivo" if not is_en else "Executive Summary")
     risk_level = risk_result["risk_level"]
