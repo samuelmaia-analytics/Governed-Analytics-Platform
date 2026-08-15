@@ -293,12 +293,12 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
     monkeypatch,
 ) -> None:
     calls: list[tuple[str, str]] = []
-    metric_labels: list[str] = []
+    metrics: list[tuple[str, object]] = []
     page_links: list[str] = []
 
     class CapturingContainer(_FakeContainer):
-        def metric(self, label: str, *_args, **_kwargs) -> None:
-            metric_labels.append(label)
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
 
         def info(self, value: str) -> None:
             calls.append(("info", value))
@@ -318,6 +318,9 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
 
         def markdown(self, value: str) -> None:
             calls.append(("markdown", value))
+
+        def write(self, value: str) -> None:
+            calls.append(("write", value))
 
         def columns(self, count: int):  # type: ignore[no-untyped-def]
             return tuple(CapturingContainer() for _ in range(count))
@@ -387,12 +390,22 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
         for kind, value in calls
         if kind == "caption"
     )
-    assert metric_labels[:4] == [
-        "Registros governados",
-        "Decisão oficial de publicação",
-        "Privacy controls aprovados",
-        "Quality/monitoring status",
+    assert metrics[:4] == [
+        ("Registros governados", "2"),
+        ("Decisão oficial de publicação", "Approved"),
+        ("Privacy controls aprovados", "16/16 PASS"),
+        ("Quality/monitoring status", "Qualidade 24/25 · Monitoramento 12/12"),
     ]
+    assert any(
+        kind == "write"
+        and "plataforma analítica governada" in value
+        and "15/100" not in value
+        for kind, value in calls
+    )
+    assert (
+        "caption",
+        "Indicadores diagnósticos do ambiente demonstrativo.",
+    ) in calls
     assert page_links == ["Explore Business Insights", "View Governance Decision"]
     assert ("info", "Raw Data") in calls
     assert ("success", "Trusted Analytics") in calls
@@ -404,6 +417,119 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
     assert control_center_page.GOVERNANCE_LAB_NOTICE.startswith(
         "Interactive diagnostic environment"
     )
+
+
+def test_portfolio_overview_uses_demonstration_fallbacks_without_evidence(
+    monkeypatch,
+) -> None:
+    calls: list[tuple[str, str]] = []
+    metrics: list[tuple[str, object]] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
+
+    class CapturingStreamlit(CapturingContainer):
+        def caption(self, value: str) -> None:
+            calls.append(("caption", value))
+
+        def write(self, value: str) -> None:
+            calls.append(("write", value))
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def expander(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+            return CapturingContainer()
+
+    unavailable = CheckSummary(0, 0, 0, 0)
+    snapshot = PublicationGovernanceSnapshot(
+        run_id="Unavailable",
+        historical_decision="Unavailable",
+        shadow_decision="Unavailable",
+        shadow_severity="Unavailable",
+        residual_decision="Unavailable",
+        residual_severity="Unavailable",
+        inherent_score=None,
+        residual_score=None,
+        divergence_type="Unavailable",
+        sensitive_data_protected=None,
+        privacy=unavailable,
+        schema=unavailable,
+        business=unavailable,
+        quality=unavailable,
+        monitoring=unavailable,
+        execution_provenance="Unavailable",
+        content_provenance="Unavailable",
+        source_fingerprint="Unavailable",
+        published_fingerprint="Unavailable",
+    )
+    monkeypatch.setattr(executive_overview_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(
+        executive_overview_page,
+        "_render_operational_readiness_section",
+        lambda _locale: None,
+    )
+
+    executive_overview_page.render_executive_overview(  # type: ignore[arg-type]
+        df=pd.DataFrame({"value": [1, 2]}),
+        classification_df=pd.DataFrame(
+            {
+                "lgpd_classification": ["non_personal"],
+                "recommended_action": ["keep"],
+            }
+        ),
+        risk_result={
+            "score": 100,
+            "total_score": 100,
+            "risk_level": "high",
+            "explanation": "Demonstration risk fixture",
+            "summary": "Demonstration risk fixture",
+            "components": {},
+            "score_components": {},
+            "per_component_points": {},
+            "component_explanations": {},
+            "publication_recommendation": "blocked",
+            "recommendations": [],
+        },
+        quality_results={
+            "total_rows": 2,
+            "total_columns": 1,
+            "null_pct_by_column": {},
+            "columns_over_30pct_null": [],
+            "duplicate_rows": 0,
+            "dtypes": {"value": "int64"},
+            "cardinality": {"value": 2},
+            "possible_unique_keys": ["value"],
+            "constant_columns": [],
+            "checks": [],
+            "failed_checks_count": 5,
+        },
+        locale="pt-BR",
+        governance_snapshot=snapshot,
+    )
+
+    assert metrics[:4] == [
+        ("Registros governados", "2"),
+        ("Decisão oficial de publicação", "Evidência demonstrativa"),
+        ("Privacy controls aprovados", "Controles demonstrados"),
+        ("Quality/monitoring status", "Validações demonstradas"),
+    ]
+    primary_values = {str(value) for _, value in metrics[:4]}
+    assert "0/0 PASS" not in primary_values
+    assert "Unavailable" not in primary_values
+    assert "Approved" not in primary_values
+
+    headline = next(value for kind, value in calls if kind == "write")
+    assert "100/100" not in headline
+    assert "50/100" not in headline
+    assert "5 falhas" not in headline
+    assert ("Score de Risco LGPD", "100 / 100") in metrics
+    assert ("Score de Qualidade", "50 / 100") in metrics
+    assert (
+        "caption",
+        "Indicadores diagnósticos do ambiente demonstrativo.",
+    ) in calls
 
 
 def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) -> None:
