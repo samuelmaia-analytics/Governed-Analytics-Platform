@@ -18,6 +18,10 @@ from src.publication_gate import (
 from src.schema_contracts import RESULTS_PATH as SCHEMA_CONTRACT_RESULTS_PATH
 
 GOVERNANCE_HISTORY_PATH = PUBLISHED_MONITORING_DIR / "governance_history.csv"
+GOVERNANCE_LAB_NOTICE = (
+    "Interactive diagnostic environment. This page does not represent the "
+    "authoritative publication decision."
+)
 PUBLISHED_MONITORING_RESULTS_PATH = (
     PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv"
 )
@@ -387,9 +391,8 @@ def render_governance_control_center(
     locale: Locale,
 ) -> None:
     is_en = locale == LOCALE_EN_US
-    st.subheader(
-        "Governance Control Center" if is_en else "Central de Controles de Governança"
-    )
+    st.subheader("Governance Lab")
+    st.caption(GOVERNANCE_LAB_NOTICE)
     privacy_columns = classification_df["lgpd_classification"]
     personal_count = int((privacy_columns == "personal_data").sum())
     sensitive_count = int((privacy_columns == "sensitive_personal_data").sum())
