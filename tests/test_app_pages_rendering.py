@@ -136,31 +136,219 @@ def test_render_metric_cards_handles_empty_and_chunked(monkeypatch) -> None:
 
 
 def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) -> None:
-    monkeypatch.setattr(data_quality_page, "st", _FakeStreamlit())
+    titles: list[str] = []
+    markdown_calls: list[str] = []
+    captions: list[str] = []
+    metrics: list[tuple[str, object]] = []
+    bar_charts: list[pd.Series] = []
+    displayed_frames: list[pd.DataFrame] = []
+    dataframe_options: list[dict[str, object]] = []
+    expanders: list[str] = []
+    errors: list[str] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def bar_chart(self, data: pd.Series, **_kwargs) -> None:
+            bar_charts.append(data.copy())
+
+        def dataframe(
+            self, frame: pd.DataFrame, **kwargs: object
+        ) -> None:
+            displayed_frames.append(frame.copy())
+            dataframe_options.append(kwargs)
+
+        def expander(
+            self, label: str, **_kwargs
+        ) -> CapturingContainer:
+            expanders.append(label)
+            return CapturingContainer()
+
+        def error(self, value: str) -> None:
+            errors.append(value)
+
+    monkeypatch.setattr(data_quality_page, "st", CapturingStreamlit())
 
     quality_results = {
-        "total_rows": 100,
-        "total_columns": 3,
-        "null_pct_by_column": {"a": 10.0, "b": 0.0},
+        "total_rows": 112650,
+        "total_columns": 8,
+        "null_pct_by_column": {"delivery_time_days": 10.0, "revenue": 0.0},
         "columns_over_30pct_null": [],
         "duplicate_rows": 0,
-        "dtypes": {"a": "int64"},
-        "cardinality": {"a": 100},
-        "possible_unique_keys": ["a"],
+        "dtypes": {"order_id": "object"},
+        "cardinality": {"order_id": 112650},
+        "possible_unique_keys": ["order_id"],
         "constant_columns": [],
         "checks": [],
-        "failed_checks_count": 1,
+        "failed_checks_count": 5,
     }
     quality_table = pd.DataFrame(
         [
-            {"status": "PASS", "severity": "low", "check_name": "ok"},
-            {"status": "FAIL", "severity": "medium", "check_name": "warn"},
-            {"status": "FAIL", "severity": "high", "check_name": "block"},
+            {
+                "check_name": "order_id_unique",
+                "status": "PASS",
+                "severity": "low",
+                "affected_columns": ["order_id"],
+                "affected_rows": 0,
+                "recommendation": "Ensure order identifiers are unique in the analytical grain.",
+                "rule_source": "schema_contract",
+            },
+            {
+                "check_name": "delivery_time_sla",
+                "status": "WARN",
+                "severity": "low",
+                "affected_columns": ["delivery_time_days"],
+                "affected_rows": 2,
+                "recommendation": "Review delivery-time observations.",
+                "rule_source": "monitoring",
+            },
+            {
+                "check_name": "revenue_accepted_range",
+                "status": "FAIL",
+                "severity": "medium",
+                "affected_columns": ["revenue"],
+                "affected_rows": 3,
+                "recommendation": "Review outlier revenue records and business rule boundaries.",
+                "rule_source": "business_rule",
+            },
+            {
+                "check_name": "revenue_no_negative",
+                "status": "FAIL",
+                "severity": "high",
+                "affected_columns": ["revenue"],
+                "affected_rows": 1,
+                "recommendation": "Negative revenue should be justified or corrected.",
+                "rule_source": "quality_rule",
+            },
+            {
+                "check_name": "order_status_allowed_values",
+                "status": "FAIL",
+                "severity": "high",
+                "affected_columns": ["order_status"],
+                "affected_rows": 4,
+                "recommendation": "Standardize order status values according to contract.",
+                "rule_source": "schema_contract",
+            },
+            {
+                "check_name": "product_category_required",
+                "status": "FAIL",
+                "severity": "medium",
+                "affected_columns": ["product_category"],
+                "affected_rows": 6,
+                "recommendation": "Review missing product categories.",
+                "rule_source": "quality_rule",
+            },
+            {
+                "check_name": "seller_state_known",
+                "status": "FAIL",
+                "severity": "low",
+                "affected_columns": ["seller_state"],
+                "affected_rows": 1,
+                "recommendation": "Review unknown seller states.",
+                "rule_source": "quality_rule",
+            },
         ]
     )
+    original_quality_results = quality_results.copy()
+    original_quality_table = quality_table.copy(deep=True)
+
     data_quality_page.render_data_quality(
         quality_results, quality_table, locale="en-US"
     )  # type: ignore[arg-type]
+
+    assert titles == ["Qualidade dos Dados"]
+    assert any("Visão executiva" in text for text in markdown_calls)
+    assert "### Como interpretar esta página" in markdown_calls
+    assert any("dataset demonstrativo" in text for text in captions)
+    assert ("Total de validações", "7") in metrics
+    assert ("Aprovadas", "1") in metrics
+    assert ("Alertas", "1") in metrics
+    assert ("Falhas", "5") in metrics
+    assert ("Total de linhas", "112.650") in metrics
+    assert ("Total de colunas", "8") in metrics
+    assert ("Score de qualidade", "50 / 100") in metrics
+    assert errors == ["Bloqueado"]
+
+    status_chart = next(
+        chart
+        for chart in bar_charts
+        if set(chart.index) == {"APROVADO", "ALERTA", "FALHA"}
+    )
+    assert status_chart.to_dict() == {"FALHA": 5, "APROVADO": 1, "ALERTA": 1}
+    null_chart = next(chart for chart in bar_charts if "Tempo de entrega (dias)" in chart.index)
+    assert null_chart.to_dict() == {"Tempo de entrega (dias)": 10.0, "Receita": 0.0}
+
+    executive_table = next(
+        frame for frame in displayed_frames if "Validação" in frame.columns
+    )
+    assert executive_table["Validação"].tolist() == [
+        "Faixa válida de receita",
+        "Receita não negativa",
+        "Status de pedido permitido",
+        "Product category required",
+    ]
+    assert executive_table["Status"].tolist() == ["FALHA"] * 4
+    assert executive_table["Severidade"].tolist() == [
+        "MÉDIA",
+        "ALTA",
+        "ALTA",
+        "MÉDIA",
+    ]
+    assert executive_table["Colunas afetadas"].tolist() == [
+        "Receita",
+        "Receita",
+        "Status do pedido",
+        "Categoria do produto",
+    ]
+    assert executive_table["Linhas afetadas"].tolist() == [3, 1, 4, 6]
+    assert executive_table["Origem da regra"].tolist() == [
+        "business_rule",
+        "quality_rule",
+        "schema_contract",
+        "quality_rule",
+    ]
+    assert executive_table["Recomendação"].tolist()[:3] == [
+        "Revisar valores atípicos de receita e os limites definidos pelas regras de negócio.",
+        "Valores negativos de receita devem ser justificados ou corrigidos.",
+        "Padronizar os valores de status do pedido conforme o contrato de dados.",
+    ]
+    executive_index = next(
+        index
+        for index, frame in enumerate(displayed_frames)
+        if "Validação" in frame.columns
+    )
+    assert dataframe_options[executive_index]["hide_index"] is True
+
+    technical_table = next(
+        frame for frame in displayed_frames if "check_name" in frame.columns
+    )
+    pd.testing.assert_frame_equal(technical_table, original_quality_table)
+    assert "Detalhes técnicos das validações" in expanders
+    assert quality_table["status"].tolist() == [
+        "PASS",
+        "WARN",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+    ]
+    assert quality_results == original_quality_results
+    pd.testing.assert_frame_equal(quality_table, original_quality_table)
 
     no_severity_table = pd.DataFrame([{"status": "PASS"}])
     data_quality_page.render_data_quality(
