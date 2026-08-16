@@ -37,14 +37,26 @@ _COLUMN_LABELS = {
 }
 
 _CHART_COLUMN_LABELS = {
+    "estimated_delay_days": "Desvio do prazo",
+    "order_delivered_customer_date": "Data de entrega",
     "carrier_delivery_time_days": "Entrega transportadora",
-    "estimated_delivery_days": "Prazo estimado",
     "delivery_time_days": "Tempo de entrega",
-    "product_category": "Categoria produto",
-    "seller_state": "Estado seller",
-    "customer_unique_id": "Cliente",
+    "product_category_name_english": "Categoria (inglês)",
+    "product_category_name": "Categoria produto",
+    "seller_dispatch_time_days": "Despacho seller",
+    "review_score_mean": "Avaliação média",
+    "seller_avg_delivery_days": "Entrega média seller",
+    "order_id": "ID pedido",
+    "order_item_id": "Item pedido",
+    "order_month": "Mês pedido",
     "order_status": "Status pedido",
-    "revenue": "Receita",
+    "customer_unique_id": "Cliente",
+    "order_estimated_delivery_date": "Entrega estimada",
+    "order_date": "Data pedido",
+    "order_year": "Ano pedido",
+    "order_purchase_timestamp": "Data da compra",
+    "seller_order_count": "Pedidos seller",
+    "seller_volume_tier": "Faixa de volume",
 }
 
 _RECOMMENDATION_LABELS = {
@@ -91,9 +103,7 @@ def _display_column_name(value: object) -> str:
 
 def _display_chart_column_name(value: object) -> str:
     technical_name = str(value)
-    fallback = _humanize_identifier(technical_name)
-    if len(fallback) > 24:
-        fallback = f"{fallback[:23].rstrip()}…"
+    fallback = " ".join(technical_name.split("_")[:3]).capitalize()
     return _CHART_COLUMN_LABELS.get(technical_name, fallback)
 
 
@@ -235,6 +245,7 @@ def render_data_quality(
             y_label="Campo",
             horizontal=True,
             sort=False,
+            height=620,
         )
 
     status_df = quality_table["status"].value_counts().reset_index()
@@ -244,7 +255,17 @@ def render_data_quality(
             lambda value: _STATUS_LABELS.get(str(value).upper(), str(value))
         )
     )
-    st.bar_chart(display_status.set_index("status_label")["count"])
+    st.markdown("### Resultado das validações")
+    st.bar_chart(
+        display_status,
+        x="status_label",
+        y="count",
+        x_label="Quantidade",
+        y_label="Status",
+        horizontal=True,
+        sort=False,
+        height=220,
+    )
 
     st.markdown("### Validações críticas com falha")
     if {"status", "severity"}.issubset(quality_table.columns):

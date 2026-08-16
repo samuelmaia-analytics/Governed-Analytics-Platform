@@ -189,16 +189,28 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
 
     quality_results = {
         "total_rows": 112650,
-        "total_columns": 8,
+        "total_columns": 34,
         "null_pct_by_column": {
-            "carrier_delivery_time_days": 14.0,
-            "estimated_delivery_days": 12.0,
-            "delivery_time_days": 10.0,
-            "product_category": 8.0,
-            "seller_state": 6.0,
-            "customer_unique_id": 4.0,
-            "order_status": 2.0,
-            "revenue": 0.0,
+            "estimated_delay_days": 2.18,
+            "order_delivered_customer_date": 2.18,
+            "carrier_delivery_time_days": 2.18,
+            "delivery_time_days": 2.18,
+            "product_category_name_english": 1.44,
+            "product_category_name": 1.42,
+            "seller_dispatch_time_days": 1.07,
+            "review_score_mean": 0.84,
+            "seller_avg_delivery_days": 0.18,
+            "order_id": 0.0,
+            "order_item_id": 0.0,
+            "order_month": 0.0,
+            "order_status": 0.0,
+            "customer_unique_id": 0.0,
+            "order_estimated_delivery_date": 0.0,
+            "order_date": 0.0,
+            "order_year": 0.0,
+            "order_purchase_timestamp": 0.0,
+            "seller_order_count": 0.0,
+            "seller_volume_tier": 0.0,
         },
         "columns_over_30pct_null": [],
         "duplicate_rows": 0,
@@ -209,26 +221,21 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
         "checks": [],
         "failed_checks_count": 5,
     }
+    passed_checks = [
+        {
+            "check_name": f"passed_check_{index}",
+            "status": "PASS",
+            "severity": "low",
+            "affected_columns": ["order_id"],
+            "affected_rows": 0,
+            "recommendation": "No remediation required.",
+            "rule_source": "quality_rule",
+        }
+        for index in range(16)
+    ]
     quality_table = pd.DataFrame(
         [
-            {
-                "check_name": "order_id_unique",
-                "status": "PASS",
-                "severity": "low",
-                "affected_columns": ["order_id"],
-                "affected_rows": 0,
-                "recommendation": "Ensure order identifiers are unique in the analytical grain.",
-                "rule_source": "schema_contract",
-            },
-            {
-                "check_name": "delivery_time_sla",
-                "status": "WARN",
-                "severity": "low",
-                "affected_columns": ["delivery_time_days"],
-                "affected_rows": 2,
-                "recommendation": "Review delivery-time observations.",
-                "rule_source": "monitoring",
-            },
+            *passed_checks,
             {
                 "check_name": "revenue_accepted_range",
                 "status": "FAIL",
@@ -288,22 +295,33 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
     assert any("Visão executiva" in text for text in markdown_calls)
     assert "### Como interpretar esta página" in markdown_calls
     assert any("dataset demonstrativo" in text for text in captions)
-    assert ("Total de validações", "7") in metrics
-    assert ("Aprovadas", "1") in metrics
-    assert ("Alertas", "1") in metrics
+    assert ("Total de validações", "21") in metrics
+    assert ("Aprovadas", "16") in metrics
+    assert ("Alertas", "0") in metrics
     assert ("Falhas", "5") in metrics
     assert ("Total de linhas", "112.650") in metrics
-    assert ("Total de colunas", "8") in metrics
+    assert ("Total de colunas", "34") in metrics
     assert ("Score de qualidade", "50 / 100") in metrics
     assert errors == ["Bloqueado"]
 
-    status_chart = next(
-        chart
-        for chart, _kwargs in bar_charts
-        if isinstance(chart, pd.Series)
-        and set(chart.index) == {"APROVADO", "ALERTA", "FALHA"}
+    status_chart, status_chart_options = next(
+        (chart, options)
+        for chart, options in bar_charts
+        if isinstance(chart, pd.DataFrame) and "status_label" in chart.columns
     )
-    assert status_chart.to_dict() == {"FALHA": 5, "APROVADO": 1, "ALERTA": 1}
+    assert status_chart["status"].tolist() == ["PASS", "FAIL"]
+    assert status_chart["status_label"].tolist() == ["APROVADO", "FALHA"]
+    assert status_chart["count"].tolist() == [16, 5]
+    assert status_chart_options == {
+        "x": "status_label",
+        "y": "count",
+        "x_label": "Quantidade",
+        "y_label": "Status",
+        "horizontal": True,
+        "sort": False,
+        "height": 220,
+    }
+    assert "### Resultado das validações" in markdown_calls
     null_chart, null_chart_options = next(
         (chart, options)
         for chart, options in bar_charts
@@ -312,15 +330,28 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
     assert null_chart["column_name"].tolist() == list(original_null_pct)
     assert null_chart["null_pct"].tolist() == list(original_null_pct.values())
     assert null_chart["column_label"].tolist() == [
+        "Desvio do prazo",
+        "Data de entrega",
         "Entrega transportadora",
-        "Prazo estimado",
         "Tempo de entrega",
+        "Categoria (inglês)",
         "Categoria produto",
-        "Estado seller",
-        "Cliente",
+        "Despacho seller",
+        "Avaliação média",
+        "Entrega média seller",
+        "ID pedido",
+        "Item pedido",
+        "Mês pedido",
         "Status pedido",
-        "Receita",
+        "Cliente",
+        "Entrega estimada",
+        "Data pedido",
+        "Ano pedido",
+        "Data da compra",
+        "Pedidos seller",
+        "Faixa de volume",
     ]
+    assert all(not label.endswith(("...", "…")) for label in null_chart["column_label"])
     assert null_chart_options == {
         "x": "column_label",
         "y": "null_pct",
@@ -328,6 +359,7 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
         "y_label": "Campo",
         "horizontal": True,
         "sort": False,
+        "height": 620,
     }
     assert "### Percentual de valores nulos por campo" in markdown_calls
 
@@ -378,13 +410,8 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
     pd.testing.assert_frame_equal(technical_table, original_quality_table)
     assert "Detalhes técnicos das validações" in expanders
     assert quality_table["status"].tolist() == [
-        "PASS",
-        "WARN",
-        "FAIL",
-        "FAIL",
-        "FAIL",
-        "FAIL",
-        "FAIL",
+        *("PASS" for _ in range(16)),
+        *("FAIL" for _ in range(5)),
     ]
     assert quality_results == original_quality_results
     assert quality_results["null_pct_by_column"] == original_null_pct
