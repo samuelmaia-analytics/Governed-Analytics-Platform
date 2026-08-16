@@ -36,6 +36,17 @@ _COLUMN_LABELS = {
     "customer_unique_id": "Cliente",
 }
 
+_CHART_COLUMN_LABELS = {
+    "carrier_delivery_time_days": "Entrega transportadora",
+    "estimated_delivery_days": "Prazo estimado",
+    "delivery_time_days": "Tempo de entrega",
+    "product_category": "Categoria produto",
+    "seller_state": "Estado seller",
+    "customer_unique_id": "Cliente",
+    "order_status": "Status pedido",
+    "revenue": "Receita",
+}
+
 _RECOMMENDATION_LABELS = {
     "Ensure order identifiers are unique in the analytical grain.": (
         "Garantir unicidade dos identificadores de pedido na granularidade "
@@ -76,6 +87,14 @@ def _display_check_name(value: object) -> str:
 def _display_column_name(value: object) -> str:
     technical_name = str(value)
     return _COLUMN_LABELS.get(technical_name, _humanize_identifier(technical_name))
+
+
+def _display_chart_column_name(value: object) -> str:
+    technical_name = str(value)
+    fallback = _humanize_identifier(technical_name)
+    if len(fallback) > 24:
+        fallback = f"{fallback[:23].rstrip()}…"
+    return _CHART_COLUMN_LABELS.get(technical_name, fallback)
 
 
 def _display_affected_columns(value: object) -> object:
@@ -202,10 +221,21 @@ def render_data_quality(
         columns=["column_name", "null_pct"],
     ).sort_values("null_pct", ascending=False)
     if not null_profile.empty:
-        display_null_profile = null_profile.assign(
-            column_label=null_profile["column_name"].map(_display_column_name)
+        display_null_profile = null_profile.head(20).assign(
+            column_label=null_profile["column_name"].map(
+                _display_chart_column_name
+            )
         )
-        st.bar_chart(display_null_profile.set_index("column_label")["null_pct"].head(20))
+        st.markdown("### Percentual de valores nulos por campo")
+        st.bar_chart(
+            display_null_profile,
+            x="column_label",
+            y="null_pct",
+            x_label="Percentual de valores nulos",
+            y_label="Campo",
+            horizontal=True,
+            sort=False,
+        )
 
     status_df = quality_table["status"].value_counts().reset_index()
     status_df.columns = ["status", "count"]

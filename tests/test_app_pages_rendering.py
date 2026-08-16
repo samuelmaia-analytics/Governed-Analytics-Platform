@@ -140,7 +140,9 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
     markdown_calls: list[str] = []
     captions: list[str] = []
     metrics: list[tuple[str, object]] = []
-    bar_charts: list[pd.Series] = []
+    bar_charts: list[
+        tuple[pd.DataFrame | pd.Series, dict[str, object]]
+    ] = []
     displayed_frames: list[pd.DataFrame] = []
     dataframe_options: list[dict[str, object]] = []
     expanders: list[str] = []
@@ -163,8 +165,10 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
         def columns(self, count: int):  # type: ignore[no-untyped-def]
             return tuple(CapturingContainer() for _ in range(count))
 
-        def bar_chart(self, data: pd.Series, **_kwargs) -> None:
-            bar_charts.append(data.copy())
+        def bar_chart(
+            self, data: pd.DataFrame | pd.Series, **kwargs: object
+        ) -> None:
+            bar_charts.append((data.copy(), kwargs))
 
         def dataframe(
             self, frame: pd.DataFrame, **kwargs: object
@@ -186,7 +190,16 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
     quality_results = {
         "total_rows": 112650,
         "total_columns": 8,
-        "null_pct_by_column": {"delivery_time_days": 10.0, "revenue": 0.0},
+        "null_pct_by_column": {
+            "carrier_delivery_time_days": 14.0,
+            "estimated_delivery_days": 12.0,
+            "delivery_time_days": 10.0,
+            "product_category": 8.0,
+            "seller_state": 6.0,
+            "customer_unique_id": 4.0,
+            "order_status": 2.0,
+            "revenue": 0.0,
+        },
         "columns_over_30pct_null": [],
         "duplicate_rows": 0,
         "dtypes": {"order_id": "object"},
@@ -264,6 +277,7 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
         ]
     )
     original_quality_results = quality_results.copy()
+    original_null_pct = dict(quality_results["null_pct_by_column"])
     original_quality_table = quality_table.copy(deep=True)
 
     data_quality_page.render_data_quality(
@@ -285,12 +299,37 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
 
     status_chart = next(
         chart
-        for chart in bar_charts
-        if set(chart.index) == {"APROVADO", "ALERTA", "FALHA"}
+        for chart, _kwargs in bar_charts
+        if isinstance(chart, pd.Series)
+        and set(chart.index) == {"APROVADO", "ALERTA", "FALHA"}
     )
     assert status_chart.to_dict() == {"FALHA": 5, "APROVADO": 1, "ALERTA": 1}
-    null_chart = next(chart for chart in bar_charts if "Tempo de entrega (dias)" in chart.index)
-    assert null_chart.to_dict() == {"Tempo de entrega (dias)": 10.0, "Receita": 0.0}
+    null_chart, null_chart_options = next(
+        (chart, options)
+        for chart, options in bar_charts
+        if isinstance(chart, pd.DataFrame) and "column_label" in chart.columns
+    )
+    assert null_chart["column_name"].tolist() == list(original_null_pct)
+    assert null_chart["null_pct"].tolist() == list(original_null_pct.values())
+    assert null_chart["column_label"].tolist() == [
+        "Entrega transportadora",
+        "Prazo estimado",
+        "Tempo de entrega",
+        "Categoria produto",
+        "Estado seller",
+        "Cliente",
+        "Status pedido",
+        "Receita",
+    ]
+    assert null_chart_options == {
+        "x": "column_label",
+        "y": "null_pct",
+        "x_label": "Percentual de valores nulos",
+        "y_label": "Campo",
+        "horizontal": True,
+        "sort": False,
+    }
+    assert "### Percentual de valores nulos por campo" in markdown_calls
 
     executive_table = next(
         frame for frame in displayed_frames if "Validação" in frame.columns
@@ -348,6 +387,7 @@ def test_render_data_quality_covers_critical_and_noncritical_paths(monkeypatch) 
         "FAIL",
     ]
     assert quality_results == original_quality_results
+    assert quality_results["null_pct_by_column"] == original_null_pct
     pd.testing.assert_frame_equal(quality_table, original_quality_table)
 
     no_severity_table = pd.DataFrame([{"status": "PASS"}])
