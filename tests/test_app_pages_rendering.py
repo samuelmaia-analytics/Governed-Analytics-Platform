@@ -7,6 +7,7 @@ import pandas as pd
 
 import app.components.cards as cards
 import app.pages.cohort_retention as cohort_page
+import app.pages.data_catalog as data_catalog_page
 import app.pages.data_quality as data_quality_page
 import app.pages.eda as eda_page
 import app.pages.executive_overview as executive_overview_page
@@ -1557,3 +1558,281 @@ def test_load_genai_features_drops_empty_rows(tmp_path: Path, monkeypatch) -> No
     loaded = genai_page._load_genai_features()
     assert len(loaded) == 1
     assert loaded.iloc[0]["source_id"] == "phone_case_001"
+
+
+def test_render_data_catalog_with_filters_and_without_data(monkeypatch) -> None:
+    titles: list[str] = []
+    subtitles: list[str] = []
+    captions: list[str] = []
+    markdown_calls: list[str] = []
+    write_calls: list[str] = []
+    metrics: list[tuple[str, object]] = []
+    displayed_frames: list[pd.DataFrame] = []
+    dataframe_options: list[dict[str, object]] = []
+    expanders: list[str] = []
+    text_inputs: list[tuple[str, dict[str, object]]] = []
+    multiselect_calls: list[tuple[str, dict[str, object]]] = []
+    merge_calls: list[dict[str, object]] = []
+    contains_calls: list[tuple[object, dict[str, object]]] = []
+    isin_calls: list[list[object]] = []
+    search_results = iter(["", "CUSTOMER", "", ""])
+    classification_results = iter([[], [], ["indirect_identifier"], []])
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs: object) -> None:
+            metrics.append((label, value))
+
+        def dataframe(
+            self, frame: pd.DataFrame, **kwargs: object
+        ) -> None:
+            displayed_frames.append(frame.copy())
+            dataframe_options.append(kwargs)
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def subheader(self, value: str) -> None:
+            subtitles.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def write(self, value: str) -> None:
+            write_calls.append(value)
+
+        def columns(self, specification):  # type: ignore[no-untyped-def]
+            count = specification if isinstance(specification, int) else len(specification)
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def text_input(self, label: str, **kwargs: object) -> str:
+            text_inputs.append((label, kwargs))
+            return next(search_results)
+
+        def multiselect(self, label: str, **kwargs: object) -> list[str]:
+            multiselect_calls.append((label, kwargs))
+            return next(classification_results)
+
+        def expander(self, label: str, **_kwargs: object) -> CapturingContainer:
+            expanders.append(label)
+            return CapturingContainer()
+
+    original_merge = pd.DataFrame.merge
+    string_methods_type = type(pd.Series(["column"]).str)
+    original_contains = string_methods_type.contains
+    original_isin = pd.Series.isin
+
+    def capturing_merge(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        merge_calls.append(dict(kwargs))
+        return original_merge(self, *args, **kwargs)
+
+    def capturing_contains(
+        self, pattern, *args, **kwargs  # type: ignore[no-untyped-def]
+    ):
+        contains_calls.append((pattern, dict(kwargs)))
+        return original_contains(self, pattern, *args, **kwargs)
+
+    def capturing_isin(self, values):  # type: ignore[no-untyped-def]
+        isin_calls.append(list(values))
+        return original_isin(self, values)
+
+    monkeypatch.setattr(pd.DataFrame, "merge", capturing_merge)
+    monkeypatch.setattr(string_methods_type, "contains", capturing_contains)
+    monkeypatch.setattr(pd.Series, "isin", capturing_isin)
+    monkeypatch.setattr(data_catalog_page, "st", CapturingStreamlit())
+
+    df = pd.DataFrame(
+        {
+            "customer_unique_id": pd.Series(["A", "A", None], dtype="object"),
+            "PRICE": pd.Series([10, 20, 20], dtype="int64"),
+            "notes": pd.Series(["ok", None, "ok"], dtype="object"),
+            None: pd.Series([1.5, 2.5, 3.5], dtype="float64"),
+        }
+    )
+    classification_df = pd.DataFrame(
+        {
+            "column_name": ["customer_unique_id", "PRICE", "notes", None],
+            "dtype": ["object", "int64", "object", "float64"],
+            "lgpd_classification": [
+                "personal_data",
+                "non_personal",
+                "indirect_identifier",
+                "sensitive_personal_data",
+            ],
+            "risk_level": ["high", "low", "medium", "high"],
+            "recommended_action": ["mask", "keep", "review", "custom_action"],
+            "reason": ["personal", "public", "indirect", "sensitive"],
+        }
+    )
+    original_df = df.copy(deep=True)
+    original_classification_df = classification_df.copy(deep=True)
+
+    data_catalog_page.render_data_catalog(
+        df, classification_df, locale="pt-BR"  # type: ignore[arg-type]
+    )
+    data_catalog_page.render_data_catalog(
+        df, classification_df, locale="pt-BR"  # type: ignore[arg-type]
+    )
+    data_catalog_page.render_data_catalog(
+        df, classification_df, locale="pt-BR"  # type: ignore[arg-type]
+    )
+    empty_df = df.iloc[0:0].copy()
+    data_catalog_page.render_data_catalog(
+        empty_df, classification_df, locale="pt-BR"  # type: ignore[arg-type]
+    )
+
+    assert titles == ["Catálogo de Dados"] * 4
+    assert subtitles == [
+        "Inventário técnico das colunas do ativo analítico, com perfil estrutural "
+        "e classificação de governança."
+    ] * 4
+    assert (
+        "A página apresenta metadados calculados sobre o dataset ativo e consome a "
+        "classificação LGPD já produzida pelas regras de governança."
+    ) in captions
+    assert "### Como interpretar esta página" in markdown_calls
+    assert any("Cada linha representa uma coluna" in value for value in write_calls)
+    assert "### Leitura executiva" in markdown_calls
+    assert any("não é uma decisão de publicação" in value for value in captions)
+    assert metrics[:4] == [
+        ("Colunas catalogadas", "4"),
+        ("Dados pessoais", "1"),
+        ("Identificadores indiretos", "1"),
+        ("Colunas que exigem ação", "3"),
+    ]
+    assert any("**3 registros**" in value for value in markdown_calls)
+    assert any("**0 registros**" in value for value in markdown_calls)
+
+    assert text_inputs == [
+        (
+            "Buscar coluna",
+            {
+                "placeholder": "Ex.: customer_unique_id",
+                "help": "Pesquisa apenas pelo nome técnico da coluna.",
+                "key": "catalog_search",
+            },
+        )
+    ] * 4
+    assert [label for label, _kwargs in multiselect_calls] == [
+        "Classificação LGPD"
+    ] * 4
+    expected_options = [
+        "indirect_identifier",
+        "non_personal",
+        "personal_data",
+        "sensitive_personal_data",
+    ]
+    assert all(call["options"] == expected_options for _, call in multiselect_calls)
+    assert all(call["default"] == [] for _, call in multiselect_calls)
+    assert all(call["key"] == "catalog_lgpd_filter" for _, call in multiselect_calls)
+    format_func = multiselect_calls[0][1]["format_func"]
+    assert callable(format_func)
+    assert format_func("non_personal") == "Não pessoal"
+    assert format_func("indirect_identifier") == "Identificador indireto"
+    assert format_func("personal_data") == "Dado pessoal"
+    assert format_func("sensitive_personal_data") == "Dado pessoal sensível"
+
+    assert merge_calls == [
+        {"on": "column_name", "how": "left"},
+        {"on": "column_name", "how": "left"},
+        {"on": "column_name", "how": "left"},
+        {"on": "column_name", "how": "left"},
+    ]
+    assert contains_calls == [("CUSTOMER", {"case": False, "na": False})]
+    assert ["indirect_identifier"] in isin_calls
+    assert "Exibindo 4 de 4 colunas" in captions
+    assert captions.count("Exibindo 1 de 4 colunas") == 2
+
+    assert len(displayed_frames) == 8
+    executive_table = displayed_frames[0]
+    technical_table = displayed_frames[1]
+    search_executive_table = displayed_frames[2]
+    classification_executive_table = displayed_frames[4]
+    empty_executive_table = displayed_frames[6]
+    empty_technical_table = displayed_frames[7]
+
+    assert executive_table.columns.tolist() == [
+        "Coluna",
+        "Tipo",
+        "Nulos",
+        "Valores distintos",
+        "Classificação LGPD",
+        "Ação recomendada",
+    ]
+    assert executive_table["Coluna"].tolist() == df.columns.tolist()
+    assert executive_table["Tipo"].tolist() == [
+        str(dtype) for dtype in df.dtypes
+    ]
+    assert executive_table["Nulos"].tolist() == [
+        "33,33%",
+        "0,00%",
+        "33,33%",
+        "0,00%",
+    ]
+    assert executive_table["Valores distintos"].tolist() == ["2", "2", "2", "3"]
+    assert executive_table["Classificação LGPD"].tolist() == [
+        "Dado pessoal",
+        "Não pessoal",
+        "Identificador indireto",
+        "Dado pessoal sensível",
+    ]
+    assert executive_table["Ação recomendada"].tolist() == [
+        "Mascarar",
+        "Manter",
+        "Revisar",
+        "custom_action",
+    ]
+    assert technical_table.columns.tolist() == [
+        "column_name",
+        "dtype",
+        "null_pct",
+        "distinct_values",
+        "lgpd_classification",
+        "recommended_action",
+    ]
+    assert technical_table["column_name"].tolist() == df.columns.tolist()
+    assert technical_table["dtype"].tolist() == [str(dtype) for dtype in df.dtypes]
+    assert technical_table["null_pct"].tolist() == [33.33, 0.0, 33.33, 0.0]
+    assert technical_table["distinct_values"].tolist() == [2, 2, 2, 3]
+    assert technical_table["lgpd_classification"].tolist() == [
+        "personal_data",
+        "non_personal",
+        "indirect_identifier",
+        "sensitive_personal_data",
+    ]
+    assert technical_table["recommended_action"].tolist() == [
+        "mask",
+        "keep",
+        "review",
+        "custom_action",
+    ]
+    assert search_executive_table["Coluna"].tolist() == ["customer_unique_id"]
+    assert classification_executive_table["Coluna"].tolist() == ["notes"]
+    assert len(empty_executive_table) == len(df.columns)
+    assert empty_executive_table["Coluna"].tolist() == df.columns.tolist()
+    assert empty_executive_table["Nulos"].tolist() == ["—"] * len(df.columns)
+    assert empty_technical_table["null_pct"].isna().all()
+    assert empty_technical_table["distinct_values"].tolist() == [0, 0, 0, 0]
+    assert dataframe_options == [
+        {"width": "stretch", "hide_index": True}
+    ] * 8
+    assert expanders == ["Detalhes técnicos do catálogo"] * 4
+
+    pd.testing.assert_frame_equal(df, original_df)
+    pd.testing.assert_frame_equal(classification_df, original_classification_df)
+
+    source = Path(data_catalog_page.__file__).read_text(encoding="utf-8")
+    assert '"dtype": [str(dtype) for dtype in df.dtypes]' in source
+    assert '"null_pct": (df.isna().mean() * 100).round(2).values' in source
+    assert "nunique(dropna=False)" in source
+    assert 'on="column_name"' in source
+    assert 'how="left"' in source
+    assert ".str.contains(search, case=False, na=False)" in source
+    assert ".isin(selected_classifications)" in source
+    assert "groupby(" not in source
+    assert "threshold" not in source.lower()
+    assert ".head(" not in source
+    assert "classify_dataframe_columns" not in source
