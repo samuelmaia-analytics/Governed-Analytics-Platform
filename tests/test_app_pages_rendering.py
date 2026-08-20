@@ -1242,22 +1242,290 @@ def test_render_seller_performance_with_and_without_data(monkeypatch) -> None:
 
 
 def test_render_cohort_retention_with_and_without_data(monkeypatch) -> None:
-    monkeypatch.setattr(cohort_page, "st", _FakeStreamlit())
-    monkeypatch.setattr(cohort_page, "px", _FakePlotlyExpress())
+    titles: list[str] = []
+    subtitles: list[str] = []
+    captions: list[str] = []
+    markdown_calls: list[str] = []
+    write_calls: list[str] = []
+    metrics: list[tuple[str, object]] = []
+    tabs: list[str] = []
+    plot_calls: list[object] = []
+    displayed_frames: list[pd.DataFrame] = []
+    dataframe_options: list[dict[str, object]] = []
+    expanders: list[str] = []
+    infos: list[str] = []
+    imshow_frames: list[pd.DataFrame] = []
+    imshow_options: list[dict[str, object]] = []
+    merge_calls: list[dict[str, object]] = []
+    pivot_calls: list[dict[str, object]] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def subheader(self, value: str) -> None:
+            subtitles.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def write(self, value: str) -> None:
+            write_calls.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def tabs(self, tab_names):  # type: ignore[no-untyped-def]
+            tabs.extend(tab_names)
+            return tuple(CapturingContainer() for _ in tab_names)
+
+        def plotly_chart(self, figure: object, **_kwargs) -> None:
+            plot_calls.append(figure)
+
+        def dataframe(self, frame: pd.DataFrame, **kwargs: object) -> None:
+            displayed_frames.append(frame.copy())
+            dataframe_options.append(kwargs)
+
+        def expander(self, label: str, **_kwargs):  # type: ignore[no-untyped-def]
+            expanders.append(label)
+            return self
+
+        def info(self, value: str) -> None:
+            infos.append(value)
+
+        def selectbox(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+            raise AssertionError("Customer Retention must not introduce filters")
+
+    class CapturingFigure:
+        def __init__(self) -> None:
+            self.trace_updates: list[dict[str, object]] = []
+            self.xaxis_updates: list[dict[str, object]] = []
+            self.yaxis_updates: list[dict[str, object]] = []
+
+        def update_traces(self, **kwargs: object) -> None:
+            self.trace_updates.append(kwargs)
+
+        def update_xaxes(self, **kwargs: object) -> None:
+            self.xaxis_updates.append(kwargs)
+
+        def update_yaxes(self, **kwargs: object) -> None:
+            self.yaxis_updates.append(kwargs)
+
+    figures: list[CapturingFigure] = []
+
+    class CapturingPlotlyExpress:
+        @staticmethod
+        def imshow(frame: pd.DataFrame, **kwargs: object) -> CapturingFigure:
+            imshow_frames.append(frame.copy())
+            imshow_options.append(kwargs)
+            figure = CapturingFigure()
+            figures.append(figure)
+            return figure
+
+    original_merge = pd.DataFrame.merge
+    original_pivot_table = pd.DataFrame.pivot_table
+
+    def capturing_merge(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        merge_calls.append(dict(kwargs))
+        return original_merge(self, *args, **kwargs)
+
+    def capturing_pivot_table(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+        pivot_calls.append(dict(kwargs))
+        return original_pivot_table(self, *args, **kwargs)
+
+    monkeypatch.setattr(pd.DataFrame, "merge", capturing_merge)
+    monkeypatch.setattr(pd.DataFrame, "pivot_table", capturing_pivot_table)
+    monkeypatch.setattr(cohort_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(cohort_page, "px", CapturingPlotlyExpress())
 
     cohort_df = pd.DataFrame(
         {
-            "purchase_cohort_month": ["2024-01", "2024-01", "2024-02"],
-            "cohort_order_month_number": [0, 1, 0],
-            "customers": [100, 45, 80],
-            "avg_ticket": [120.0, 115.0, 130.0],
+            "purchase_cohort_month": [
+                "2024-01",
+                "2024-01",
+                "2024-02",
+                "2024-02",
+                "2024-03",
+            ],
+            "cohort_order_month_number": [0, 1, 0, 1, 1],
+            "customers": [100, 45, 0, 10, 5],
+            "avg_ticket": [120.0, 115.0, 130.0, 125.0, 140.0],
         }
     )
+    original = cohort_df.copy(deep=True)
     monkeypatch.setattr(cohort_page, "_load_cohort_slice", lambda: cohort_df.copy())
     cohort_page.render_cohort_retention(locale="pt-BR")  # type: ignore[arg-type]
 
+    assert titles == ["Retenção de Clientes"]
+    assert subtitles == [
+        "Análise por cohorts para acompanhar a permanência de clientes ao longo "
+        "dos meses após a primeira compra."
+    ]
+    assert (
+        "A retenção compara, em cada cohort, a quantidade de clientes de cada mês "
+        "relativo com o volume do mês inicial."
+    ) in captions
+    assert "### Como interpretar esta página" in markdown_calls
+    assert any("O Mês 0 é o baseline" in value for value in write_calls)
+    assert (
+        "**Retenção = clientes no mês relativo ÷ clientes do Mês 0 × 100**"
+        in markdown_calls
+    )
+    assert metrics == [
+        ("Cohorts analisados", "1"),
+        ("Período analisado", "2024-01 a 2024-03"),
+        ("Meses relativos observados", "2"),
+        ("Células com retenção calculável", "2"),
+    ]
+    assert "### Leitura executiva" in markdown_calls
+    assert tabs == ["Retenção", "Ticket médio"]
+    assert len(plot_calls) == 2
+
+    assert merge_calls == [{"on": "purchase_cohort_month", "how": "left"}]
+    assert [call["aggfunc"] for call in pivot_calls] == ["mean", "mean"]
+    assert [call["values"] for call in pivot_calls] == [
+        "retention_rate",
+        "avg_ticket",
+    ]
+    assert all(call["index"] == "purchase_cohort_month" for call in pivot_calls)
+    assert all(
+        call["columns"] == "cohort_order_month_number" for call in pivot_calls
+    )
+
+    expected_retention_pivot = pd.DataFrame(
+        [[100.0, 45.0]],
+        index=pd.Index(["2024-01"], name="purchase_cohort_month"),
+        columns=pd.Index([0, 1], name="cohort_order_month_number"),
+    )
+    pd.testing.assert_frame_equal(
+        imshow_frames[0], expected_retention_pivot, check_dtype=False
+    )
+    expected_ticket_pivot = pd.DataFrame(
+        [[120.0, 115.0], [130.0, 125.0], [float("nan"), 140.0]],
+        index=pd.Index(
+            ["2024-01", "2024-02", "2024-03"],
+            name="purchase_cohort_month",
+        ),
+        columns=pd.Index([0, 1], name="cohort_order_month_number"),
+    )
+    pd.testing.assert_frame_equal(
+        imshow_frames[1], expected_ticket_pivot, check_dtype=False
+    )
+    assert imshow_options[0] == {
+        "text_auto": False,
+        "aspect": "auto",
+        "color_continuous_scale": "Teal",
+        "title": "Matriz de retenção por cohort (%)",
+        "labels": {
+            "x": "Meses desde a primeira compra",
+            "y": "Cohort de compra",
+            "color": "Retenção (%)",
+        },
+    }
+    assert imshow_options[1] == {
+        "text_auto": False,
+        "aspect": "auto",
+        "color_continuous_scale": "Blues",
+        "title": "Ticket médio por cohort",
+        "labels": {
+            "x": "Meses desde a primeira compra",
+            "y": "Cohort de compra",
+            "color": "Ticket médio",
+        },
+    }
+    assert figures[0].trace_updates[0]["text"].tolist() == [
+        ["100,0%", "45,0%"]
+    ]
+    assert figures[1].trace_updates[0]["text"].tolist() == [
+        ["R$ 120,00", "R$ 115,00"],
+        ["R$ 130,00", "R$ 125,00"],
+        ["—", "R$ 140,00"],
+    ]
+    assert figures[0].xaxis_updates[0]["ticktext"] == ["Mês 0", "Mês 1"]
+    assert figures[1].xaxis_updates[0]["ticktext"] == ["Mês 0", "Mês 1"]
+    assert imshow_frames[0].columns.tolist() == [0, 1]
+    assert imshow_frames[1].columns.tolist() == [0, 1]
+
+    assert len(displayed_frames) == 2
+    executive_table, technical_table = displayed_frames
+    assert executive_table.columns.tolist() == [
+        "Cohort",
+        "Mês relativo",
+        "Clientes",
+        "Retenção",
+        "Ticket médio",
+    ]
+    assert len(executive_table) == len(cohort_df)
+    assert executive_table["Cohort"].tolist() == [
+        "2024-01",
+        "2024-01",
+        "2024-02",
+        "2024-02",
+        "2024-03",
+    ]
+    assert executive_table["Mês relativo"].tolist() == [
+        "Mês 0",
+        "Mês 1",
+        "Mês 0",
+        "Mês 1",
+        "Mês 1",
+    ]
+    assert executive_table["Clientes"].tolist() == ["100", "45", "0", "10", "5"]
+    assert executive_table["Retenção"].tolist() == [
+        "100,0%",
+        "45,0%",
+        "—",
+        "—",
+        "—",
+    ]
+    assert executive_table["Ticket médio"].tolist() == [
+        "R$ 120,00",
+        "R$ 115,00",
+        "R$ 130,00",
+        "R$ 125,00",
+        "R$ 140,00",
+    ]
+    assert dataframe_options == [
+        {"width": "stretch", "hide_index": True},
+        {"width": "stretch", "hide_index": True},
+    ]
+
+    assert expanders == ["Detalhes técnicos da retenção"]
+    assert technical_table.columns.tolist() == [
+        "purchase_cohort_month",
+        "cohort_order_month_number",
+        "customers",
+        "baseline_customers",
+        "retention_rate",
+        "avg_ticket",
+    ]
+    assert technical_table["cohort_order_month_number"].tolist() == [0, 1, 0, 1, 1]
+    assert technical_table["baseline_customers"].iloc[:4].tolist() == [100, 100, 0, 0]
+    assert pd.isna(technical_table["baseline_customers"].iloc[4])
+    assert technical_table["retention_rate"].iloc[:2].tolist() == [100.0, 45.0]
+    assert technical_table["retention_rate"].iloc[2:].isna().all()
+    assert any("identificadores e cálculos" in value for value in captions)
+    pd.testing.assert_frame_equal(cohort_df, original)
+
     monkeypatch.setattr(cohort_page, "_load_cohort_slice", lambda: pd.DataFrame())
-    cohort_page.render_cohort_retention(locale="en-US")  # type: ignore[arg-type]
+    cohort_page.render_cohort_retention(locale="pt-BR")  # type: ignore[arg-type]
+    monkeypatch.setattr(
+        cohort_page,
+        "_load_cohort_slice",
+        lambda: pd.DataFrame({"purchase_cohort_month": ["2024-01"]}),
+    )
+    cohort_page.render_cohort_retention(locale="pt-BR")  # type: ignore[arg-type]
+    assert infos == [
+        "Dados de retenção não disponíveis neste ambiente.",
+        "Dados de retenção não disponíveis neste ambiente.",
+    ]
 
 
 def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
