@@ -883,14 +883,185 @@ def test_render_executive_overview_and_governance_report(
         locale="pt-BR",
     )
 
-    monkeypatch.setattr(governance_report_page, "st", _FakeStreamlit())
+    titles: list[str] = []
+    subtitles: list[str] = []
+    captions: list[str] = []
+    markdown_calls: list[str] = []
+    write_calls: list[str] = []
+    info_calls: list[str] = []
+    metrics: list[tuple[str, object]] = []
+    tab_groups: list[list[str]] = []
+    expanders: list[str] = []
+    code_calls: list[tuple[str, dict[str, object]]] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs: object) -> None:
+            metrics.append((label, value))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def subheader(self, value: str) -> None:
+            subtitles.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def write(self, value: str) -> None:
+            write_calls.append(value)
+
+        def info(self, value: str) -> None:
+            info_calls.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def tabs(self, tab_names):  # type: ignore[no-untyped-def]
+            tab_groups.append(list(tab_names))
+            return tuple(CapturingContainer() for _ in tab_names)
+
+        def expander(
+            self, label: str, **_kwargs: object
+        ) -> CapturingContainer:
+            expanders.append(label)
+            return CapturingContainer()
+
+        def code(self, value: str, **kwargs: object) -> None:
+            code_calls.append((value, kwargs))
+
+    monkeypatch.setattr(governance_report_page, "st", CapturingStreamlit())
     existing = tmp_path / "existing.md"
-    existing.write_text("# report", encoding="utf-8")
+    existing_content = "# report\n\nPersisted evidence."
+    existing.write_text(existing_content, encoding="utf-8")
+    existing_mtime = existing.stat().st_mtime_ns
+    empty = tmp_path / "empty.md"
+    empty.write_text("", encoding="utf-8")
+    empty_mtime = empty.stat().st_mtime_ns
     missing = tmp_path / "missing.md"
+    report_paths = {
+        "data_dictionary": existing,
+        "data_quality_report": missing,
+        "lgpd_controls": empty,
+    }
+    original_report_paths = report_paths.copy()
+
     governance_report_page.render_governance_report(
-        {"existing": existing, "missing": missing},
+        report_paths,
+        locale="pt-BR",  # type: ignore[arg-type]
+    )
+    governance_report_page.render_governance_report(
+        report_paths,
         locale="en-US",  # type: ignore[arg-type]
     )
+    governance_report_page.render_governance_report(
+        {},
+        locale="pt-BR",  # type: ignore[arg-type]
+    )
+
+    assert report_paths == original_report_paths
+    assert list(report_paths) == [
+        "data_dictionary",
+        "data_quality_report",
+        "lgpd_controls",
+    ]
+    assert existing.is_file()
+    assert empty.is_file()
+    assert not missing.exists()
+    assert existing.read_text(encoding="utf-8") == existing_content
+    assert empty.read_text(encoding="utf-8") == ""
+    assert existing.stat().st_mtime_ns == existing_mtime
+    assert empty.stat().st_mtime_ns == empty_mtime
+
+    assert titles == [
+        "Evidências de Governança",
+        "Governance Evidence",
+        "Evidências de Governança",
+    ]
+    assert subtitles == [
+        "Artefatos persistidos que documentam estrutura dos dados, controles "
+        "de privacidade, qualidade e avaliação demonstrativa de riscos.",
+        "Persisted artifacts documenting data structure, privacy controls, "
+        "quality, and demonstrative risk assessment.",
+        "Artefatos persistidos que documentam estrutura dos dados, controles "
+        "de privacidade, qualidade e avaliação demonstrativa de riscos.",
+    ]
+    assert tab_groups == [
+        ["Resumo", "Evidências", "Detalhes técnicos"],
+        ["Summary", "Evidence", "Technical details"],
+    ]
+    assert metrics == [
+        ("Evidências esperadas", "3"),
+        ("Disponíveis", "2"),
+        ("Ausentes", "1"),
+        ("Expected evidence", "3"),
+        ("Available", "2"),
+        ("Missing", "1"),
+    ]
+    assert "### Como interpretar esta página" in markdown_calls
+    assert "### How to interpret this page" in markdown_calls
+    assert "### Leitura executiva" in markdown_calls
+    assert "### Executive summary" in markdown_calls
+    assert markdown_calls.count(existing_content) == 2
+    assert markdown_calls.count("") == 2
+    assert code_calls == [
+        (existing_content, {"language": "markdown"}),
+        ("", {"language": "markdown"}),
+        (existing_content, {"language": "markdown"}),
+        ("", {"language": "markdown"}),
+    ]
+
+    expected_pt_expanders = [
+        ":material/description: Dicionário de Dados",
+        ":material/description: Controles LGPD",
+        ":material/description: Qualidade de Dados",
+        ":material/code: Dicionário de Dados — `data_dictionary`",
+        ":material/code: Controles LGPD — `lgpd_controls`",
+        ":material/code: Qualidade de Dados — `data_quality_report`",
+    ]
+    expected_en_expanders = [
+        ":material/description: Data Dictionary",
+        ":material/description: LGPD Controls",
+        ":material/description: Data Quality",
+        ":material/code: Data Dictionary — `data_dictionary`",
+        ":material/code: LGPD Controls — `lgpd_controls`",
+        ":material/code: Data Quality — `data_quality_report`",
+    ]
+    assert expanders[:6] == expected_pt_expanders
+    assert expanders[6:] == expected_en_expanders
+    assert any(f"`{existing}`" in caption for caption in captions)
+    assert any(f"`{empty}`" in caption for caption in captions)
+    assert any(f"`{missing}`" in caption for caption in captions)
+    assert any("`data_dictionary`" in caption for caption in captions)
+    assert any("`lgpd_controls`" in caption for caption in captions)
+    assert any("`data_quality_report`" in caption for caption in captions)
+
+    assert "Disponível — o path configurado existe." in info_calls
+    assert "Available — the configured path exists." in info_calls
+    assert "Não persistido" in info_calls
+    assert "Not persisted" in info_calls
+    assert "Artefato persistido sem conteúdo textual." in info_calls
+    assert "Persisted artifact with no textual content." in info_calls
+    assert (
+        "Nenhuma evidência de governança foi configurada para este contexto."
+        in info_calls
+    )
+    presentation_text = " ".join([*captions, *write_calls, *info_calls])
+    assert "PASS" not in presentation_text
+    assert "FAIL" not in presentation_text
+
+    page_source = Path(governance_report_page.__file__).read_text(encoding="utf-8")
+    assert "path.exists()" in page_source
+    assert 'path.read_text(encoding="utf-8")' in page_source
+    assert 'st.code(contents[name], language="markdown")' in page_source
+    assert ".write_text(" not in page_source
+    assert ".write_bytes(" not in page_source
+    assert "hash" not in page_source.lower()
+    assert "checksum" not in page_source.lower()
+    assert "md5" not in page_source.lower()
 
 
 def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
