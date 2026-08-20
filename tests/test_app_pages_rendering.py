@@ -1046,27 +1046,199 @@ def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) 
 
 
 def test_render_seller_performance_with_and_without_data(monkeypatch) -> None:
-    monkeypatch.setattr(seller_page, "st", _FakeStreamlit())
-    monkeypatch.setattr(seller_page, "px", _FakePlotlyExpress())
+    titles: list[str] = []
+    markdown_calls: list[str] = []
+    captions: list[str] = []
+    metrics: list[tuple[str, object]] = []
+    selectbox_calls: list[dict[str, object]] = []
+    plot_calls: list[tuple[pd.DataFrame, dict[str, object]]] = []
+    displayed_frames: list[pd.DataFrame] = []
+    dataframe_options: list[dict[str, object]] = []
+    expanders: list[str] = []
+    infos: list[str] = []
 
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
+
+        def selectbox(self, label: str, **kwargs: object):  # type: ignore[no-untyped-def]
+            options = list(kwargs["options"])  # type: ignore[arg-type]
+            format_func = kwargs.get("format_func")
+            visual_options = (
+                [format_func(option) for option in options]  # type: ignore[operator]
+                if format_func is not None
+                else options
+            )
+            selectbox_calls.append(
+                {
+                    "label": label,
+                    "options": options,
+                    "visual_options": visual_options,
+                    "key": kwargs.get("key"),
+                }
+            )
+            return options[0]
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def dataframe(self, frame: pd.DataFrame, **kwargs: object) -> None:
+            displayed_frames.append(frame.copy())
+            dataframe_options.append(kwargs)
+
+        def expander(self, label: str, **_kwargs):  # type: ignore[no-untyped-def]
+            expanders.append(label)
+            return self
+
+        def info(self, value: str) -> None:
+            infos.append(value)
+
+    class CapturingPlotlyExpress(_FakePlotlyExpress):
+        @staticmethod
+        def bar(frame: pd.DataFrame, **kwargs: object) -> _FakeFigure:
+            plot_calls.append((frame.copy(), kwargs))
+            return _FakeFigure()
+
+    seller_count = 22
     seller_df = pd.DataFrame(
         {
-            "seller_key": ["s1", "s2"],
-            "seller_state": ["SP", "RJ"],
-            "seller_volume_tier": ["core", "core"],
-            "total_items": [100, 80],
-            "seller_order_count": [90, 70],
-            "avg_ticket": [120.0, 140.0],
-            "avg_delivery_time_days": [10.0, 12.0],
-            "delay_rate": [0.05, 0.08],
-            "avg_review_score": [4.2, 4.0],
+            "seller_key": [
+                f"seller_id_{index:016x}" for index in range(1, seller_count + 1)
+            ],
+            "seller_state": ["SP" if index % 2 else "RJ" for index in range(1, 23)],
+            "seller_volume_tier": [
+                ["long_tail", "scaled", "core", "strategic"][(index - 1) % 4]
+                for index in range(1, 23)
+            ],
+            "total_items": list(range(101, 123)),
+            "seller_order_count": list(range(1, 23)),
+            "avg_ticket": [100.0] * seller_count,
+            "avg_delivery_time_days": [5.0 + index for index in range(1, 23)],
+            "delay_rate": [index / 100 for index in range(1, 23)],
+            "avg_review_score": [4.0 + index / 100 for index in range(1, 23)],
         }
     )
+    original = seller_df.copy(deep=True)
+    monkeypatch.setattr(seller_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(seller_page, "px", CapturingPlotlyExpress())
     monkeypatch.setattr(seller_page, "_load_seller_slice", lambda: seller_df.copy())
+
     seller_page.render_seller_performance(locale="pt-BR")  # type: ignore[arg-type]
+
+    assert titles == ["Desempenho de Sellers"]
+    assert any("Visão de volume" in value for value in markdown_calls)
+    assert "### Como interpretar esta página" in markdown_calls
+    assert "### Leitura executiva" in markdown_calls
+    assert any("dataset" not in value.lower() for value in captions)
+    assert metrics == [
+        ("Sellers ativos", "22"),
+        ("Pedidos", "253"),
+        ("Taxa média de atraso", "11,5%"),
+        ("Tempo médio de entrega", "16,5 dias"),
+    ]
+
+    assert selectbox_calls == [
+        {
+            "label": "Faixa de volume",
+            "options": ["all", "core", "long_tail", "scaled", "strategic"],
+            "visual_options": [
+                "Todos",
+                "Core",
+                "Cauda longa",
+                "Em escala",
+                "Estratégico",
+            ],
+            "key": "seller_perf_tier_filter",
+        },
+        {
+            "label": "Estado",
+            "options": ["all", "RJ", "SP"],
+            "visual_options": ["Todos", "RJ", "SP"],
+            "key": "seller_perf_state_filter",
+        },
+    ]
+
+    tier_frame, tier_options = plot_calls[0]
+    expected_tier = (
+        original["seller_volume_tier"]
+        .value_counts(dropna=False)
+        .rename_axis("seller_volume_tier")
+        .reset_index(name="count")
+    )
+    pd.testing.assert_frame_equal(
+        tier_frame[["seller_volume_tier", "count"]], expected_tier
+    )
+    assert tier_options["orientation"] == "h"
+    assert set(tier_frame["tier_label"]) == {
+        "Cauda longa",
+        "Em escala",
+        "Core",
+        "Estratégico",
+    }
+
+    sla_frame, sla_options = plot_calls[1]
+    expected_sla = (
+        original.groupby("seller_volume_tier", dropna=False)
+        .agg(
+            avg_delay_rate=("delay_rate", "mean"),
+            avg_delivery_days=("avg_delivery_time_days", "mean"),
+        )
+        .reset_index()
+    )
+    expected_sla["avg_delay_rate"] = expected_sla["avg_delay_rate"] * 100
+    pd.testing.assert_frame_equal(
+        sla_frame[
+            ["seller_volume_tier", "avg_delay_rate", "avg_delivery_days"]
+        ],
+        expected_sla,
+    )
+    assert sla_options["orientation"] == "h"
+
+    assert len(displayed_frames) == 2
+    executive_ranking, technical_ranking = displayed_frames
+    assert dataframe_options == [
+        {"width": "stretch", "hide_index": True},
+        {"width": "stretch", "hide_index": True},
+    ]
+    assert expanders == ["Detalhes técnicos dos sellers"]
+    assert len(executive_ranking) == 20
+    assert len(technical_ranking) == 20
+    expected_revenue = (
+        pd.to_numeric(technical_ranking["avg_ticket"], errors="coerce").fillna(0)
+        * pd.to_numeric(
+            technical_ranking["seller_order_count"], errors="coerce"
+        ).fillna(0)
+    )
+    pd.testing.assert_series_equal(
+        technical_ranking["estimated_revenue"],
+        expected_revenue,
+        check_names=False,
+    )
+    assert technical_ranking["estimated_revenue"].is_monotonic_decreasing
+    assert technical_ranking["seller_key"].tolist() == [
+        f"seller_id_{index:016x}" for index in range(22, 2, -1)
+    ]
+    assert executive_ranking["Seller"].tolist() == [
+        f"Seller • {value[-8:]}" for value in technical_ranking["seller_key"]
+    ]
+    assert executive_ranking["Ticket médio"].str.startswith("R$ ").all()
+    assert executive_ranking["Taxa de atraso"].str.endswith("%").all()
+    assert executive_ranking["Entrega média"].str.endswith(" dias").all()
+    pd.testing.assert_frame_equal(seller_df, original)
 
     monkeypatch.setattr(seller_page, "_load_seller_slice", lambda: pd.DataFrame())
     seller_page.render_seller_performance(locale="en-US")  # type: ignore[arg-type]
+    assert infos == ["Dados de sellers não disponíveis neste ambiente."]
 
 
 def test_render_cohort_retention_with_and_without_data(monkeypatch) -> None:
