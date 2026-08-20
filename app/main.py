@@ -189,7 +189,7 @@ def main() -> None:
             lambda: _render_eda_page(context, locale),
             title="Technical Analysis",
             icon=":material/monitoring:",
-            url_path="eda",
+            url_path="technical-analysis",
         ),
         st.Page(
             lambda: _render_report_page(context, locale),
