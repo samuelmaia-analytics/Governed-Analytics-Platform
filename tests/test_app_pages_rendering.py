@@ -549,16 +549,284 @@ def test_render_lgpd_privacy_risk_with_and_without_metadata(monkeypatch) -> None
 
 
 def test_render_eda_with_empty_and_non_empty_profiles(monkeypatch) -> None:
-    monkeypatch.setattr(eda_page, "st", _FakeStreamlit())
-    monkeypatch.setattr(eda_page, "px", _FakePlotlyExpress())
+    titles: list[str] = []
+    subtitles: list[str] = []
+    captions: list[str] = []
+    markdown_calls: list[str] = []
+    write_calls: list[str] = []
+    info_calls: list[str] = []
+    metrics: list[tuple[str, object]] = []
+    displayed_frames: list[pd.DataFrame] = []
+    dataframe_options: list[dict[str, object]] = []
+    tab_groups: list[list[str]] = []
+    expanders: list[str] = []
+    selectbox_calls: list[tuple[str, dict[str, object]]] = []
+    slider_calls: list[tuple[str, dict[str, object]]] = []
+    histogram_calls: list[tuple[pd.DataFrame, dict[str, object]]] = []
+    box_calls: list[tuple[pd.DataFrame, dict[str, object]]] = []
+    bar_calls: list[tuple[pd.DataFrame, dict[str, object]]] = []
+    imshow_calls: list[tuple[pd.DataFrame, dict[str, object]]] = []
+    selected_columns = iter(["value", "category", "event_time", "category"])
 
-    df = pd.DataFrame({"category": ["a", "b"], "value": [10, 20]})
-    eda_page.render_eda(df, locale="en-US")  # type: ignore[arg-type]
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs: object) -> None:
+            metrics.append((label, value))
 
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def subheader(self, value: str) -> None:
+            subtitles.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def write(self, value: str) -> None:
+            write_calls.append(value)
+
+        def info(self, value: str) -> None:
+            info_calls.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def dataframe(
+            self, frame: pd.DataFrame, **kwargs: object
+        ) -> None:
+            displayed_frames.append(frame.copy())
+            dataframe_options.append(kwargs)
+
+        def tabs(self, tab_names):  # type: ignore[no-untyped-def]
+            tab_groups.append(list(tab_names))
+            return tuple(CapturingContainer() for _ in tab_names)
+
+        def expander(self, label: str, **_kwargs: object) -> CapturingContainer:
+            expanders.append(label)
+            return CapturingContainer()
+
+        def selectbox(self, label: str, **kwargs: object) -> str:
+            selectbox_calls.append((label, kwargs))
+            return next(selected_columns)
+
+        def slider(self, label: str, **kwargs: object) -> int:
+            slider_calls.append((label, kwargs))
+            return int(kwargs["value"])
+
+    class CapturingPlotlyExpress:
+        @staticmethod
+        def imshow(frame: pd.DataFrame, **kwargs: object) -> _FakeFigure:
+            imshow_calls.append((frame.copy(), kwargs))
+            return _FakeFigure()
+
+        @staticmethod
+        def histogram(frame: pd.DataFrame, **kwargs: object) -> _FakeFigure:
+            histogram_calls.append((frame.copy(), kwargs))
+            return _FakeFigure()
+
+        @staticmethod
+        def box(frame: pd.DataFrame, **kwargs: object) -> _FakeFigure:
+            box_calls.append((frame.copy(), kwargs))
+            return _FakeFigure()
+
+        @staticmethod
+        def bar(frame: pd.DataFrame, **kwargs: object) -> _FakeFigure:
+            bar_calls.append((frame.copy(), kwargs))
+            return _FakeFigure()
+
+    df = pd.DataFrame(
+        {
+            "category": ["a", "b", "c", "d", "e", "f", "a", "b", None, "a"],
+            "value": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, None, 100.0],
+            "value_two": [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 200.0],
+            "event_time": pd.date_range("2026-01-01", periods=10),
+        }
+    )
+    original_df = df.copy(deep=True)
+
+    helper_names = [
+        "generate_storytelling_insights",
+        "descriptive_statistics",
+        "dtype_distribution",
+        "top_categories",
+        "null_profile",
+        "detect_outliers_iqr",
+        "correlation_matrix",
+        "run_statistical_tests",
+    ]
+    original_helpers = {name: getattr(eda_page, name) for name in helper_names}
+    helper_calls: dict[str, list[object]] = {name: [] for name in helper_names}
+
+    expected_descriptive = original_helpers["descriptive_statistics"](df)
+    expected_dtypes = original_helpers["dtype_distribution"](df)
+    expected_categories = original_helpers["top_categories"](df)
+    expected_nulls = original_helpers["null_profile"](df)
+    expected_outliers = original_helpers["detect_outliers_iqr"](df)
+    expected_correlation = original_helpers["correlation_matrix"](df)
+    expected_tests = original_helpers["run_statistical_tests"](df)
+
+    def capture_helper(name):  # type: ignore[no-untyped-def]
+        helper = original_helpers[name]
+
+        def wrapped(in_df):  # type: ignore[no-untyped-def]
+            result = helper(in_df)
+            helper_calls[name].append(
+                result.copy() if isinstance(result, pd.DataFrame) else list(result)
+            )
+            return result
+
+        return wrapped
+
+    for helper_name in helper_names:
+        monkeypatch.setattr(eda_page, helper_name, capture_helper(helper_name))
+
+    monkeypatch.setattr(eda_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(eda_page, "px", CapturingPlotlyExpress())
+
+    eda_page.render_eda(df, locale="pt-BR")  # type: ignore[arg-type]
+    eda_page.render_eda(df, locale="pt-BR")  # type: ignore[arg-type]
+    eda_page.render_eda(df, locale="pt-BR")  # type: ignore[arg-type]
+
+    for helper_name in helper_names:
+        assert len(helper_calls[helper_name]) == 3
+
+    pd.testing.assert_frame_equal(
+        helper_calls["descriptive_statistics"][0], expected_descriptive
+    )
+    pd.testing.assert_frame_equal(helper_calls["dtype_distribution"][0], expected_dtypes)
+    pd.testing.assert_frame_equal(helper_calls["top_categories"][0], expected_categories)
+    pd.testing.assert_frame_equal(helper_calls["null_profile"][0], expected_nulls)
+    pd.testing.assert_frame_equal(helper_calls["detect_outliers_iqr"][0], expected_outliers)
+    pd.testing.assert_frame_equal(
+        helper_calls["correlation_matrix"][0], expected_correlation
+    )
+    pd.testing.assert_frame_equal(helper_calls["run_statistical_tests"][0], expected_tests)
+
+    assert titles == ["Análise Técnica dos Dados"] * 3
+    assert subtitles == [
+        "Diagnóstico exploratório do ativo analítico para compreender estrutura, "
+        "distribuição, ausência de valores, outliers e relações entre variáveis."
+    ] * 3
+    assert any("não representam, por si só, decisões de negócio" in text for text in captions)
+    assert "### Como interpretar esta página" in markdown_calls
+    assert "### Leitura técnica" in markdown_calls
+    assert any("Cada resultado deve ser interpretado" in text for text in write_calls)
+    assert metrics[:4] == [
+        ("Registros", "10"),
+        ("Colunas", "4"),
+        ("Colunas numéricas", "2"),
+        ("Colunas com nulos", "2"),
+    ]
+    assert ["Visão Geral", "Análise por Coluna"] in tab_groups
+    assert [
+        "Resumo",
+        "Perfil estrutural",
+        "Relações numéricas",
+        "Detalhes estatísticos",
+    ] in tab_groups
+    assert "Detalhes técnicos da análise" in expanders
+
+    assert all(call[1]["options"] == list(df.columns) for call in selectbox_calls[:3])
+    assert all(call[1]["key"] == "eda_column_selector" for call in selectbox_calls[:3])
+    assert slider_calls == [
+        (
+            "Quantidade de categorias exibidas",
+            {"min_value": 5, "max_value": 7, "value": 7, "key": "eda_top_n"},
+        )
+    ]
+
+    numeric_histograms = [call for call in histogram_calls if call[1]["x"] == "value"]
+    assert len(numeric_histograms) == 1
+    assert numeric_histograms[0][1]["nbins"] == 40
+    assert numeric_histograms[0][1]["marginal"] == "rug"
+    datetime_histograms = [
+        call for call in histogram_calls if call[1]["x"] == "event_time"
+    ]
+    assert len(datetime_histograms) == 1
+    assert "nbins" not in datetime_histograms[0][1]
+    assert "marginal" not in datetime_histograms[0][1]
+    assert len(box_calls) == 1
+    assert box_calls[0][1]["y"] == "value"
+    assert box_calls[0][1]["points"] == "outliers"
+
+    expected_counts = df["category"].dropna().value_counts().head(7).reset_index()
+    expected_counts.columns = ["category", "count"]
+    assert len(bar_calls) == 1
+    pd.testing.assert_frame_equal(bar_calls[0][0], expected_counts)
+    assert bar_calls[0][1]["x"] == "category"
+    assert bar_calls[0][1]["y"] == "count"
+    assert len(imshow_calls) == 3
+    for correlation_frame, kwargs in imshow_calls:
+        pd.testing.assert_frame_equal(correlation_frame, expected_correlation)
+        assert kwargs == {
+            "text_auto": True,
+            "aspect": "auto",
+            "color_continuous_scale": "Blues",
+        }
+
+    assert any(frame.equals(expected_descriptive) for frame in displayed_frames)
+    assert any(frame.equals(expected_dtypes) for frame in displayed_frames)
+    assert any(frame.equals(expected_categories) for frame in displayed_frames)
+    assert any(frame.equals(expected_nulls) for frame in displayed_frames)
+    assert any(frame.equals(expected_outliers) for frame in displayed_frames)
+    assert any(frame.equals(expected_correlation) for frame in displayed_frames)
+    assert any(frame.equals(expected_tests) for frame in displayed_frames)
+    assert any("Variável" in frame.columns for frame in displayed_frames)
+    assert any("Percentual ausente" in frame.columns for frame in displayed_frames)
+    assert any("Normalidade — Jarque-Bera" in frame.astype(str).values for frame in displayed_frames)
+    assert any(options.get("hide_index") is True for options in dataframe_options)
+
+    monkeypatch.setattr(eda_page, "generate_storytelling_insights", lambda _df: [])
     monkeypatch.setattr(eda_page, "top_categories", lambda _df: pd.DataFrame())
     monkeypatch.setattr(eda_page, "detect_outliers_iqr", lambda _df: pd.DataFrame())
     monkeypatch.setattr(eda_page, "correlation_matrix", lambda _df: pd.DataFrame())
+    monkeypatch.setattr(eda_page, "run_statistical_tests", lambda _df: pd.DataFrame())
     eda_page.render_eda(df, locale="pt-BR")  # type: ignore[arg-type]
+
+    assert "Sem insights narrativos disponíveis para este dataset." in info_calls
+    assert "Sem colunas categóricas disponíveis." in info_calls
+    assert "Sem colunas numéricas para detecção de outliers." in info_calls
+    assert "Sem colunas numéricas para correlação." in info_calls
+    assert "Dados numéricos insuficientes para testes estatísticos." in info_calls
+    assert selectbox_calls[-1][1]["key"] == "eda_column_selector"
+    assert slider_calls[-1][1] == {
+        "min_value": 5,
+        "max_value": 7,
+        "value": 7,
+        "key": "eda_top_n",
+    }
+
+    pd.testing.assert_frame_equal(df, original_df)
+
+    page_source = Path(eda_page.__file__).read_text(encoding="utf-8")
+    src_eda_source = (Path(eda_page.__file__).parents[2] / "src" / "eda.py").read_text(
+        encoding="utf-8"
+    )
+    assert "df[column].dropna()" in page_source
+    assert "df[column].isna().sum()" in page_source
+    assert "df[column].isna().mean() * 100" in page_source
+    assert "nunique(dropna=False)" in page_source
+    assert "str(df[column].dtype)" in page_source
+    assert "is_numeric_dtype(df[column])" in page_source
+    assert "is_datetime64_any_dtype(df[column])" in page_source
+    assert "pd.to_datetime" not in page_source
+    assert "series.value_counts().head(top_n).reset_index()" in page_source
+    assert "min_value=5" in page_source
+    assert "max_value=min(50, distinct)" in page_source
+    assert "value=min(20, distinct)" in page_source
+    assert "nbins=40" in page_source
+    assert 'marginal="rug"' in page_source
+    assert 'points="outliers"' in page_source
+    assert "groupby(" not in page_source
+    assert ".merge(" not in page_source
+    assert "top_n: int = 5" in src_eda_source
+    assert "numeric_df.columns[:5]" in src_eda_source
+    assert "if n < 8" in src_eda_source
+    assert "p_value < 0.05" in src_eda_source
+    assert "1.5 * iqr" in src_eda_source
 
 
 def test_render_executive_overview_and_governance_report(
