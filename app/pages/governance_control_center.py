@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Literal
 
@@ -58,6 +59,64 @@ _CHECK_STATUS_LABELS_PT_BR = {
     "PASS": "Aprovado no check",
     "FAIL": "Reprovado no check",
 }
+_GATE_REASON_LABELS_PT_BR = {
+    "Sensitive data found without masking/anonymization.": (
+        "Foram encontrados dados sensíveis sem mascaramento ou anonimização."
+    ),
+    "Schema contract validation failed.": "A validação do contrato de schema falhou.",
+    "All publication controls are within acceptable thresholds.": (
+        "Todos os controles de publicação estão dentro dos limites aceitáveis."
+    ),
+}
+_GATE_ACTION_LABELS_PT_BR = {
+    "Resolve critical quality rule failures before publication.": (
+        "Resolver falhas críticas de qualidade antes da publicação."
+    ),
+    "Investigate failed checks and improve data quality score.": (
+        "Investigar checks reprovados e melhorar o score de qualidade dos dados."
+    ),
+    "Review privacy controls and mitigation actions.": (
+        "Revisar controles de privacidade e ações de mitigação."
+    ),
+    "Mask, anonymize, or remove sensitive data before publication.": (
+        "Mascarar, anonimizar ou remover dados sensíveis antes da publicação."
+    ),
+    "Fix schema contract violations and revalidate.": (
+        "Corrigir violações do contrato de schema e validar novamente."
+    ),
+    "Refresh dataset and confirm SLA/freshness compliance.": (
+        "Atualizar o dataset e confirmar o atendimento ao SLA de freshness."
+    ),
+    "Proceed with publication and keep routine monitoring.": (
+        "Prosseguir com a publicação e manter o monitoramento de rotina."
+    ),
+}
+_RECOMMENDATION_LABELS_PT_BR = {
+    "Apply masking for direct identifiers in shared datasets.": (
+        "Aplicar mascaramento a identificadores diretos em datasets compartilhados."
+    ),
+    "Anonymize or remove sensitive columns from executive layers.": (
+        "Anonimizar ou remover colunas sensíveis das camadas executivas."
+    ),
+    "Review null patterns in critical personal-data columns.": (
+        "Revisar padrões de nulos em colunas críticas de dados pessoais."
+    ),
+    "Document legal basis and retention policy for personal data usage.": (
+        "Documentar a base legal e a política de retenção para uso de dados pessoais."
+    ),
+    "Keep recurring LGPD checks in CI to prevent regressions.": (
+        "Manter checks recorrentes de LGPD na CI para evitar regressões."
+    ),
+    "Maintain data dictionary and ownership metadata updated.": (
+        "Manter atualizados o dicionário de dados e os metadados de responsabilidade."
+    ),
+    "Block publication until masking/anonymization controls are implemented.": (
+        "Bloquear a publicação até implementar controles de mascaramento ou anonimização."
+    ),
+    "Remediate failed quality checks before executive publication.": (
+        "Remediar checks de qualidade reprovados antes da publicação executiva."
+    ),
+}
 
 
 def _presentation_label(
@@ -65,6 +124,99 @@ def _presentation_label(
 ) -> str:
     technical_value = str(value)
     return technical_value if is_en else labels.get(technical_value, technical_value)
+
+
+def _presentation_gate_reason(reason: str, *, is_en: bool) -> str:
+    if is_en:
+        return reason
+
+    critical_match = re.fullmatch(
+        r"Critical rule failures detected: ([0-9]+)\.", reason
+    )
+    if critical_match:
+        count = critical_match.group(1)
+        if count == "1":
+            return "Foi detectada 1 falha crítica de regra."
+        return f"Foram detectadas {count} falhas críticas de regra."
+
+    quality_match = re.fullmatch(
+        r"Data quality score below recommended threshold "
+        r"\(([0-9]+) < ([0-9]+)\)\.",
+        reason,
+    )
+    if quality_match:
+        score, threshold = quality_match.groups()
+        return (
+            "Score de qualidade abaixo do limite recomendado "
+            f"({score} < {threshold})."
+        )
+
+    privacy_match = re.fullmatch(
+        r"Privacy risk score is elevated \(([0-9]+) >= ([0-9]+)\)\.",
+        reason,
+    )
+    if privacy_match:
+        score, threshold = privacy_match.groups()
+        return f"Score de risco de privacidade elevado ({score} >= {threshold})."
+
+    freshness_match = re.fullmatch(
+        r"Freshness status requires attention: (warning|stale)\.", reason
+    )
+    if freshness_match:
+        status = freshness_match.group(1)
+        status_label = "alerta" if status == "warning" else "desatualizado"
+        return f"O status de freshness requer atenção: {status_label}."
+
+    return _GATE_REASON_LABELS_PT_BR.get(reason, reason)
+
+
+def _presentation_gate_action(action: str, *, is_en: bool) -> str:
+    return (
+        action
+        if is_en
+        else _GATE_ACTION_LABELS_PT_BR.get(action, action)
+    )
+
+
+def _presentation_rationale_reason(reason: str, *, is_en: bool) -> str:
+    if is_en:
+        return reason
+
+    risk_match = re.fullmatch(
+        r"Privacy risk level: (low|medium|high) \(([0-9]+)/100\)\.", reason
+    )
+    if risk_match:
+        risk_level, score = risk_match.groups()
+        displayed_level = _presentation_label(
+            risk_level, _SEVERITY_LABELS_PT_BR, is_en=False
+        )
+        return f"Nível de risco de privacidade: {displayed_level} ({score}/100)."
+
+    failed_checks_match = re.fullmatch(r"Failed quality checks: ([0-9]+)\.", reason)
+    if failed_checks_match:
+        return f"Checks de qualidade reprovados: {failed_checks_match.group(1)}."
+
+    columns_match = re.fullmatch(
+        r"Sensitive/personal/indirect columns: "
+        r"([0-9]+)/([0-9]+)/([0-9]+)\.",
+        reason,
+    )
+    if columns_match:
+        sensitive, personal, indirect = columns_match.groups()
+        return (
+            "Colunas sensíveis/pessoais/identificadores indiretos: "
+            f"{sensitive}/{personal}/{indirect}."
+        )
+
+    return reason
+
+
+def _presentation_recommendation(recommendation: str, *, is_en: bool) -> str:
+    return (
+        recommendation
+        if is_en
+        else _RECOMMENDATION_LABELS_PT_BR.get(recommendation, recommendation)
+    )
 
 
 def _governance_status(privacy_level: str, failed_checks: int) -> str:
@@ -826,35 +978,63 @@ def render_governance_control_center(
             )
         else:
             for check in failed_checks[:5]:
-                st.write(f"- {check['check_name']}: {check['recommendation']}")
+                displayed_recommendation = _presentation_recommendation(
+                    check["recommendation"], is_en=is_en
+                )
+                st.write(f"- {check['check_name']}: {displayed_recommendation}")
             if risk_result["risk_level"] in {"medium", "high"}:
                 st.write(
-                    f"- Privacy risk level is {risk_result['risk_level']} (score {risk_result['score']})."
+                    (
+                        f"- Privacy risk level is {risk_result['risk_level']} "
+                        f"(score {risk_result['score']})."
+                    )
+                    if is_en
+                    else (
+                        "- O nível de risco de privacidade está classificado como "
+                        f"{_presentation_label(risk_result['risk_level'], _SEVERITY_LABELS_PT_BR, is_en=False)} "
+                        f"(score {risk_result['score']})."
+                    )
                 )
 
         st.markdown("**Recommended Actions**" if is_en else "**Ações Recomendadas**")
         for recommendation in risk_result["recommendations"][:5]:
-            st.write(f"- {recommendation}")
+            st.write(
+                f"- {_presentation_recommendation(recommendation, is_en=is_en)}"
+            )
 
     st.markdown("### Technical summary" if is_en else "### Leitura técnica")
     if is_en:
         st.write(
-            f"This dataset has {len(df)} rows and {df.shape[1]} columns. Governance status is {governance_status}. "
-            f"Privacy risk is {risk_result['risk_level']} ({risk_result['score']}/100) and data quality score is {quality_score}/100. "
-            f"Publication decision: {publication_status}."
+            f"This dataset has {len(df)} rows and {df.shape[1]} columns. The "
+            f"summarized diagnosis is {governance_status}. Privacy risk is "
+            f"classified as {risk_result['risk_level']} "
+            f"({risk_result['score']}/100), and data quality is "
+            f"{quality_score}/100. The publication gate resulted in "
+            f"{gate_result.decision}."
         )
     else:
+        displayed_risk_level = _presentation_label(
+            risk_result["risk_level"], _SEVERITY_LABELS_PT_BR, is_en=False
+        )
+        displayed_gate_decision = _presentation_label(
+            gate_result.decision, _STATUS_LABELS_PT_BR, is_en=False
+        )
+        displayed_row_count = f"{len(df):,}".replace(",", ".")
         st.write(
-            f"Este dataset possui {len(df)} linhas e {df.shape[1]} colunas. O status de governança é {governance_status}. "
-            f"O risco de privacidade é {risk_result['risk_level']} ({risk_result['score']}/100) e o score de qualidade é {quality_score}/100. "
-            f"Decisão de publicação: {publication_status}."
+            f"Este dataset possui {displayed_row_count} linhas e "
+            f"{df.shape[1]} colunas. O "
+            f"diagnóstico resumido está {displayed_governance_status}. O risco "
+            f"de privacidade está classificado como {displayed_risk_level} "
+            f"({risk_result['score']}/100), e a qualidade dos dados está em "
+            f"{quality_score}/100. O publication gate resultou em "
+            f"{displayed_gate_decision}."
         )
 
     with st.expander(
         "Decision Rationale" if is_en else "Racional da Decisão", expanded=False
     ):
         for line in rationale_reasons:
-            st.write(f"- {line}")
+            st.write(f"- {_presentation_rationale_reason(line, is_en=is_en)}")
 
     st.markdown("## Publication Gate")
     st.write(
@@ -874,13 +1054,13 @@ def render_governance_control_center(
 
     st.markdown("**Gate Reasons**" if is_en else "**Motivos do Gate**")
     for reason in gate_result.reasons:
-        st.write(f"- {reason}")
+        st.write(f"- {_presentation_gate_reason(reason, is_en=is_en)}")
 
     st.markdown(
         "**Gate Required Actions**" if is_en else "**Ações Obrigatórias do Gate**"
     )
     for action in gate_result.required_actions:
-        st.write(f"- {action}")
+        st.write(f"- {_presentation_gate_action(action, is_en=is_en)}")
 
     st.markdown(
         "### Publication gate criteria"
@@ -1043,6 +1223,12 @@ def render_governance_control_center(
             st.write(f"- {action}")
         for item in rationale_evidence:
             st.write(f"- {item}")
+
+        st.markdown("**Publication gate — technical values**")
+        for reason in gate_result.reasons:
+            st.write(f"- {reason}")
+        for action in gate_result.required_actions:
+            st.write(f"- {action}")
 
         st.markdown("**Gate assumptions / fallbacks — technical values**")
         for note in gate_fallback_notes:
