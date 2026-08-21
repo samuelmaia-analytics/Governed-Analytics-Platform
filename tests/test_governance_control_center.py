@@ -240,17 +240,28 @@ def _patch_deterministic_gate(
     *,
     decision: str,
     severity: str,
-) -> list[dict[str, object]]:
+) -> tuple[list[dict[str, object]], gcc.PublicationReadinessDecision]:
     gate_calls: list[dict[str, object]] = []
+    gate_result = gcc.PublicationReadinessDecision(
+        decision=decision,  # type: ignore[arg-type]
+        severity=severity,  # type: ignore[arg-type]
+        reasons=[
+            "Critical rule failures detected: 1.",
+            "Data quality score below recommended threshold (50 < 80).",
+            "Privacy risk score is elevated (100 >= 60).",
+            "Unknown gate reason.",
+        ],
+        required_actions=[
+            "Resolve critical quality rule failures before publication.",
+            "Investigate failed checks and improve data quality score.",
+            "Review privacy controls and mitigation actions.",
+            "Unknown gate action.",
+        ],
+    )
 
     def fake_evaluate_publication_readiness(**kwargs):  # type: ignore[no-untyped-def]
         gate_calls.append(dict(kwargs))
-        return gcc.PublicationReadinessDecision(
-            decision=decision,  # type: ignore[arg-type]
-            severity=severity,  # type: ignore[arg-type]
-            reasons=["canonical reason"],
-            required_actions=["canonical action"],
-        )
+        return gate_result
 
     monkeypatch.setattr(
         gcc, "_load_schema_contract_status", lambda: ("passed", None)
@@ -259,7 +270,7 @@ def _patch_deterministic_gate(
     monkeypatch.setattr(
         gcc, "evaluate_publication_readiness", fake_evaluate_publication_readiness
     )
-    return gate_calls
+    return gate_calls, gate_result
 
 
 def test_render_governance_control_center_handles_empty_history(monkeypatch) -> None:
@@ -283,11 +294,13 @@ def test_render_governance_control_center_handles_empty_history(monkeypatch) -> 
         "save_governance_snapshot",
         lambda **kwargs: snapshot_calls.append(dict(kwargs)) or Path("unused.csv"),
     )
-    gate_calls = _patch_deterministic_gate(
+    gate_calls, gate_result = _patch_deterministic_gate(
         monkeypatch,
         decision="Blocked",
         severity="Critical",
     )
+    original_gate_reasons = list(gate_result.reasons)
+    original_gate_actions = list(gate_result.required_actions)
 
     gcc.render_governance_control_center(
         df=df,
@@ -301,6 +314,8 @@ def test_render_governance_control_center_handles_empty_history(monkeypatch) -> 
     assert_frame_equal(classification_df, original_classification_df)
     assert risk_result == original_risk_result
     assert quality_result == original_quality_result
+    assert gate_result.reasons == original_gate_reasons
+    assert gate_result.required_actions == original_gate_actions
 
     assert fake_st.titles == ["Governance Lab"]
     assert any("does not replace" in caption for caption in fake_st.captions)
@@ -564,11 +579,13 @@ def test_render_governance_control_center_with_history(
         gcc, "_load_governance_history", lambda *_args, **_kwargs: history_df
     )
     monkeypatch.setattr(gcc, "save_governance_snapshot", fake_save_governance_snapshot)
-    gate_calls = _patch_deterministic_gate(
+    gate_calls, gate_result = _patch_deterministic_gate(
         monkeypatch,
         decision="Approved",
         severity="Low",
     )
+    original_gate_reasons = list(gate_result.reasons)
+    original_gate_actions = list(gate_result.required_actions)
 
     gcc.render_governance_control_center(
         df=df,
@@ -583,6 +600,8 @@ def test_render_governance_control_center_with_history(
     assert risk_result == original_risk_result
     assert quality_result == original_quality_result
     assert_frame_equal(history_df, original_history_df)
+    assert gate_result.reasons == original_gate_reasons
+    assert gate_result.required_actions == original_gate_actions
 
     assert fake_st.titles == ["Laboratório de Governança"]
     assert "### Como interpretar esta página" in fake_st.markdowns
@@ -682,6 +701,38 @@ def test_render_governance_control_center_with_history(
     assert presentation_history_kwargs["hide_index"] is True
 
     rendered_text = " ".join(str(value) for value in fake_st.writes)
+    assert (
+        "Este dataset possui 2 linhas e 2 colunas. O diagnóstico resumido está "
+        "Requer revisão. O risco de privacidade está classificado como Média "
+        "(55/100), e a qualidade dos dados está em 40/100. O publication gate "
+        "resultou em Aprovado."
+    ) in rendered_text
+    assert "Foi detectada 1 falha crítica de regra." in rendered_text
+    assert (
+        "Score de qualidade abaixo do limite recomendado (50 < 80)."
+        in rendered_text
+    )
+    assert "Score de risco de privacidade elevado (100 >= 60)." in rendered_text
+    assert (
+        "Resolver falhas críticas de qualidade antes da publicação."
+        in rendered_text
+    )
+    assert (
+        "Investigar checks reprovados e melhorar o score de qualidade dos dados."
+        in rendered_text
+    )
+    assert "Revisar controles de privacidade e ações de mitigação." in rendered_text
+    assert "**Severidade:** Baixa" in rendered_text
+    for technical_text in original_gate_reasons + original_gate_actions:
+        assert technical_text in rendered_text
+    assert (
+        gcc._presentation_gate_reason("Unmapped reason.", is_en=False)
+        == "Unmapped reason."
+    )
+    assert (
+        gcc._presentation_gate_action("Unmapped action.", is_en=False)
+        == "Unmapped action."
+    )
     for index in range(5):
         assert f"check_{index}: fix_{index}" in rendered_text
         assert f"recommendation_{index}" in rendered_text
