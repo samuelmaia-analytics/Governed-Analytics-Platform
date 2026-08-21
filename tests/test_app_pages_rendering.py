@@ -1969,22 +1969,225 @@ def test_render_cohort_retention_with_and_without_data(monkeypatch) -> None:
 
 
 def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
-    monkeypatch.setattr(genai_page, "st", _FakeStreamlit())
-    monkeypatch.setattr(genai_page, "px", _FakePlotlyExpress())
+    titles: list[str] = []
+    markdown_calls: list[str] = []
+    captions: list[str] = []
+    infos: list[str] = []
+    writes: list[object] = []
+    metrics: list[tuple[str, object]] = []
+    displayed_frames: list[pd.DataFrame] = []
+    dataframe_options: list[dict[str, object]] = []
+    expanders: list[str] = []
+    code_calls: list[tuple[str, dict[str, object]]] = []
+    bar_calls: list[tuple[pd.DataFrame, dict[str, object]]] = []
+    plotly_calls: list[dict[str, object]] = []
+    value_counts_inputs: list[pd.Series] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, value: object, **_kwargs) -> None:
+            metrics.append((label, value))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            titles.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def info(self, value: str) -> None:
+            infos.append(value)
+
+        def write(self, value: object) -> None:
+            writes.append(value)
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def dataframe(self, frame: pd.DataFrame, **kwargs: object) -> None:
+            displayed_frames.append(frame.copy(deep=True))
+            dataframe_options.append(kwargs)
+
+        def expander(self, label: str, **_kwargs):  # type: ignore[no-untyped-def]
+            expanders.append(label)
+            return _FakeContainer()
+
+        def code(self, value: str, **kwargs: object) -> None:
+            code_calls.append((value, kwargs))
+
+        def plotly_chart(self, _figure: object, **kwargs: object) -> None:
+            plotly_calls.append(kwargs)
+
+    class CapturingPlotlyExpress:
+        @staticmethod
+        def bar(
+            data: pd.DataFrame, **kwargs: object
+        ) -> _FakeFigure:
+            bar_calls.append((data.copy(deep=True), kwargs))
+            return _FakeFigure()
 
     genai_df = pd.DataFrame(
         {
             "source_id": ["a1", "a2"],
-            "category": ["Phone Accessories", "Phone Accessories"],
-            "extraction_mode": ["reference", "reference"],
-            "model_name": ["reference_output", "reference_output"],
+            "title": ["Case A", "Case B"],
+            "category": ["Phone Accessories", None],
+            "material": ["Leather", "Silicone"],
+            "compatibility": ["Phone A", "Phone B"],
+            "quality_signals": ["Durable", "Lightweight"],
+            "functional_features": ["Stand", "Grip"],
+            "security_features": ["RFID", ""],
+            "aesthetic_signals": ["Elegant", "Minimal"],
+            "target_use_cases": ["Daily use", "Travel"],
+            "summary": ["Summary A", "Summary B"],
+            "extraction_mode": ["openai_api", "openai_api"],
+            "model_name": ["gpt-4.1-mini", "gpt-4.1-mini"],
         }
     )
-    monkeypatch.setattr(genai_page, "_load_genai_features", lambda: genai_df.copy())
+    genai_original = genai_df.copy(deep=True)
+    en_df = pd.DataFrame(
+        {
+            "source_id": ["b1", "b2", "b3"],
+            "title": ["One", "Two", "Three"],
+            "category": ["Accessories", "Accessories", None],
+            "extraction_mode": ["reference", "reference", "reference"],
+            "model_name": ["reference_output"] * 3,
+        }
+    )
+    en_original = en_df.copy(deep=True)
+    loaded_frames = [genai_df, en_df, pd.DataFrame()]
+
+    def load_features() -> pd.DataFrame:
+        return loaded_frames.pop(0).copy(deep=True)
+
+    original_value_counts = pd.Series.value_counts
+
+    def capturing_value_counts(
+        series: pd.Series, *args, **kwargs  # type: ignore[no-untyped-def]
+    ) -> pd.Series:
+        value_counts_inputs.append(series.copy(deep=True))
+        return original_value_counts(series, *args, **kwargs)
+
+    monkeypatch.setattr(genai_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(genai_page, "px", CapturingPlotlyExpress())
+    monkeypatch.setattr(genai_page, "_load_genai_features", load_features)
+    monkeypatch.setattr(pd.Series, "value_counts", capturing_value_counts)
+
+    genai_page.render_genai_insights(locale="pt-BR")  # type: ignore[arg-type]
+    genai_page.render_genai_insights(locale="en-US")  # type: ignore[arg-type]
     genai_page.render_genai_insights(locale="pt-BR")  # type: ignore[arg-type]
 
-    monkeypatch.setattr(genai_page, "_load_genai_features", lambda: pd.DataFrame())
-    genai_page.render_genai_insights(locale="en-US")  # type: ignore[arg-type]
+    assert titles == [
+        "Experimento de IA Generativa",
+        "Generative AI Experiment",
+        "Experimento de IA Generativa",
+    ]
+    assert "### Como interpretar esta página" in markdown_calls
+    assert "### How to interpret this page" in markdown_calls
+    assert "## Resultado persistido" in markdown_calls
+    assert "## Persisted result" in markdown_calls
+    assert "## Limitações do experimento" in markdown_calls
+    assert any("resultados persistidos" in value for value in captions)
+    assert any("No inference" in value for value in captions)
+    assert any("não inferência ao vivo" in value for value in infos)
+    assert "Resultado GenAI não disponível neste ambiente." in infos
+
+    assert metrics == [
+        ("Itens processados", 2),
+        ("Categorias identificadas", 1),
+        ("Modo registrado", "API OpenAI — execução registrada"),
+        ("Modelo registrado", "gpt-4.1-mini"),
+        ("Items processed", 3),
+        ("Categories identified", 1),
+        ("Recorded mode", "reference"),
+        ("Recorded model", "reference_output"),
+    ]
+    assert any("não executa esse modo novamente" in str(value) for value in writes)
+    assert any("does not execute that mode again" in str(value) for value in writes)
+
+    assert len(displayed_frames) == 4
+    pt_presentation, pt_technical, en_presentation, en_technical = displayed_frames
+    assert pt_presentation.columns.tolist() == [
+        "ID da origem",
+        "Título",
+        "Categoria",
+        "Material",
+        "Compatibilidade",
+        "Sinais de qualidade",
+        "Características funcionais",
+        "Características de segurança",
+        "Sinais estéticos",
+        "Casos de uso",
+        "Resumo",
+        "Modo de extração",
+        "Modelo",
+    ]
+    assert pt_presentation["Modo de extração"].tolist() == [
+        "API OpenAI — execução registrada",
+        "API OpenAI — execução registrada",
+    ]
+    assert pt_technical.columns.tolist() == genai_df.columns.tolist()
+    assert pt_technical["extraction_mode"].tolist() == ["openai_api", "openai_api"]
+    assert pt_technical["model_name"].tolist() == [
+        "gpt-4.1-mini",
+        "gpt-4.1-mini",
+    ]
+    assert en_presentation.columns.tolist() == [
+        "Source ID",
+        "Title",
+        "Category",
+        "Extraction mode",
+        "Model",
+    ]
+    assert en_technical.columns.tolist() == en_df.columns.tolist()
+    assert en_technical["extraction_mode"].tolist() == ["reference"] * 3
+    assert dataframe_options == [
+        {"width": "stretch", "hide_index": True}
+    ] * 4
+
+    assert len(value_counts_inputs) == 2
+    assert value_counts_inputs[0].tolist() == ["Phone Accessories", "unknown"]
+    assert value_counts_inputs[1].tolist() == ["Accessories", "Accessories", "unknown"]
+    assert "- Phone Accessories: 1" in writes
+    assert "- Não informado: 1" in writes
+    assert len(bar_calls) == 1
+    category_chart, bar_options = bar_calls[0]
+    assert category_chart.to_dict("records") == [
+        {"category": "Accessories", "count": 2},
+        {"category": "unknown", "count": 1},
+    ]
+    assert bar_options == {
+        "x": "category",
+        "y": "count",
+        "color": "category",
+        "title": "Category distribution",
+    }
+    assert plotly_calls == [{"width": "stretch"}]
+
+    assert expanders == [
+        "Detalhes técnicos do experimento",
+        "Experiment technical details",
+        "Detalhes técnicos do experimento",
+    ]
+    assert (str(genai_page.GENAI_FEATURES_PATH), {}) in code_calls
+    assert (
+        "python -m src.genai_feature_extraction --mode reference",
+        {"language": "bash"},
+    ) in code_calls
+    assert any("não há rag" in str(value).lower() for value in writes)
+    assert any("não são acessadas" in value for value in captions)
+
+    pd.testing.assert_frame_equal(genai_df, genai_original)
+    pd.testing.assert_frame_equal(en_df, en_original)
+    source = Path(genai_page.__file__).read_text(encoding="utf-8")
+    assert "requests" not in source
+    assert "httpx" not in source
+    assert "urlopen" not in source
+    assert "write_text(" not in source
+    assert "write_bytes(" not in source
+    assert "to_csv(" not in source
+    assert "to_json(" not in source
 
 
 def test_load_genai_features_drops_empty_rows(tmp_path: Path, monkeypatch) -> None:
@@ -1996,7 +2199,57 @@ def test_load_genai_features_drops_empty_rows(tmp_path: Path, monkeypatch) -> No
     monkeypatch.setattr(genai_page, "GENAI_FEATURES_PATH", csv_path)
     loaded = genai_page._load_genai_features()
     assert len(loaded) == 1
+    assert loaded.index.tolist() == [0]
     assert loaded.iloc[0]["source_id"] == "phone_case_001"
+
+    missing_path = tmp_path / "missing.csv"
+    monkeypatch.setattr(genai_page, "GENAI_FEATURES_PATH", missing_path)
+    assert genai_page._load_genai_features().empty
+
+    valid_frame = pd.DataFrame(
+        {
+            "source_id": ["source-1", ""],
+            "title": ["Title", ""],
+            "category": ["Category", ""],
+        },
+        index=[5, 6],
+    )
+    valid_original = valid_frame.copy(deep=True)
+    separators: list[str] = []
+
+    def read_csv_with_second_separator(_path: Path, *, sep: str) -> pd.DataFrame:
+        separators.append(sep)
+        if sep == ";":
+            return pd.DataFrame({"not_source_id": ["value"]})
+        return valid_frame
+
+    monkeypatch.setattr(genai_page, "GENAI_FEATURES_PATH", csv_path)
+    monkeypatch.setattr(genai_page.pd, "read_csv", read_csv_with_second_separator)
+    loaded_from_comma = genai_page._load_genai_features()
+    assert separators == [";", ","]
+    assert loaded_from_comma.index.tolist() == [0]
+    assert loaded_from_comma["source_id"].tolist() == ["source-1"]
+    pd.testing.assert_frame_equal(valid_frame, valid_original)
+
+    separators.clear()
+
+    def read_csv_without_source_id(_path: Path, *, sep: str) -> pd.DataFrame:
+        separators.append(sep)
+        return pd.DataFrame({"other": ["value"]})
+
+    monkeypatch.setattr(genai_page.pd, "read_csv", read_csv_without_source_id)
+    assert genai_page._load_genai_features().empty
+    assert separators == [";", ","]
+
+    source = Path(genai_page.__file__).read_text(encoding="utf-8")
+    assert "if not GENAI_FEATURES_PATH.exists():" in source
+    assert 'for sep in (";", ","):' in source
+    assert 'if "source_id" in df.columns:' in source
+    assert "cleaned = df.copy()" in source
+    assert 'for col in ["source_id", "title", "category"]:' in source
+    assert 'cleaned[col] = cleaned[col].replace("", pd.NA)' in source
+    assert 'cleaned = cleaned.dropna(subset=key_cols, how="all")' in source
+    assert "return cleaned.reset_index(drop=True)" in source
 
 
 def test_render_data_catalog_with_filters_and_without_data(monkeypatch) -> None:
