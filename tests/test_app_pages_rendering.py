@@ -1987,6 +1987,12 @@ def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
         def metric(self, label: str, value: object, **_kwargs) -> None:
             metrics.append((label, value))
 
+        def caption(self, value: str) -> None:
+            captions.append(value)
+
+        def markdown(self, value: str) -> None:
+            markdown_calls.append(value)
+
     class CapturingStreamlit(CapturingContainer):
         def title(self, value: str) -> None:
             titles.append(value)
@@ -2051,6 +2057,9 @@ def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
             "source_id": ["b1", "b2", "b3"],
             "title": ["One", "Two", "Three"],
             "category": ["Accessories", "Accessories", None],
+            "material": ["Steel", "Plastic", "Fabric"],
+            "compatibility": ["Device A", "Device B", "Device C"],
+            "summary": ["Summary 1", "Summary 2", "Summary 3"],
             "extraction_mode": ["reference", "reference", "reference"],
             "model_name": ["reference_output"] * 3,
         }
@@ -2096,13 +2105,37 @@ def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
     assert metrics == [
         ("Itens processados", 2),
         ("Categorias identificadas", 1),
-        ("Modo registrado", "API OpenAI — execução registrada"),
         ("Modelo registrado", "gpt-4.1-mini"),
         ("Items processed", 3),
         ("Categories identified", 1),
-        ("Recorded mode", "reference"),
         ("Recorded model", "reference_output"),
     ]
+    assert "Modo registrado" in captions
+    assert "Recorded mode" in captions
+    assert "**API OpenAI — execução registrada**" in markdown_calls
+    assert "**reference**" in markdown_calls
+    assert not any(
+        "API OpenAI — execução registr..." in value
+        for value in markdown_calls
+    )
+    pt_indicators = {
+        label for label, _value in metrics[:3]
+    } | {"Modo registrado"}
+    en_indicators = {
+        label for label, _value in metrics[3:]
+    } | {"Recorded mode"}
+    assert pt_indicators == {
+        "Itens processados",
+        "Categorias identificadas",
+        "Modo registrado",
+        "Modelo registrado",
+    }
+    assert en_indicators == {
+        "Items processed",
+        "Categories identified",
+        "Recorded mode",
+        "Recorded model",
+    }
     assert any("não executa esse modo novamente" in str(value) for value in writes)
     assert any("does not execute that mode again" in str(value) for value in writes)
 
@@ -2114,20 +2147,44 @@ def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
         "Categoria",
         "Material",
         "Compatibilidade",
-        "Sinais de qualidade",
-        "Características funcionais",
-        "Características de segurança",
-        "Sinais estéticos",
-        "Casos de uso",
         "Resumo",
-        "Modo de extração",
-        "Modelo",
     ]
-    assert pt_presentation["Modo de extração"].tolist() == [
-        "API OpenAI — execução registrada",
-        "API OpenAI — execução registrada",
-    ]
+    assert len(pt_presentation.columns) == 6
+    pd.testing.assert_frame_equal(
+        pt_presentation,
+        genai_df[
+            [
+                "source_id",
+                "title",
+                "category",
+                "material",
+                "compatibility",
+                "summary",
+            ]
+        ].rename(
+            columns={
+                "source_id": "ID da origem",
+                "title": "Título",
+                "category": "Categoria",
+                "material": "Material",
+                "compatibility": "Compatibilidade",
+                "summary": "Resumo",
+            }
+        ),
+    )
     assert pt_technical.columns.tolist() == genai_df.columns.tolist()
+    for technical_column in [
+        "quality_signals",
+        "functional_features",
+        "security_features",
+        "aesthetic_signals",
+        "target_use_cases",
+        "extraction_mode",
+        "model_name",
+    ]:
+        assert pt_technical[technical_column].tolist() == genai_df[
+            technical_column
+        ].tolist()
     assert pt_technical["extraction_mode"].tolist() == ["openai_api", "openai_api"]
     assert pt_technical["model_name"].tolist() == [
         "gpt-4.1-mini",
@@ -2137,9 +2194,11 @@ def test_render_genai_insights_with_and_without_data(monkeypatch) -> None:
         "Source ID",
         "Title",
         "Category",
-        "Extraction mode",
-        "Model",
+        "Material",
+        "Compatibility",
+        "Summary",
     ]
+    assert len(en_presentation.columns) == 6
     assert en_technical.columns.tolist() == en_df.columns.tolist()
     assert en_technical["extraction_mode"].tolist() == ["reference"] * 3
     assert dataframe_options == [
