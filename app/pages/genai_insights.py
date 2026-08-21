@@ -177,9 +177,9 @@ def render_genai_insights(locale: Locale) -> None:
         "Categories identified" if is_en else "Categorias identificadas",
         total_categories,
     )
-    m3.metric(
-        "Recorded mode" if is_en else "Modo registrado",
-        _extraction_mode_label(extraction_mode, is_en=is_en),
+    m3.caption("Recorded mode" if is_en else "Modo registrado")
+    m3.markdown(
+        f"**{_extraction_mode_label(extraction_mode, is_en=is_en)}**"
     )
     m4.metric("Recorded model" if is_en else "Modelo registrado", model_name)
     st.caption(
@@ -209,12 +209,16 @@ def render_genai_insights(locale: Locale) -> None:
         "aplicada "
         "pela página."
     )
+    executive_columns = [
+        "source_id",
+        "title",
+        "category",
+        "material",
+        "compatibility",
+        "summary",
+    ]
     column_labels = _COLUMN_LABELS_EN_US if is_en else _COLUMN_LABELS_PT_BR
-    presentation_df = features_df.copy()
-    if not is_en and "extraction_mode" in presentation_df.columns:
-        presentation_df["extraction_mode"] = presentation_df[
-            "extraction_mode"
-        ].map(lambda value: _extraction_mode_label(str(value), is_en=False))
+    presentation_df = features_df.loc[:, executive_columns].copy()
     presentation_df = presentation_df.rename(columns=column_labels)
     st.dataframe(presentation_df, width="stretch", hide_index=True)
 
