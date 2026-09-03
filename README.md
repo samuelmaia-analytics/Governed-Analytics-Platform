@@ -42,6 +42,16 @@ A aplicação utiliza dados públicos do e-commerce Olist e mantém uma separaç
 - Testes, linting e CI/CD com GitHub Actions.
 - Exemplos de orquestração com n8n, mantendo a lógica de negócio versionada em código.
 
+### Escopo mensurável
+
+As métricas abaixo descrevem componentes realmente implementados e versionados no repositório, sem estimar ganhos financeiros ou percentuais de produtividade não medidos:
+
+- **4 camadas de dados:** Bronze, Silver, Gold e Quarantine.
+- **3 estados de publicação:** `Approved`, `Needs Review` e `Blocked`.
+- **7 workflows no GitHub Actions:** CI, deploy do Streamlit, lint, operação da camada publicada, policy check, segurança e sincronização de catálogo.
+- **1 aplicação executiva em Streamlit** com integração a endpoints FastAPI.
+- Controles versionados de **Data Quality, Data Contracts, Data Lineage, Privacy Risk Score e Publication Gate**.
+
 ---
 
 ## Arquitetura
