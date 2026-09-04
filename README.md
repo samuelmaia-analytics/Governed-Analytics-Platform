@@ -9,9 +9,19 @@
 
 **Idioma:** `Português` · [English documentation](docs/README.en.md)
 
-> Plataforma de Analytics Engineering com qualidade, governança e controles de publicação, transformando dados brutos em uma camada analítica confiável para consumo executivo.
+> Dados de e-commerce podem chegar ao consumo analítico sem controle suficiente de qualidade, rastreabilidade ou critério claro de publicação. Para enfrentar esse problema, construí uma plataforma de Analytics Engineering em Python, SQL e dbt com Data Quality, Data Contracts, Data Lineage, Privacy Risk Score e um Publication Gate que aprova, revisa ou bloqueia a publicação. O resultado é um fluxo em que mudanças e dados inadequados podem ser detectados antes de chegar ao consumo executivo, reduzindo o risco de decisões apoiadas em informação inconsistente.
 
 **[→ Abrir demonstração ao vivo](https://governed-analytics-platform.streamlit.app/)**
+
+---
+
+## Método CAR
+
+**Contexto:** dados brutos e transformações sem critérios explícitos de qualidade e publicação aumentam o risco de inconsistências chegarem ao dashboard e à tomada de decisão.
+
+**Ação:** desenvolvi um pipeline modular com Python, SQL, dbt, DuckDB e PostgreSQL, estruturado em Bronze, Silver, Gold e Quarantine, com Data Contracts em YAML, Data Quality Gates, classificação de privacidade, Data Lineage, FastAPI, Streamlit, CI/CD e automações com n8n.
+
+**Resultado:** a publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. A suíte do projeto ultrapassou 900 testes automatizados durante sua evolução, ajudando a impedir que mudanças silenciosas alterem regras críticas sem detecção.
 
 ---
 
@@ -135,7 +145,7 @@ flowchart LR
 2. Abra a **[demonstração ao vivo](https://governed-analytics-platform.streamlit.app/)**.
 3. Visite **Governance Control Center**, **Data Quality** e **LGPD & Privacy Risk**.
 4. Consulte a arquitetura e a documentação técnica em `docs/`.
-5. Revise `Implemented x simulado` para distinguir funcionalidades reais de componentes demonstrativos.
+5. Revise `Implementado x simulado` para distinguir funcionalidades reais de componentes demonstrativos.
 
 ---
 
