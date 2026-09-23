@@ -33,7 +33,7 @@ dev = [
     "pytest-cov>=7,<8",
     "httpx>=0.28,<1",
     "ruff>=0.12,<0.16",
-    "mypy>=1.18,<2.2",
+    "mypy>=1.18,<2.4",
     "playwright",
     "dbt-duckdb>=1.8,<2",
 ]
