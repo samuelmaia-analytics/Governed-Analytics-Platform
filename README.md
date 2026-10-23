@@ -100,6 +100,23 @@ flowchart LR
 | Visualização e entrega | Streamlit · Power BI · FastAPI |
 | Automação e CI/CD | GitHub Actions · Codecov · n8n |
 | Cloud / integração | Snowflake opcional · arquitetura AWS de referência |
+| IA generativa | OpenAI API · prompts · extração de atributos textuais · JSON · CSV/JSONL |
+
+---
+
+## IA generativa aplicada a dados de produtos
+
+**Contexto:** descrições de produtos chegam como texto livre, enquanto análises de categoria, material e compatibilidade precisam de atributos estruturados.
+
+**Ação:** implementei um módulo em Python integrado à API da OpenAI, com engenharia de prompts e resposta JSON, para extrair categoria, material, compatibilidade, características e resumo. O pipeline normaliza as saídas e persiste os atributos em CSV e JSONL.
+
+**Resultado:** descrições textuais passam a ter atributos estruturados e rastreáveis por produto, disponíveis para consumo analítico na página GenAI do Streamlit.
+
+**Escopo implementado:** o módulo oferece o modo `reference`, com saída de referência versionada, e o modo `openai`, que chama a API mediante configuração de credenciais. A interface exibe o artefato persistido e não executa inferência ao ser aberta. Esta implementação é de extração estruturada com LLM; não inclui RAG.
+
+- [Módulo de extração](src/genai_feature_extraction.py)
+- [Interface de resultados persistidos](app/pages/genai_insights.py)
+- [Documentação do experimento](docs/genai_bonus.md)
 
 ---
 
