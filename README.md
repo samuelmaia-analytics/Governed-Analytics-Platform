@@ -21,7 +21,7 @@
 
 **Ação:** desenvolvi um pipeline modular com Python, SQL, dbt, DuckDB e PostgreSQL, estruturado em Bronze, Silver, Gold e Quarantine, com Data Contracts em YAML, Data Quality Gates, classificação de privacidade, Data Lineage, FastAPI, Streamlit, CI/CD e automações com n8n.
 
-**Resultado:** a publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. A suíte do projeto ultrapassou 900 testes automatizados durante sua evolução, ajudando a impedir que mudanças silenciosas alterem regras críticas sem detecção.
+**Resultado:** a publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. Na revisão de governança de 24/10/2026, a suíte completa passou com **383 testes**, incluindo validações de entradas inválidas do Gate. Esse resultado corresponde à revisão documentada; execuções posteriores podem alterar a contagem.
 
 ---
 
@@ -203,8 +203,30 @@ make app
 
 ---
 
+## Validação de evidências do Publication Gate
+
+O Gate rejeita evidências malformadas antes de decidir a publicação: scores
+precisam ser finitos e estar entre 0 e 100, falhas críticas precisam ser um inteiro
+não negativo, estados de freshness/contrato precisam ser reconhecidos e a indicação
+de dados sensíveis sem proteção precisa ser booleana. Valores desconhecidos,
+`NaN` ou ausência de evidência geram erro; não são convertidos em aprovação.
+
+Para verificar os casos normais, limites e entradas inválidas:
+
+```bash
+uv sync --extra dev
+uv run pytest -q tests/test_publication_gate.py tests/test_governance_edge_cases.py
+uv run ruff check src app tests
+```
+
+Esses controles complementam a política de publicação. O modelo de acesso e
+retenção permanece demonstrativo, conforme a
+[política de acesso e retenção](docs/governance/access_and_retention_policy.md).
+
 ## Autor
 
-**Samuel Maia** — Analista de Dados | Analytics Engineer
+**Samuel de Andrade Maia — Engenheiro de Dados Pleno | Analytics Engineer**
 
-[LinkedIn](https://www.linkedin.com/in/samuelmaia-analytics/) · [GitHub](https://github.com/samuelmaia-analytics)
+Atuo na **Avanade** desde **20/10/2026**, em Engenharia de Dados. Este é um **projeto pessoal de portfólio**; suas implementações, dados e resultados não representam entregas da Avanade ou de seus clientes.
+
+[LinkedIn](https://www.linkedin.com/in/samuelmaia-analytics/) · [Portfólio](https://samuelmaia-analytics.github.io/samuelmaia-analytics/) · [Currículo em PDF](https://samuelmaia-analytics.github.io/samuelmaia-analytics/assets/Samuel_Maia_Curriculo.pdf)
