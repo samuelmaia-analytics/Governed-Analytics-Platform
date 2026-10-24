@@ -205,6 +205,26 @@ make app
 
 ## Autor
 
-**Samuel Maia** — Analista de Dados | Analytics Engineer
+**Samuel Maia** — Engenheiro de Dados Pleno | Analytics Engineer
 
 [LinkedIn](https://www.linkedin.com/in/samuelmaia-analytics/) · [GitHub](https://github.com/samuelmaia-analytics)
+
+## Validação de evidências do Publication Gate
+
+O Gate rejeita evidências malformadas antes de decidir a publicação: scores
+precisam ser finitos e estar entre 0 e 100, falhas críticas precisam ser um inteiro
+não negativo, estados de freshness/contrato precisam ser reconhecidos e a indicação
+de dados sensíveis sem proteção precisa ser booleana. Valores desconhecidos,
+`NaN` ou ausência de evidência geram erro; não são convertidos em aprovação.
+
+Para verificar os casos normais, limites e entradas inválidas:
+
+```bash
+uv sync --extra dev
+uv run pytest -q tests/test_publication_gate.py tests/test_governance_edge_cases.py
+uv run ruff check src app tests
+```
+
+Esses controles complementam a política de publicação. O modelo de acesso e
+retenção permanece demonstrativo, conforme a
+[política de acesso e retenção](docs/governance/access_and_retention_policy.md).

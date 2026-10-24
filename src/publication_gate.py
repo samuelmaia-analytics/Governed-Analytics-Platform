@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import isfinite
+from numbers import Integral, Real
 from typing import Literal
 
 PublicationDecision = Literal["Approved", "Needs Review", "Blocked"]
@@ -48,6 +50,26 @@ def evaluate_publication_readiness(
     - Approved:
       - all quality/privacy/freshness/contract checks acceptable
     """
+    # Type hints are not runtime validation: unknown/malformed evidence must
+    # never fall through to Approved.
+    for name, score in (
+        ("data_quality_score", data_quality_score),
+        ("privacy_risk_score", privacy_risk_score),
+    ):
+        if (isinstance(score, bool) or not isinstance(score, Real)
+                or not isfinite(score) or not 0 <= score <= 100):
+            raise ValueError(f"{name} must be a finite number between 0 and 100")
+    if (isinstance(critical_rule_failures, bool)
+            or not isinstance(critical_rule_failures, Integral)
+            or critical_rule_failures < 0):
+        raise ValueError("critical_rule_failures must be a nonnegative integer")
+    if freshness_status not in ("fresh", "warning", "stale"):
+        raise ValueError("Unknown freshness_status")
+    if schema_contract_status not in ("passed", "failed"):
+        raise ValueError("Unknown schema_contract_status")
+    if not isinstance(has_sensitive_data_without_protection, bool):
+        raise ValueError("has_sensitive_data_without_protection must be a boolean")
+
     reasons: list[str] = []
     required_actions: list[str] = []
 
