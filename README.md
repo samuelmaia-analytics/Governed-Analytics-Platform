@@ -1,7 +1,7 @@
 # Governed Analytics Platform
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
-[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
+[![CI](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![Lint](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
@@ -15,13 +15,9 @@
 
 ---
 
-## Método CAR
+## Resultados e evidências
 
-**Contexto:** dados brutos e transformações sem critérios explícitos de qualidade e publicação aumentam o risco de inconsistências chegarem ao dashboard e à tomada de decisão.
-
-**Ação:** desenvolvi um pipeline modular com Python, SQL, dbt, DuckDB e PostgreSQL, estruturado em Bronze, Silver, Gold e Quarantine, com Data Contracts em YAML, Data Quality Gates, classificação de privacidade, Data Lineage, FastAPI, Streamlit, CI/CD e automações com n8n.
-
-**Resultado:** a publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. Na revisão de governança de 24/10/2026, a suíte completa passou com **383 testes**, incluindo validações de entradas inválidas do Gate. Esse resultado corresponde à revisão documentada; execuções posteriores podem alterar a contagem.
+A publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. Na revisão de governança de 24/10/2026, a suíte completa passou com **383 testes**, incluindo validações de entradas inválidas do Gate. Esse resultado corresponde à revisão documentada; execuções posteriores podem alterar a contagem.
 
 ---
 
@@ -67,19 +63,23 @@ As métricas abaixo descrevem componentes realmente implementados e versionados 
 ## Arquitetura
 
 ```mermaid
-flowchart LR
-    A[Dados brutos] --> B[Ingestão e padronização]
-    B --> C[Transformação e Analytics]
-    C --> D[Classificação LGPD]
-    C --> E[Data Quality]
-    D --> F[Privacy Risk Score]
-    E --> F
-    F --> G{Publication Gate}
-    G -->|Approved| H[Camada publicada]
-    G -->|Blocked / Needs Review| I[Evidências de governança]
-    H --> J[Streamlit / consumo executivo]
-    I --> J
+flowchart TD
+    raw["Dados brutos"] --> ingest["Ingestão e padronização"]
+    ingest --> analytics["Transformação e Analytics"]
+    analytics --> privacy["Classificação LGPD"]
+    analytics --> quality["Data Quality e contratos"]
+    privacy --> risk["Privacy Risk Score"]
+    risk --> gate{"Publication Gate"}
+    quality --> gate
+    gate -->|Approved| published["Camada publicada"]
+    gate -->|Blocked / Needs Review| evidence["Evidências para revisão"]
+    published --> app["Streamlit: consumo executivo"]
+    evidence -.->|Status e justificativa| control["Central de governança"]
 ```
+
+As setas contínuas representam o fluxo de dados e controles. A seta tracejada leva apenas status e justificativas para a central de governança; não representa publicação de dados bloqueados.
+
+O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_reference_architecture.md); as camadas locais não representam buckets AWS provisionados.
 
 ### Impacto demonstrado
 
