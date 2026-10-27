@@ -1,7 +1,7 @@
 # Governed Analytics Platform
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
-[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
+[![CI](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![Lint](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
@@ -50,19 +50,23 @@ Abordagem de produto analítico governado:
 Fluxo principal:
 
 ```mermaid
-flowchart LR
-    A[CSV Bruto] --> B[ingestão & padronização]
-    B --> C[enriquecimento & analytics]
-    C --> D[classificação LGPD]
-    C --> E[checks de qualidade]
-    D --> F[score de risco de privacidade]
-    E --> F
-    F --> G{publication gate}
-    G -->|Aprovado| H[camada publicada]
-    G -->|Bloqueado / Em revisão| I[relatório de governança]
-    H --> J[app Streamlit executivo]
-    I --> J
+flowchart TD
+    raw["Dados brutos"] --> ingest["Ingestão e padronização"]
+    ingest --> analytics["Transformação e Analytics"]
+    analytics --> privacy["Classificação LGPD"]
+    analytics --> quality["Data Quality e contratos"]
+    privacy --> risk["Privacy Risk Score"]
+    risk --> gate{"Publication Gate"}
+    quality --> gate
+    gate -->|Approved| published["Camada publicada"]
+    gate -->|Blocked / Needs Review| evidence["Evidências para revisão"]
+    published --> app["Streamlit: consumo executivo"]
+    evidence -.->|Status e justificativa| control["Central de governança"]
 ```
+
+As setas contínuas representam o fluxo de dados e controles. A seta tracejada leva apenas status e justificativas para a central de governança; não representa publicação de dados bloqueados.
+
+O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_reference_architecture.md); as camadas locais não representam buckets AWS provisionados.
 
 Fronteira chave: o app consome a camada publicada (`data/published/dashboard`), não a camada curada interna completa.
 
