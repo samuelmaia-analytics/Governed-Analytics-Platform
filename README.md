@@ -62,20 +62,9 @@ As métricas abaixo descrevem componentes realmente implementados e versionados 
 
 ## Arquitetura
 
-```mermaid
-flowchart TD
-    raw["Dados brutos"] --> ingest["Ingestão e padronização"]
-    ingest --> analytics["Transformação e Analytics"]
-    analytics --> privacy["Classificação LGPD"]
-    analytics --> quality["Data Quality e contratos"]
-    privacy --> risk["Privacy Risk Score"]
-    risk --> gate{"Publication Gate"}
-    quality --> gate
-    gate -->|Approved| published["Camada publicada"]
-    gate -->|Blocked / Needs Review| evidence["Evidências para revisão"]
-    published --> app["Streamlit: consumo executivo"]
-    evidence -.->|Status e justificativa| control["Central de governança"]
-```
+![Arquitetura: ingestão, controles, Publication Gate e consumo governado](docs/assets/architecture-overview.png)
+
+[Abrir diagrama em alta resolução](docs/assets/architecture-overview.png) · [Versão vetorial](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
 
 As setas contínuas representam o fluxo de dados e controles. A seta tracejada leva apenas status e justificativas para a central de governança; não representa publicação de dados bloqueados.
 
