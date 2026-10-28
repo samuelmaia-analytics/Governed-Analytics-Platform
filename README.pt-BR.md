@@ -8,7 +8,7 @@
 [![App Principal](https://img.shields.io/badge/App_Principal-app%2Fmain.py-FF4B4B?logo=streamlit&logoColor=white)](app/main.py)
 [![Licença](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](LICENSE)
 
-**Idioma:** [English](README.md) | `Português`
+**Idioma:** [English](README.en.md) | `Português`
 
 Plataforma analítica governada para portfólio.
 Foco em Analytics Engineering com controles de governança, qualidade e privacidade.

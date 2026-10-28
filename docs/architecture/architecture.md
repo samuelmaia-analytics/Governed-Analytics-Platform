@@ -35,6 +35,8 @@ The platform is composed of the following major components:
 6. **Data contracts**
    - validates schema/governance expectations (required/forbidden fields, quality contracts).
 
+   The repository also includes a dbt + DuckDB project with staging, intermediate and marts models, tests and documentation in [`dbt/`](../../dbt/README.md). It is an independently executed SQL modeling path alongside the Python pipeline; it is not invoked automatically by `src/run_platform_pipeline.py`.
+
 7. **Publication layer**
    - materializes a minimized/pseudonymized output surface for executive consumption.
 
@@ -76,7 +78,9 @@ Governance is enforced through a layered control sequence:
 2. **Quality checks**: rules detect data reliability issues that may affect publication.
 3. **Contract validation**: schema and governance rules verify publication eligibility constraints.
 4. **Risk scoring**: privacy exposure is quantified and translated into operational recommendation.
-5. **Decision support**: governance outputs are consolidated into publication status and evidence.
+5. **Decision support**: governance outputs are consolidated into publication status and evidence. The deterministic evaluator in [`src/publication_gate.py`](../../src/publication_gate.py) validates input evidence and returns `Approved`, `Needs Review` or `Blocked`; the Governance Control Center calls it.
+
+The evaluator and its tests are implemented. Enforcement must still be assessed per execution path: `src/run_platform_pipeline.py` invokes `run_publish_dashboard` and records a separate monitoring decision. The existence of the evaluator does not establish a single atomic promotion gate across all Python and dbt entrypoints.
 
 This flow ensures publication decisions are not based on visualization readiness alone, but on explicit privacy + quality + contract controls.
 
@@ -137,23 +141,14 @@ These states support auditable and explainable publication governance.
 
 The goal is technical rigor and transparency, not overclaiming production certification.
 
-## 8) Future architecture improvements
+## 8) Implemented components and remaining work
 
-1. **dbt layer**
-   - add modeled transformation layer with explicit tests and semantic model governance.
+| Capability | Implemented evidence | Remaining scope |
+| --- | --- | --- |
+| dbt modeling | [`dbt/README.md`](../../dbt/README.md), staging/intermediate/marts SQL models and YAML tests | Coordinate Python/dbt execution and publication policies consistently across entrypoints. |
+| Publication Gate | [`src/publication_gate.py`](../../src/publication_gate.py), [`tests/test_publication_gate.py`](../../tests/test_publication_gate.py), Governance Control Center integration | Unify enforcement across execution paths and define atomic release promotion. |
+| Metadata and lineage | Local catalog, contracts and lineage artifacts | Integrate a centralized catalog and ownership/SLA management. |
+| Observability | Monitoring artifacts and governance history | Persist longer-range telemetry and control drift monitoring. |
+| Security | Versioned CI checks and documented access assumptions | Implement and validate enterprise IAM, centralized audit and cloud controls. |
 
-2. **Stronger metadata catalog**
-   - expand metadata management beyond local artifacts, with richer ownership and SLA metadata.
-
-3. **More historical observability**
-   - persist long-range governance telemetry for trend analysis and control drift detection.
-
-4. **Automated publication gate**
-   - formalize a deterministic gate that blocks promotion unless all control thresholds pass.
-
-5. **Stronger security checks**
-   - add policy-as-code checks for secrets exposure, access control assumptions, and artifact hardening.
-
----
-
-This architecture is designed to be understandable by senior data engineering reviewers while keeping claims aligned with portfolio scope.
+These are implementation boundaries, not claims of a validated enterprise deployment. AWS remains a reference architecture, and this documentation update does not re-execute the pipeline or dbt models.
