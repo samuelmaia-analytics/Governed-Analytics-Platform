@@ -6,7 +6,7 @@
 [![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
 [![App Principal](https://img.shields.io/badge/App_Principal-app%2Fmain.py-FF4B4B?logo=streamlit&logoColor=white)](app/main.py)
-[![Licença](https://img.shields.io/github/license/samuelmaia-analytics/Governed-Analytics-Platform)](LICENSE)
+[![Licença](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](LICENSE)
 
 **Idioma:** [English](README.md) | `Português`
 
@@ -253,4 +253,8 @@ Artefato forte para discussão em entrevistas de:
 - Streamlit app: <https://governed-analytics-platform.streamlit.app/>
 - Repositório: <https://github.com/samuelmaia-analytics/Governed-Analytics-Platform>
 - Índice técnico: [docs/README.md](docs/README.md)
+
+## Licença
+
+Este projeto utiliza a licença **Creative Commons Atribuição-NãoComercial 4.0 Internacional (CC BY-NC 4.0)**. Consulte os termos completos em [LICENSE](LICENSE) e o [aviso do dashboard](DASHBOARD_LICENSE_NOTICE.txt).
 
