@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -217,9 +218,13 @@ def save_report(checks: list[ContractCheck]) -> Path:
     return REPORT_PATH
 
 
-def main() -> None:
+def main(
+    *, capture_results_fn: Callable[[list[ContractCheck]], None] | None = None
+) -> None:
     configure_logging()
     checks = run_contract_checks()
+    if capture_results_fn is not None:
+        capture_results_fn(checks)
     save_results(checks)
     save_report(checks)
 
