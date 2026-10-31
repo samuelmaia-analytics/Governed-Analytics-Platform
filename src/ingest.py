@@ -139,7 +139,7 @@ def summarize_dataset(path: Path) -> DatasetSummary:
         rows=df.shape[0],
         columns_count=df.shape[1],
         columns=list(df.columns),
-        dtypes={column: str(dtype) for column, dtype in df.dtypes.items()},
+        dtypes={str(column): str(dtype) for column, dtype in df.dtypes.items()},
         parsed_date_columns=parsed_date_columns,
         encoding=encoding,
     )

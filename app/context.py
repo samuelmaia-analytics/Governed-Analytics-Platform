@@ -25,6 +25,7 @@ class GovernanceAppContext:
     quality_table: pd.DataFrame
     risk_result: PrivacyRiskResult
     report_paths: dict[str, Path]
+    uses_persisted_governance: bool = False
 
 
 def _render_data_freshness_sidebar(locale: Locale) -> None:
@@ -51,6 +52,14 @@ def _render_data_freshness_sidebar(locale: Locale) -> None:
         )
 
 
+def _load_platform_dataframe(path: Path) -> pd.DataFrame:
+    dataframe = load_dataset(path)
+    dataframe.attrs["uses_persisted_governance"] = (
+        path.resolve() == DEFAULT_PUBLISHED_DATASET.resolve()
+    )
+    return dataframe
+
+
 def load_input_dataframe(locale: Locale) -> pd.DataFrame:
     st.sidebar.header(t("data_source_header", locale))
     uploaded_file = st.sidebar.file_uploader(
@@ -62,25 +71,33 @@ def load_input_dataframe(locale: Locale) -> pd.DataFrame:
     if uploaded_file is not None:
         suffix = Path(uploaded_file.name).suffix.lower()
         if suffix == ".parquet":
-            return pd.read_parquet(uploaded_file)
-        return pd.read_csv(uploaded_file)
+            dataframe = pd.read_parquet(uploaded_file)
+        else:
+            dataframe = pd.read_csv(uploaded_file)
+        dataframe.attrs["uses_persisted_governance"] = False
+        return dataframe
 
     if use_sample:
         if DEFAULT_PUBLISHED_DATASET.exists():
-            return load_dataset(DEFAULT_PUBLISHED_DATASET)
-        return load_dataset(DEFAULT_SAMPLE_DATASET)
+            return _load_platform_dataframe(DEFAULT_PUBLISHED_DATASET)
+        return _load_platform_dataframe(DEFAULT_SAMPLE_DATASET)
     if DEFAULT_PUBLISHED_DATASET.exists():
-        return load_dataset(DEFAULT_PUBLISHED_DATASET)
-    return load_dataset(DEFAULT_SAMPLE_DATASET)
+        return _load_platform_dataframe(DEFAULT_PUBLISHED_DATASET)
+    return _load_platform_dataframe(DEFAULT_SAMPLE_DATASET)
 
 
 @st.cache_data(show_spinner=False)
-def _build_context_from_dataframe(df: pd.DataFrame) -> GovernanceAppContext:
+def _build_context_from_dataframe(
+    df: pd.DataFrame, *, uses_persisted_governance: bool = False
+) -> GovernanceAppContext:
     classification_df = classify_dataframe_columns(df)
     quality_results = run_data_quality_checks(df)
     quality_table = generate_data_quality_table(df)
     risk_result = calculate_privacy_risk_score(classification_df, total_rows=len(df))
-    report_paths = generate_markdown_reports(df, docs_dir="docs")
+    report_paths = (
+        generate_markdown_reports(df, docs_dir="docs")
+        if uses_persisted_governance else {}
+    )
     return GovernanceAppContext(
         df=df,
         classification_df=classification_df,
@@ -88,9 +105,12 @@ def _build_context_from_dataframe(df: pd.DataFrame) -> GovernanceAppContext:
         quality_table=quality_table,
         risk_result=risk_result,
         report_paths=report_paths,
+        uses_persisted_governance=uses_persisted_governance,
     )
 
 
 def build_context(locale: Locale) -> GovernanceAppContext:
     df = load_input_dataframe(locale)
-    return _build_context_from_dataframe(df)
+    return _build_context_from_dataframe(
+        df, uses_persisted_governance=bool(df.attrs.get("uses_persisted_governance", False))
+    )

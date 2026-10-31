@@ -57,6 +57,7 @@ def _render_executive_page(
         business_page=business_page,
         governance_page=governance_page,
         duckdb_version=get_duckdb_version(),
+        uses_persisted_governance=context.uses_persisted_governance,
     )
 
 
@@ -194,7 +195,7 @@ def main() -> None:
             lambda: _render_eda_page(context, locale),
             title="Technical Analysis",
             icon=":material/monitoring:",
-            url_path="eda",
+            url_path="technical-analysis",
         ),
         st.Page(
             lambda: _render_report_page(context, locale),

@@ -132,35 +132,83 @@ def render_executive_overview(
     governance_page: StreamlitPage | None = None,
     governance_snapshot: PublicationGovernanceSnapshot | None = None,
     duckdb_version: str | None = None,
+    uses_persisted_governance: bool = False,
 ) -> None:
     is_en = locale == LOCALE_EN_US
-    snapshot = governance_snapshot or load_publication_governance_snapshot()
+    snapshot = governance_snapshot or (
+        load_publication_governance_snapshot() if uses_persisted_governance else None
+    )
+
+    unavailable = "Evidence unavailable for selected data" if is_en else "Evidências indisponíveis para estes dados"
+    privacy_summary = (
+        snapshot.privacy.display
+        if snapshot is not None and snapshot.privacy.total > 0
+        else unavailable
+        if snapshot is None
+        else "Controls demonstrated"
+        if is_en
+        else "Controles demonstrados"
+    )
+    validation_summaries: list[str] = []
+    if snapshot is not None and snapshot.quality.total > 0:
+        validation_summaries.append(
+            f"Quality {snapshot.quality.passed}/{snapshot.quality.total}"
+            if is_en
+            else f"Qualidade {snapshot.quality.passed}/{snapshot.quality.total}"
+        )
+    if snapshot is not None and snapshot.monitoring.total > 0:
+        validation_summaries.append(
+            f"Monitoring {snapshot.monitoring.passed}/{snapshot.monitoring.total}"
+            if is_en
+            else f"Monitoramento {snapshot.monitoring.passed}/{snapshot.monitoring.total}"
+        )
+    validation_summary = " · ".join(validation_summaries) or (
+        unavailable if snapshot is None else
+        "Validations demonstrated" if is_en else "Validações demonstradas"
+    )
 
     st.title("Governed Analytics Platform")
-    st.caption("Projeto de portfólio profissional")
+    st.caption("Professional portfolio project" if is_en else "Projeto de portfólio profissional")
     st.markdown(
+        "An end-to-end analytics platform that transforms raw data into business "
+        "insights with quality, privacy and auditable publication decisions."
+        if is_en else
         "Uma plataforma analítica end-to-end que transforma dados brutos em "
         "insights de negócio com qualidade, privacidade e decisões de publicação "
         "auditáveis."
     )
     st.caption(
+        "The displayed data and workflows are demonstrative and do not represent "
+        "a production business operation."
+        if is_en else
         "Os dados e fluxos apresentados são utilizados para fins demonstrativos "
         "e não representam uma operação empresarial em produção."
     )
 
     primary_col1, primary_col2, primary_col3, primary_col4 = st.columns(4)
-    primary_col1.metric("Registros governados", f"{len(df):,}")
+    primary_col1.metric(
+        ("Governed records" if is_en else "Registros governados")
+        if snapshot is not None else ("Analyzed records" if is_en else "Registros analisados"),
+        f"{len(df):,}",
+    )
     primary_col2.metric(
-        "Decisão oficial de publicação", snapshot.historical_decision
+        "Publication governance" if is_en else "Governança de publicação",
+        ("Auditable decision available" if is_en else "Decisão auditável disponível")
+        if snapshot is not None else unavailable,
     )
-    primary_col3.metric("Privacy controls aprovados", snapshot.privacy.display)
+    primary_col3.metric("Privacy controls" if is_en else "Controles de privacidade", privacy_summary)
     primary_col4.metric(
-        "Quality/monitoring status",
-        f"Quality: {snapshot.quality.display} | "
-        f"Monitoring: {snapshot.monitoring.display}",
+        "Quality and monitoring" if is_en else "Qualidade e monitoramento",
+        validation_summary,
     )
+    if snapshot is None:
+        st.warning(
+            "Persisted evidence belongs to fact_orders_dashboard and does not validate uploaded or sample data."
+            if is_en else
+            "As evidências persistidas pertencem a fact_orders_dashboard e não validam dados enviados ou de amostra."
+        )
 
-    st.markdown("**Fluxo de valor governado**")
+    st.markdown("**Governed value flow**" if is_en else "**Fluxo de valor governado**")
     flow_columns = st.columns(4)
     flow_columns[0].info("Raw Data")
     flow_columns[1].info("Quality & Privacy Controls")
@@ -242,6 +290,11 @@ def render_executive_overview(
         else "Métricas detalhadas de governança",
         expanded=False,
     ):
+        st.caption(
+            "Diagnostic indicators from the demonstration environment."
+            if is_en
+            else "Indicadores diagnósticos do ambiente demonstrativo."
+        )
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric(
@@ -309,20 +362,22 @@ def render_executive_overview(
             st.caption(f"DuckDB: {duckdb_version}")
 
     st.subheader("Resumo Executivo" if not is_en else "Executive Summary")
-    risk_level = risk_result["risk_level"]
     if is_en:
         st.write(
-            f"The dataset has **{len(df):,}** rows and **{df.shape[1]}** columns. "
-            f"The current LGPD risk is **{risk_level}** (score **{risk_result['score']}/100**). "
-            f"Data quality score is **{quality_score}/100** with **{quality_results['failed_checks_count']}** failed checks. "
-            f"**{suppressed_columns}** columns are under active LGPD protection."
+            f"This project demonstrates a governed analytics platform across "
+            f"**{len(df):,}** records and **{df.shape[1]}** columns, with a "
+            "transformation pipeline, data quality and privacy controls, publication "
+            "governance, and an analytics layer for insights. Detailed technical "
+            "evaluations remain available on the governance and quality pages."
         )
     else:
         st.write(
-            f"O dataset possui **{len(df):,}** registros e **{df.shape[1]}** colunas. "
-            f"O risco LGPD atual é **{risk_level}** (score **{risk_result['score']}/100**). "
-            f"O score de qualidade é **{quality_score}/100** com **{quality_results['failed_checks_count']}** falhas. "
-            f"**{suppressed_columns}** colunas estão sob proteção LGPD ativa."
+            "O projeto demonstra uma plataforma analítica governada com "
+            f"**{len(df):,}** registros e **{df.shape[1]}** colunas, pipeline de "
+            "transformação, controles de qualidade e privacidade, governança de "
+            "publicação e camada analítica para geração de insights. As avaliações "
+            "técnicas detalhadas permanecem disponíveis nas páginas de governança "
+            "e qualidade."
         )
     if prev is None:
         st.caption(

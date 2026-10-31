@@ -132,12 +132,13 @@ def generate_storytelling_insights(df: pd.DataFrame) -> list[str]:
         corr = numeric_df.corr(numeric_only=True).abs()
         np.fill_diagonal(corr.values, np.nan)
         stacked = corr.stack()
-        if not stacked.empty:
+        if isinstance(stacked, pd.Series) and not stacked.empty:
             best_pair = stacked.idxmax()
-            best_value = float(stacked.max())
-            insights.append(
-                f"Highest numeric correlation is between `{best_pair[0]}` and `{best_pair[1]}` (|r|={best_value:.2f})."
-            )
+            if isinstance(best_pair, tuple) and len(best_pair) == 2:
+                best_value = float(stacked.max())
+                insights.append(
+                    f"Highest numeric correlation is between `{best_pair[0]}` and `{best_pair[1]}` (|r|={best_value:.2f})."
+                )
 
     return insights
 
@@ -175,25 +176,27 @@ def run_statistical_tests(df: pd.DataFrame) -> pd.DataFrame:
         corr = numeric_df.corr(numeric_only=True).abs()
         np.fill_diagonal(corr.values, np.nan)
         stacked = corr.stack()
-        if not stacked.empty:
-            col_x, col_y = stacked.idxmax()
-            pair = numeric_df[[col_x, col_y]].dropna()
-            n = len(pair)
-            if n >= 8:
-                r = float(pair[col_x].corr(pair[col_y]))
-                clamped_r = min(max(r, -0.999999), 0.999999)
-                z = 0.5 * math.log((1 + clamped_r) / (1 - clamped_r)) * math.sqrt(n - 3)
-                p_value = float(math.erfc(abs(z) / math.sqrt(2)))
-                rows.append(
-                    {
-                        "test_name": "pearson_correlation_significance",
-                        "target": f"{col_x}~{col_y}",
-                        "statistic": round(r, 4),
-                        "p_value": round(p_value, 6),
-                        "interpretation": "significant_correlation"
-                        if p_value < 0.05
-                        else "weak_evidence",
-                    }
-                )
+        if isinstance(stacked, pd.Series) and not stacked.empty:
+            best_pair = stacked.idxmax()
+            if isinstance(best_pair, tuple) and len(best_pair) == 2:
+                col_x, col_y = best_pair
+                pair = numeric_df[[col_x, col_y]].dropna()
+                n = len(pair)
+                if n >= 8:
+                    r = float(pair[col_x].corr(pair[col_y]))
+                    clamped_r = min(max(r, -0.999999), 0.999999)
+                    z = 0.5 * math.log((1 + clamped_r) / (1 - clamped_r)) * math.sqrt(n - 3)
+                    p_value = float(math.erfc(abs(z) / math.sqrt(2)))
+                    rows.append(
+                        {
+                            "test_name": "pearson_correlation_significance",
+                            "target": f"{col_x}~{col_y}",
+                            "statistic": round(r, 4),
+                            "p_value": round(p_value, 6),
+                            "interpretation": "significant_correlation"
+                            if p_value < 0.05
+                            else "weak_evidence",
+                        }
+                    )
 
     return pd.DataFrame(rows)

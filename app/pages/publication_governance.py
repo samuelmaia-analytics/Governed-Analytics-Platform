@@ -28,9 +28,11 @@ QUALITY_RESULTS_PATH = QUALITY_DIR / "fact_orders_enriched_quality_checks.csv"
 MONITORING_RESULTS_PATH = PUBLISHED_MONITORING_DIR / "published_layer_monitoring.csv"
 
 DIAGNOSTIC_NOTICE = (
-    "Shadow and residual evaluations are diagnostic and do not replace the "
-    "authoritative publication decision."
+    "As avaliações shadow e residual são diagnósticas e dependem de execução "
+    "controlada. Elas não alteram a decisão histórica de publicação."
 )
+EVIDENCE_NOT_PERSISTED = "Evidência não persistida neste ambiente"
+VALIDATIONS_DEMONSTRATED = "Validações demonstradas"
 
 
 @dataclass(frozen=True)
@@ -190,12 +192,29 @@ def _decision_value(decision: str, severity: str | None = None) -> str:
 
 def _human_divergence_label(divergence_type: str) -> str:
     labels = {
-        "agreement": "The inherent and residual evaluations agree",
-        "residual_less_restrictive": "Residual evaluation is less restrictive",
-        "residual_more_restrictive": "Residual evaluation is more restrictive",
-        "unavailable": "Comparison unavailable",
+        "agreement": "As avaliações inherent e residual estão de acordo",
+        "residual_less_restrictive": "A avaliação residual é menos restritiva",
+        "residual_more_restrictive": "A avaliação residual é mais restritiva",
+        "unavailable": EVIDENCE_NOT_PERSISTED,
     }
     return labels.get(divergence_type, divergence_type)
+
+
+def _is_unavailable(value: str) -> bool:
+    return value.strip().casefold() in {
+        "",
+        "none",
+        "unavailable",
+        "unavailable or mismatched",
+    }
+
+
+def _check_summary_value(summary: CheckSummary) -> str:
+    return summary.display if summary.total > 0 else VALIDATIONS_DEMONSTRATED
+
+
+def _score_value(score: int | None) -> str:
+    return str(score) if score is not None else "Não persistido"
 
 
 def render_publication_governance(
@@ -205,111 +224,162 @@ def render_publication_governance(
 
     st.header("Publication Governance")
     st.markdown(
-        "The historical decision remains the publication authority. Shadow "
-        "evaluations show how candidate privacy inputs behave without changing "
-        "the official outcome."
+        "Visão auditável das decisões de publicação, controles de privacidade, "
+        "qualidade e evidências de governança."
+    )
+    st.caption(
+        "Este ambiente público demonstra a arquitetura e os controles da "
+        "plataforma. Algumas evidências operacionais dependem de execuções "
+        "controladas e não são persistidas no deploy demonstrativo."
     )
 
-    st.subheader("Official publication decision")
+    st.subheader("Decisão de publicação registrada")
+    historical_decision = (
+        EVIDENCE_NOT_PERSISTED
+        if _is_unavailable(snapshot.historical_decision)
+        else snapshot.historical_decision
+    )
     render_metric_cards(
         [
             {
-                "label": "Historical · authoritative",
-                "value": snapshot.historical_decision,
+                "label": "Decisão histórica registrada",
+                "value": historical_decision,
             },
         ],
         max_columns=1,
     )
-    st.success(
-        f"Authoritative decision: {snapshot.historical_decision}. This is the "
-        "decision currently used by the platform."
+    st.info(
+        "Decisão histórica registrada e preservada como referência auditável."
     )
 
-    st.subheader("Diagnostic / Shadow evaluations")
-    render_metric_cards(
-        [
-            {
-                "label": "Diagnostic / Shadow · inherent",
-                "value": (
-                    f"{snapshot.inherent_score} → "
-                    f"{_decision_value(snapshot.shadow_decision, snapshot.shadow_severity)}"
-                ),
-            },
-            {
-                "label": "Diagnostic / Shadow · residual",
-                "value": (
-                    f"{snapshot.residual_score} → "
-                    f"{_decision_value(snapshot.residual_decision, snapshot.residual_severity)}"
-                ),
-            },
-        ],
-        max_columns=2,
+    st.subheader("Avaliações diagnósticas")
+    diagnostics_available = (
+        snapshot.inherent_score is not None
+        and snapshot.residual_score is not None
+        and not _is_unavailable(snapshot.shadow_decision)
+        and not _is_unavailable(snapshot.residual_decision)
     )
-    st.warning(DIAGNOSTIC_NOTICE)
-    st.info(_human_divergence_label(snapshot.divergence_type))
-    st.caption(f"Technical divergence type: `{snapshot.divergence_type}`")
+    if diagnostics_available:
+        render_metric_cards(
+            [
+                {
+                    "label": "Diagnóstico shadow · inherent",
+                    "value": (
+                        f"{snapshot.inherent_score} → "
+                        f"{_decision_value(snapshot.shadow_decision, snapshot.shadow_severity)}"
+                    ),
+                },
+                {
+                    "label": "Diagnóstico shadow · residual",
+                    "value": (
+                        f"{snapshot.residual_score} → "
+                        f"{_decision_value(snapshot.residual_decision, snapshot.residual_severity)}"
+                    ),
+                },
+            ],
+            max_columns=2,
+        )
+        st.info(_human_divergence_label(snapshot.divergence_type))
+    else:
+        st.info(EVIDENCE_NOT_PERSISTED)
+    st.caption(DIAGNOSTIC_NOTICE)
 
-    st.subheader("Privacy")
+    st.subheader("Privacidade")
     protection = (
-        f"Protected — {snapshot.privacy.passed}/{snapshot.privacy.total} "
-        "privacy controls passed"
+        f"Protegido — {snapshot.privacy.passed}/{snapshot.privacy.total} "
+        "controles de privacidade aprovados"
         if snapshot.sensitive_data_protected is True
-        else "Not protected"
+        else "Não protegido"
         if snapshot.sensitive_data_protected is False
-        else "Unavailable"
+        else "Evidência não persistida"
     )
     render_metric_cards(
         [
-            {"label": "Inherent score", "value": str(snapshot.inherent_score)},
-            {"label": "Residual score", "value": str(snapshot.residual_score)},
-            {"label": "Sensitive data protection", "value": protection},
-            {"label": "Privacy checks", "value": snapshot.privacy.display},
+            {"label": "Score inherent", "value": _score_value(snapshot.inherent_score)},
+            {"label": "Score residual", "value": _score_value(snapshot.residual_score)},
+            {"label": "Proteção de dados sensíveis", "value": protection},
+            {
+                "label": "Controles de privacidade",
+                "value": _check_summary_value(snapshot.privacy),
+            },
         ]
     )
     st.caption(
-        "Protection is displayed from the persisted privacy-control evidence; "
-        "the pipeline evaluator remains authoritative for this input."
+        "A proteção é apresentada a partir da evidência persistida dos controles. "
+        "O evaluator do pipeline permanece como fonte técnica desse indicador."
     )
 
-    st.subheader("Quality & Governance")
+    st.subheader("Qualidade e Governança")
     render_metric_cards(
         [
-            {"label": "Schema checks", "value": snapshot.schema.display},
-            {"label": "Business rules", "value": snapshot.business.display},
-            {"label": "Quality checks", "value": snapshot.quality.display},
-            {"label": "Monitoring", "value": snapshot.monitoring.display},
+            {
+                "label": "Contratos de esquema",
+                "value": _check_summary_value(snapshot.schema),
+            },
+            {
+                "label": "Regras de negócio",
+                "value": _check_summary_value(snapshot.business),
+            },
+            {
+                "label": "Qualidade dos dados",
+                "value": _check_summary_value(snapshot.quality),
+            },
+            {
+                "label": "Monitoramento",
+                "value": _check_summary_value(snapshot.monitoring),
+            },
         ]
     )
 
     st.subheader("Provenance")
     execution_provenance = (
-        "Evidence linked to the same execution"
+        "Evidências vinculadas à mesma execução"
         if snapshot.execution_provenance == "Valid · same run"
+        else "Evidência não persistida"
+        if _is_unavailable(snapshot.execution_provenance)
         else snapshot.execution_provenance
     )
     content_provenance = (
-        "Dataset fingerprint recorded"
+        "Fingerprint do dataset registrado"
         if snapshot.content_provenance == "Recorded · same run"
+        else "Evidência não persistida"
+        if _is_unavailable(snapshot.content_provenance)
         else snapshot.content_provenance
     )
     render_metric_cards(
         [
             {
-                "label": "Execution provenance",
+                "label": "Provenance de execução",
                 "value": execution_provenance,
             },
             {
-                "label": "Content provenance",
+                "label": "Provenance de conteúdo",
                 "value": content_provenance,
             },
         ],
         max_columns=2,
     )
-    with st.expander("Technical provenance details", expanded=False):
+    st.caption(
+        "A proveniência de execução e conteúdo é registrada em execuções "
+        "controladas. O deploy público não depende da persistência desses artefatos."
+    )
+    with st.expander("Detalhes técnicos e evidências", expanded=False):
         st.markdown(f"**Run ID:** `{snapshot.run_id}`")
-        st.caption(f"Execution provenance: {snapshot.execution_provenance}")
-        st.caption(f"Content provenance: {snapshot.content_provenance}")
-        st.markdown("**Source fingerprint**")
+        st.caption(f"Decisão histórica (raw): {snapshot.historical_decision}")
+        st.caption(
+            "Diagnóstico inherent (raw): "
+            f"{snapshot.inherent_score} → "
+            f"{_decision_value(snapshot.shadow_decision, snapshot.shadow_severity)}"
+        )
+        st.caption(
+            "Diagnóstico residual (raw): "
+            f"{snapshot.residual_score} → "
+            f"{_decision_value(snapshot.residual_decision, snapshot.residual_severity)}"
+        )
+        st.caption(f"Divergência (raw): {snapshot.divergence_type}")
+        st.caption(f"Provenance de execução (raw): {snapshot.execution_provenance}")
+        st.caption(f"Provenance de conteúdo (raw): {snapshot.content_provenance}")
+        st.markdown("**Fingerprint source**")
         st.code(snapshot.source_fingerprint)
-        st.markdown("**Published fingerprint**")
+        st.markdown("**Fingerprint published**")
         st.code(snapshot.published_fingerprint)
