@@ -301,3 +301,31 @@ def test_approved_sources_survive_checkout_line_endings_not_content_changes(tmp_
     source.write_bytes(lf + b"quality_override: disabled\n")
     assert not rag.load_corpus(tmp_path, manifest).chunks
     assert rag.document_digest(b"a \n") != rag.document_digest(b"a\n")
+
+
+@pytest.mark.parametrize("question", [
+    "quality_rules gold_fact_orders",
+    "O que devo conferir antes de publicar dados de pedidos?",
+])
+def test_technical_and_natural_questions_retrieve_cited_evidence(index, monkeypatch, question):
+    monkeypatch.setattr(rag.request, "urlopen", lambda *_args, **_kwargs: pytest.fail("Network forbidden"))
+    answer = rag.answer_question(index, question)
+    assert answer.supported and not answer.external_called
+    assert answer.hits[0].chunk.source == "contracts/gold_fact_orders_contract.yml"
+    assert "[S1]" in answer.text
+    assert "no_duplicate_primary_key" in answer.text
+
+
+@pytest.mark.parametrize("source", [
+    "AGENTS.md", "policies/DATA_GOVERNANCE.md", "standards/example.md",
+    "checklists/example.md", "templates/example.md", ".git/info/exclude",
+])
+def test_local_only_sources_never_reach_external_provider(monkeypatch, source):
+    chunks = rag.split_document("privacy customer publication", source=source, sha256="d" * 64)
+    index = rag.LocalIndex(chunks)
+    monkeypatch.setattr(rag, "load_app_settings", lambda: pytest.fail("Provider configuration must not be loaded"))
+    monkeypatch.setattr(rag.request, "urlopen", lambda *_args, **_kwargs: pytest.fail("Network forbidden"))
+    local = rag.answer_question(index, "privacy customer")
+    assert local.supported and not local.external_called
+    with pytest.raises(rag.RagError, match="restrita ao modo local"):
+        rag.answer_question(index, "privacy customer", mode="openai", consent=True)

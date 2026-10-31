@@ -51,6 +51,25 @@ heuristica adicional exclui arquivos com padroes de chaves, CPF, email ou segred
 Essa verificacao NAO substitui revisao humana e pode ter falsos positivos/negativos.
 O tamanho por documento e limitado a 200 KB; UTF-8 e YAML seguro sao exigidos.
 
+## Itens Somente Locais
+
+`AGENTS.md`, `policies/`, `standards/`, `checklists/` e `templates/` permanecem
+somente na copia local. As exclusoes sao configuradas em `.git/info/exclude`,
+sem alterar `.gitignore`. O arquivo de exclusao tambem nao entra no Git.
+
+```bash
+git check-ignore -v AGENTS.md policies/ standards/ checklists/ templates/
+git status --short --ignored -- AGENTS.md policies/ standards/ checklists/ templates/
+git ls-files -- AGENTS.md policies/ standards/ checklists/ templates/ .git/info/exclude
+```
+
+Se um desses itens ja estiver rastreado, interromper a preparacao de publicacao
+e pedir orientacao; nao remover arquivos do Git automaticamente. A politica
+explicitamente aprovada no manifesto pode ser consultada no RAG local, mas
+nunca e enviada ao provedor. Os demais caminhos continuam fora da ingestao.
+Se a recuperacao contiver qualquer fonte local restrita, toda a chamada externa
+e bloqueada antes de carregar a configuracao do provedor, mesmo com consentimento.
+
 ## Execucao e Atualizacao
 
 Use o ambiente do projeto (Python 3.11 a 3.13), com as dependencias existentes:
@@ -59,6 +78,8 @@ Use o ambiente do projeto (Python 3.11 a 3.13), com as dependencias existentes:
 .\.venv\Scripts\python.exe -m streamlit run app/main.py
 .\.venv\Scripts\python.exe -m src.governance_rag
 .\.venv\Scripts\python.exe -m src.governance_rag --question "Quais regras de qualidade se aplicam a gold_fact_orders?"
+.\.venv\Scripts\python.exe -m src.governance_rag --question "O que devo conferir antes de publicar dados de clientes?"
+.\.venv\Scripts\python.exe -m src.governance_rag --question "Qual a previsao meteorologica em Marte?"
 ```
 
 Nao ha banco vetorial nem indice persistido. Cada consulta reconstrui o indice
@@ -93,7 +114,8 @@ politica local nao versionada e as versoes locais modificadas dos relatorios
 nao entram no commit do RAG. Em checkout limpo, essas fontes sao excluidas se
 ausentes ou com hash divergente; os contratos continuam disponiveis. Nao
 aprovar automaticamente a versao diferente de um relatorio para eliminar
-avisos. A inclusao dessas versoes exige uma contribuicao separada revisada.
+avisos. A inclusao de versoes dos relatorios exige uma contribuicao separada
+revisada; a politica permanece somente local e nao deve ser publicada.
 Nao ha benchmark de relevancia de relatorios ausentes no checkout publicado.
 
 ## Provedor Opcional
@@ -135,8 +157,9 @@ conciliadas por uma pessoa; o RAG nao decide autoridade nem vigencia.
 
 ## Avaliacao
 
-O manifesto inclui perguntas e fontes esperadas, incluindo negativos para
-execucao inexistente e pergunta fora do dominio. Executar sobre a base aprovada:
+O manifesto inclui perguntas tecnicas, perguntas naturais sem nomes de tabelas
+e fontes esperadas, incluindo negativos para execucao inexistente e pergunta
+fora do dominio. Executar sobre a base aprovada:
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.governance_rag --evaluate
@@ -164,6 +187,11 @@ TF-IDF depende de vocabulario (com pequeno glossario PT/EN), pode perder
 parafrases e recuperar trechos pouco relevantes. Trechos podem dividir tabelas
 ou YAML; consulte a fonte inteira. Latencia cresce com o tamanho da base pois
 o indice e reconstruido. API acrescenta latencia, custo e transferencia externa.
+O glossario relaciona palavras como dados, conferir e proteger ao vocabulario
+dos documentos e ignora palavras comuns de formulacao, como devo e antes.
+Isso melhora perguntas naturais, mas nao oferece compreensao semantica geral,
+traducao completa ou resposta abstrativa. As respostas locais continuam sendo
+evidencias extrativas citadas, nao autorizacoes nem decisoes geradas pelo modelo.
 Nao ha medicao real dessas grandezas, certificacao LGPD ou garantia de ausencia
 de PII. Em ambiente multiusuario, a base aprovada e compartilhada; nao incluir
 documentos sujeitos a permissoes individuais sem implementar controle de acesso.

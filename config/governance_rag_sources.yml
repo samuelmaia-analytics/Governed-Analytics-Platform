@@ -25,6 +25,12 @@ evaluation:
   - question: O que exige o contrato customer_privacy_controls para publication?
     expected_sources:
       - contracts/customer_privacy_contract.yml
+  - question: O que devo conferir antes de publicar dados de clientes?
+    expected_sources:
+      - contracts/customer_privacy_contract.yml
+  - question: O que devo conferir antes de publicar dados de pedidos?
+    expected_sources:
+      - contracts/gold_fact_orders_contract.yml
   - question: Quais checks falharam order_id_unique no Data Quality Report?
     expected_sources:
       - docs/reports/data_quality_report.md
