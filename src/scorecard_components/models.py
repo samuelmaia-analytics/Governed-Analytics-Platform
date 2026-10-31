@@ -19,4 +19,3 @@ class DatasetScorecard:
     dataset_name: str
     governance_score: float
     status: str
-

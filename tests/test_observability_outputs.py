@@ -57,4 +57,3 @@ def test_save_results_propagates_write_error(tmp_path: Path) -> None:
         save_observability_results(
             _checks(), output_path=output_path, ensure_directory_fn=lambda path: path
         )
-

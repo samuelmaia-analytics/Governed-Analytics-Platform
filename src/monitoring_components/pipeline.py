@@ -32,4 +32,3 @@ def run_monitoring(
     results.extend(check_critical_nulls_fn(df))
     results.extend(check_semantic_coverage_fn(df))
     return results
-

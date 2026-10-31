@@ -88,4 +88,3 @@ def build_dataset_scorecards(metrics: list[ScorecardMetric]) -> list[DatasetScor
         score = round(sum(metric.score for metric in dataset_metrics) / len(dataset_metrics), 2)
         scorecards.append(DatasetScorecard(dataset_name, score, status_from_score(score)))
     return scorecards
-

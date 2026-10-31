@@ -94,4 +94,3 @@ def test_semantic_coverage_preserves_zero_and_one_percent_boundaries() -> None:
     assert [result.status for result in results] == ["PASS", "PASS"]
     assert [result.metric_value for result in results] == [0.0, 1.0]
     assert [result.threshold for result in results] == [0, 1.0]
-

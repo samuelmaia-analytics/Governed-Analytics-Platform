@@ -26,4 +26,3 @@ def test_physically_empty_csv_keeps_pandas_exception(tmp_path: Path) -> None:
     path.write_text("", encoding="utf-8")
     with pytest.raises(pd.errors.EmptyDataError):
         read_csv(path)
-

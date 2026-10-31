@@ -156,4 +156,3 @@ def quality_score_trend_check(history_df: pd.DataFrame) -> ObservabilityCheck:
         -10.0,
         f"Latest quality-score delta: {delta:.2f}.",
     )
-

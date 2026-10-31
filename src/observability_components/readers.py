@@ -12,4 +12,3 @@ def load_governance_history(path: Path) -> pd.DataFrame:
     if "execution_timestamp" in history_df.columns:
         history_df = history_df.sort_values("execution_timestamp")
     return history_df
-

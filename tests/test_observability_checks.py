@@ -89,4 +89,3 @@ def test_zero_row_count_baseline_preserves_current_percentage_rule() -> None:
     result = checks.row_count_anomaly_check(pd.DataFrame({"row_count": [0, 1]}))
     assert result.metric_value == 100.0
     assert result.status == "FAIL"
-

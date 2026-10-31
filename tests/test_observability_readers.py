@@ -64,4 +64,3 @@ def test_reader_error_is_propagated_with_expected_path(
 
     with pytest.raises(ValueError, match="invalid history"):
         readers.load_governance_history(path)
-

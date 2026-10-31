@@ -11,4 +11,3 @@ def run_scorecards(*, build_metrics_fn: Callable[[], list[ScorecardMetric]], bui
     save_outputs_fn(metrics, scorecards)
     save_report_fn(metrics, scorecards)
     return metrics, scorecards
-

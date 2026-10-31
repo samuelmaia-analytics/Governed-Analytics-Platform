@@ -71,4 +71,3 @@ def calculate_snapshot_metrics(
         null_rate=round(null_rate, 4),
         duplicate_rate=round(duplicate_rate, 4),
     )
-

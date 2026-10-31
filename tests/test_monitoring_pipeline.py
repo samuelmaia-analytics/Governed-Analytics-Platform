@@ -102,4 +102,3 @@ def test_pipeline_propagates_dependency_errors(step: str) -> None:
 
     with pytest.raises(LookupError, match=step):
         run_monitoring(**kwargs)  # type: ignore[arg-type]
-

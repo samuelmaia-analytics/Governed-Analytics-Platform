@@ -90,4 +90,3 @@ def test_save_report_propagates_write_error(tmp_path: Path, monkeypatch) -> None
         outputs.save_report(
             "report", docs_dir=tmp_path, report_path=tmp_path / "report.md"
         )
-

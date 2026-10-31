@@ -158,4 +158,3 @@ def check_semantic_coverage(
             "Cobertura da semantica de seller.",
         ),
     ]
-

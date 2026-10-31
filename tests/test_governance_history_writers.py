@@ -61,4 +61,3 @@ def test_decision_writer_preserves_schema_reasons_and_no_run_id(
     assert payload["decision_reason"] == reason
     assert "run_id" not in payload
     assert "acentuação" in path.read_text(encoding="utf-8")
-

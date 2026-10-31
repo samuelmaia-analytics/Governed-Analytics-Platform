@@ -75,4 +75,3 @@ def save_report(report: str, *, docs_dir: Path, report_path: Path) -> Path:
     ensure_directory(docs_dir)
     report_path.write_text(report, encoding="utf-8")
     return report_path
-

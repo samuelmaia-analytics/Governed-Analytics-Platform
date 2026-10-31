@@ -43,4 +43,3 @@ def save_publication_decision_artifact(
         json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
     )
     return output_path
-

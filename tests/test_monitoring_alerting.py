@@ -99,4 +99,3 @@ def test_http_errors_are_propagated() -> None:
             webhook_url="https://example.invalid",
             post_fn=lambda *args, **kwargs: Response(),
         )
-

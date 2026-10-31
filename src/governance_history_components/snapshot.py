@@ -51,4 +51,3 @@ def build_snapshot(
         "privacy_risk_level": privacy_result["risk_level"],
         "failed_checks_count": metrics.failed_rules_count,
     }
-

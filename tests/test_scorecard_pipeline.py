@@ -35,4 +35,3 @@ def test_pipeline_propagates_errors_and_stops(step: str) -> None:
     with pytest.raises(RuntimeError, match=step):
         run_scorecards(build_metrics_fn=action("metrics", metrics), build_dataset_scorecards_fn=action("cards", cards), save_outputs_fn=action("outputs", None), save_report_fn=action("report", None))  # type: ignore[arg-type]
     assert calls[-1] == step
-

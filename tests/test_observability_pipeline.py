@@ -92,4 +92,3 @@ def test_pipeline_propagates_check_exception_and_stops() -> None:
         )
 
     assert later_calls == []
-

@@ -59,4 +59,3 @@ def test_dataset_scorecards_average_dimensions_and_sort_datasets() -> None:
     ]
     cards = scoring.build_dataset_scorecards(metrics)
     assert [(card.dataset_name, card.governance_score, card.status) for card in cards] == [("a", 75.0, "critical"), ("b", 100.0, "healthy")]
-

@@ -85,4 +85,3 @@ def test_earlier_failures_stop_pipeline(step: str, tmp_path: Path) -> None:
             history_path=tmp_path / "h.csv", publication_decision_path=tmp_path / "d.json",
         )
     assert "decision" not in calls
-

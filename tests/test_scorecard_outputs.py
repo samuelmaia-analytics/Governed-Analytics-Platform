@@ -38,3 +38,33 @@ def test_output_error_is_propagated(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(pd.DataFrame, "to_csv", lambda *args, **kwargs: (_ for _ in ()).throw(OSError("write failed")))
     with pytest.raises(OSError, match="write failed"):
         outputs.save_outputs(metrics, cards, output_dir=tmp_path, csv_path=tmp_path / "x.csv", json_path=tmp_path / "x.json")
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        (r"C:\old\source.csv", "C:/old/source.csv"),
+        ("C:/old/source.csv", "C:/old/source.csv"),
+        (r"\\server\share\source.csv", "//server/share/source.csv"),
+        ("//server/share/source.csv", "//server/share/source.csv"),
+        (r"data\quality\source.csv", "data/quality/source.csv"),
+        ("data/quality/source.csv", "data/quality/source.csv"),
+        ("/var/data/source.csv", "/var/data/source.csv"),
+        (r"C:relative\source.csv", "C:relative/source.csv"),
+        ("data/path with spaces/../source.csv", "data/path with spaces/../source.csv"),
+    ],
+)
+def test_foreign_paths_render_consistently_without_changing_stored_evidence(
+    source: str, expected: str, tmp_path: Path
+) -> None:
+    metrics = [ScorecardMetric("dataset", "quality", 95.0, "healthy", source, 2, 1)]
+    cards = [DatasetScorecard("dataset", 95.0, "healthy")]
+    assert f"| `{expected}` |" in outputs.render_report(metrics, cards)
+    assert metrics[0].source == source
+
+    csv_path, json_path = outputs.save_outputs(
+        metrics, cards, output_dir=tmp_path,
+        csv_path=tmp_path / "cards.csv", json_path=tmp_path / "cards.json",
+    )
+    assert pd.read_csv(csv_path)["source"].iloc[0] == source
+    assert json.loads(json_path.read_text(encoding="utf-8"))["metrics"][0]["source"] == source

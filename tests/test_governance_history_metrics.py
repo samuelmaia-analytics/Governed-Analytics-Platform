@@ -54,4 +54,3 @@ def test_null_and_duplicate_rates_keep_rounding() -> None:
     assert metrics.null_rate == 1.6667
     assert metrics.duplicate_rate == 33.3333
     assert (metrics.warning_rules_count, metrics.critical_rules_count) == (1, 2)
-

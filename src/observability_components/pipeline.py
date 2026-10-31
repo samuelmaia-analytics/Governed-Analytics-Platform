@@ -50,4 +50,3 @@ def evaluate_governance_observability(
         privacy_risk_trend_check_fn(history_df),
         quality_score_trend_check_fn(history_df),
     ]
-

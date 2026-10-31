@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Pattern, cast
@@ -39,6 +40,13 @@ INDIRECT_IDENTIFIER_TERMS = {
     "ip",
 }
 PERSONAL_NAME_CONTEXT_TERMS = {
+    "cliente",
+    "completo",
+    "contato",
+    "pessoa",
+    "primeiro",
+    "ultimo",
+    "usuario",
     "contact",
     "customer",
     "first",
@@ -91,12 +99,24 @@ def normalize_name(column_name: str) -> str:
     return column_name.strip().lower()
 
 
+def _normalize_header(column_name: str) -> str:
+    # Keep contract keys and original dataframe headers unchanged.
+    header = (
+        unicodedata.normalize("NFKD", column_name)
+        .encode("ascii", "ignore")
+        .decode("ascii")
+    )
+    header = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", header)
+    header = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", header)
+    return re.sub(r"[^a-z0-9]+", "_", header.lower()).strip("_")
+
+
 def _name_tokens(column_name: str) -> set[str]:
-    return set(re.findall(r"[a-z0-9]+", normalize_name(column_name)))
+    return set(_normalize_header(column_name).split("_"))
 
 
 def _contains_term(column_name: str, term: str) -> bool:
-    normalized = normalize_name(column_name)
+    normalized = _normalize_header(column_name)
     return re.search(rf"(?:^|_){re.escape(term)}(?:_|$)", normalized) is not None
 
 
@@ -233,19 +253,19 @@ def detect_by_column_name(column_name: str) -> tuple[LGPDClassification, str]:
             "Column name matches the governed technical-identifier policy.",
         )
 
-    if any(_contains_term(normalized, term) for term in SENSITIVE_TERMS):
+    header = _normalize_header(column_name)
+    if any(_contains_term(header, term) for term in SENSITIVE_TERMS):
         return "sensitive_personal_data", "Column name indicates sensitive data."
 
-    tokens = _name_tokens(normalized)
-    has_personal_name = normalized in {"name", "nome"} or (
-        bool({"name", "nome"} & tokens)
-        and bool(PERSONAL_NAME_CONTEXT_TERMS & tokens)
+    tokens = _name_tokens(header)
+    has_personal_name = header in {"name", "nome"} or (
+        bool({"name", "nome"} & tokens) and bool(PERSONAL_NAME_CONTEXT_TERMS & tokens)
     )
     if has_personal_name or any(
-        _contains_term(normalized, term) for term in PERSONAL_TERMS
+        _contains_term(header, term) for term in PERSONAL_TERMS
     ):
         return "personal_data", "Column name indicates personal data."
-    if any(_contains_term(normalized, term) for term in INDIRECT_IDENTIFIER_TERMS):
+    if any(_contains_term(header, term) for term in INDIRECT_IDENTIFIER_TERMS):
         return (
             "indirect_identifier",
             "Column name indicates indirect identification risk.",
@@ -261,17 +281,15 @@ def detect_by_regex(series: pd.Series) -> tuple[LGPDClassification, str]:
     if sample_values.empty:
         return "non_personal", "Column has only null values."
 
-    if pd.api.types.is_numeric_dtype(series.dtype) or pd.api.types.is_datetime64_any_dtype(
+    if pd.api.types.is_numeric_dtype(
         series.dtype
-    ):
+    ) or pd.api.types.is_datetime64_any_dtype(series.dtype):
         return (
             "non_personal",
             "Value regex profiling skipped for numeric or temporal column.",
         )
 
-    regex_classifications: tuple[
-        tuple[str, LGPDClassification, str], ...
-    ] = (
+    regex_classifications: tuple[tuple[str, LGPDClassification, str], ...] = (
         ("email", "personal_data", "Regex matched email pattern in sampled values."),
         ("cpf", "personal_data", "Regex matched CPF pattern in sampled values."),
         ("cnpj", "personal_data", "Regex matched CNPJ pattern in sampled values."),
@@ -279,9 +297,14 @@ def detect_by_regex(series: pd.Series) -> tuple[LGPDClassification, str]:
         ("phone", "personal_data", "Regex matched phone pattern in sampled values."),
     )
     values = sample_values.tolist()
+    result: LGPDClassification = "non_personal"
+    reasons: list[str] = []
     for pattern_name, classification, reason in regex_classifications:
         if any(REGEX_PATTERNS[pattern_name].search(value) for value in values):
-            return classification, reason
+            result = merge_signal_priority(result, classification)
+            reasons.append(reason)
+    if reasons:
+        return result, " ".join(reasons)
     return "non_personal", "No personal-data regex pattern matched sampled values."
 
 
@@ -302,7 +325,7 @@ def merge_signal_priority(
 def map_risk_and_action(
     classification: LGPDClassification, column_name: str
 ) -> tuple[RiskLevel, RecommendedAction]:
-    lowered = column_name.lower()
+    lowered = _normalize_header(column_name)
     if classification == "sensitive_personal_data":
         if any(token in lowered for token in ["biometric", "biometrico"]):
             return "high", "remove"

@@ -15,4 +15,3 @@ def append_history(snapshot: dict[str, object], *, history_path: Path) -> Path:
         row_df = pd.concat([existing, row_df], ignore_index=True)
     row_df.to_csv(history_path, index=False)
     return history_path
-
