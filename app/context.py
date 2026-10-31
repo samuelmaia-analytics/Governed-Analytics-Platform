@@ -88,15 +88,19 @@ def load_input_dataframe(locale: Locale) -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def _build_context_from_dataframe(
-    df: pd.DataFrame, *, uses_persisted_governance: bool = False
+    df: pd.DataFrame,
+    docs_dir: str | Path = "docs",
+    *,
+    uses_persisted_governance: bool = False,
 ) -> GovernanceAppContext:
     classification_df = classify_dataframe_columns(df)
     quality_results = run_data_quality_checks(df)
     quality_table = generate_data_quality_table(df)
     risk_result = calculate_privacy_risk_score(classification_df, total_rows=len(df))
     report_paths = (
-        generate_markdown_reports(df, docs_dir="docs")
-        if uses_persisted_governance else {}
+        generate_markdown_reports(df, docs_dir=docs_dir)
+        if uses_persisted_governance
+        else {}
     )
     return GovernanceAppContext(
         df=df,
@@ -109,8 +113,14 @@ def _build_context_from_dataframe(
     )
 
 
-def build_context(locale: Locale) -> GovernanceAppContext:
+def build_context(
+    locale: Locale, *, docs_dir: str | Path = "docs"
+) -> GovernanceAppContext:
     df = load_input_dataframe(locale)
     return _build_context_from_dataframe(
-        df, uses_persisted_governance=bool(df.attrs.get("uses_persisted_governance", False))
+        df,
+        docs_dir=docs_dir,
+        uses_persisted_governance=bool(
+            df.attrs.get("uses_persisted_governance", False)
+        ),
     )

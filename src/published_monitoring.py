@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import os
 import sys
-from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -17,7 +14,11 @@ if __package__ is None or __package__ == "":
 
 from src.config import DOCS_DIR, PUBLISHED_DASHBOARD_DIR, PUBLISHED_MONITORING_DIR
 from src.ingest import configure_logging
-from src.utils import ensure_directory
+from src.monitoring_components import alerting as _alerting
+from src.monitoring_components import checks as _checks
+from src.monitoring_components import outputs as _outputs
+from src.monitoring_components import pipeline as _pipeline
+from src.monitoring_components.models import AlertDispatchResult, MonitoringCheckResult
 
 LOGGER = logging.getLogger(__name__)
 PUBLISHED_PARQUET_PATH = PUBLISHED_DASHBOARD_DIR / "fact_orders_dashboard.parquet"
@@ -59,23 +60,6 @@ MAX_MISSING_SELLER_DELAY_RATE_PCT = 1.0
 DEFAULT_ALERT_SOURCE = "published_layer_monitoring"
 
 
-@dataclass
-class MonitoringCheckResult:
-    check_name: str
-    status: str
-    metric_value: float | str
-    threshold: float | str
-    severity: str
-    details: str
-
-
-@dataclass
-class AlertDispatchResult:
-    delivered: bool
-    status_code: int | None
-    destination: str
-
-
 def build_result(
     check_name: str,
     passed: bool,
@@ -84,13 +68,8 @@ def build_result(
     severity: str,
     details: str,
 ) -> MonitoringCheckResult:
-    return MonitoringCheckResult(
-        check_name=check_name,
-        status="PASS" if passed else "FAIL",
-        metric_value=metric_value,
-        threshold=threshold,
-        severity=severity,
-        details=details,
+    return _checks.build_result(
+        check_name, passed, metric_value, threshold, severity, details
     )
 
 
@@ -107,144 +86,48 @@ def load_published_table(path: Path | None = None) -> pd.DataFrame:
 def check_file_freshness(
     path: Path, *, max_freshness_hours: int
 ) -> MonitoringCheckResult:
-    modified_at = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-    age_hours = round(
-        (datetime.now(timezone.utc) - modified_at).total_seconds() / 3600, 2
-    )
-    return build_result(
-        "published_file_freshness_hours",
-        age_hours <= max_freshness_hours,
-        age_hours,
-        max_freshness_hours,
-        "high",
-        f"Ultima modificacao UTC: {modified_at.isoformat()}",
+    return _checks.check_file_freshness(
+        path, max_freshness_hours=max_freshness_hours
     )
 
 
 def check_expected_schema(df: pd.DataFrame) -> MonitoringCheckResult:
-    missing_columns = sorted(EXPECTED_COLUMNS.difference(df.columns))
-    return build_result(
-        "published_expected_schema",
-        not missing_columns,
-        len(missing_columns),
-        0,
-        "high",
-        f"Colunas ausentes: {missing_columns if missing_columns else 'nenhuma'}",
-    )
+    return _checks.check_expected_schema(df, expected_columns=EXPECTED_COLUMNS)
 
 
 def check_primary_key_duplicates(df: pd.DataFrame) -> MonitoringCheckResult:
-    duplicate_count = int(
-        df.duplicated(subset=["order_id", "order_item_id"], keep=False).sum()
-    )
-    return build_result(
-        "published_primary_key_duplicates",
-        duplicate_count == 0,
-        duplicate_count,
-        0,
-        "high",
-        "Duplicidades na granularidade publicada `order_id + order_item_id`.",
-    )
+    return _checks.check_primary_key_duplicates(df)
 
 
 def check_row_volume(df: pd.DataFrame) -> MonitoringCheckResult:
-    return build_result(
-        "published_min_rows",
-        len(df) >= MIN_ROWS,
-        int(len(df)),
-        MIN_ROWS,
-        "high",
-        "Volume minimo esperado para a camada publicada.",
-    )
+    return _checks.check_row_volume(df, min_rows=MIN_ROWS)
 
 
 def check_critical_nulls(df: pd.DataFrame) -> list[MonitoringCheckResult]:
-    results: list[MonitoringCheckResult] = []
-    for column in CRITICAL_COLUMNS:
-        if column not in df.columns:
-            results.append(
-                build_result(
-                    f"published_critical_nulls__{column}",
-                    False,
-                    "missing_column",
-                    0,
-                    "high",
-                    f"Coluna critica ausente no schema publicado: `{column}`.",
-                )
-            )
-            continue
-        null_count = int(df[column].isna().sum())
-        results.append(
-            build_result(
-                f"published_critical_nulls__{column}",
-                null_count == 0,
-                null_count,
-                0,
-                "high",
-                f"Nulos observados na coluna `{column}`.",
-            )
-        )
-    return results
+    return _checks.check_critical_nulls(df, critical_columns=CRITICAL_COLUMNS)
 
 
 def check_semantic_coverage(df: pd.DataFrame) -> list[MonitoringCheckResult]:
-    missing_semantic_columns = [
-        column
-        for column in ("purchase_cohort_month", "seller_delay_rate")
-        if column not in df.columns
-    ]
-    if missing_semantic_columns:
-        return [
-            build_result(
-                "published_semantic_coverage_schema",
-                False,
-                len(missing_semantic_columns),
-                0,
-                "high",
-                f"Colunas semanticas ausentes: {missing_semantic_columns}",
-            )
-        ]
-    cohort_missing_pct = round(
-        float(df["purchase_cohort_month"].isna().mean() * 100), 2
+    return _checks.check_semantic_coverage(
+        df,
+        max_missing_seller_delay_rate_pct=MAX_MISSING_SELLER_DELAY_RATE_PCT,
     )
-    seller_delay_missing_pct = round(
-        float(df["seller_delay_rate"].isna().mean() * 100), 2
-    )
-    return [
-        build_result(
-            "published_missing_pct__purchase_cohort_month",
-            cohort_missing_pct == 0,
-            cohort_missing_pct,
-            0,
-            "medium",
-            "Cobertura da semantica de cohort.",
-        ),
-        build_result(
-            "published_missing_pct__seller_delay_rate",
-            seller_delay_missing_pct <= MAX_MISSING_SELLER_DELAY_RATE_PCT,
-            seller_delay_missing_pct,
-            MAX_MISSING_SELLER_DELAY_RATE_PCT,
-            "medium",
-            "Cobertura da semantica de seller.",
-        ),
-    ]
 
 
 def run_monitoring(
     *, max_freshness_hours: int = DEFAULT_MAX_FRESHNESS_HOURS
 ) -> list[MonitoringCheckResult]:
-    df = load_published_table()
-    results = [
-        check_file_freshness(
-            PUBLISHED_PARQUET_PATH, max_freshness_hours=max_freshness_hours
-        )
-    ]
-    results.append(check_expected_schema(df))
-    results.append(check_primary_key_duplicates(df))
-    results.append(check_row_volume(df))
-    results.extend(check_critical_nulls(df))
-    results.extend(check_semantic_coverage(df))
-    return results
+    return _pipeline.run_monitoring(
+        max_freshness_hours=max_freshness_hours,
+        published_path=PUBLISHED_PARQUET_PATH,
+        load_published_table_fn=load_published_table,
+        check_file_freshness_fn=check_file_freshness,
+        check_expected_schema_fn=check_expected_schema,
+        check_primary_key_duplicates_fn=check_primary_key_duplicates,
+        check_row_volume_fn=check_row_volume,
+        check_critical_nulls_fn=check_critical_nulls,
+        check_semantic_coverage_fn=check_semantic_coverage,
+    )
 
 
 def build_alert_payload(
@@ -253,22 +136,9 @@ def build_alert_payload(
     source: str = DEFAULT_ALERT_SOURCE,
     environment: str = "prod",
 ) -> dict[str, object]:
-    failed_results = [result for result in results if result.status == "FAIL"]
-    severity_order = {"high": 3, "medium": 2, "low": 1}
-    max_severity = "low"
-    if failed_results:
-        max_severity = max(
-            failed_results, key=lambda result: severity_order.get(result.severity, 0)
-        ).severity
-    return {
-        "source": source,
-        "environment": environment,
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "status": "FAIL" if failed_results else "PASS",
-        "failed_checks": len(failed_results),
-        "max_severity": max_severity,
-        "results": [asdict(result) for result in failed_results],
-    }
+    return _alerting.build_alert_payload(
+        results, source=source, environment=environment
+    )
 
 
 def send_external_alert(
@@ -280,79 +150,34 @@ def send_external_alert(
     source: str = DEFAULT_ALERT_SOURCE,
     timeout_seconds: int = 15,
 ) -> AlertDispatchResult:
-    payload = build_alert_payload(results, source=source, environment=environment)
-    headers = {"Content-Type": "application/json"}
-    if token:
-        headers["Authorization"] = token
-    response = requests.post(
-        webhook_url, json=payload, headers=headers, timeout=timeout_seconds
-    )
-    response.raise_for_status()
-    return AlertDispatchResult(
-        delivered=True,
-        status_code=response.status_code,
-        destination=webhook_url,
+    return _alerting.send_external_alert(
+        results,
+        webhook_url=webhook_url,
+        token=token,
+        environment=environment,
+        source=source,
+        timeout_seconds=timeout_seconds,
+        post_fn=requests.post,
     )
 
 
 def save_results(results: list[MonitoringCheckResult]) -> tuple[Path, Path]:
-    ensure_directory(PUBLISHED_MONITORING_DIR)
-    results_df = pd.DataFrame(asdict(result) for result in results)
-    results_df.to_csv(RESULTS_PATH, index=False)
-    SUMMARY_PATH.write_text(
-        json.dumps(
-            {
-                "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-                "total_checks": len(results),
-                "failed_checks": int((results_df["status"] == "FAIL").sum()),
-                "results": [asdict(result) for result in results],
-            },
-            indent=2,
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
+    return _outputs.save_results(
+        results,
+        monitoring_dir=PUBLISHED_MONITORING_DIR,
+        results_path=RESULTS_PATH,
+        summary_path=SUMMARY_PATH,
     )
-    return RESULTS_PATH, SUMMARY_PATH
 
 
 def render_report(results: list[MonitoringCheckResult]) -> str:
-    results_df = pd.DataFrame(asdict(result) for result in results)
-    failed_df = results_df[results_df["status"] == "FAIL"]
-    lines = [
-        "# Monitoramento da Camada Published",
-        "",
-        "Relatorio recorrente de freshness e qualidade da camada `fact_orders_dashboard`.",
-        "",
-        "## Resumo",
-        "",
-        f"- Checks executados: **{len(results)}**",
-        f"- Checks aprovados: **{int((results_df['status'] == 'PASS').sum())}**",
-        f"- Checks reprovados: **{int((results_df['status'] == 'FAIL').sum())}**",
-        "",
-        "## Resultado dos Checks",
-        "",
-        "| Check | Status | Valor | Threshold | Severidade |",
-        "| --- | --- | ---: | ---: | --- |",
-    ]
-    for row in results_df.itertuples(index=False):
-        lines.append(
-            f"| `{row.check_name}` | **{row.status}** | {row.metric_value} | {row.threshold} | {row.severity} |"
-        )
-    lines.extend(["", "## Alertas", ""])
-    if failed_df.empty:
-        lines.append("- Nenhum alerta aberto na execucao atual.")
-    else:
-        for row in failed_df.itertuples(index=False):
-            lines.append(
-                f"- `{row.check_name}`: {row.details} Valor observado={row.metric_value}."
-            )
-    return "\n".join(lines) + "\n"
+    return _outputs.render_report(results)
 
 
 def save_report(results: list[MonitoringCheckResult]) -> Path:
-    ensure_directory(DOCS_DIR)
-    REPORT_PATH.write_text(render_report(results), encoding="utf-8")
-    return REPORT_PATH
+    return _outputs.save_report(
+        render_report(results), docs_dir=DOCS_DIR, report_path=REPORT_PATH
+    )
 
 
 def parse_args() -> argparse.Namespace:

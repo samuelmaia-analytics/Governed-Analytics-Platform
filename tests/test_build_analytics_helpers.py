@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 import src.build_analytics as build_analytics
 from src.duckdb_engine import execute_query
@@ -22,15 +23,60 @@ def test_read_olist_table_prefers_standardized_parquet(
 ) -> None:
     standardized_dir = tmp_path / "standardized"
     standardized_dir.mkdir()
+    landing_dir = tmp_path / "landing"
+    landing_dir.mkdir()
     source = pd.DataFrame({"Order ID": [1], "OrderDate": ["2018-01-01"]})
     source.to_parquet(standardized_dir / "olist_orders_dataset.parquet", index=False)
+    pd.DataFrame({"Order ID": [2]}).to_csv(
+        landing_dir / "olist_orders_dataset.csv", index=False
+    )
 
     monkeypatch.setattr(build_analytics, "STANDARDIZED_OLIST_DIR", standardized_dir)
-    monkeypatch.setattr(build_analytics, "OLIST_LANDING_DIR", tmp_path / "landing")
+    monkeypatch.setattr(build_analytics, "OLIST_LANDING_DIR", landing_dir)
 
     result = build_analytics.read_olist_table("olist_orders_dataset.csv")
 
     assert list(result.columns) == ["order_id", "order_date"]
+    assert int(result.loc[0, "order_id"]) == 1
+
+
+def test_read_olist_table_falls_back_to_landing_csv(
+    tmp_path: Path, monkeypatch
+) -> None:
+    standardized_dir = tmp_path / "standardized"
+    landing_dir = tmp_path / "landing"
+    standardized_dir.mkdir()
+    landing_dir.mkdir()
+    pd.DataFrame({"Order ID": [2], "CustomerID": [3]}).to_csv(
+        landing_dir / "olist_orders_dataset.csv", index=False
+    )
+
+    monkeypatch.setattr(build_analytics, "STANDARDIZED_OLIST_DIR", standardized_dir)
+    monkeypatch.setattr(build_analytics, "OLIST_LANDING_DIR", landing_dir)
+
+    result = build_analytics.read_olist_table("olist_orders_dataset.csv")
+
+    assert list(result.columns) == ["order_id", "customer_id"]
+    assert int(result.loc[0, "order_id"]) == 2
+
+
+def test_read_olist_table_raises_when_no_source_exists(
+    tmp_path: Path, monkeypatch
+) -> None:
+    standardized_dir = tmp_path / "standardized"
+    landing_dir = tmp_path / "landing"
+    monkeypatch.setattr(build_analytics, "STANDARDIZED_OLIST_DIR", standardized_dir)
+    monkeypatch.setattr(build_analytics, "OLIST_LANDING_DIR", landing_dir)
+
+    with pytest.raises(FileNotFoundError) as exc_info:
+        build_analytics.read_olist_table("olist_orders_dataset.csv")
+
+    expected_standardized = standardized_dir / "olist_orders_dataset.parquet"
+    expected_landing = landing_dir / "olist_orders_dataset.csv"
+    assert str(exc_info.value) == (
+        "Arquivo não encontrado em standardized nem landing: "
+        f"{expected_standardized} | {expected_landing}"
+    )
 
 
 def test_convert_datetime_columns_and_deduplicate_work_together() -> None:
@@ -241,3 +287,41 @@ def test_render_report_save_report_and_run_build_return_artifacts(
         db_path=artifacts.duckdb_path,
     )
     assert int(persisted.loc[0, "total_rows"]) == len(fact_df)
+
+
+def test_run_build_respects_facade_monkeypatches(
+    tmp_path: Path, monkeypatch
+) -> None:
+    fact_df = pd.DataFrame({"order_id": ["o1"]})
+    parquet_path = tmp_path / "fact.parquet"
+    csv_path = tmp_path / "fact.csv"
+    duckdb_path = tmp_path / "fact.duckdb"
+    report_path = tmp_path / "fact.md"
+    call_order: list[str] = []
+
+    def fake_build_fact() -> pd.DataFrame:
+        call_order.append("build")
+        return fact_df
+
+    def fake_save_outputs(df: pd.DataFrame) -> tuple[Path, Path, Path]:
+        call_order.append("outputs")
+        assert df is fact_df
+        return parquet_path, csv_path, duckdb_path
+
+    def fake_save_report(df: pd.DataFrame) -> Path:
+        call_order.append("report")
+        assert df is fact_df
+        return report_path
+
+    monkeypatch.setattr(build_analytics, "build_fact_orders_enriched", fake_build_fact)
+    monkeypatch.setattr(build_analytics, "save_outputs", fake_save_outputs)
+    monkeypatch.setattr(build_analytics, "save_report", fake_save_report)
+
+    artifacts = build_analytics.run_build()
+
+    assert call_order == ["build", "outputs", "report"]
+    assert artifacts.fact_table is fact_df
+    assert artifacts.parquet_path == parquet_path
+    assert artifacts.csv_path == csv_path
+    assert artifacts.duckdb_path == duckdb_path
+    assert artifacts.report_path == report_path
