@@ -10,7 +10,6 @@ from pandas.testing import assert_frame_equal
 from src import build_analytics
 
 ROOT = Path(__file__).resolve().parents[1]
-ANALYTICS_DIR = ROOT / "data" / "curated" / "analytics"
 PRIMARY_KEY = ["order_id", "order_item_id", "product_id", "seller_id"]
 
 EXPECTED_COLUMNS = [
@@ -83,6 +82,28 @@ def canonical_fact(tmp_path_factory: pytest.TempPathFactory) -> pd.DataFrame:
     finally:
         build_analytics.OLIST_LANDING_DIR = original_landing
         build_analytics.STANDARDIZED_OLIST_DIR = original_standardized
+
+
+@pytest.fixture(scope="module")
+def materialized_fact_outputs(
+    canonical_fact: pd.DataFrame, tmp_path_factory: pytest.TempPathFactory
+) -> dict[str, Path]:
+    """Persist the real canonical fact without relying on checkout artifacts."""
+    output_dir = tmp_path_factory.mktemp("materialized_analytics")
+    expected_paths = (
+        output_dir / "fact_orders_enriched.parquet",
+        output_dir / "fact_orders_enriched.csv",
+        output_dir / "governance.duckdb",
+    )
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(build_analytics, "ANALYTICS_DIR", output_dir)
+        patch.setattr(build_analytics, "FACT_PARQUET_PATH", expected_paths[0])
+        patch.setattr(build_analytics, "FACT_CSV_PATH", expected_paths[1])
+        patch.setattr(build_analytics, "FACT_DUCKDB_PATH", expected_paths[2])
+        written_paths = build_analytics.save_outputs(canonical_fact)
+    assert written_paths == expected_paths
+    assert all(path.is_file() for path in written_paths)
+    return dict(zip(("parquet", "csv", "duckdb"), written_paths, strict=True))
 
 
 def _control_metrics(df: pd.DataFrame) -> dict[str, float | int]:
@@ -168,21 +189,17 @@ def test_payment_review_and_seller_aggregations_are_stable(canonical_fact: pd.Da
 
 
 @pytest.mark.parametrize("kind", ["parquet", "csv", "duckdb"])
-def test_materialized_fact_outputs_logically_match_canonical(kind: str, canonical_fact: pd.DataFrame) -> None:
+def test_materialized_fact_outputs_logically_match_canonical(
+    kind: str,
+    canonical_fact: pd.DataFrame,
+    materialized_fact_outputs: dict[str, Path],
+) -> None:
+    path = materialized_fact_outputs[kind]
     if kind == "parquet":
-        path = ANALYTICS_DIR / "fact_orders_enriched.parquet"
-        if not path.exists():
-            pytest.skip("Parquet fact is not materialized in this checkout")
         actual = pd.read_parquet(path)
     elif kind == "csv":
-        path = ANALYTICS_DIR / "fact_orders_enriched.csv"
-        if not path.exists():
-            pytest.skip("CSV fact is not materialized in this checkout")
         actual = pd.read_csv(path)
     else:
-        path = ANALYTICS_DIR / "governance.duckdb"
-        if not path.exists():
-            pytest.skip("DuckDB fact is not materialized in this checkout")
         with duckdb.connect(str(path), read_only=True) as connection:
             actual = connection.execute("SELECT * FROM fact_orders_enriched").df()
     assert actual.shape == canonical_fact.shape
