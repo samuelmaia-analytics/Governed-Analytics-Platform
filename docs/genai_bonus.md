@@ -1,5 +1,14 @@
 # Bônus de GenAI
 
+## Assistente de Governança Separado
+
+O RAG implementado está na página **Assistente de Governança**, separado da
+extração estruturada de atributos de produtos descrita abaixo. Usa recuperação
+local TF-IDF e respostas extrativas citadas; a seleção de evidências via OpenAI
+é opcional. A base exige aprovação explícita de fontes e hash do conteúdo.
+Arquitetura, execução, avaliação e limitações: [governance_rag.md](governance_rag.md).
+Não há execução de SQL nem alteração de dados pelo assistente.
+
 
 ## Acesso Rápido
 

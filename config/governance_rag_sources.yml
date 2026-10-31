@@ -1,0 +1,43 @@
+version: 1
+sources:
+  - path: contracts/customer_privacy_contract.yml
+    approved: true
+    sha256: "f4300e81cd0084e0a427994e05033a0d259dc944f11a13948e0be12e158c6082"
+  - path: contracts/gold_fact_orders_contract.yml
+    approved: true
+    sha256: "2d75bda95ef98edba4d8646c115c6314a1b27be044ad827ff53b666c53d501c4"
+  - path: contracts/data_quality_rules.yml
+    approved: true
+    sha256: "41c3cde6dd466347a88e92e028c550b89c33bec5d4f56e7e4f420c6f12d874d0"
+  - path: policies/DATA_GOVERNANCE.md
+    approved: true
+    sha256: "27e435613f0eccebea100b1ed92441a181732161472e83ab577bfe6dd30e29b9"
+  - path: docs/reports/data_quality_report.md
+    approved: true
+    sha256: "0595ea63caafb37e79ce2a57575150bcce0e428aef10306a3b05a6b91e7c8f55"
+  - path: docs/reports/published_layer_monitoring.md
+    approved: true
+    sha256: "9f8b76749d43fe25660d114f9d240f53441ccb8ec01f4b76abd39ff74c4e0935"
+evaluation:
+  - question: Quais regras de qualidade se aplicam a gold_fact_orders?
+    expected_sources:
+      - contracts/gold_fact_orders_contract.yml
+  - question: O que exige o contrato customer_privacy_controls para publication?
+    expected_sources:
+      - contracts/customer_privacy_contract.yml
+  - question: O que devo conferir antes de publicar dados de clientes?
+    expected_sources:
+      - contracts/customer_privacy_contract.yml
+  - question: O que devo conferir antes de publicar dados de pedidos?
+    expected_sources:
+      - contracts/gold_fact_orders_contract.yml
+  - question: Quais checks falharam order_id_unique no Data Quality Report?
+    expected_sources:
+      - docs/reports/data_quality_report.md
+  - question: Qual o status published_primary_key_duplicates no monitoramento published?
+    expected_sources:
+      - docs/reports/published_layer_monitoring.md
+  - question: Por que a publicacao run_999 foi bloqueada?
+    expected_sources: []
+  - question: Qual a previsao meteorologica em Marte?
+    expected_sources: []

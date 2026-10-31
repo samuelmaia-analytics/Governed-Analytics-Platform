@@ -143,7 +143,7 @@ def render_cohort_retention(locale: Locale) -> None:
     retention_text = retention_pivot.map(_format_percentage)
     retention_offsets = list(retention_pivot.columns)
     retention_offset_labels = [
-        _format_month_offset(value) for value in retention_offsets
+        _format_month_offset(float(value)) for value in retention_offsets
     ]
     fig_retention = px.imshow(
         retention_pivot,
@@ -181,7 +181,7 @@ def render_cohort_retention(locale: Locale) -> None:
     )
     ticket_text = ticket_pivot.map(_format_currency)
     ticket_offsets = list(ticket_pivot.columns)
-    ticket_offset_labels = [_format_month_offset(value) for value in ticket_offsets]
+    ticket_offset_labels = [_format_month_offset(float(value)) for value in ticket_offsets]
     fig_ticket = px.imshow(
         ticket_pivot,
         text_auto=False,

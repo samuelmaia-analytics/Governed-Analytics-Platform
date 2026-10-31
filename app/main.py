@@ -25,6 +25,7 @@ from app.pages.governance_control_center import (
 from app.pages.governance_report import render_governance_report  # noqa: E402
 from app.pages.snowflake_explorer import render_snowflake_explorer  # noqa: E402
 from app.pages.genai_insights import render_genai_insights  # noqa: E402
+from app.pages.governance_assistant import render_governance_assistant  # noqa: E402
 from app.pages.lgpd_privacy_risk import render_lgpd_privacy_risk  # noqa: E402
 from app.pages.n8n_automation import render_n8n_automation  # noqa: E402
 from app.pages.publication_governance import (  # noqa: E402
@@ -56,6 +57,7 @@ def _render_executive_page(
         business_page=business_page,
         governance_page=governance_page,
         duckdb_version=get_duckdb_version(),
+        uses_persisted_governance=context.uses_persisted_governance,
     )
 
 
@@ -97,6 +99,10 @@ def _render_cohort_retention_page(_context: GovernanceAppContext, locale: str) -
 
 def _render_genai_page(_context: GovernanceAppContext, locale: str) -> None:
     render_genai_insights(locale)
+
+
+def _render_assistant_page(_context: GovernanceAppContext, locale: str) -> None:
+    render_governance_assistant(locale)
 
 
 def _render_control_center_page(context: GovernanceAppContext, locale: str) -> None:
@@ -214,6 +220,12 @@ def main() -> None:
             title="GenAI Experiment",
             icon=":material/auto_awesome:",
             url_path="genai-insights",
+        ),
+        st.Page(
+            lambda: _render_assistant_page(context, locale),
+            title="Governance Assistant" if locale == "en-US" else "Assistente de Governan\u00e7a",
+            icon=":material/forum:",
+            url_path="governance-assistant",
         ),
         st.Page(
             lambda: _render_snowflake_page(context, locale),

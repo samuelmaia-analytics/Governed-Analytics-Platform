@@ -4,6 +4,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
+from streamlit.testing.v1 import AppTest
 
 import app.components.cards as cards
 import app.pages.cohort_retention as cohort_page
@@ -1307,6 +1309,153 @@ def test_portfolio_overview_uses_demonstration_fallbacks_without_evidence(
         "caption",
         "Indicadores diagnósticos do ambiente demonstrativo.",
     ) in calls
+
+
+def test_portfolio_overview_navigation_keeps_governance_links(
+    monkeypatch,
+) -> None:
+    calls: list[tuple[str, str]] = []
+    metric_labels: list[str] = []
+    page_links: list[str] = []
+
+    class CapturingContainer(_FakeContainer):
+        def metric(self, label: str, *_args, **_kwargs) -> None:
+            metric_labels.append(label)
+
+        def info(self, value: str) -> None:
+            calls.append(("info", value))
+
+        def success(self, value: str) -> None:
+            calls.append(("success", value))
+
+        def page_link(self, *_args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+            page_links.append(str(kwargs["label"]))
+
+    class CapturingStreamlit(CapturingContainer):
+        def title(self, value: str) -> None:
+            calls.append(("title", value))
+
+        def caption(self, value: str) -> None:
+            calls.append(("caption", value))
+
+        def markdown(self, value: str) -> None:
+            calls.append(("markdown", value))
+
+        def columns(self, count: int):  # type: ignore[no-untyped-def]
+            return tuple(CapturingContainer() for _ in range(count))
+
+        def expander(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+            return CapturingContainer()
+
+    checks = CheckSummary(1, 0, 0, 1)
+    snapshot = PublicationGovernanceSnapshot(
+        run_id="run-1",
+        historical_decision="Approved",
+        shadow_decision="Needs Review",
+        shadow_severity="High",
+        residual_decision="Approved",
+        residual_severity="Low",
+        inherent_score=86,
+        residual_score=53,
+        divergence_type="residual_less_restrictive",
+        sensitive_data_protected=True,
+        privacy=CheckSummary(16, 0, 0, 16),
+        schema=checks,
+        business=checks,
+        quality=CheckSummary(24, 1, 0, 25),
+        monitoring=CheckSummary(12, 0, 0, 12),
+        execution_provenance="Valid · same run",
+        content_provenance="Recorded · same run",
+        source_fingerprint="source-sha256",
+        published_fingerprint="published-sha256",
+    )
+    monkeypatch.setattr(executive_overview_page, "st", CapturingStreamlit())
+    monkeypatch.setattr(
+        executive_overview_page,
+        "_render_operational_readiness_section",
+        lambda _locale: None,
+    )
+
+    executive_overview_page.render_executive_overview(  # type: ignore[arg-type]
+        df=pd.DataFrame({"value": [1, 2]}),
+        classification_df=pd.DataFrame(
+            {
+                "lgpd_classification": ["non_personal"],
+                "recommended_action": ["keep"],
+            }
+        ),
+        risk_result={
+            "score": 15,
+            "risk_level": "low",
+            "recommendations": [],
+        },
+        quality_results={"failed_checks_count": 0},
+        locale="pt-BR",
+        business_page=SimpleNamespace(),
+        governance_page=SimpleNamespace(),
+        governance_snapshot=snapshot,
+        duckdb_version="1.0",
+    )
+
+    assert ("title", "Governed Analytics Platform") in calls
+    assert ("caption", "Projeto de portfólio profissional") in calls
+    assert any(
+        "transforma dados brutos" in value
+        for kind, value in calls
+        if kind == "markdown"
+    )
+    assert any(
+        "fins demonstrativos" in value
+        for kind, value in calls
+        if kind == "caption"
+    )
+    assert metric_labels[:4] == [
+        "Registros governados",
+        "Governança de publicação",
+        "Controles de privacidade",
+        "Qualidade e monitoramento",
+    ]
+    assert page_links == ["Explore Business Insights", "View Governance Decision"]
+    assert ("info", "Raw Data") in calls
+    assert ("success", "Trusted Analytics") in calls
+    assert any(
+        "github.com/samuelmaia-analytics" in value
+        for kind, value in calls
+        if kind == "markdown"
+    )
+    assert control_center_page.GOVERNANCE_LAB_NOTICE.startswith(
+        "Interactive diagnostic environment"
+    )
+
+
+@pytest.mark.parametrize("locale,record_label,unavailable", [
+    ("pt-BR", "Registros analisados", "Evidências indisponíveis para estes dados"),
+    ("en-US", "Analyzed records", "Evidence unavailable for selected data"),
+])
+def test_overview_without_published_source_does_not_load_persisted_evidence(
+    monkeypatch, locale, record_label, unavailable,
+) -> None:
+    monkeypatch.setattr(
+        executive_overview_page, "load_publication_governance_snapshot",
+        lambda: pytest.fail("Unrelated data must not load persisted evidence"),
+    )
+    monkeypatch.setattr(executive_overview_page, "_render_operational_readiness_section", lambda _locale: None)
+    app = AppTest.from_string(
+        "import pandas as pd\n"
+        "from app.pages.executive_overview import render_executive_overview\n"
+        "render_executive_overview(\n"
+        "    pd.DataFrame({'value': [1]}),\n"
+        "    pd.DataFrame({'lgpd_classification': ['non_personal'], 'recommended_action': ['keep']}),\n"
+        "    {'score': 15, 'risk_level': 'low', 'recommendations': []},\n"
+        f"    {{'failed_checks_count': 0}}, '{locale}', uses_persisted_governance=False)\n"
+    ).run()
+    assert not app.exception
+    assert app.metric[0].label == record_label
+    assert [metric.value for metric in app.metric[1:4]] == [unavailable] * 3
+    assert app.warning
+    if locale == "en-US":
+        assert any("Professional portfolio project" in item.value for item in app.caption)
+        assert app.metric[1].label == "Publication governance"
 
 
 def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) -> None:
