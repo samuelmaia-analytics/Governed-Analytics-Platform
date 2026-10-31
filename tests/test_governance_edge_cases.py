@@ -144,12 +144,14 @@ def test_governance_history_failure_counter_and_append_from_dataframes(
         }
     )
     output = tmp_path / "history.csv"
+    publication_decision_path = tmp_path / "publication_decision.json"
     path = append_governance_history_from_dataframes(
         df=df,
         classification_df=classification_df,
         quality_result=quality_result,
         publication_status="Approved",
         history_path=output,
+        publication_decision_path=publication_decision_path,
     )
     stored = pd.read_csv(path)
     assert "privacy_risk_score" in stored.columns
