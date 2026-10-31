@@ -51,6 +51,7 @@ def test_main_entrypoints_are_callable() -> None:
     assert callable(main_module._render_seller_performance_page)
     assert callable(main_module._render_cohort_retention_page)
     assert callable(main_module._render_genai_page)
+    assert callable(main_module._render_assistant_page)
     assert callable(main_module._render_report_page)
     assert callable(main_module._render_control_center_page)
     assert callable(main_module._render_n8n_automation_page)
@@ -139,7 +140,7 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
 
     main_module.main()
 
-    assert calls.count("page") == 14
+    assert calls.count("page") == 15
     assert "n8n-automation" in url_paths
     assert "publication-governance" in url_paths
     assert navigation_titles == [
@@ -156,6 +157,7 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
         "Governance Lab",
         "Automation & Orchestration",
         "GenAI Experiment",
+        "Assistente de Governan\u00e7a",
         "Snowflake Integration",
     ]
     assert "navigation_run" in calls
