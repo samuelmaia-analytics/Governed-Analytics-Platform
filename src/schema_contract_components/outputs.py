@@ -44,9 +44,11 @@ def render_report(checks: list[ContractCheck]) -> str:
         "| Dataset | Camada | Checks | Falhas |",
         "| --- | --- | ---: | ---: |",
     ]
-    for row in summary.itertuples(index=False):
+    for dataset_name, layer, total_checks, failed_checks in summary.itertuples(
+        index=False, name=None
+    ):
         lines.append(
-            f"| `{row.dataset_name}` | `{row.layer}` | {int(row.total_checks)} | {int(row.failed_checks)} |"
+            f"| `{dataset_name}` | `{layer}` | {int(total_checks)} | {int(failed_checks)} |"
         )
 
     lines.extend(

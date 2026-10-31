@@ -277,8 +277,8 @@ def _load_freshness_status() -> tuple[Literal["fresh", "warning", "stale"], str 
     if status == "PASS":
         return "fresh", None
 
-    metric_value = pd.to_numeric(freshness_row.get("metric_value"), errors="coerce")
-    threshold = pd.to_numeric(freshness_row.get("threshold"), errors="coerce")
+    metric_value = pd.to_numeric(freshness_row.get("metric_value", float("nan")), errors="coerce")
+    threshold = pd.to_numeric(freshness_row.get("threshold", float("nan")), errors="coerce")
     if (
         pd.notna(metric_value)
         and pd.notna(threshold)

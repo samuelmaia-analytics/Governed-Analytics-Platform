@@ -243,8 +243,8 @@ def render_genai_insights(locale: Locale) -> None:
                 if is_en
                 else "**Distribuição por categoria**"
             )
-            for row in category_presentation.itertuples(index=False):
-                st.write(f"- {row.category}: {int(row.count)}")
+            for category, count in category_presentation.itertuples(index=False, name=None):
+                st.write(f"- {category}: {int(count)}")
         else:
             fig = px.bar(
                 category_presentation,

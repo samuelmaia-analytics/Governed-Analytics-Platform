@@ -4,6 +4,7 @@ import importlib
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
 
 import app.context as context_module
 import app.main as main_module
@@ -38,6 +39,56 @@ def test_load_input_dataframe_mocks_io_and_csv_read(monkeypatch) -> None:
 
     result = context_module.load_input_dataframe("pt-BR")
     pd.testing.assert_frame_equal(result, expected)
+    assert result.attrs["uses_persisted_governance"] is False
+
+
+def test_platform_source_distinguishes_published_data_from_sample(monkeypatch) -> None:
+    monkeypatch.setattr(context_module, "load_dataset", lambda _path: pd.DataFrame({"value": [1]}))
+    published = context_module._load_platform_dataframe(context_module.DEFAULT_PUBLISHED_DATASET)
+    sample = context_module._load_platform_dataframe(context_module.DEFAULT_SAMPLE_DATASET)
+    assert published.attrs["uses_persisted_governance"] is True
+    assert sample.attrs["uses_persisted_governance"] is False
+
+
+def test_build_context_passes_provenance_as_separate_cache_argument(monkeypatch) -> None:
+    dataframe = pd.DataFrame({"value": [1]})
+    dataframe.attrs["uses_persisted_governance"] = False
+    calls = []
+    monkeypatch.setattr(context_module, "load_input_dataframe", lambda _locale: dataframe)
+    monkeypatch.setattr(
+        context_module, "_build_context_from_dataframe",
+        lambda frame, **kwargs: calls.append((frame, kwargs)),
+    )
+    context_module.build_context("pt-BR")
+    dataframe.attrs["uses_persisted_governance"] = True
+    context_module.build_context("pt-BR")
+    assert [kwargs["uses_persisted_governance"] for _, kwargs in calls] == [False, True]
+
+
+def test_uploaded_parquet_cannot_claim_published_provenance(monkeypatch) -> None:
+    dataframe = pd.DataFrame({"value": [1]})
+    dataframe.attrs["uses_persisted_governance"] = True
+    sidebar = SimpleNamespace(
+        header=lambda *_args: None,
+        file_uploader=lambda *_args, **_kwargs: SimpleNamespace(name="input.parquet"),
+        toggle=lambda *_args, **_kwargs: True,
+    )
+    monkeypatch.setattr(context_module, "st", SimpleNamespace(sidebar=sidebar))
+    monkeypatch.setattr(context_module, "_render_data_freshness_sidebar", lambda _locale: None)
+    monkeypatch.setattr(context_module.pd, "read_parquet", lambda _uploaded: dataframe)
+    assert context_module.load_input_dataframe("pt-BR").attrs["uses_persisted_governance"] is False
+
+
+def test_context_for_upload_does_not_write_shared_reports(monkeypatch) -> None:
+    dataframe = pd.DataFrame({"value": [1]})
+    monkeypatch.setattr(context_module, "classify_dataframe_columns", lambda _frame: pd.DataFrame())
+    monkeypatch.setattr(context_module, "run_data_quality_checks", lambda _frame: {})
+    monkeypatch.setattr(context_module, "generate_data_quality_table", lambda _frame: pd.DataFrame())
+    monkeypatch.setattr(context_module, "calculate_privacy_risk_score", lambda *_args, **_kwargs: {})
+    monkeypatch.setattr(context_module, "generate_markdown_reports", lambda *_args, **_kwargs: pytest.fail("Upload must not overwrite reports"))
+    context = context_module._build_context_from_dataframe.__wrapped__(dataframe, uses_persisted_governance=False)
+    assert context.report_paths == {}
+    assert context.uses_persisted_governance is False
 
 
 def test_main_entrypoints_are_callable() -> None:

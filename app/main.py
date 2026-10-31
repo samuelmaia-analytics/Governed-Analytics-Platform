@@ -57,6 +57,7 @@ def _render_executive_page(
         business_page=business_page,
         governance_page=governance_page,
         duckdb_version=get_duckdb_version(),
+        uses_persisted_governance=context.uses_persisted_governance,
     )
 
 

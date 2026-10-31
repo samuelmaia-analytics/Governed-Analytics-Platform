@@ -21,7 +21,9 @@ def test_build_context_writes_reports_only_to_injected_directory(
     )
 
     _build_context_from_dataframe.clear()
-    context = _build_context_from_dataframe(source_df, docs_dir=docs_dir)
+    context = _build_context_from_dataframe(
+        source_df, docs_dir=docs_dir, uses_persisted_governance=True
+    )
 
     assert context.df.equals(source_df)
     assert set(context.report_paths) == {
@@ -32,3 +34,15 @@ def test_build_context_writes_reports_only_to_injected_directory(
     }
     assert all(path.is_file() for path in context.report_paths.values())
     assert all(path.is_relative_to(docs_dir) for path in context.report_paths.values())
+
+
+def test_unpublished_context_never_writes_reports(tmp_path: Path) -> None:
+    docs_dir = tmp_path / "unpublished-reports"
+    source_df = pd.DataFrame({"price": [100.0]})
+    _build_context_from_dataframe.clear()
+
+    for options in ({}, {"uses_persisted_governance": False}):
+        context = _build_context_from_dataframe(source_df, docs_dir=docs_dir, **options)
+        assert context.report_paths == {}
+        assert context.uses_persisted_governance is False
+        assert not docs_dir.exists()

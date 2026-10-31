@@ -1,18 +1,23 @@
 # Governed Analytics Platform
 
-[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
-[![Lint](https://img.shields.io/badge/Lint-Ruff-2D2D2D?logo=ruff&logoColor=white)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
+[![CI](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/ci.yml)
+[![Lint](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions/workflows/lint.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Coverage](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform/branch/main/graph/badge.svg)](https://codecov.io/gh/samuelmaia-analytics/Governed-Analytics-Platform)
 [![Streamlit App](https://img.shields.io/badge/Streamlit-Live-red?logo=streamlit)](https://governed-analytics-platform.streamlit.app/)
-[![Main App](https://img.shields.io/badge/Main_App-app%2Fmain.py-FF4B4B?logo=streamlit&logoColor=white)](app/main.py)
-[![License](https://img.shields.io/github/license/samuelmaia-analytics/Governed-Analytics-Platform)](LICENSE)
+[![License](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](LICENSE)
 
-**Idioma:** `Português` · [English documentation](docs/README.en.md)
+**Idioma:** `Português` · [English](README.en.md)
 
-> Plataforma de Analytics Engineering para analytics governado, com qualidade, privacidade, publicação controlada e rastreabilidade, transformando dados brutos em uma camada analítica confiável para consumo executivo.
+> Dados de e-commerce podem chegar ao consumo analítico sem controle suficiente de qualidade, rastreabilidade ou critério claro de publicação. Para enfrentar esse problema, construí uma plataforma de Analytics Engineering em Python, SQL e dbt com Data Quality, Data Contracts, Data Lineage, Privacy Risk Score e um Publication Gate que aprova, revisa ou bloqueia a publicação. O resultado é um fluxo em que mudanças e dados inadequados podem ser detectados antes de chegar ao consumo executivo, reduzindo o risco de decisões apoiadas em informação inconsistente.
 
 **[→ Abrir demonstração ao vivo](https://governed-analytics-platform.streamlit.app/)**
+
+---
+
+## Resultados e evidências
+
+A publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. Na revisão de governança de 24/10/2026, a suíte completa passou com **383 testes**, incluindo validações de entradas inválidas do Gate. Esse resultado corresponde à revisão documentada; execuções posteriores podem alterar a contagem.
 
 ---
 
@@ -20,47 +25,50 @@
 
 ![Demonstração do Governed Analytics Platform](docs/assets/governedanalytics.gif)
 
-**Fluxo demonstrado:** dados → transformação → qualidade → privacidade → decisão de publicação → evidências → consumo analítico.
+**Fluxo demonstrado:** ingestão → transformação → qualidade → governança → publicação → consumo analítico.
 
 ---
 
 ## O que este projeto resolve
 
-O Governed Analytics Platform demonstra um produto analítico governado de ponta a ponta: os dados públicos do e-commerce Olist passam por transformação, qualidade, privacidade, decisão de publicação e geração de evidências antes do consumo analítico.
+O Governed Analytics Platform foi criado para demonstrar como uma solução de dados pode ir além de dashboards e incorporar controles de qualidade, privacidade, rastreabilidade e publicação.
 
-A solução mantém uma separação clara entre dados internos de processamento e a camada governada disponibilizada para análises executivas e técnicas.
+A aplicação utiliza dados públicos do e-commerce Olist e mantém uma separação clara entre dados internos de processamento e a camada governada disponibilizada para consumo executivo.
 
 ### Principais entregas
 
-- Pipeline modular em Python e SQL, modelagem com dbt e camadas Bronze, Silver, Gold e Quarantine.
-- Analytics executivo e análise de negócio com Portfolio Overview, Business Insights, Seller Performance e Customer Retention.
-- Governança de publicação, rastreabilidade e evidências com Publication Governance, Governance Evidence e Governance Lab.
-- Privacy & LGPD Controls com classificação inspirada na LGPD e Privacy Risk Score explicável.
-- Data Quality e Data Contracts em YAML com validações automatizadas e evidências de execução.
-- Data Catalog e Technical Analysis para descoberta, perfil e exploração dos ativos analíticos.
-- Templates versionados de orquestração n8n para demonstrar arquitetura, tratamento de falhas e integração externa.
-- Experimento de IA Generativa com atributos estruturados previamente materializados e exibidos sem inferência ao vivo.
-- Integração Snowflake opcional, configurada por ambiente e acionada somente pelos controles da página.
-- Aplicação em Streamlit, endpoints FastAPI, testes, linting e CI/CD com GitHub Actions.
+- Pipeline modular em Python e SQL para ingestão, transformação e construção de ativos analíticos.
+- Modelagem analítica com dbt e camadas Bronze, Silver, Gold e Quarantine.
+- Data Quality com validações automatizadas e evidências de execução.
+- Data Contracts em YAML para schema, regras e políticas de publicação.
+- Classificação inspirada na LGPD e cálculo explicável de Privacy Risk Score.
+- Publication Gate com decisões `Approved`, `Needs Review` e `Blocked`.
+- Data Lineage, logs operacionais, monitoramento e evidências de governança.
+- Aplicação executiva em Streamlit e endpoints em FastAPI.
+- Testes, linting e CI/CD com GitHub Actions.
+- Exemplos de orquestração com n8n, mantendo a lógica de negócio versionada em código.
+
+### Escopo mensurável
+
+As métricas abaixo descrevem componentes realmente implementados e versionados no repositório, sem estimar ganhos financeiros ou percentuais de produtividade não medidos:
+
+- **4 camadas de dados:** Bronze, Silver, Gold e Quarantine.
+- **3 estados de publicação:** `Approved`, `Needs Review` e `Blocked`.
+- **7 workflows no GitHub Actions:** CI, deploy do Streamlit, lint, operação da camada publicada, policy check, segurança e sincronização de catálogo.
+- **1 aplicação executiva em Streamlit** com integração a endpoints FastAPI.
+- Controles versionados de **Data Quality, Data Contracts, Data Lineage, Privacy Risk Score e Publication Gate**.
 
 ---
 
 ## Arquitetura
 
-```mermaid
-flowchart LR
-    A[Dados brutos] --> B[Ingestão e padronização]
-    B --> C[Transformação e Analytics]
-    C --> D[Classificação LGPD]
-    C --> E[Data Quality]
-    D --> F[Privacy Risk Score]
-    E --> F
-    F --> G{Publication Gate}
-    G -->|Approved| H[Camada publicada]
-    G -->|Blocked / Needs Review| I[Evidências de governança]
-    H --> J[Streamlit / consumo executivo]
-    I --> J
-```
+![Arquitetura: ingestão, controles, Publication Gate e consumo governado](docs/assets/architecture-overview.png)
+
+[Abrir diagrama em alta resolução](docs/assets/architecture-overview.png) · [Versão vetorial](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
+
+As setas contínuas representam o fluxo de dados e controles. A seta tracejada leva apenas status e justificativas para a central de governança; não representa publicação de dados bloqueados.
+
+O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_reference_architecture.md); as camadas locais não representam buckets AWS provisionados.
 
 ### Impacto demonstrado
 
@@ -76,12 +84,28 @@ flowchart LR
 | Área | Tecnologias |
 |---|---|
 | Processamento e análise | Python · pandas · DuckDB · SQL |
-| Analytics Engineering | dbt · modelagem dimensional · ETL/ELT |
+| Analytics Engineering | dbt · modelagem analítica · ETL/ELT |
 | Qualidade e governança | pytest · Data Contracts (YAML) · Ruff · mypy |
 | Visualização e entrega | Streamlit · Power BI · FastAPI |
 | Automação e CI/CD | GitHub Actions · Codecov · n8n |
 | Cloud / integração | Snowflake opcional · arquitetura AWS de referência |
-| IA aplicada | GenAI experimental · resultados persistidos |
+| IA generativa | OpenAI API · prompts · extração de atributos textuais · JSON · CSV/JSONL |
+
+---
+
+## IA generativa aplicada a dados de produtos
+
+**Contexto:** descrições de produtos chegam como texto livre, enquanto análises de categoria, material e compatibilidade precisam de atributos estruturados.
+
+**Ação:** implementei um módulo em Python integrado à API da OpenAI, com engenharia de prompts e resposta JSON, para extrair categoria, material, compatibilidade, características e resumo. O pipeline normaliza as saídas e persiste os atributos em CSV e JSONL.
+
+**Resultado:** descrições textuais passam a ter atributos estruturados e rastreáveis por produto, disponíveis para consumo analítico na página GenAI do Streamlit.
+
+**Escopo implementado:** o módulo oferece o modo `reference`, com saída de referência versionada, e o modo `openai`, que chama a API mediante configuração de credenciais. A interface exibe o artefato persistido e não executa inferência ao ser aberta. Esta implementação é de extração estruturada com LLM; não inclui RAG.
+
+- [Módulo de extração](src/genai_feature_extraction.py)
+- [Interface de resultados persistidos](app/pages/genai_insights.py)
+- [Documentação do experimento](docs/genai_bonus.md)
 
 ---
 
@@ -89,23 +113,21 @@ flowchart LR
 
 ### Implementado
 
-- Pipeline modular, camadas analíticas e execução reproduzível.
+- Pipeline modular e execução reproduzível.
 - Classificação de colunas por heurísticas e regras de contrato.
-- Privacy Risk Score, Publication Gate e justificativas de decisão.
-- Data Quality, contratos e artefatos de evidência e rastreabilidade.
-- Aplicação Streamlit com analytics executivo, análises de negócio e páginas de governança.
-- Endpoints FastAPI, testes, linting, mypy e workflows de CI.
-- Integração Snowflake opcional: configuração por ambiente, nenhuma conexão automática e operações somente sob ação do usuário, com graceful degradation quando a configuração está incompleta.
-- Experimento GenAI baseado em resultado persistido; modo e modelo são metadados do artefato, sem inferência ao vivo na página.
-- Templates n8n versionados para inspeção da arquitetura de orquestração e tratamento de falhas, sem execução automática pelo Streamlit.
+- Privacy Risk Score e lógica de decisão de publicação.
+- Regras de Data Quality e artefatos de evidência.
+- Views executivas em Streamlit com justificativa de publicação.
+- Testes, linting, mypy e workflows de CI.
+- Endpoints FastAPI para governança e integração com Snowflake.
+- Integração Snowflake com graceful degradation quando não há credenciais.
 
 ### Simulado / demonstrativo
 
 - Metadados de controlador, operador e DPO com entidades fictícias.
-- Mini RIPD, base legal e retenção para demonstração de governança, sem substituir avaliação jurídica.
-- Templates n8n demonstrativos, que exigem importação, configuração e ativação externas para se tornarem operacionais.
-- Interface GenAI que apresenta atributos materializados anteriormente, sem RAG, embeddings ou avaliação de modelo em tempo real.
-- Arquitetura AWS apresentada como referência, não como infraestrutura produtiva implantada.
+- Mini RIPD para demonstração.
+- Base legal e retenção representadas para simulação de governança.
+- Arquitetura AWS apresentada como referência, não como infraestrutura produtiva de cliente real.
 
 > Projeto de portfólio inspirado em práticas de produção. Utiliza dados públicos, sintéticos ou demonstrativos e não representa certificação jurídica de conformidade com a LGPD.
 
@@ -113,25 +135,23 @@ flowchart LR
 
 ## Visão da aplicação
 
-Os screenshots abaixo são registros visuais da evolução da aplicação. Eles foram preservados como histórico e podem anteceder os polimentos mais recentes da interface.
-
-| Portfolio Overview — registro anterior | Governance Lab — registro anterior |
+| Executive Overview | Governance Control Center |
 |---|---|
-| ![Registro visual da visão executiva](assets/screenshots/executive_overview_v3.png) | ![Registro visual do laboratório de governança](assets/screenshots/governance_control_center.png) |
+| ![Executive Overview](assets/screenshots/executive_overview_v3.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
 
-| Privacy & LGPD Controls — registro anterior | Data Quality |
+| LGPD & Privacy Risk | Data Quality |
 |---|---|
-| ![Registro visual de privacidade e LGPD](assets/screenshots/lgpd_privacy_risk.png) | ![Registro visual de qualidade de dados](assets/screenshots/data_quality.png) |
+| ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
 
 ---
 
 ## Como revisar este projeto em 5 minutos
 
-1. Assista ao GIF e abra a **[demonstração ao vivo](https://governed-analytics-platform.streamlit.app/)**.
-2. Comece em **Portfolio Overview** para entender o produto analítico e seu contexto.
-3. Visite **Business Insights**, **Publication Governance**, **Privacy & LGPD Controls** e **Data Quality**.
-4. Para aprofundamento técnico, explore **Governance Evidence**, **Governance Lab**, **Automation & Orchestration**, **GenAI Experiment** e **Snowflake Integration**.
-5. Consulte `docs/`, `contracts/` e `workflows/n8n/` para arquitetura, regras e artefatos versionados.
+1. Assista ao GIF no início deste README.
+2. Abra a **[demonstração ao vivo](https://governed-analytics-platform.streamlit.app/)**.
+3. Visite **Governance Control Center**, **Data Quality** e **LGPD & Privacy Risk**.
+4. Consulte a arquitetura e a documentação técnica em `docs/`.
+5. Revise `Implementado x simulado` para distinguir funcionalidades reais de componentes demonstrativos.
 
 ---
 
@@ -169,12 +189,37 @@ make app
 - **Documentação em inglês:** [`docs/README.en.md`](docs/README.en.md)
 - **Data Contracts:** [`contracts/`](contracts/)
 - **Workflows n8n:** [`workflows/n8n/`](workflows/n8n/)
-- **Experimento GenAI:** [`docs/genai_bonus.md`](docs/genai_bonus.md)
 
 ---
 
+## Validação de evidências do Publication Gate
+
+O Gate rejeita evidências malformadas antes de decidir a publicação: scores
+precisam ser finitos e estar entre 0 e 100, falhas críticas precisam ser um inteiro
+não negativo, estados de freshness/contrato precisam ser reconhecidos e a indicação
+de dados sensíveis sem proteção precisa ser booleana. Valores desconhecidos,
+`NaN` ou ausência de evidência geram erro; não são convertidos em aprovação.
+
+Para verificar os casos normais, limites e entradas inválidas:
+
+```bash
+uv sync --extra dev
+uv run pytest -q tests/test_publication_gate.py tests/test_governance_edge_cases.py
+uv run ruff check src app tests
+```
+
+Esses controles complementam a política de publicação. O modelo de acesso e
+retenção permanece demonstrativo, conforme a
+[política de acesso e retenção](docs/governance/access_and_retention_policy.md).
+
+## Licença
+
+Este projeto utiliza a licença **Creative Commons Atribuição-NãoComercial 4.0 Internacional (CC BY-NC 4.0)**. Consulte os termos completos em [LICENSE](LICENSE) e o [aviso do dashboard](DASHBOARD_LICENSE_NOTICE.txt).
+
 ## Autor
 
-**Samuel Maia** — Analista de Dados | Analytics Engineer
+**Samuel de Andrade Maia — Engenheiro de Dados Pleno | Analytics Engineer**
 
-[LinkedIn](https://www.linkedin.com/in/samuelmaia-analytics/) · [GitHub](https://github.com/samuelmaia-analytics)
+Atuo na **Avanade** desde **20/10/2026**, em Engenharia de Dados. Este é um **projeto pessoal de portfólio**; suas implementações, dados e resultados não representam entregas da Avanade ou de seus clientes.
+
+[LinkedIn](https://www.linkedin.com/in/samuelmaia-analytics/) · [Portfólio](https://samuelmaia-analytics.github.io/samuelmaia-analytics/) · [Currículo em PDF](https://samuelmaia-analytics.github.io/samuelmaia-analytics/assets/Samuel_Maia_Curriculo.pdf)

@@ -276,3 +276,52 @@ def test_explicit_historical_input_still_requires_privacy_score(monkeypatch: pyt
                                      "--quality-score", "95"])
     with pytest.raises(SystemExit, match="--lgpd-risk-score"):
         publication_gate_cli.build_inputs(publication_gate_cli.parse_args())
+
+
+@pytest.mark.parametrize("field,value", [
+    ("data_quality_score", float("nan")),
+    ("data_quality_score", float("inf")),
+    ("data_quality_score", -1),
+    ("data_quality_score", 101),
+    ("data_quality_score", "95"),
+    ("data_quality_score", True),
+    ("privacy_risk_score", float("nan")),
+    ("privacy_risk_score", float("-inf")),
+    ("privacy_risk_score", -1),
+    ("privacy_risk_score", 101),
+    ("privacy_risk_score", None),
+    ("critical_rule_failures", -1),
+    ("critical_rule_failures", 0.5),
+    ("critical_rule_failures", False),
+    ("critical_rule_failures", None),
+    ("freshness_status", "unknown"),
+    ("freshness_status", None),
+    ("schema_contract_status", "unknown"),
+    ("schema_contract_status", None),
+    ("has_sensitive_data_without_protection", "false"),
+    ("has_sensitive_data_without_protection", 0),
+    ("has_sensitive_data_without_protection", None),
+])
+def test_invalid_evidence_cannot_be_approved(field, value):
+    evidence = dict(
+        data_quality_score=95, privacy_risk_score=20,
+        critical_rule_failures=0, freshness_status="fresh",
+        schema_contract_status="passed", has_sensitive_data_without_protection=False,
+    )
+    evidence[field] = value
+    with pytest.raises(ValueError):
+        evaluate_publication_readiness(**evidence)
+
+
+@pytest.mark.parametrize("quality,privacy,expected", [
+    (100, 0, "Approved"), (80, 59.5, "Approved"),
+    (79.9, 0, "Needs Review"), (100, 60, "Needs Review"),
+    (0, 100, "Needs Review"),
+])
+def test_valid_score_boundaries(quality, privacy, expected):
+    result = evaluate_publication_readiness(
+        data_quality_score=quality, privacy_risk_score=privacy,
+        critical_rule_failures=0, freshness_status="fresh",
+        schema_contract_status="passed", has_sensitive_data_without_protection=False,
+    )
+    assert result.decision == expected

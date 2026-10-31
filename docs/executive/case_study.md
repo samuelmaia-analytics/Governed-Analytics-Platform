@@ -1,210 +1,210 @@
-# Case Study: Governed Analytics Platform
+# Estudo de Caso: Governed Analytics Platform
 
-## 1) Executive summary
+## 1) Resumo executivo
 
-This project is a **portfolio-grade, production-inspired governed analytics platform** built to demonstrate Analytics Engineering and Data Governance practices from ingestion to executive consumption.
+Este projeto é uma **plataforma de analytics governado para portfólio, inspirada em cenários de produção**, desenvolvida para demonstrar práticas de Analytics Engineering e Governança de Dados desde a ingestão até o consumo executivo.
 
-It combines:
+A solução combina:
 
-- modular data processing in Python;
-- privacy-aware controls (LGPD-inspired);
-- quality and contract validation;
-- explainable publication decisioning;
-- Streamlit-based executive analytics delivery;
-- CI-backed engineering quality gates.
+- processamento modular de dados em Python;
+- controles orientados à privacidade, inspirados na LGPD;
+- validação de qualidade e contratos de dados;
+- tomada de decisão explicável para publicação;
+- entrega de analytics executivo por meio de Streamlit;
+- quality gates de engenharia apoiados por CI.
 
-The objective is to show technical maturity without overclaiming enterprise production status.
+O objetivo é demonstrar maturidade técnica sem apresentar o projeto como um sistema corporativo real em produção.
 
-## 2) Business problem
+## 2) Problema de negócio
 
-Analytics teams often publish dashboards quickly, but without explicit governance boundaries.
-As a result, organizations can face:
+Equipes de analytics frequentemente publicam dashboards com rapidez, mas sem limites explícitos de governança.
+Como consequência, organizações podem enfrentar:
 
-- unclear data ownership and trust issues;
-- inconsistent KPI definitions;
-- weak publication controls;
-- unnecessary privacy exposure in executive outputs.
+- falta de clareza sobre propriedade e confiabilidade dos dados;
+- definições inconsistentes de KPIs;
+- controles de publicação frágeis;
+- exposição desnecessária de informações sensíveis em produtos executivos.
 
-The core business need is to deliver executive analytics with clear governance evidence, not just visualization.
+A principal necessidade de negócio é entregar analytics executivo com evidências claras de governança, e não apenas visualizações.
 
-## 3) Data and governance challenge
+## 3) Desafio de dados e governança
 
-The challenge is to transform relational e-commerce-style datasets into an executive-ready analytical product while balancing:
+O desafio consiste em transformar conjuntos de dados relacionais, com características de e-commerce, em um produto analítico pronto para consumo executivo, equilibrando:
 
-- analytical usefulness;
-- privacy-aware exposure minimization;
-- quality reliability;
-- reproducibility and auditability.
+- utilidade analítica;
+- minimização da exposição de dados sob a ótica de privacidade;
+- confiabilidade da qualidade dos dados;
+- reprodutibilidade e auditabilidade.
 
-In governance terms, the platform must make publication status explicit and explainable.
+Sob a perspectiva de governança, a plataforma precisa tornar o status de publicação explícito e explicável.
 
-## 4) Proposed solution
+## 4) Solução proposta
 
-The proposed solution is a layered governed pipeline that:
+A solução proposta é um pipeline governado em camadas que:
 
-1. ingests and prepares source data;
-2. profiles data quality and structure;
-3. classifies columns with LGPD-inspired sensitivity logic;
-4. computes explainable privacy risk;
-5. validates schema/governance expectations via contracts;
-6. publishes a minimized, controlled analytical layer;
-7. provides governance scorecards and history;
-8. exposes outcomes through an executive app and documentation artifacts.
+1. ingere e prepara os dados de origem;
+2. realiza profiling da estrutura e da qualidade dos dados;
+3. classifica colunas utilizando lógica de sensibilidade inspirada na LGPD;
+4. calcula risco de privacidade de forma explicável;
+5. valida expectativas de schema e governança por meio de contratos de dados;
+6. publica uma camada analítica controlada e minimizada;
+7. disponibiliza scorecards e histórico de governança;
+8. expõe os resultados por meio de uma aplicação executiva e artefatos de documentação.
 
-## 5) Architecture overview
+## 5) Visão geral da arquitetura
 
-The architecture separates internal processing from executive exposure:
+A arquitetura separa o processamento interno da exposição executiva:
 
-- internal analytical and governance computation in curated layers;
-- controlled outputs in published layers;
-- executive app consumes published outputs only.
+- cálculos analíticos e de governança realizados internamente em camadas curadas;
+- outputs controlados disponibilizados em camadas publicadas;
+- a aplicação executiva consome somente os outputs publicados.
 
-Main architectural components:
+Principais componentes arquiteturais:
 
-- ingestion/loading;
-- profiling and quality checks;
-- privacy classification;
+- ingestão e carregamento;
+- profiling e verificações de qualidade;
+- classificação de privacidade;
 - risk scoring;
-- contract validation;
-- publication controls;
-- governance monitoring artifacts;
-- Streamlit executive interface;
-- CI/CD workflows.
+- validação de contratos;
+- controles de publicação;
+- artefatos de monitoramento de governança;
+- interface executiva em Streamlit;
+- workflows de CI/CD.
 
-## 6) Data quality strategy
+## 6) Estratégia de qualidade de dados
 
-Data quality is treated as a publication gate input, not a post-publication report.
+A qualidade dos dados é tratada como uma entrada para o publication gate, e não como um relatório produzido apenas após a publicação.
 
-Strategy elements:
+A estratégia inclui:
 
-- declarative and code-based checks;
-- critical field checks for publication safety;
-- quality summaries for executive interpretation;
-- traceable check results for engineering diagnosis.
+- verificações declarativas e baseadas em código;
+- validações de campos críticos para segurança da publicação;
+- resumos de qualidade voltados à interpretação executiva;
+- resultados rastreáveis dos checks para diagnóstico de engenharia.
 
-This ensures that publication status reflects both privacy and reliability signals.
+Isso garante que o status de publicação considere simultaneamente sinais de privacidade e confiabilidade.
 
-## 7) LGPD-inspired privacy classification strategy
+## 7) Estratégia de classificação de privacidade inspirada na LGPD
 
-The platform classifies columns using a layered approach:
+A plataforma classifica colunas utilizando uma abordagem em camadas:
 
-- heuristic name-based signals;
-- regex pattern signals;
-- contract-based YAML overrides for deterministic governance cases.
+- sinais heurísticos baseados no nome das colunas;
+- sinais baseados em padrões regex;
+- overrides definidos em contratos YAML para casos determinísticos de governança.
 
-Classification outcomes feed:
+Os resultados da classificação alimentam:
 
-- risk scoring;
-- action hints (`keep`, `review`, `mask`, `anonymize`, `remove`);
-- publication rationale documentation.
+- o risk scoring;
+- recomendações de ação (`keep`, `review`, `mask`, `anonymize`, `remove`);
+- a documentação da justificativa de publicação.
 
-This is explicitly LGPD-inspired technical modeling for portfolio demonstration.
+Trata-se explicitamente de uma modelagem técnica inspirada na LGPD para fins de demonstração em portfólio.
 
-## 8) Risk scoring strategy
+## 8) Estratégia de risk scoring
 
-Privacy risk is scored with explainable components and mapped to risk levels (for example `low`, `medium`, `high`).
+O risco de privacidade é calculado por componentes explicáveis e convertido em níveis de risco, como `low`, `medium` e `high`.
 
-The strategy combines:
+A estratégia combina:
 
-- sensitivity exposure signals;
-- indirect re-identification context;
-- quality-related penalties where relevant;
-- recommendation outputs for governance action.
+- sinais de exposição de dados sensíveis;
+- contexto de reidentificação indireta;
+- penalidades relacionadas à qualidade, quando aplicáveis;
+- recomendações de ação para governança.
 
-Risk output is not a legal verdict; it is an engineering decision support mechanism.
+O resultado do risco não representa um parecer jurídico; trata-se de um mecanismo de apoio à decisão de engenharia.
 
-## 9) Data contracts strategy
+## 9) Estratégia de contratos de dados
 
-Contracts are used to formalize governance expectations, including:
+Os contratos são utilizados para formalizar expectativas de governança, incluindo:
 
-- required columns;
-- forbidden columns;
-- pseudonymization expectations;
-- default fill/consistency expectations;
-- schema and quality constraints.
+- colunas obrigatórias;
+- colunas proibidas;
+- expectativas de pseudonimização;
+- regras de preenchimento padrão e consistência;
+- restrições de schema e qualidade.
 
-Contract checks help prevent silent drift and make publication controls auditable.
+As verificações de contrato ajudam a evitar alterações silenciosas na estrutura dos dados e tornam os controles de publicação auditáveis.
 
-## 10) Publication decision workflow
+## 10) Fluxo de decisão de publicação
 
-The platform models publication as explicit states:
+A plataforma modela a publicação por meio de estados explícitos:
 
-- **Candidate**: dataset prepared and pending governance evaluation;
-- **Validated**: validation routines executed with evidence produced;
-- **Needs Review**: medium-risk and/or quality findings require remediation review;
-- **Approved**: controls indicate acceptable publication condition;
-- **Blocked**: critical governance/quality/privacy failures prevent publication.
+- **Candidate**: dataset preparado e aguardando avaliação de governança;
+- **Validated**: rotinas de validação executadas com geração de evidências;
+- **Needs Review**: achados de risco médio e/ou qualidade exigem revisão ou remediação;
+- **Approved**: os controles indicam condição aceitável para publicação;
+- **Blocked**: falhas críticas de governança, qualidade ou privacidade impedem a publicação.
 
-This workflow makes go/no-go decisions visible and explainable to technical and business reviewers.
+Esse fluxo torna as decisões de go/no-go visíveis e explicáveis para revisores técnicos e de negócio.
 
-## 11) Observability and monitoring strategy
+## 11) Estratégia de observabilidade e monitoramento
 
-Governance observability is handled through:
+A observabilidade de governança é tratada por meio de:
 
-- scorecards of control outcomes;
-- monitoring artifacts in published monitoring paths;
-- append-only governance history snapshots;
-- technical lineage artifacts for transformation traceability.
+- scorecards dos resultados dos controles;
+- artefatos de monitoramento em caminhos publicados;
+- snapshots históricos append-only de governança;
+- artefatos técnicos de lineage para rastreabilidade das transformações.
 
-The goal is to document not only data outputs, but also the reliability of governance operations over time.
+O objetivo é documentar não apenas os outputs de dados, mas também a confiabilidade das operações de governança ao longo do tempo.
 
-## 12) Executive dashboard usage
+## 12) Uso do dashboard executivo
 
-The Streamlit executive app supports:
+A aplicação executiva em Streamlit oferece suporte a:
 
-- KPI and governance status interpretation;
-- quality and privacy risk visibility;
-- publication decision rationale;
-- evidence-backed review conversations.
+- interpretação de KPIs e status de governança;
+- visibilidade sobre qualidade e risco de privacidade;
+- justificativa da decisão de publicação;
+- discussões de revisão sustentadas por evidências.
 
-It is designed for executive and reviewer workflows, not only exploratory analytics.
+A solução foi projetada para fluxos executivos e de revisão, e não apenas para exploração analítica.
 
-## 13) Engineering practices
+## 13) Práticas de engenharia
 
-### Modular Python
+### Python modular
 
-Pipeline responsibilities are split across dedicated modules to keep boundaries explicit and maintainable.
+As responsabilidades do pipeline são distribuídas entre módulos dedicados para manter limites claros e facilitar manutenção e evolução.
 
-### Tests
+### Testes
 
-Automated tests cover core governance, quality, publication, and application behaviors.
+Testes automatizados cobrem comportamentos centrais relacionados a governança, qualidade, publicação e aplicação.
 
 ### CI/CD
 
-GitHub workflows enforce linting, tests, and coverage thresholds.
+Workflows no GitHub aplicam linting, testes automatizados e limites mínimos de cobertura.
 
-### Type checks where applicable
+### Verificação de tipos quando aplicável
 
-Type checking is applied to targeted modules to improve reliability and reviewability.
+Type checking é aplicado a módulos selecionados para aumentar a confiabilidade e facilitar revisões de código.
 
-### Documentation
+### Documentação
 
-Documentation is part of the delivery artifact, including architecture, governance controls, case-study narrative, and recruiter-oriented summaries.
+A documentação faz parte da entrega do projeto e inclui arquitetura, controles de governança, narrativa do estudo de caso e resumos direcionados a recrutadores.
 
-## 14) Limitations
+## 14) Limitações
 
-- This is **not** a live enterprise production client system.
-- It uses sample/synthetic/public data context only.
-- It does not claim legal LGPD compliance certification.
-- Enterprise IAM and centralized security operations are outside current scope.
+- Este projeto **não é** um sistema corporativo real de cliente em produção.
+- Utiliza apenas contexto de dados de exemplo, sintéticos ou públicos.
+- Não declara possuir certificação jurídica de conformidade com a LGPD.
+- IAM corporativo e operações centralizadas de segurança estão fora do escopo atual.
 
-These boundaries are intentional and transparent.
+Esses limites são intencionais e apresentados de forma transparente.
 
-## 15) Future improvements
+## 15) Melhorias futuras
 
-- Add a dbt modeling layer with stronger semantic governance.
-- Expand metadata catalog depth and ownership metadata.
-- Improve long-range historical observability and trend analytics.
-- Harden automated publication gating with stricter policy thresholds.
-- Add stronger security checks and policy-as-code validations.
+- Adicionar uma camada de modelagem em dbt com governança semântica mais robusta.
+- Expandir a profundidade do catálogo de metadados e as informações de ownership.
+- Melhorar a observabilidade histórica de longo prazo e a análise de tendências.
+- Tornar o publication gate automatizado mais rigoroso por meio de thresholds de política mais restritivos.
+- Adicionar verificações de segurança mais robustas e validações de policy-as-code.
 
-## 16) Skills demonstrated
+## 16) Competências demonstradas
 
-This case demonstrates capabilities relevant to international roles such as Analytics Engineer, Data Engineer, and Data Governance-focused positions:
+Este case demonstra competências relevantes para posições como Analytics Engineer, Data Engineer e funções com foco em Governança de Dados:
 
-- governed analytics architecture design;
-- privacy-aware data publication patterns;
-- quality and contract-driven reliability;
-- risk-based decision support;
-- reproducible engineering workflows with CI gates;
-- technical communication for executive and hiring audiences.
+- desenho de arquitetura de analytics governado;
+- padrões de publicação de dados orientados à privacidade;
+- confiabilidade baseada em qualidade e contratos de dados;
+- apoio à decisão baseado em risco;
+- workflows de engenharia reprodutíveis com gates de CI;
+- comunicação técnica voltada a públicos executivos e processos seletivos.
