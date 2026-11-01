@@ -110,6 +110,12 @@ temperature=0 e resposta JSON, e passe as duas flags para true. A página inicia
 os secrets de nível raiz como variáveis de ambiente somente na consulta externa
 consentida; a chave não é lida para renderização nem exibida.
 
+No Streamlit 1.56.0, o exportador de secrets não transforma valores TOML booleanos
+em variáveis de ambiente. A página normaliza explicitamente OPENAI_ENABLED e
+RAG_EXTERNAL_ENABLED (booleanos ou strings reconhecidas), inclusive false para
+desligar. Valores inválidos bloqueiam a consulta. Os testes usam o parser real
+de secrets da versão instalada com um TOML temporário e chave fictícia.
+
 Não crie uma seção TOML [openai] para estas variáveis: secrets aninhados não são
 exportados como variáveis de ambiente. A representação de OpenAISettings omite
 a chave. Não imprimir o objeto de configuração ou o ambiente.

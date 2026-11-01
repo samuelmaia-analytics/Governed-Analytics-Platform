@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 import streamlit as st
 
 from app.i18n import LOCALE_EN_US, Locale
@@ -18,6 +20,27 @@ def _consume_query_consent() -> None:
         st.session_state.get("_rag_consent", False) is True
     )
     st.session_state["_rag_consent"] = False
+
+
+def _prepare_provider_flags() -> None:
+    # Streamlit 1.56 exports string/int/float root secrets, but not TOML booleans.
+    # Read only flags here; the key remains in Streamlit's server environment.
+    flags: dict[str, str] = {}
+    for name in ("OPENAI_ENABLED", "RAG_EXTERNAL_ENABLED"):
+        value = st.secrets.get(name)
+        if value is None:
+            continue
+        if type(value) is bool:
+            flags[name] = "true" if value else "false"
+        elif isinstance(value, str) and value.strip().lower() in {
+            "true", "false", "1", "0", "yes", "no", "on", "off",
+        }:
+            flags[name] = (
+                "true" if value.strip().lower() in {"true", "1", "yes", "on"} else "false"
+            )
+        else:
+            raise ValueError("Invalid provider flag configuration.")
+    os.environ.update(flags)
 
 
 def render_governance_assistant(locale: Locale) -> None:
@@ -73,9 +96,7 @@ def render_governance_assistant(locale: Locale) -> None:
         return
     if mode == "openai" and consent:
         try:
-            # Initialize root-level Streamlit secrets as environment variables.
-            # No key value is read into the page or rendered.
-            st.secrets.get("RAG_EXTERNAL_ENABLED", False)
+            _prepare_provider_flags()
         except FileNotFoundError:
             pass  # Environment-only configuration is also supported locally.
         except Exception:

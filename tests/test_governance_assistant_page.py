@@ -157,24 +157,35 @@ def test_consent_is_consumed_and_never_reused_for_the_next_query(monkeypatch, co
     assert "_rag_query_consent" not in app.session_state
 
 
-def test_streamlit_secrets_enable_only_the_consented_query_without_display(monkeypatch, corpus):
-    from types import SimpleNamespace
-
-    from src.settings import OpenAISettings
-    monkeypatch.setattr(page, "load_corpus", lambda: corpus)
-    calls = []
-    # Streamlit's documented root-level secret -> environment bridge is simulated;
-    # no credential file is created or read.
-    class Secrets:
-        def get(self, name, default):
-            calls.append(name)
-            monkeypatch.setenv("OPENAI_ENABLED", "true")
-            monkeypatch.setenv("RAG_EXTERNAL_ENABLED", "true")
-            monkeypatch.setenv("RAG_OPENAI_MODEL", "test-model")
-            return True
-    monkeypatch.setattr(page.st, "secrets", Secrets())
-    monkeypatch.setattr(rag, "load_app_settings", lambda: SimpleNamespace(openai=OpenAISettings(True, "test-key")))
+@pytest.mark.parametrize("flag", [True, False, "true", "false", "invalid", 1])
+def test_real_streamlit_secrets_flags_control_consented_queries(
+    monkeypatch, corpus, tmp_path, flag
+):
     import json
+    import os
+
+    from streamlit.runtime.secrets import Secrets
+
+    monkeypatch.setattr(page, "load_corpus", lambda: corpus)
+    # Use the pinned Streamlit parser/export implementation, never real secrets.
+    for name in ("OPENAI_ENABLED", "RAG_EXTERNAL_ENABLED", "OPENAI_API_KEY", "RAG_OPENAI_MODEL"):
+        monkeypatch.setenv(name, "")
+    secret_path = tmp_path / "secrets.toml"
+    literal = str(flag).lower() if type(flag) in {bool, int} else json.dumps(flag)
+    secret_path.write_text(
+        f"OPENAI_ENABLED = {literal}\nRAG_EXTERNAL_ENABLED = {literal}\n"
+        'OPENAI_API_KEY = "test-key"\nRAG_OPENAI_MODEL = "test-model"\n',
+        encoding="utf-8",
+    )
+    original_get_option = page.st.config.get_option
+    monkeypatch.setattr(
+        page.st.config, "get_option",
+        lambda name: [str(secret_path)] if name == "secrets.files" else original_get_option(name),
+    )
+    secrets = Secrets()
+    monkeypatch.setattr(Secrets, "_maybe_install_file_watchers", lambda self: None)
+    monkeypatch.setattr(page.st, "secrets", secrets)
+    calls = []
 
     class Response:
         def __enter__(self):
@@ -188,13 +199,27 @@ def test_streamlit_secrets_enable_only_the_consented_query_without_display(monke
                 "evidence": [{"id": "S1", "quote": "no_duplicate_primary_key"}]
             })}}]}).encode()
 
-    monkeypatch.setattr(rag.request, "urlopen", lambda *a, **k: Response())
+    def respond(req, timeout):
+        calls.append(1)
+        return Response()
+
+    monkeypatch.setattr(rag.request, "urlopen", respond)
     app = app_test().run()
-    assert not calls
+    assert not calls and secrets._secrets is None
     app.text_area[0].set_value("quality orders")
     app.radio[0].set_value("openai")
     app.checkbox[0].check()
     app.button[0].click().run()
-    assert not app.exception and calls == ["RAG_EXTERNAL_ENABLED"]
-    assert any("realizada" in item.value for item in app.caption)
+    assert not app.exception
+    if flag is True or flag == "true":
+        assert calls == [1]
+        assert os.environ["OPENAI_ENABLED"] == "true"
+        assert os.environ["RAG_EXTERNAL_ENABLED"] == "true"
+        assert any("realizada" in item.value for item in app.caption)
+    else:
+        assert not calls and app.error
+        if flag is False or flag == "false":
+            assert os.environ["OPENAI_ENABLED"] == "false"
+            assert os.environ["RAG_EXTERNAL_ENABLED"] == "false"
+    assert app.checkbox[0].value is False
     assert "test-key" not in str(app)
