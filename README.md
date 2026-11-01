@@ -47,6 +47,7 @@ A aplicação utiliza dados públicos do e-commerce Olist e mantém uma separaç
 - Aplicação executiva em Streamlit e endpoints em FastAPI.
 - Testes, linting e CI/CD com GitHub Actions.
 - Exemplos de orquestração com n8n, mantendo a lógica de negócio versionada em código.
+- Assistente RAG de governança com recuperação TF-IDF local, citações e corpus limitado a contratos aprovados.
 
 ### Escopo mensurável
 
@@ -62,13 +63,13 @@ As métricas abaixo descrevem componentes realmente implementados e versionados 
 
 ## Arquitetura
 
-![Arquitetura: ingestão, controles, Publication Gate e consumo governado](docs/assets/architecture-overview.png)
+![Arquitetura de referência Azure do Governed Analytics Platform](docs/assets/architecture-overview.svg)
 
-[Abrir diagrama em alta resolução](docs/assets/architecture-overview.png) · [Versão vetorial](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
+[Abrir diagrama em alta resolução (SVG)](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
 
-As setas contínuas representam o fluxo de dados e controles. A seta tracejada leva apenas status e justificativas para a central de governança; não representa publicação de dados bloqueados.
+**Arquitetura proposta, ainda não implantada.** O desenho mostra um possível mapeamento para Azure: Data Factory, ADLS Gen2, Azure Databricks, Unity Catalog, Azure AI Search, Azure OpenAI, Azure Container Apps e Power BI são serviços de referência. A implementação atual usa processamento local e a demonstração em Streamlit; o assistente RAG usa TF-IDF local e a OpenAI API opcional. Levar o projeto para Azure exige adaptação do código e provisionamento dos serviços.
 
-O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_reference_architecture.md); as camadas locais não representam buckets AWS provisionados.
+
 
 ### Impacto demonstrado
 
@@ -89,25 +90,25 @@ O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_ref
 | Visualização e entrega | Streamlit · Power BI · FastAPI |
 | Automação e CI/CD | GitHub Actions · Codecov · n8n |
 | Cloud / integração | Snowflake opcional · arquitetura AWS de referência |
-| IA generativa | OpenAI API · prompts · extração de atributos textuais · JSON · CSV/JSONL |
+| IA generativa e RAG | OpenAI API · prompts · extração estruturada · TF-IDF local · recuperação com citações · PyYAML |
 
 ---
 
 ## IA generativa aplicada a dados de produtos
 
-**Contexto:** descrições de produtos chegam como texto livre, enquanto análises de categoria, material e compatibilidade precisam de atributos estruturados.
+O módulo src/genai_feature_extraction.py extrai categoria, material, compatibilidade, características e resumo de descrições de produtos usando prompts e saída JSON estruturada. Os resultados são persistidos em CSV e JSONL. O modo reference usa dados de referência versionados; o modo openai chama a API quando as credenciais estão configuradas. A interface mostra os resultados persistidos e não executa inferência ao abrir.
 
-**Ação:** implementei um módulo em Python integrado à API da OpenAI, com engenharia de prompts e resposta JSON, para extrair categoria, material, compatibilidade, características e resumo. O pipeline normaliza as saídas e persiste os atributos em CSV e JSONL.
+## RAG de governança
 
-**Resultado:** descrições textuais passam a ter atributos estruturados e rastreáveis por produto, disponíveis para consumo analítico na página GenAI do Streamlit.
+Implementei um assistente RAG para consultar regras presentes nos contratos técnicos aprovados do projeto, com recuperação local TF-IDF, trechos citados e respostas que se abstêm quando não há evidência suficiente.
 
-**Escopo implementado:** o módulo oferece o modo `reference`, com saída de referência versionada, e o modo `openai`, que chama a API mediante configuração de credenciais. A interface exibe o artefato persistido e não executa inferência ao ser aberta. Esta implementação é de extração estruturada com LLM; não inclui RAG.
+- **Corpus:** somente três contratos versionados em contracts/, aprovados por manifesto e SHA-256. Documentos locais, relatórios gerados, dados brutos e arquivos fora desse escopo não são ingeridos.
+- **Modo local:** TF-IDF é o padrão; não exige chave, banco vetorial ou rede. A cada consulta, os arquivos são revalidados.
+- **OpenAI opcional:** chamada externa somente após seleção explícita e consentimento para aquela consulta, com configuração de credenciais no servidor. A integração seleciona evidências e exige citações literais; não executa SQL, ferramentas ou decisões de publicação.
+- **Limites:** contexto externo limitado a cinco trechos e 7.000 caracteres; sem histórico persistente de perguntas e respostas.
+- **Segurança e configuração:** [documentação do RAG](docs/governance_rag.md) descreve fontes, hashes, consentimento, secrets, limites, custos e o roteiro local.
 
-- [Módulo de extração](src/genai_feature_extraction.py)
-- [Interface de resultados persistidos](app/pages/genai_insights.py)
-- [Documentação do experimento](docs/genai_bonus.md)
-
----
+Na revisão da integração registrada em **31/10/2026**, a suíte passou com **1.111 testes, zero skips e 92% de cobertura**. É um resultado daquela validação, não uma execução realizada durante esta atualização.
 
 ## Implementado x simulado
 

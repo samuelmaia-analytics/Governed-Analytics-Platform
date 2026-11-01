@@ -18,22 +18,37 @@ A personal portfolio platform that turns public Olist e-commerce data into analy
 - A deterministic Publication Gate evaluator with `Approved`, `Needs Review` and `Blocked` decisions, used by the Governance Control Center.
 - Streamlit executive views, FastAPI endpoints, operational artifacts and GitHub Actions checks.
 - Optional Snowflake integration and versioned n8n workflow templates.
+- A governance RAG assistant with local TF-IDF retrieval, citations and an approved-contract corpus.
 
 The documented governance review on **24 October 2026** passed **383 tests**, including invalid Gate evidence cases. This is a historical result, not a new test run or a guarantee that all execution paths use one promotion gate.
 
 ## Architecture and publication boundary
 
-Internal processing produces analytical candidates. Quality, contract and privacy controls provide evidence for publication decisions. Executive consumption is separated from the full internal analytical layer; governance views expose decision status and rationale.
+![Azure reference architecture for the Governed Analytics Platform](docs/assets/architecture-overview.svg)
+
+[Open the high-resolution SVG](docs/assets/architecture-overview.svg) · [Mermaid source](docs/assets/architecture-overview.mmd)
+
+**This is a proposed Azure reference design, not deployed infrastructure.** Azure Data Factory, ADLS Gen2, Azure Databricks, Unity Catalog, Azure AI Search, Azure OpenAI, Azure Container Apps and Power BI are illustrative target services. The current project uses local processing and a Streamlit demo; its RAG assistant uses local TF-IDF retrieval and an optional OpenAI API call after per-query consent. Moving the project to Azure would require code changes and provisioning.
 
 The Gate evaluator is implemented, but enforcement differs across entrypoints. See [the technical architecture](docs/architecture/architecture.md) for the Python/dbt execution boundaries and remaining work.
 
-Amazon S3 is part of an [AWS reference design](docs/architecture/aws_reference_architecture.md). Local folders do not represent provisioned AWS buckets.
-
 ## Generative AI for product attributes
 
-A Python module extracts category, material, compatibility, features and summaries from product descriptions using prompts and structured JSON output. It persists CSV/JSONL artifacts. The `reference` mode uses versioned reference output; `openai` calls the OpenAI API when credentials are configured. The UI displays persisted results and does not run inference on page load. This feature extraction implementation does not include RAG.
+The src/genai_feature_extraction.py module extracts category, material, compatibility, features and summaries from product descriptions with prompts and structured JSON output. Results are persisted as CSV and JSONL. The reference mode uses versioned reference data; openai calls the API when credentials are configured. The UI displays persisted results and does not run inference on page load.
 
 [Module](src/genai_feature_extraction.py) · [Documentation](docs/genai_bonus.md)
+
+## Governance RAG assistant
+
+A separate RAG assistant answers questions grounded in approved technical contracts, using local TF-IDF retrieval, cited source excerpts and abstention when evidence is insufficient.
+
+- **Corpus:** only three versioned contracts under contracts/, approved in a manifest and checked by SHA-256. Local-only documents, generated reports, raw data and files outside this scope are excluded.
+- **Local mode:** TF-IDF is the default and needs no API key, vector database or network. Source files are revalidated for each query.
+- **Optional OpenAI mode:** an external call requires explicit mode selection and consent for that query, plus server-side credentials. The integration selects supporting evidence and requires literal citations; it does not execute SQL, tools or publication decisions.
+- **Limits:** external context is limited to five chunks and 7,000 characters; questions and answers are not persisted as application history.
+- **Security and setup:** [RAG documentation](docs/governance_rag.md) covers sources, hashes, consent, secrets, limits, costs and the local walkthrough.
+
+The integration review recorded on **31 October 2026** passed **1,111 tests, zero skips and 92% coverage**. This is the result from that validation, not a test run performed during this README update.
 
 ## Run locally
 
