@@ -63,13 +63,13 @@ As métricas abaixo descrevem componentes realmente implementados e versionados 
 
 ## Arquitetura
 
-![Arquitetura: ingestão, controles, Publication Gate e consumo governado](docs/assets/architecture-overview.png)
+![Arquitetura de referência Azure do Governed Analytics Platform](docs/assets/architecture-overview.svg)
 
-[Abrir diagrama em alta resolução](docs/assets/architecture-overview.png) · [Versão vetorial](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
+[Abrir diagrama em alta resolução (SVG)](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
 
-As setas contínuas representam o fluxo de dados e controles. A seta tracejada leva apenas status e justificativas para a central de governança; não representa publicação de dados bloqueados.
+**Arquitetura proposta, ainda não implantada.** O desenho mostra um possível mapeamento para Azure: Data Factory, ADLS Gen2, Azure Databricks, Unity Catalog, Azure AI Search, Azure OpenAI, Azure Container Apps e Power BI são serviços de referência. A implementação atual usa processamento local e a demonstração em Streamlit; o assistente RAG usa TF-IDF local e a OpenAI API opcional. Levar o projeto para Azure exige adaptação do código e provisionamento dos serviços.
 
-O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_reference_architecture.md); as camadas locais não representam buckets AWS provisionados.
+
 
 ### Impacto demonstrado
 
