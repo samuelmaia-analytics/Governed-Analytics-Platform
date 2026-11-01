@@ -1,12 +1,18 @@
-flowchart TD
-    raw["Dados brutos"] --> ingest["Ingestão e padronização"]
-    ingest --> analytics["Transformação e Analytics"]
-    analytics --> privacy["Classificação LGPD"]
-    analytics --> quality["Data Quality e contratos"]
-    privacy --> risk["Privacy Risk Score"]
-    risk --> gate{"Publication Gate"}
-    quality --> gate
-    gate -->|Approved| published["Camada publicada"]
-    gate -->|Blocked / Needs Review| evidence["Evidências para revisão"]
-    published --> app["Streamlit: consumo executivo"]
-    evidence -.->|Status e justificativa| control["Central de governança"]
+flowchart LR
+    subgraph azure["Fluxo analítico · referência Azure"]
+        source["Dados públicos Olist<br/>Arquivos CSV"] --> ingest["Azure Data Factory<br/>Ingestão em lote"]
+        ingest --> storage["ADLS Gen2<br/>Raw · Bronze · Silver · Gold<br/>Quarantine"]
+        storage --> transform["Azure Databricks<br/>Python · PySpark · Delta Lake"]
+        transform --> checks["Regras do projeto<br/>Contratos · qualidade · privacidade"]
+        checks --> gate{"Publication Gate"}
+        gate -->|Approved| consume["Power BI + Azure Container Apps<br/>Streamlit / FastAPI"]
+        gate -->|Needs Review / Blocked| hold["Revisão / Quarantine"]
+    end
+
+    subgraph rag["Assistente RAG · evolução Azure proposta"]
+        contracts["3 contratos YAML aprovados"] --> integrity["Manifesto + SHA-256"]
+        integrity --> search["Azure AI Search<br/>(proposta)"]
+        search --> answer["Citações verificáveis<br/>Sem evidência, abstém"]
+        search -. "consentimento por consulta" .-> model["Azure OpenAI<br/>(opcional)"]
+        model --> answer
+    end
