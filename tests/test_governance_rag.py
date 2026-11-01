@@ -259,16 +259,22 @@ def test_missing_large_invalid_and_symbolic_sources(tmp_path, monkeypatch):
         rag.load_corpus(tmp_path, manifest)
 
 
-def test_repository_candidates_retrieval_evaluation_in_isolated_manifest(tmp_path):
+def test_repository_manifest_is_available_with_original_approved_hashes():
+    import subprocess
+
     spec = yaml.safe_load(rag.MANIFEST_PATH.read_text(encoding="utf-8"))
-    spec["sources"] = [entry for entry in spec["sources"] if (rag.PROJECT_ROOT / entry["path"]).is_file()]
+    assert len(spec["sources"]) == 3
     for entry in spec["sources"]:
-        entry["approved"] = True
-        entry["sha256"] = rag.document_digest((rag.PROJECT_ROOT / entry["path"]).read_bytes())
-    manifest = tmp_path / "evaluation.yml"
-    manifest.write_text(yaml.safe_dump(spec), encoding="utf-8")
-    corpus = rag.load_corpus(rag.PROJECT_ROOT, manifest)
+        assert entry["approved"] is True
+        assert entry["path"].startswith("contracts/")
+        assert subprocess.check_output(
+            ["git", "ls-files", "--", entry["path"]], cwd=rag.PROJECT_ROOT
+        ).strip()
+    corpus = rag.load_corpus()
     assert not corpus.notices
+    assert {chunk.source for chunk in corpus.chunks} == {
+        entry["path"] for entry in spec["sources"]
+    }
     result = rag.evaluate(rag.LocalIndex(corpus.chunks), spec["evaluation"])
     assert result["status"] == "ready"
     assert result["mean_recall_at_k"] == 1.0
@@ -329,3 +335,120 @@ def test_local_only_sources_never_reach_external_provider(monkeypatch, source):
     assert local.supported and not local.external_called
     with pytest.raises(rag.RagError, match="restrita ao modo local"):
         rag.answer_question(index, "privacy customer", mode="openai", consent=True)
+
+def test_real_local_corpus_needs_no_key_or_provider_settings(monkeypatch):
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_ENABLED", raising=False)
+    monkeypatch.delenv("RAG_EXTERNAL_ENABLED", raising=False)
+    monkeypatch.setattr(rag, "load_app_settings", lambda: pytest.fail("No provider settings in local mode"))
+    monkeypatch.setattr(rag.request, "urlopen", lambda *a, **k: pytest.fail("No network"))
+    corpus = rag.load_corpus()
+    answer = rag.answer_question(rag.LocalIndex(corpus.chunks), "Quais regras de qualidade se aplicam a gold_fact_orders?")
+    assert answer.supported and answer.mode == "local" and not answer.external_called
+
+
+@pytest.mark.parametrize("path", [
+    "policies/DATA_GOVERNANCE.md", "docs/reports/quality.md",
+    "docs/governance/lgpd_controls.md", "docs/personal.md",
+])
+def test_demo_ingestion_rejects_local_and_generated_documents(tmp_path, path):
+    manifest = write_source(tmp_path, "quality: orders", path=path)
+    with pytest.raises(rag.RagError, match="escopo"):
+        rag.load_corpus(tmp_path, manifest)
+
+
+def test_missing_approved_source_is_reported_without_substitution(tmp_path):
+    manifest = write_source(tmp_path, "quality: orders")
+    (tmp_path / "contracts/orders.yml").unlink()
+    corpus = rag.load_corpus(tmp_path, manifest)
+    assert not corpus.chunks
+    assert len(corpus.notices) == 1 and "indisponivel" in corpus.notices[0]
+
+
+@pytest.mark.parametrize("question", [None, 42, [], "x" * 2001])
+def test_question_limits_before_provider_or_retrieval(index, monkeypatch, question):
+    monkeypatch.setattr(rag.request, "urlopen", lambda *a, **k: pytest.fail("No network"))
+    with pytest.raises(rag.RagError, match="2000"):
+        rag.answer_question(index, question, mode="openai", consent=True)
+
+
+@pytest.mark.parametrize("consent", [False, None, "true", 1])
+def test_external_consent_must_be_explicit_boolean(index, monkeypatch, consent):
+    monkeypatch.setattr(rag, "load_app_settings", lambda: pytest.fail("No credentials before consent"))
+    with pytest.raises(rag.RagError, match="autorizacao"):
+        rag.answer_question(index, "quality gold_fact_orders", mode="openai", consent=consent)
+
+
+def test_provider_payload_has_explicit_storage_timeout_and_output_caps(index, monkeypatch):
+    configure_external(monkeypatch)
+    calls = []
+    class Response(SimpleNamespaceResponse):
+        def read(self, limit):
+            assert limit == rag.MAX_RESPONSE_BYTES + 1
+            return super().read(limit)
+    def respond(req, timeout):
+        payload = json.loads(req.data)
+        assert timeout == rag.REQUEST_TIMEOUT_SECONDS == 20
+        assert payload["store"] is False
+        assert payload["max_completion_tokens"] == rag.MAX_COMPLETION_TOKENS == 1200
+        sources = json.loads(payload["messages"][1]["content"])["sources"]
+        assert len(sources) <= rag.MAX_EXTERNAL_CHUNKS
+        assert sum(len(source["text"]) for source in sources) <= rag.MAX_CONTEXT_CHARS
+        calls.append(req)
+        return Response(fake_response([{"id": "S1", "quote": "no_duplicate_primary_key"}]).raw)
+    monkeypatch.setattr(rag.request, "urlopen", respond)
+    answer = rag.answer_question(index, "quality gold_fact_orders", mode="openai", consent=True)
+    assert len(calls) == 1 and answer.external_called
+    assert len(answer.text) <= rag.MAX_ANSWER_CHARS
+
+
+@pytest.mark.parametrize("kind", ["count", "chunk", "total", "sensitive"])
+def test_external_context_limits_fail_closed(index, monkeypatch, kind):
+    from dataclasses import replace
+    configure_external(monkeypatch)
+    monkeypatch.setattr(rag.request, "urlopen", lambda *a, **k: pytest.fail("No network"))
+    hits = index.retrieve("quality gold_fact_orders")
+    if kind == "count":
+        hits = hits * 6
+    elif kind == "chunk":
+        hits = (replace(hits[0], chunk=replace(hits[0].chunk, text="x" * 1401)),)
+    elif kind == "total":
+        monkeypatch.setattr(rag, "MAX_CONTEXT_CHARS", 1)
+    else:
+        hits = (replace(hits[0], chunk=replace(hits[0].chunk, text="Contact person@example.org")),)
+    with pytest.raises(rag.RagError, match="limites"):
+        rag._openai_evidence("quality gold_fact_orders", hits)
+
+
+@pytest.mark.parametrize("raw", [b"x" * 32001, b"invalid JSON", b'{"choices": []}'])
+def test_oversized_or_invalid_provider_response_is_safe(index, monkeypatch, raw):
+    configure_external(monkeypatch)
+    monkeypatch.setattr(rag.request, "urlopen", lambda *a, **k: SimpleNamespaceResponse(raw))
+    with pytest.raises(rag.RagError, match="integracao"):
+        rag.answer_question(index, "quality gold_fact_orders", mode="openai", consent=True)
+
+
+def test_timeout_has_no_retry_no_secret_in_traceback_or_logs(index, monkeypatch, caplog):
+    import traceback
+    configure_external(monkeypatch)
+    calls = []
+    def fail(*a, **k):
+        calls.append(1)
+        raise TimeoutError("test-key sensitive-provider-body")
+    monkeypatch.setattr(rag.request, "urlopen", fail)
+    with pytest.raises(rag.RagError) as error:
+        rag.answer_question(index, "quality gold_fact_orders", mode="openai", consent=True)
+    rendered = "".join(traceback.format_exception(error.value))
+    assert len(calls) == 1
+    assert "test-key" not in rendered + caplog.text
+    assert "sensitive-provider-body" not in rendered + caplog.text
+
+
+def test_answer_character_limit_is_enforced(index, monkeypatch):
+    monkeypatch.setattr(rag, "MAX_ANSWER_CHARS", 10)
+    with pytest.raises(rag.RagError, match="caracteres"):
+        rag.answer_question(index, "quality gold_fact_orders")
+
+
+def test_openai_key_is_excluded_from_settings_representation():
+    assert "test-key" not in repr(OpenAISettings(True, "test-key"))

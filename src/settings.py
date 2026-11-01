@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from dotenv import load_dotenv
 
@@ -64,7 +64,7 @@ class DadosferaSettings:
 @dataclass(frozen=True)
 class OpenAISettings:
     enabled: bool
-    api_key: str | None
+    api_key: str | None = field(repr=False)
 
     def validate_credentials(self) -> None:
         if not self.enabled:

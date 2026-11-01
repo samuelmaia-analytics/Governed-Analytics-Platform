@@ -1,197 +1,202 @@
-# Assistente de Governanca (RAG)
+# RAG de governança: demonstração segura
 
-## Implementado
+## Escopo e fontes
 
-Pagina independente `governance-assistant` na navegacao Streamlit. Ingestao
-somente leitura, divisao por linhas com sobreposicao, metadados, embeddings
-esparsos TF-IDF normalizados, recuperacao por similaridade cosseno e resposta
-extrativa com citacoes. Nao e busca semantica neural. Nenhuma nova dependencia.
-A extracao estruturada de produtos e a pagina GenAI permanecem separadas.
+A rota governance-assistant em app/main.py oferece recuperação local TF-IDF e
+respostas extrativas com citações. Não executa SQL, tools ou decisões de
+publicação. Os contratos descrevem condições; não comprovam o resultado de uma
+execução. Não é certificação LGPD nem assistente corporativo.
 
-Fluxo: manifesto aprovado -> verificacao de caminho/hash/conteudo -> trechos
-de ate 1400 caracteres com duas linhas de sobreposicao -> TF-IDF -> top-5 ->
-evidencias citadas -> conferencia humana. A interface mostra fontes, linhas,
-hash SHA-256, mtime UTC, dataset e owner quando presentes na fonte, e score.
-Mtime nao e data de vigencia nem prova de freshness da execucao de governanca.
+O manifesto config/governance_rag_sources.yml da demonstração contém somente
+estas fontes técnicas do projeto, já aprovadas, versionadas e sem registros
+reais de clientes:
 
-## Fontes e Aprovacao
+| Fonte | Conteúdo |
+| --- | --- |
+| contracts/customer_privacy_contract.yml | Identificadores, pseudonimização e condições de publicação |
+| contracts/gold_fact_orders_contract.yml | Schema e regras técnicas do contrato gold_fact_orders |
+| contracts/data_quality_rules.yml | Catálogo de checks de qualidade |
 
-As seis fontes abaixo foram autorizadas pelo usuario para uso local em
-2026-10-31 e registradas em `config/governance_rag_sources.yml` com hashes:
+Não foram criadas novas fontes ou regras de negócio. Os três hashes aprovados
+foram preservados. A avaliação usa o manifesto real, sem recalcular/aprovar hashes
+durante o teste. Também verifica que os três documentos são rastreados pelo Git.
 
-- Contrato de privacidade de clientes.
-- Contrato `gold_fact_orders`.
-- Regras de qualidade.
-- Politica DATA_GOVERNANCE.
-- Relatorios de qualidade e monitoramento published em `docs/reports/`.
+Problemas encontrados no manifesto anterior:
+- policies/DATA_GOVERNANCE.md: arquivo local não versionado, ausente no checkout limpo.
+- docs/reports/data_quality_report.md: relatório gerado com hash diferente do aprovado.
+- docs/reports/published_layer_monitoring.md: relatório gerado com hash diferente do aprovado.
 
-Novas fontes ficam fora da base ate aprovacao humana explicita. Revisar cada arquivo quanto a
-autorizacao, sensibilidade, conteudo e vigencia. Registrar o hash SHA-256 dos
-bytes revisados, normalizando apenas CRLF para LF, e somente entao definir
-`approved: true`. Espacos e qualquer outra mudanca de conteudo alteram o hash.
-O manifesto e uma
-allowlist operacional, nao substitui o processo de aprovacao da organizacao.
-Nao atribui owner, SLA, classificacao ou autoridade a fontes que nao os tenham.
+Esses itens foram removidos do corpus da demonstração por serem instruções
+locais/relatórios gerados, não reintroduzidos com novos hashes. A ingestão aceita
+somente o diretório contracts/; políticas, documentos pessoais/corporativos,
+relatórios, dados brutos e uploads estão fora do escopo. Não há ingestão automática
+de diretórios nem busca externa.
 
-Para calcular um hash, sem enviar conteudo para fora:
+## Aprovação e validação de hash
 
-```powershell
-.\.venv\Scripts\python.exe -c "from pathlib import Path; from src.governance_rag import document_digest; print(document_digest(Path('contracts/gold_fact_orders_contract.yml').read_bytes()))"
-```
+Uma fonte exige approved: true, caminho autorizado, SHA-256 válido, UTF-8,
+tamanho até 200.000 bytes e ausência dos indicadores sensíveis reconhecidos.
+Caminhos absolutos, traversal, arquivos ocultos e symlinks são rejeitados.
+A heurística de conteúdo sensível não substitui revisão humana de privacidade.
 
-Registrar o valor retornado em `sha256` da entrada revisada. Novas fontes
-exigem entrada explicita e aprovacao. Caminhos aceitos: arquivos MD/YAML em
-`contracts/`, `policies/`, `docs/governance/` e `docs/reports/`. Nao ha glob nem
-descoberta recursiva. Fontes alteradas desde a aprovacao sao excluidas.
+O digest é SHA-256 dos bytes após trocar somente CRLF por LF. Assim, checkout
+Windows/Linux não invalida uma aprovação; espaços, texto, BOM ou qualquer outra
+mudança continuam alterando o digest. O hash valida integridade da revisão,
+não autoria, vigência, veracidade ou ausência de dados pessoais.
 
-Excluidos: `.env`, arquivos ocultos, segredos, credenciais, dados brutos,
-bronze, amostras, external, logs, CSV/Parquet, artefatos de dados pessoais,
-diretorios fora da allowlist, path traversal e links simbolicos. Uma verificacao
-heuristica adicional exclui arquivos com padroes de chaves, CPF, email ou segredo.
-Essa verificacao NAO substitui revisao humana e pode ter falsos positivos/negativos.
-O tamanho por documento e limitado a 200 KB; UTF-8 e YAML seguro sao exigidos.
+Fonte ausente, ilegível, alterada ou potencialmente sensível não entra no índice.
+A interface mostra o problema; as demais fontes válidas podem continuar locais.
+Nunca copiar outra versão ou atualizar o hash automaticamente para ocultar o aviso.
+Se uma das três fontes da demo falhar, interromper a demonstração e revisar a causa.
+Mudanças futuras de conteúdo/aprovação exigem revisão separada.
 
-## Itens Somente Locais
+~~~powershell
+uv run python -m src.governance_rag --evaluate
+uv run python -m src.governance_rag --question "Quais regras de qualidade se aplicam a gold_fact_orders?"
+~~~
 
-`AGENTS.md`, `policies/`, `standards/`, `checklists/` e `templates/` permanecem
-somente na copia local. As exclusoes sao configuradas em `.git/info/exclude`,
-sem alterar `.gitignore`. O arquivo de exclusao tambem nao entra no Git.
+A CLI é exclusivamente local. Não há banco vetorial nem índice persistido.
+Cada consulta relê e valida os documentos; não há histórico de perguntas/respostas.
+Não execute o pipeline de dados para preparar a base RAG.
 
-```bash
-git check-ignore -v AGENTS.md policies/ standards/ checklists/ templates/
-git status --short --ignored -- AGENTS.md policies/ standards/ checklists/ templates/
-git ls-files -- AGENTS.md policies/ standards/ checklists/ templates/ .git/info/exclude
-```
+## Demonstração local sem chave
 
-Se um desses itens ja estiver rastreado, interromper a preparacao de publicacao
-e pedir orientacao; nao remover arquivos do Git automaticamente. A politica
-explicitamente aprovada no manifesto pode ser consultada no RAG local, mas
-nunca e enviada ao provedor. Os demais caminhos continuam fora da ingestao.
-Se a recuperacao contiver qualquer fonte local restrita, toda a chamada externa
-e bloqueada antes de carregar a configuracao do provedor, mesmo com consentimento.
+Use Python suportado pelo pyproject.toml e o ambiente do projeto. Na raiz do
+worktree da demonstração:
 
-## Execucao e Atualizacao
+~~~powershell
+$env:OPENAI_ENABLED = "false"
+$env:RAG_EXTERNAL_ENABLED = "false"
+$env:PYTHON_DOTENV_DISABLED = "1"
+uv run streamlit run app/main.py --server.address=127.0.0.1
+~~~
 
-Use o ambiente do projeto (Python 3.11 a 3.13), com as dependencias existentes:
+O modo Local (TF-IDF) é o padrão e funciona sem OPENAI_API_KEY, secrets ou rede.
+Não há fallback que chame o provedor. A pergunta e os excertos são exibidos como
+texto; metadados recuperados não são renderizados como HTML/Markdown ativo.
 
-```powershell
-.\.venv\Scripts\python.exe -m streamlit run app/main.py
-.\.venv\Scripts\python.exe -m src.governance_rag
-.\.venv\Scripts\python.exe -m src.governance_rag --question "Quais regras de qualidade se aplicam a gold_fact_orders?"
-.\.venv\Scripts\python.exe -m src.governance_rag --question "O que devo conferir antes de publicar dados de clientes?"
-.\.venv\Scripts\python.exe -m src.governance_rag --question "Qual a previsao meteorologica em Marte?"
-```
+Roteiro: consultar as regras de qualidade e privacidade dos contratos, abrir
+as citações e conferir linhas/hash; perguntar sobre uma execução inexistente e
+conferir a abstenção. Não usar perguntas com pessoas, clientes ou segredos.
 
-Nao ha banco vetorial nem indice persistido. Cada consulta reconstrui o indice
-em memoria a partir das fontes aprovadas. Ao atualizar documentos/relatorios,
-revise novamente, registre o novo hash e mantenha ou revogue a aprovacao. Nao
-execute o pipeline de dados para atualizar o RAG. Hash divergente impede uso
-automatico de conteudo novo. Perguntas e respostas nao sao gravadas pelo RAG.
-Ao atualizar o codigo enquanto o Streamlit esta aberto, reiniciar o servidor
-local se houver divergencia entre modulos em memoria e arquivos atuais.
+## OpenAI opcional: configuração e consentimento
 
-## Deploy Existente
+A chamada só ocorre se houver evidência recuperada e todas as condições:
+1. Seleção explícita de OpenAI na consulta.
+2. Consentimento booleano daquela consulta.
+3. OPENAI_ENABLED=true e credencial configurada no servidor.
+4. RAG_EXTERNAL_ENABLED=true e RAG_OPENAI_MODEL explícito.
 
-O entrypoint do app analitico, conforme README.pt-BR.md, e `app/main.py`.
-`app.py` e uma interface menor separada; nao foi substituida. Dependencias em
-`requirements.txt` e runtime Python 3.11 em `runtime.txt` continuam inalterados.
+Não há modelo padrão ou campo de chave na interface. O callback de envio consome
+a autorização e desmarca o checkbox no servidor. O formulário também limpa os
+campos ao enviar; uma próxima consulta exige autorização nova. O consentimento
+não autoriza dados fora do escopo do manifesto.
 
-O workflow `.github/workflows/deploy-streamlit.yml` promove `main` para
-`streamlit-prod` apos CI verde. Promocoes manuais tambem exigem branch fonte
-compativel: `develop` -> `streamlit-dev`, `release` -> `streamlit-stage`,
-`main` -> `streamlit-prod`. Uma branch de funcionalidade nao pode ser promovida
-diretamente pelos guardrails atuais. Enviar o commit nao significa publicar.
-O passo seguinte e revisao/merge autorizado em `main`, CI e promocao existente,
-seguido da conferencia da rota `governance-assistant` no app publicado.
+Use secrets do Streamlit. Localmente, prefira o arquivo global fora do repositório,
+por exemplo %USERPROFILE%/.streamlit/secrets.toml no Windows. Na Cloud, use o painel
+privado de Secrets do app. Nunca coloque uma chave em código, commit, pergunta,
+manifesto, log, screenshot, compartilhamento de tela ou documentação.
 
-Nenhum secret do Streamlit Cloud e alterado pelo RAG. O modo local dispensa
-credenciais e provedor. A branch realmente selecionada no painel do Cloud
-precisa ser confirmada pelo operador; o workflow declara a branch de destino,
-mas nao configura o painel do Streamlit.
+Configuração inicial segura no painel de Secrets, em chaves de nível raiz:
 
-Os tres contratos aprovados estao versionados sem mudancas de conteudo. A
-politica local nao versionada e as versoes locais modificadas dos relatorios
-nao entram no commit do RAG. Em checkout limpo, essas fontes sao excluidas se
-ausentes ou com hash divergente; os contratos continuam disponiveis. Nao
-aprovar automaticamente a versao diferente de um relatorio para eliminar
-avisos. A inclusao de versoes dos relatorios exige uma contribuicao separada
-revisada; a politica permanece somente local e nao deve ser publicada.
-Nao ha benchmark de relevancia de relatorios ausentes no checkout publicado.
+~~~toml
+OPENAI_ENABLED = false
+RAG_EXTERNAL_ENABLED = false
+~~~
 
-## Provedor Opcional
+Para ligar a demo externa, configure no painel privado OPENAI_API_KEY com a chave
+real, RAG_OPENAI_MODEL com um modelo autorizado compatível com Chat Completions,
+temperature=0 e resposta JSON, e passe as duas flags para true. A página inicializa
+os secrets de nível raiz como variáveis de ambiente somente na consulta externa
+consentida; a chave não é lida para renderização nem exibida.
 
-O modo local e padrao e nunca acessa o provedor. O modo OpenAI exige TODOS:
-`OPENAI_ENABLED=true`, `OPENAI_API_KEY` pelo mecanismo seguro existente de
-`src/settings.py`, `RAG_EXTERNAL_ENABLED=true`, `RAG_OPENAI_MODEL` explicito,
-e consentimento na interface para enviar a pergunta e os trechos aprovados.
-Nao colocar chaves no manifesto, em perguntas, no Git ou na documentacao.
+No Streamlit 1.56.0, o exportador de secrets não transforma valores TOML booleanos
+em variáveis de ambiente. A página normaliza explicitamente OPENAI_ENABLED e
+RAG_EXTERNAL_ENABLED (booleanos ou strings reconhecidas), inclusive false para
+desligar. Valores inválidos bloqueiam a consulta. Os testes usam o parser real
+de secrets da versão instalada com um TOML temporário e chave fictícia.
 
-A recuperacao e os embeddings continuam locais. OpenAI seleciona apenas
-citacoes e excertos verbatim em JSON; ids inexistentes ou texto inventado sao
-rejeitados. Erros de rede/API/formato sao apresentados sem corpo de resposta,
-credenciais ou detalhes internos. Sem fallback silencioso para outro provedor.
-Timeout: 20 segundos; uma chamada sem retries; saida ate 1200 tokens. Somente
-pergunta e ate cinco trechos sao enviados; o restante da base nao e enviado.
-O envio exige tambem aprovacao organizacional para transferencia ao provedor.
-Nao houve chamada real, paga, medicao de tokens ou validacao de custo nesta
-implementacao. A CLI oferece apenas modo local.
+Não crie uma seção TOML [openai] para estas variáveis: secrets aninhados não são
+exportados como variáveis de ambiente. A representação de OpenAISettings omite
+a chave. Não imprimir o objeto de configuração ou o ambiente.
 
-## Evidencia e Seguranca
+Para desligar: definir RAG_EXTERNAL_ENABLED=false e OPENAI_ENABLED=false no painel,
+reiniciar o app para reaplicar configuração e confirmar o modo Local. Remover a
+chave do painel se ela não for mais necessária; revogá-la no provedor se exposta.
+Reiniciar após remoção de secrets evita valores antigos no ambiente do processo.
 
-Trechos sao dados nao confiaveis, jamais instrucoes. O prompt do provedor
-proibe alteracao de regras, exfiltracao e acoes. As saidas sao validadas contra
-citacoes e texto exato das fontes e exibidas como texto, sem HTML executavel.
-Titulo, dataset e owner recuperados tambem sao texto simples, nao Markdown.
-Os trechos permitem quebra de linha para leitura em celular.
-Nao ha tools do modelo, SQL gerado, execucao, gravacao de dados ou decisao
-automatica de publicacao. Um trecho malicioso pode aparecer como evidencia:
-nao e executado, mas ainda exige revisao humana da fonte e da resposta.
+## Limites e privacidade
 
-Falta de dois termos relevantes, cobertura lexical menor que 40%, similaridade
-menor que 0.08 ou ausencia de trechos produz falta de evidencia. Essas heuristicas
-nao provam que uma resposta seja correta. Politicas descrevem condicoes, nao
-comprovam por que uma execucao especifica foi bloqueada. Para investigar uma
-decisao concreta, aprove um relatorio que identifique a execucao, tabela,
-resultado e evidencias. Fontes conflitantes/desatualizadas precisam ser
-conciliadas por uma pessoa; o RAG nao decide autoridade nem vigencia.
+| Controle | Limite |
+| --- | --- |
+| Pergunta | 2.000 caracteres |
+| Documento | 200.000 bytes |
+| Trecho | 1.400 caracteres |
+| Contexto enviado | Até 5 trechos, total até 7.000 caracteres |
+| Saída solicitada | max_completion_tokens=1.200 |
+| Corpo de resposta lido | 32.000 bytes; excesso rejeitado |
+| Resposta exibida | Até 8.000 caracteres |
+| Rede | Timeout de I/O de 20 segundos, uma chamada, sem retries |
 
-## Avaliacao
+O timeout de rede não é garantia de latência total exata (por exemplo, resolução
+DNS e fases de rede variam). O teste simula timeout; nenhuma chamada paga é usada.
+Apenas pergunta e trechos recuperados são enviados. O índice e os embeddings
+continuam locais. store=false é explícito; isso não garante retenção zero pelo
+provedor. Conferir a política de dados e as permissões da conta antes da demo.
 
-O manifesto inclui perguntas tecnicas, perguntas naturais sem nomes de tabelas
-e fontes esperadas, incluindo negativos para execucao inexistente e pergunta
-fora do dominio. Executar sobre a base aprovada:
+A saída do provedor só pode selecionar IDs válidos e citações verbatim dos trechos.
+JSON inválido, erros HTTP/rede, timeout, excesso ou citações inventadas falham com
+mensagem genérica, sem corpo da resposta, credenciais ou cadeia interna de erro.
+Não há retry nem fallback externo. Local continua disponível para nova consulta.
 
-```powershell
-.\.venv\Scripts\python.exe -m src.governance_rag --evaluate
-.\.venv\Scripts\python.exe -m pytest tests/test_governance_rag.py tests/test_governance_assistant_page.py tests/test_app_main.py tests/test_genai_feature_extraction_module.py -q -p no:cacheprovider
-```
+O RAG não grava perguntas, respostas ou chave em arquivos/logs/cache. Valores dos
+widgets e resposta existem transitoriamente na sessão do Streamlit; não há histórico
+da aplicação nem garantia de apagamento forense da memória. Configuração de logs,
+acesso ao host e retenção do provedor devem ser conferidos pelo operador.
 
-`recall_at_k` e a fracao das fontes esperadas recuperadas no top-k (por caminho,
-sem duplicar trechos). `hit_at_k` informa se alguma fonte esperada apareceu.
-Nos casos negativos, sucesso significa nao recuperar nada (`negative_accuracy`).
-A media de recall inclui somente casos positivos; conferir os resultados
-individuais. Base vazia tem status `empty_corpus` e nao constitui validacao de
-relevancia. Testes usam conteudo controlado e um manifesto temporario para
-avaliar os candidatos reais, sem aprovar o manifesto operacional. Integracoes
-sao simuladas: nenhum segredo real ou chamada paga.
+## Custos e demonstração privada no Streamlit Cloud
 
-## Limitacoes e Propostas
+Local não tem custo de API. OpenAI cobra conforme modelo e tokens de entrada/saída,
+incluindo o contexto e instruções. O teto de saída não fixa o custo da consulta nem
+substitui orçamento da conta; caracteres não são tokens. Consultar preços oficiais,
+usar projeto/chave dedicados e monitorar uso. Não há custo medido ou modelo validado
+com chamada real neste trabalho.
 
-Implementado: RAG extrativo local e selecao opcional de evidencia via OpenAI.
-Nao implementado: embeddings semanticos neurais, banco vetorial, reranker,
-respostas abstrativas livres, historico, aprovacao corporativa automatizada,
-RBAC documental ou avaliacao ampla de qualidade de respostas. Nao sao
-necessarios para executar o fluxo local e nao devem ser apresentados como prontos.
+Após revisão e publicação do código autorizadas separadamente:
+1. Confirmar repositório, branch, Python e entrypoint app/main.py no app de demo.
+2. Configurar acesso privado e convidados no painel; testar o bloqueio com uma
+   sessão não autorizada antes de compartilhar o link. Não foi implementada nova
+   autenticação/RBAC nesta mudança.
+3. Começar com ambas as flags false e sem chave. Confirmar três fontes e nenhum
+   aviso de hash; testar o modo Local e as citações.
+4. Se houver necessidade e autorização para envio, configurar somente pelo painel
+   de Secrets e ligar as flags. Não compartilhar a tela de Secrets.
+5. Autorizar uma pergunta sintética na consulta e conferir a indicação de chamada
+   externa. Submeter outra sem consentimento deve bloquear o envio.
+6. Desligar as flags, reiniciar e retestar Local após a demonstração.
 
-TF-IDF depende de vocabulario (com pequeno glossario PT/EN), pode perder
-parafrases e recuperar trechos pouco relevantes. Trechos podem dividir tabelas
-ou YAML; consulte a fonte inteira. Latencia cresce com o tamanho da base pois
-o indice e reconstruido. API acrescenta latencia, custo e transferencia externa.
-O glossario relaciona palavras como dados, conferir e proteger ao vocabulario
-dos documentos e ignora palavras comuns de formulacao, como devo e antes.
-Isso melhora perguntas naturais, mas nao oferece compreensao semantica geral,
-traducao completa ou resposta abstrativa. As respostas locais continuam sendo
-evidencias extrativas citadas, nao autorizacoes nem decisoes geradas pelo modelo.
-Nao ha medicao real dessas grandezas, certificacao LGPD ou garantia de ausencia
-de PII. Em ambiente multiusuario, a base aprovada e compartilhada; nao incluir
-documentos sujeitos a permissoes individuais sem implementar controle de acesso.
+Não houve commit, push ou deploy nesta preparação. O fluxo existente de promoção
+de branches não foi modificado; não promover uma feature contornando guardrails.
+A configuração de privacidade e o funcionamento do provedor na Cloud ainda
+dependem dessa verificação manual. Não anunciar o app como privado só pelo nome.
+
+## Verificações e limitações
+
+~~~powershell
+uv run pytest tests/test_governance_rag.py tests/test_governance_assistant_page.py tests/test_settings.py -q
+uv run ruff check src app tests
+uv run python -m src.governance_rag --evaluate
+git diff --check
+~~~
+
+Testes usam rede simulada. Cobrem configuração desligada, ausência de chave e de
+consentimento, autorização consumida por consulta, limites, erro seguro, hashes,
+CRLF/LF e manifesto real. TF-IDF é lexical e pode não entender paráfrases;
+a avaliação pequena não prova correção geral. Conferir as fontes e sua vigência.
+Perguntas sobre resultados de execuções não são suportadas por estes contratos.
+
+Referências oficiais:
+- Streamlit secrets: https://docs.streamlit.io/develop/concepts/connections/secrets-management
+- Streamlit Cloud: https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management
+- Formulário: https://docs.streamlit.io/develop/api-reference/execution-flow/st.form
+- API e limites/store: https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create

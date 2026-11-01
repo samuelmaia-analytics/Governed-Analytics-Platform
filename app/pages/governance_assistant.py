@@ -1,9 +1,46 @@
 from __future__ import annotations
 
+import os
+
 import streamlit as st
 
 from app.i18n import LOCALE_EN_US, Locale
-from src.governance_rag import LocalIndex, RagError, answer_question, load_corpus
+from src.governance_rag import (
+    MAX_QUESTION_CHARS,
+    LocalIndex,
+    RagError,
+    answer_question,
+    load_corpus,
+)
+
+
+def _consume_query_consent() -> None:
+    # Runs before the submit rerun: approval is consumed once, never inherited.
+    st.session_state["_rag_query_consent"] = (
+        st.session_state.get("_rag_consent", False) is True
+    )
+    st.session_state["_rag_consent"] = False
+
+
+def _prepare_provider_flags() -> None:
+    # Streamlit 1.56 exports string/int/float root secrets, but not TOML booleans.
+    # Read only flags here; the key remains in Streamlit's server environment.
+    flags: dict[str, str] = {}
+    for name in ("OPENAI_ENABLED", "RAG_EXTERNAL_ENABLED"):
+        value = st.secrets.get(name)
+        if value is None:
+            continue
+        if type(value) is bool:
+            flags[name] = "true" if value else "false"
+        elif isinstance(value, str) and value.strip().lower() in {
+            "true", "false", "1", "0", "yes", "no", "on", "off",
+        }:
+            flags[name] = (
+                "true" if value.strip().lower() in {"true", "1", "yes", "on"} else "false"
+            )
+        else:
+            raise ValueError("Invalid provider flag configuration.")
+    os.environ.update(flags)
 
 
 def render_governance_assistant(locale: Locale) -> None:
@@ -35,26 +72,36 @@ def render_governance_assistant(locale: Locale) -> None:
             if is_en else
             "Nenhuma fonte aprovada dispon\u00edvel. Revise o manifesto de fontes e os hashes do conte\u00fado."
         )
-    with st.form("governance_rag_question"):
-        question = st.text_area("Question" if is_en else "Pergunta", max_chars=2000)
+    with st.form("governance_rag_question", clear_on_submit=True):
+        question = st.text_area("Question" if is_en else "Pergunta", max_chars=MAX_QUESTION_CHARS)
         mode = st.radio(
             "Mode" if is_en else "Modo", options=["local", "openai"], horizontal=True,
             format_func=lambda value: "Local (TF-IDF)" if value == "local" else "OpenAI (API)",
         )
-        consent = st.checkbox(
+        st.checkbox(
             "I authorize sending this question and approved excerpts to OpenAI (possible charges)."
             if is_en else
             "Autorizo enviar esta pergunta e os trechos aprovados \u00e0 OpenAI (pode haver cobran\u00e7a).",
-            value=False,
+            value=False, key="_rag_consent",
         )
         submitted = st.form_submit_button(
             "Ask" if is_en else "Consultar", icon=":material/search:",
+            on_click=_consume_query_consent,
         )
+    consent = st.session_state.pop("_rag_query_consent", False) is True
     if not submitted:
         return
     if not question.strip():
         st.warning("Enter a question." if is_en else "Informe uma pergunta.")
         return
+    if mode == "openai" and consent:
+        try:
+            _prepare_provider_flags()
+        except FileNotFoundError:
+            pass  # Environment-only configuration is also supported locally.
+        except Exception:
+            st.error("Unable to load provider settings." if is_en else "Configuracao do provedor indisponivel.")
+            return
     try:
         result = answer_question(LocalIndex(corpus.chunks), question, mode=mode, consent=consent)
     except RagError as exc:
