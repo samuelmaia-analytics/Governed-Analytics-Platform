@@ -47,6 +47,7 @@ A aplicação utiliza dados públicos do e-commerce Olist e mantém uma separaç
 - Aplicação executiva em Streamlit e endpoints em FastAPI.
 - Testes, linting e CI/CD com GitHub Actions.
 - Exemplos de orquestração com n8n, mantendo a lógica de negócio versionada em código.
+- Assistente RAG de governança no Streamlit, com recuperação local TF-IDF, respostas com citações e fontes controladas por manifesto e hash.
 
 ### Escopo mensurável
 
@@ -90,6 +91,7 @@ O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_ref
 | Automação e CI/CD | GitHub Actions · Codecov · n8n |
 | Cloud / integração | Snowflake opcional · arquitetura AWS de referência |
 | IA generativa | OpenAI API · prompts · extração de atributos textuais · JSON · CSV/JSONL |
+| RAG de governança | Python · TF-IDF local · Streamlit · contratos YAML aprovados · citações verificáveis · OpenAI opcional |
 
 ---
 
@@ -106,6 +108,16 @@ O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_ref
 - [Módulo de extração](src/genai_feature_extraction.py)
 - [Interface de resultados persistidos](app/pages/genai_insights.py)
 - [Documentação do experimento](docs/genai_bonus.md)
+
+## Assistente RAG de governança
+
+O assistente recupera evidências dos contratos versionados do projeto e apresenta respostas extrativas com trechos e referências às fontes. O modo **Local (TF-IDF)** é o padrão: não exige chave, não envia perguntas a serviços externos e continua funcionando sem OpenAI. O corpus da demonstração inclui somente três contratos aprovados, validados por hash.
+
+A integração opcional com a API OpenAI fica desativada por padrão e exige configuração no servidor, seleção explícita e consentimento para cada consulta. Não houve chamada real à API nesta validação. O RAG não executa SQL nem publica dados; por usar busca lexical, pode não recuperar bem paráfrases ou termos que não apareçam nas fontes. Consulte [a documentação do RAG](docs/governance_rag.md) para fontes, limites, privacidade e configuração.
+
+- [Página do assistente](app/pages/governance_assistant.py)
+- [Implementação da recuperação](src/governance_rag.py)
+- [Documentação do RAG](docs/governance_rag.md)
 
 ---
 
