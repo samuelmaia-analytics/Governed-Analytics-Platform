@@ -49,13 +49,11 @@ Abordagem de produto analítico governado:
 
 Fluxo principal:
 
-![Arquitetura: ingestão, controles, Publication Gate e consumo governado](docs/assets/architecture-overview.png)
+![Arquitetura de referência Azure do Governed Analytics Platform](docs/assets/architecture-overview.svg)
 
-[Abrir diagrama em alta resolução](docs/assets/architecture-overview.png) · [Versão vetorial](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
+[Abrir diagrama em alta resolução (SVG)](docs/assets/architecture-overview.svg) · [Fonte Mermaid](docs/assets/architecture-overview.mmd)
 
-As setas contínuas representam o fluxo de dados e controles. A seta tracejada leva apenas status e justificativas para a central de governança; não representa publicação de dados bloqueados.
-
-O armazenamento S3 é uma [arquitetura de referência](docs/architecture/aws_reference_architecture.md); as camadas locais não representam buckets AWS provisionados.
+**Arquitetura proposta, ainda não implantada.** O desenho mostra um possível mapeamento para Azure: Data Factory, ADLS Gen2, Azure Databricks, Unity Catalog, Azure AI Search, Azure OpenAI, Azure Container Apps e Power BI são serviços de referência. A execução atual do pipeline é local e a aplicação tem uma demonstração em Streamlit; o RAG usa TF-IDF local, com chamada opcional à OpenAI API após consentimento. A implantação em Azure exige adaptação do código e provisionamento dos serviços.
 
 Fronteira chave: o app consome a camada publicada (`data/published/dashboard`), não a camada curada interna completa.
 
