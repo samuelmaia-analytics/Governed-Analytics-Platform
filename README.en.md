@@ -36,6 +36,8 @@ The Gate evaluator is implemented, but enforcement differs across entrypoints. S
 
 The src/genai_feature_extraction.py module extracts category, material, compatibility, features and summaries from product descriptions with prompts and structured JSON output. Results are persisted as CSV and JSONL. The reference mode uses versioned reference data; openai calls the API when credentials are configured. The UI displays persisted results and does not run inference on page load.
 
+[Module](src/genai_feature_extraction.py) · [Documentation](docs/genai_bonus.md)
+
 ## Governance RAG assistant
 
 A separate RAG assistant answers questions grounded in approved technical contracts, using local TF-IDF retrieval, cited source excerpts and abstention when evidence is insufficient.
