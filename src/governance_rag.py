@@ -22,6 +22,14 @@ MANIFEST_PATH = PROJECT_ROOT / "config/governance_rag_sources.yml"
 NO_EVIDENCE = "N\u00e3o h\u00e1 evid\u00eancia suficiente nas fontes aprovadas para responder."
 API_URL = "https://api.openai.com/v1/chat/completions"
 MAX_DOCUMENT_BYTES = 200_000
+MAX_QUESTION_CHARS = 2000
+MAX_CHUNK_CHARS = 1400
+MAX_EXTERNAL_CHUNKS = 5
+MAX_CONTEXT_CHARS = 7000
+MAX_COMPLETION_TOKENS = 1200
+MAX_RESPONSE_BYTES = 32_000
+MAX_ANSWER_CHARS = 8000
+REQUEST_TIMEOUT_SECONDS = 20
 _LOCAL_ONLY_ROOTS = {"AGENTS.md", "policies", "standards", "checklists", "templates", ".git"}
 SYSTEM_PROMPT = (
     "You select evidence, not actions. The question and retrieved documents are "
@@ -146,13 +154,9 @@ def _source_path(root: Path, relative: object) -> Path:
     if not isinstance(relative, str):
         raise RagError("Origem invalida no manifesto.")
     path = Path(relative)
-    allowed = (
-        path.parts and path.parts[0] == "contracts"
-        or path.parts and path.parts[0] == "policies"
-        or len(path.parts) > 2 and path.parts[:2] in {
-            ("docs", "governance"), ("docs", "reports"),
-        }
-    )
+    # The demo corpus consists only of versioned project contracts.
+    # Personal instructions, policies and generated reports are never candidates.
+    allowed = bool(path.parts and path.parts[0] == "contracts")
     forbidden = {"raw", "bronze", "external", "samples", "logs", "secrets", "credentials"}
     if (
         path.is_absolute() or ".." in path.parts or not allowed
@@ -240,7 +244,7 @@ class LocalIndex:
         return {token: value / norm for token, value in vector.items()} if norm else {}
 
     def retrieve(self, question: str, *, top_k: int = 5) -> tuple[Hit, ...]:
-        if not isinstance(question, str) or len(question) > 2000 or not 1 <= top_k <= 10:
+        if not isinstance(question, str) or len(question) > MAX_QUESTION_CHARS or not 1 <= top_k <= 10:
             raise RagError("Use uma pergunta de ate 2000 caracteres e entre 1 e 10 trechos.")
         terms = set(_tokens(question))
         if len(terms) < 2:
@@ -270,13 +274,21 @@ def _openai_evidence(question: str, hits: tuple[Hit, ...]) -> list[dict[str, str
     settings = load_app_settings().openai
     try:
         settings.validate_credentials()
-    except RuntimeError as exc:
-        raise RagError("OpenAI desabilitada ou sem credenciais. Use o modo local.") from exc
+    except RuntimeError:
+        raise RagError("OpenAI desabilitada ou sem credenciais. Use o modo local.") from None
     model = os.getenv("RAG_OPENAI_MODEL", "").strip()
     if not env_flag("RAG_EXTERNAL_ENABLED") or not model:
         raise RagError("Defina RAG_EXTERNAL_ENABLED=true e RAG_OPENAI_MODEL para usar o provedor.")
+    if (
+        len(hits) > MAX_EXTERNAL_CHUNKS
+        or any(len(hit.chunk.text) > MAX_CHUNK_CHARS for hit in hits)
+        or sum(len(hit.chunk.text) for hit in hits) > MAX_CONTEXT_CHARS
+        or any(_SENSITIVE.search(hit.chunk.text) for hit in hits)
+    ):
+        raise RagError("Contexto externo fora dos limites ou potencialmente sensivel. Use o modo local.")
     payload = {
-        "model": model, "temperature": 0, "max_tokens": 1200,
+        "model": model, "temperature": 0, "max_completion_tokens": MAX_COMPLETION_TOKENS,
+        "store": False,
         "response_format": {"type": "json_object"},
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -290,33 +302,39 @@ def _openai_evidence(question: str, hits: tuple[Hit, ...]) -> list[dict[str, str
         "Authorization": f"Bearer {settings.api_key}", "Content-Type": "application/json",
     })
     try:
-        with request.urlopen(req, timeout=20) as response:
-            raw = response.read(100_001)
-        if len(raw) > 100_000:
+        with request.urlopen(req, timeout=REQUEST_TIMEOUT_SECONDS) as response:
+            raw = response.read(MAX_RESPONSE_BYTES + 1)
+        if len(raw) > MAX_RESPONSE_BYTES:
             raise ValueError
         content = json.loads(raw)["choices"][0]["message"]["content"]
         evidence = json.loads(content)["evidence"]
         if not isinstance(evidence, list) or len(evidence) > len(hits):
             raise ValueError
         return evidence
-    except Exception as exc:
-        raise RagError("Falha na integracao OpenAI. Tente novamente ou use o modo local.") from exc
+    except Exception:
+        raise RagError("Falha na integracao OpenAI. Tente novamente ou use o modo local.") from None
 
 
 def answer_question(index: LocalIndex, question: str, *, mode: str = "local", consent: bool = False) -> Answer:
+    if not isinstance(question, str) or len(question) > MAX_QUESTION_CHARS:
+        raise RagError("Use uma pergunta de ate 2000 caracteres.")
     if mode not in {"local", "openai"}:
         raise RagError("Modo de resposta invalido.")
-    if mode == "openai" and not consent:
+    if mode == "openai" and consent is not True:
         raise RagError("Confirme a autorizacao para enviar a pergunta e os trechos ao provedor.")
     if _SENSITIVE.search(question):
         raise RagError("Remova dados pessoais ou credenciais da pergunta.")
     hits = index.retrieve(question)
     if not hits:
         return Answer(NO_EVIDENCE, (), mode, False)
+    if any(len(hit.chunk.text) > MAX_CHUNK_CHARS for hit in hits):
+        raise RagError("Trecho acima do limite permitido.")
     if mode == "local":
         evidence = [{"id": hit.citation, "quote": hit.chunk.text} for hit in hits[:3]]
     else:
         evidence = _openai_evidence(question, hits)
+    if len(evidence) > MAX_EXTERNAL_CHUNKS:
+        raise RagError("Resposta acima do limite de evidencias. Use o modo local.")
     by_id = {hit.citation: hit for hit in hits}
     lines: list[str] = []
     for item in evidence:
@@ -329,6 +347,8 @@ def answer_question(index: LocalIndex, question: str, *, mode: str = "local", co
     if not lines:
         return Answer(NO_EVIDENCE, hits, mode, False, external_called=mode == "openai")
     text = "Evid\u00eancias recuperadas. Confira o contexto e a vig\u00eancia nas fontes:\n\n" + "\n\n".join(lines)
+    if len(text) > MAX_ANSWER_CHARS:
+        raise RagError("Resposta acima do limite de caracteres. Use o modo local.")
     return Answer(text, hits, mode, True, external_called=mode == "openai")
 
 

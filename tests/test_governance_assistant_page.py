@@ -132,3 +132,69 @@ def test_english_title(monkeypatch):
     ).run()
     assert app.title[0].value == "Governance Assistant"
     assert not app.exception
+
+def test_consent_is_consumed_and_never_reused_for_the_next_query(monkeypatch, corpus):
+    monkeypatch.setattr(page, "load_corpus", lambda: corpus)
+    calls = []
+    def answer(index, question, *, mode, consent):
+        calls.append((mode, consent))
+        return rag.answer_question(index, question, mode="local")
+    monkeypatch.setattr(page, "answer_question", answer)
+    app = app_test().run()
+    assert app.radio[0].value == "local"
+    app.text_area[0].set_value("quality orders")
+    app.radio[0].set_value("openai")
+    app.checkbox[0].check()
+    app.button[0].click().run()
+    assert not app.exception
+    assert calls[-1] == ("openai", True)
+    assert app.checkbox[0].value is False
+    app.text_area[0].set_value("quality orders again")
+    app.radio[0].set_value("openai")
+    app.button[0].click().run()
+    assert calls[-1] == ("openai", False)
+    assert app.checkbox[0].value is False
+    assert "_rag_query_consent" not in app.session_state
+
+
+def test_streamlit_secrets_enable_only_the_consented_query_without_display(monkeypatch, corpus):
+    from types import SimpleNamespace
+
+    from src.settings import OpenAISettings
+    monkeypatch.setattr(page, "load_corpus", lambda: corpus)
+    calls = []
+    # Streamlit's documented root-level secret -> environment bridge is simulated;
+    # no credential file is created or read.
+    class Secrets:
+        def get(self, name, default):
+            calls.append(name)
+            monkeypatch.setenv("OPENAI_ENABLED", "true")
+            monkeypatch.setenv("RAG_EXTERNAL_ENABLED", "true")
+            monkeypatch.setenv("RAG_OPENAI_MODEL", "test-model")
+            return True
+    monkeypatch.setattr(page.st, "secrets", Secrets())
+    monkeypatch.setattr(rag, "load_app_settings", lambda: SimpleNamespace(openai=OpenAISettings(True, "test-key")))
+    import json
+
+    class Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def read(self, limit):
+            return json.dumps({"choices": [{"message": {"content": json.dumps({
+                "evidence": [{"id": "S1", "quote": "no_duplicate_primary_key"}]
+            })}}]}).encode()
+
+    monkeypatch.setattr(rag.request, "urlopen", lambda *a, **k: Response())
+    app = app_test().run()
+    assert not calls
+    app.text_area[0].set_value("quality orders")
+    app.radio[0].set_value("openai")
+    app.checkbox[0].check()
+    app.button[0].click().run()
+    assert not app.exception and calls == ["RAG_EXTERNAL_ENABLED"]
+    assert any("realizada" in item.value for item in app.caption)
+    assert "test-key" not in str(app)
