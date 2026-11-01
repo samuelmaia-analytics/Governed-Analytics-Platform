@@ -24,11 +24,13 @@ The documented governance review on **24 October 2026** passed **383 tests**, in
 
 ## Architecture and publication boundary
 
-Internal processing produces analytical candidates. Quality, contract and privacy controls provide evidence for publication decisions. Executive consumption is separated from the full internal analytical layer; governance views expose decision status and rationale.
+![Azure reference architecture for the Governed Analytics Platform](docs/assets/architecture-overview.svg)
+
+[Open the high-resolution SVG](docs/assets/architecture-overview.svg) · [Mermaid source](docs/assets/architecture-overview.mmd)
+
+**This is a proposed Azure reference design, not deployed infrastructure.** Azure Data Factory, ADLS Gen2, Azure Databricks, Unity Catalog, Azure AI Search, Azure OpenAI, Azure Container Apps and Power BI are illustrative target services. The current project uses local processing and a Streamlit demo; its RAG assistant uses local TF-IDF retrieval and an optional OpenAI API call after per-query consent. Moving the project to Azure would require code changes and provisioning.
 
 The Gate evaluator is implemented, but enforcement differs across entrypoints. See [the technical architecture](docs/architecture/architecture.md) for the Python/dbt execution boundaries and remaining work.
-
-Amazon S3 is part of an [AWS reference design](docs/architecture/aws_reference_architecture.md). Local folders do not represent provisioned AWS buckets.
 
 ## Generative AI for product attributes
 
