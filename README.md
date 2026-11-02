@@ -46,7 +46,7 @@ A aplicação utiliza dados públicos do e-commerce Olist e mantém uma separaç
 - Data Lineage, logs operacionais, monitoramento e evidências de governança.
 - Aplicação executiva em Streamlit e endpoints em FastAPI.
 - Testes, linting e CI/CD com GitHub Actions.
-- Exemplos de orquestração com n8n, mantendo a lógica de negócio versionada em código.
+- Templates n8n importáveis para orquestração local ou self-hosted de scripts, com registro de execução e alertas que exigem configuração. A lógica de negócio permanece em Python, SQL e dbt.
 - Assistente RAG de governança com recuperação TF-IDF local, citações e corpus limitado a contratos aprovados.
 
 ### Escopo mensurável
@@ -89,7 +89,7 @@ As métricas abaixo descrevem componentes realmente implementados e versionados 
 | Qualidade e governança | pytest · Data Contracts (YAML) · Ruff · mypy |
 | Visualização e entrega | Streamlit · Power BI · FastAPI |
 | Automação e CI/CD | GitHub Actions · Codecov · n8n |
-| Cloud / integração | Snowflake opcional · arquitetura AWS de referência |
+| Cloud / integração | Snowflake opcional · arquitetura Azure proposta · referência AWS demonstrativa |
 | IA generativa e RAG | OpenAI API · prompts · extração estruturada · TF-IDF local · recuperação com citações · PyYAML |
 
 ---
