@@ -13,6 +13,13 @@ from src.publication_shadow.normative_comparison import (
     PublicationReadinessEvidence,
     compare_normative_shadow,
 )
+from src.publication_shadow.traceability import (
+    PolicyIdentityStatus,
+    ShadowEvidenceContext,
+    TraceabilityAssessment,
+    TraceabilityStatus,
+    assess_shadow_traceability,
+)
 
 ShadowReportClassification = Literal[
     "agreement",
@@ -33,6 +40,10 @@ class ShadowScenario:
     readiness_evidence: PublicationReadinessEvidence | None = None
     operational_gate_evidence: OperationalGateEvidence | None = None
 
+    # Optional: only used for observability/audit of whether the three evaluator
+    # outputs can be proven to share the same dataset/execution context.
+    traceability_contexts: tuple[ShadowEvidenceContext | None, ...] | None = None
+
 
 @dataclass(frozen=True)
 class ShadowScenarioReport:
@@ -51,7 +62,18 @@ class ShadowScenarioReport:
     divergences: tuple[str, ...]
 
     classification: ShadowReportClassification
+
+    # Comparable means: technical comparability of the three evaluator decisions
+    # in this synthetic scenario, not identity of dataset/execution.
     comparable: bool
+
+    # Traceability is evaluated separately from decision comparability.
+    traceability_status: TraceabilityStatus
+    policy_identity_status: PolicyIdentityStatus
+    traceability_reasons: tuple[str, ...]
+
+    # Auditably comparable means we can prove shared context and shared policy.
+    auditably_comparable: bool
 
     @property
     def report_authorizes_publication(self) -> bool:
@@ -67,7 +89,9 @@ class ShadowDivergenceReport:
         return False
 
 
-def _classify_comparison(comparison: NormativeShadowComparison) -> tuple[ShadowReportClassification, bool]:
+def _classify_comparison(
+    comparison: NormativeShadowComparison,
+) -> tuple[ShadowReportClassification, bool]:
     errors = [
         comparison.normative_error,
         comparison.readiness_error,
@@ -101,6 +125,19 @@ def _classify_comparison(comparison: NormativeShadowComparison) -> tuple[ShadowR
     return "inconclusive", comparable
 
 
+def _assess_traceability_for_scenario(
+    scenario: ShadowScenario,
+) -> TraceabilityAssessment:
+    if scenario.traceability_contexts is None:
+        return TraceabilityAssessment(
+            status="insufficient",
+            policy_identity_status="insufficient",
+            reasons=("No traceability contexts provided.",),
+        )
+
+    return assess_shadow_traceability(scenario.traceability_contexts)
+
+
 def build_shadow_divergence_report(
     scenarios: Iterable[ShadowScenario],
 ) -> ShadowDivergenceReport:
@@ -130,6 +167,13 @@ def build_shadow_divergence_report(
         )
         classification, comparable = _classify_comparison(comparison)
 
+        traceability = _assess_traceability_for_scenario(scenario)
+        auditably_comparable = (
+            comparable
+            and traceability.status == "compatible"
+            and traceability.policy_identity_status == "proven"
+        )
+
         reports.append(
             ShadowScenarioReport(
                 scenario_id=scenario.scenario_id,
@@ -150,6 +194,10 @@ def build_shadow_divergence_report(
                 divergences=comparison.divergences,
                 classification=classification,
                 comparable=comparable,
+                traceability_status=traceability.status,
+                policy_identity_status=traceability.policy_identity_status,
+                traceability_reasons=traceability.reasons,
+                auditably_comparable=auditably_comparable,
             )
         )
 
