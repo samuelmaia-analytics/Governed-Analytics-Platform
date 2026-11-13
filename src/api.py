@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import os
+import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from src.config import PUBLISHED_MONITORING_DIR
@@ -19,6 +22,38 @@ PUBLISHED_MONITORING_RESULTS_PATH = (
 )
 
 app = FastAPI(title="Governed Analytics Platform API", version="1.0.0")
+
+
+_AUTH_BEARER = HTTPBearer(auto_error=False)
+
+
+def _require_api_auth(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_AUTH_BEARER),
+) -> None:
+    expected = os.getenv("GAP_API_BEARER_TOKEN", "")
+    if not expected:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="API authentication is enabled but GAP_API_BEARER_TOKEN is not configured.",
+        )
+
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing credentials.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if credentials.scheme.lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unsupported authentication scheme.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not secrets.compare_digest(credentials.credentials, expected):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid credentials.",
+        )
 
 
 def _load_publication_decision(path: Path) -> dict[str, Any]:
@@ -77,7 +112,7 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/api/v1/governance/status")
+@app.get("/api/v1/governance/status", dependencies=[Depends(_require_api_auth)])
 def governance_status() -> dict[str, Any]:
     decision = _load_publication_decision(PUBLICATION_DECISION_PATH)
     return {
@@ -106,7 +141,7 @@ class _QueryRequest(BaseModel):
     sql: str
 
 
-@app.get("/api/v1/snowflake/health")
+@app.get("/api/v1/snowflake/health", dependencies=[Depends(_require_api_auth)])
 def snowflake_health() -> dict[str, Any]:
     connector = get_snowflake_connector()
     result = connector.health_check()
@@ -114,13 +149,13 @@ def snowflake_health() -> dict[str, Any]:
     return result
 
 
-@app.get("/api/v1/snowflake/tables")
+@app.get("/api/v1/snowflake/tables", dependencies=[Depends(_require_api_auth)])
 def snowflake_tables() -> list[dict[str, str]]:
     with get_snowflake_connector() as connector:
         return connector.list_tables()
 
 
-@app.post("/api/v1/snowflake/query")
+@app.post("/api/v1/snowflake/query", dependencies=[Depends(_require_api_auth)])
 def snowflake_query(request: _QueryRequest) -> dict[str, Any]:
     if _is_write_query(request.sql):
         raise HTTPException(status_code=400, detail="Only SELECT queries are allowed.")

@@ -76,14 +76,17 @@ def test_api_payload_and_missing_artifact_behavior(tmp_path: Path, monkeypatch) 
     monkeypatch.setattr(api, "PUBLICATION_DECISION_PATH", decision)
     monkeypatch.setattr(api, "SCHEMA_CONTRACT_RESULTS_PATH", schema)
     monkeypatch.setattr(api, "PUBLISHED_MONITORING_RESULTS_PATH", monitoring)
+    token = "test-token"
+    monkeypatch.setenv("GAP_API_BEARER_TOKEN", token)
+    headers = {"Authorization": f"Bearer {token}"}
     client = TestClient(api.app)
     assert client.get("/health").json() == {"status": "ok"}
-    payload = client.get("/api/v1/governance/status").json()
+    payload = client.get("/api/v1/governance/status", headers=headers).json()
     assert payload == {"dataset": "fact_orders_dashboard", "publication_status": "Approved", "data_quality_score": 97, "privacy_risk_score": 18, "failed_checks": 0, "schema_contract_status": "passed", "freshness_status": "fresh", "decision_reason": "baseline", "timestamp_utc": "2026-01-01T00:00:00+00:00"}
     monkeypatch.setattr(api, "PUBLICATION_DECISION_PATH", tmp_path / "missing-decision.json")
     monkeypatch.setattr(api, "SCHEMA_CONTRACT_RESULTS_PATH", tmp_path / "missing-schema.csv")
     monkeypatch.setattr(api, "PUBLISHED_MONITORING_RESULTS_PATH", tmp_path / "missing-monitoring.csv")
-    missing = client.get("/api/v1/governance/status").json()
+    missing = client.get("/api/v1/governance/status", headers=headers).json()
     assert missing["publication_status"] == "unknown"
     assert missing["schema_contract_status"] == "unknown"
     assert missing["freshness_status"] == "unknown"
@@ -96,9 +99,12 @@ def test_snowflake_api_closes_health_connection_and_context_manages_queries(monk
     connector.list_tables.return_value = [{"table": "ORDERS", "database": "DB", "schema": "PUBLIC"}]
     connector.query.return_value = pd.DataFrame({"value": [1]})
     monkeypatch.setattr(api, "get_snowflake_connector", lambda: connector)
+    token = "test-token"
+    monkeypatch.setenv("GAP_API_BEARER_TOKEN", token)
+    headers = {"Authorization": f"Bearer {token}"}
     client = TestClient(api.app)
-    assert client.get("/api/v1/snowflake/health").json() == {"status": "connected"}
+    assert client.get("/api/v1/snowflake/health", headers=headers).json() == {"status": "connected"}
     connector.close.assert_called_once_with()
-    assert client.get("/api/v1/snowflake/tables").json()[0]["table"] == "ORDERS"
-    assert client.post("/api/v1/snowflake/query", json={"sql": "SELECT 1"}).json() == {"columns": ["value"], "rows": [{"value": 1}], "row_count": 1}
+    assert client.get("/api/v1/snowflake/tables", headers=headers).json()[0]["table"] == "ORDERS"
+    assert client.post("/api/v1/snowflake/query", headers=headers, json={"sql": "SELECT 1"}).json() == {"columns": ["value"], "rows": [{"value": 1}], "row_count": 1}
     assert connector.__exit__.call_count == 2
