@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 import logging
 import platform
@@ -59,6 +60,10 @@ from src.publication_shadow import (
 from src.publication_shadow.execution_identity_manifest import ExecutionIdentityManifest
 from src.publication_shadow.in_memory_manifest_collector import (
     InMemoryExecutionManifestCollector,
+)
+from src.publication_shadow.manifest_capture_diagnostics import (
+    ObservationStatus,
+    ShadowManifestCaptureDiagnostics,
 )
 from src.publish_components.models import PrivacyCheck
 from src.publish_dashboard import run_publish_dashboard
@@ -217,6 +222,7 @@ def _run_monitor_step(
     record_shadow_telemetry: bool = False,
     capture_shadow_manifest_entries: bool = False,
     consume_shadow_manifest_snapshot_fn: Callable[[ExecutionIdentityManifest], None] | None = None,
+    consume_shadow_manifest_capture_diagnostics_fn: Callable[[ShadowManifestCaptureDiagnostics], None] | None = None,
     shadow_telemetry_path: Path = DEFAULT_SHADOW_TELEMETRY_PATH,
     record_dual_privacy_telemetry: bool = False,
     dual_privacy_telemetry_path: Path = DEFAULT_DUAL_PRIVACY_TELEMETRY_PATH,
@@ -277,6 +283,25 @@ def _run_monitor_step(
         timestamp_utc=datetime.now(UTC).isoformat(),
     )
 
+    writer_attempted = False
+    writer_status = ObservationStatus.NOT_ATTEMPTED
+    capture_enabled = False
+    skipped_empty_snapshot = False
+    snapshot_entries_count = 0
+
+    manifest_capture_events: dict[str, int] = {}
+
+    def record_manifest_capture_event(name: str) -> None:
+        manifest_capture_events[name] = manifest_capture_events.get(name, 0) + 1
+
+    manifest_build_attempted = 0
+    manifest_build_succeeded = 0
+    manifest_build_failed = 0
+
+    consumer_call_attempted = 0
+    consumer_call_succeeded = 0
+    consumer_call_failed = 0
+
     collector: InMemoryExecutionManifestCollector | None = None
 
     if context is not None:
@@ -286,6 +311,7 @@ def _run_monitor_step(
             try:
                 capture_manifest = capture_shadow_manifest_entries
                 if capture_manifest:
+                    capture_enabled = True
                     collector = InMemoryExecutionManifestCollector(
                         run_id=context.run_id,
                         dataset_name=None,
@@ -299,33 +325,156 @@ def _run_monitor_step(
                     evaluation,
                     validate_evidence_provenance(envelope, SHADOW_REQUIRED_SOURCES),
                 )
+                try:
+                    supports_manifest_capture_events = (
+                        "record_manifest_capture_event_fn"
+                        in inspect.signature(append_shadow_comparison).parameters
+                    )
+                except (TypeError, ValueError):
+                    supports_manifest_capture_events = False
+                    LOGGER.warning(
+                        "Observational append_shadow_comparison signature introspection failed",
+                        exc_info=True,
+                    )
                 if collector is None:
+                    writer_attempted = True
                     append_shadow_comparison(
                         comparison,
                         timestamp_utc=timestamp,
                         output_path=shadow_telemetry_path,
                     )
+                    writer_status = ObservationStatus.SUCCEEDED
                 else:
+                    writer_attempted = True
+                    append_kwargs: dict[str, object] = {
+                        "capture_manifest_entry_fn": collector.capture_manifest_entry_fn,
+                    }
+                    if supports_manifest_capture_events:
+                        append_kwargs["record_manifest_capture_event_fn"] = (
+                            record_manifest_capture_event
+                        )
                     append_shadow_comparison(
                         comparison,
                         timestamp_utc=timestamp,
                         output_path=shadow_telemetry_path,
-                        capture_manifest_entry_fn=collector.capture_manifest_entry_fn,
+                        **append_kwargs,
                     )
+                    writer_status = ObservationStatus.SUCCEEDED
 
                     if consume_shadow_manifest_snapshot_fn is not None:
                         try:
                             entries = collector.snapshot_entries()
-                            if entries:
-                                manifest = collector.build_execution_identity_manifest_v1()
-                                consume_shadow_manifest_snapshot_fn(manifest)
+                            snapshot_entries_count = len(entries)
+                            if not entries:
+                                skipped_empty_snapshot = True
+                            else:
+                                manifest_build_attempted += 1
+                                try:
+                                    manifest = collector.build_execution_identity_manifest_v1()
+                                except Exception:
+                                    manifest_build_failed += 1
+                                    raise
+                                else:
+                                    manifest_build_succeeded += 1
+
+                                consumer_call_attempted += 1
+                                try:
+                                    consume_shadow_manifest_snapshot_fn(manifest)
+                                except Exception:
+                                    consumer_call_failed += 1
+                                    raise
+                                else:
+                                    consumer_call_succeeded += 1
                         except Exception:
                             LOGGER.warning(
                                 "Observational manifest snapshot consumption failed",
                                 exc_info=True,
                             )
             except Exception:
+                if writer_attempted:
+                    writer_status = ObservationStatus.FAILED
                 LOGGER.warning("Falha ao registrar telemetria shadow", exc_info=True)
+
+        if consume_shadow_manifest_capture_diagnostics_fn is not None:
+            try:
+                evidence_build_attempted = manifest_capture_events.get("evidence_build_attempted", 0)
+                evidence_build_succeeded = manifest_capture_events.get("evidence_build_succeeded", 0)
+                evidence_build_failed = manifest_capture_events.get("evidence_build_failed", 0)
+
+                entry_capture_attempted = manifest_capture_events.get("entry_capture_attempted", 0)
+                entry_capture_succeeded = manifest_capture_events.get("entry_capture_succeeded", 0)
+                entry_capture_failed = manifest_capture_events.get("entry_capture_failed", 0)
+
+                if (not capture_enabled) or (writer_status is not ObservationStatus.SUCCEEDED):
+                    capture_status = ObservationStatus.NOT_ATTEMPTED
+                elif evidence_build_attempted == 0:
+                    capture_status = ObservationStatus.INDETERMINATE
+                else:
+                    capture_successes = entry_capture_succeeded
+                    capture_failures = evidence_build_failed + entry_capture_failed
+                    if capture_successes > 0 and capture_failures > 0:
+                        capture_status = ObservationStatus.PARTIALLY_FAILED
+                    elif capture_successes > 0 and capture_failures == 0:
+                        capture_status = ObservationStatus.SUCCEEDED
+                    elif capture_successes == 0 and capture_failures > 0:
+                        capture_status = ObservationStatus.FAILED
+                    else:
+                        capture_status = ObservationStatus.INDETERMINATE
+
+                consumer_present = consume_shadow_manifest_snapshot_fn is not None
+                if (not consumer_present) or (writer_status is not ObservationStatus.SUCCEEDED):
+                    delivery_status = ObservationStatus.NOT_ATTEMPTED
+                elif skipped_empty_snapshot:
+                    delivery_status = ObservationStatus.NOT_ATTEMPTED
+                elif consumer_call_failed > 0 or manifest_build_failed > 0:
+                    delivery_status = ObservationStatus.FAILED
+                elif consumer_call_succeeded > 0:
+                    delivery_status = ObservationStatus.SUCCEEDED
+                else:
+                    delivery_status = ObservationStatus.INDETERMINATE
+
+                diagnostics = ShadowManifestCaptureDiagnostics(
+                    writer_status=writer_status,
+                    capture_status=capture_status,
+                    delivery_status=delivery_status,
+
+                    writer_attempted=writer_attempted,
+                    capture_enabled=capture_enabled,
+                    consumer_present=consumer_present,
+                    skipped_empty_snapshot=skipped_empty_snapshot,
+
+                    snapshot_entries_count=snapshot_entries_count,
+
+                    evidence_build_attempted=evidence_build_attempted,
+                    evidence_build_succeeded=evidence_build_succeeded,
+                    evidence_build_failed=evidence_build_failed,
+
+                    entry_capture_attempted=entry_capture_attempted,
+                    entry_capture_succeeded=entry_capture_succeeded,
+                    entry_capture_failed=entry_capture_failed,
+
+                    manifest_build_attempted=manifest_build_attempted,
+                    manifest_build_succeeded=manifest_build_succeeded,
+                    manifest_build_failed=manifest_build_failed,
+
+                    consumer_call_attempted=consumer_call_attempted,
+                    consumer_call_succeeded=consumer_call_succeeded,
+                    consumer_call_failed=consumer_call_failed,
+                )
+            except Exception:
+                LOGGER.warning(
+                    "Observational manifest capture diagnostics generation failed",
+                    exc_info=True,
+                )
+            else:
+                try:
+                    consume_shadow_manifest_capture_diagnostics_fn(diagnostics)
+                except Exception:
+                    LOGGER.warning(
+                        "Observational manifest capture diagnostics consumption failed",
+                        exc_info=True,
+                    )
+
         if record_dual_privacy_telemetry or _ACTIVE_DUAL_ENABLED.get():
             try:
                 dual = compare_dual_privacy_policy(
@@ -427,6 +576,7 @@ def execute_step(
     *,
     capture_shadow_manifest_entries: bool = False,
     consume_shadow_manifest_snapshot_fn: Callable[[ExecutionIdentityManifest], None] | None = None,
+    consume_shadow_manifest_capture_diagnostics_fn: Callable[[ShadowManifestCaptureDiagnostics], None] | None = None,
 ) -> None:
     handler = STEP_HANDLERS.get(step_name)
     if handler is None:  # pragma: no cover
@@ -457,13 +607,22 @@ def execute_step(
         )
     else:
         if step_name == "monitor" and capture_shadow_manifest_entries:
-            if consume_shadow_manifest_snapshot_fn is None:
+            if (
+                consume_shadow_manifest_snapshot_fn is None
+                and consume_shadow_manifest_capture_diagnostics_fn is None
+            ):
                 handler(capture_shadow_manifest_entries=True)
             else:
-                handler(
-                    capture_shadow_manifest_entries=True,
-                    consume_shadow_manifest_snapshot_fn=consume_shadow_manifest_snapshot_fn,
-                )
+                kwargs: dict[str, object] = {"capture_shadow_manifest_entries": True}
+                if consume_shadow_manifest_snapshot_fn is not None:
+                    kwargs["consume_shadow_manifest_snapshot_fn"] = (
+                        consume_shadow_manifest_snapshot_fn
+                    )
+                if consume_shadow_manifest_capture_diagnostics_fn is not None:
+                    kwargs["consume_shadow_manifest_capture_diagnostics_fn"] = (
+                        consume_shadow_manifest_capture_diagnostics_fn
+                    )
+                handler(**kwargs)
         else:
             handler()
 
@@ -546,6 +705,7 @@ def run_selected_steps(
     *,
     capture_shadow_manifest_entries: bool = False,
     consume_shadow_manifest_snapshot_fn: Callable[[ExecutionIdentityManifest], None] | None = None,
+    consume_shadow_manifest_capture_diagnostics_fn: Callable[[ShadowManifestCaptureDiagnostics], None] | None = None,
 ) -> list[StepExecution]:
     executions: list[StepExecution] = []
     failures: list[StepExecution] = []
@@ -554,14 +714,22 @@ def run_selected_steps(
         LOGGER.info("Iniciando etapa: %s", step_name)
         try:
             if capture_shadow_manifest_entries:
-                if consume_shadow_manifest_snapshot_fn is None:
+                if (
+                    consume_shadow_manifest_snapshot_fn is None
+                    and consume_shadow_manifest_capture_diagnostics_fn is None
+                ):
                     execute_step(step_name, capture_shadow_manifest_entries=True)
                 else:
-                    execute_step(
-                        step_name,
-                        capture_shadow_manifest_entries=True,
-                        consume_shadow_manifest_snapshot_fn=consume_shadow_manifest_snapshot_fn,
-                    )
+                    kwargs: dict[str, object] = {"capture_shadow_manifest_entries": True}
+                    if consume_shadow_manifest_snapshot_fn is not None:
+                        kwargs["consume_shadow_manifest_snapshot_fn"] = (
+                            consume_shadow_manifest_snapshot_fn
+                        )
+                    if consume_shadow_manifest_capture_diagnostics_fn is not None:
+                        kwargs["consume_shadow_manifest_capture_diagnostics_fn"] = (
+                            consume_shadow_manifest_capture_diagnostics_fn
+                        )
+                    execute_step(step_name, **kwargs)
             else:
                 execute_step(step_name)
         except Exception as exc:

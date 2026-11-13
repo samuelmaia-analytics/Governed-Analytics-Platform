@@ -12,10 +12,15 @@ from src.monitoring_components.models import MonitoringCheckResult
 from src.observability_components.models import ObservabilityCheck
 from src.publication_provenance import PipelineGovernanceContext
 from src.publication_shadow import ShadowDivergenceType
+from src.publication_shadow.comparison import PublicationShadowComparison
 from src.publication_shadow.execution_identity_manifest import (
     ExecutionIdentityManifest,
     IdentityStatus,
     ManifestEvidenceEntry,
+)
+from src.publication_shadow.manifest_capture_diagnostics import (
+    ObservationStatus,
+    ShadowManifestCaptureDiagnostics,
 )
 from src.publish_components.models import PrivacyCheck
 from src.quality_components.models import QualityCheckResult
@@ -915,3 +920,397 @@ def test_execute_step_other_steps_remain_zero_arg(monkeypatch: pytest.MonkeyPatc
     pipeline.execute_step("inventory")
 
     assert called == ["inventory"]
+
+
+def test_diagnostics_callback_default_off_reports_not_attempted(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    isolate_monitor(monkeypatch)
+    received: list[ShadowManifestCaptureDiagnostics] = []
+
+    def consume(diagnostics: ShadowManifestCaptureDiagnostics) -> None:
+        received.append(diagnostics)
+
+    pipeline._run_monitor_step(
+        context(),
+        consume_shadow_manifest_capture_diagnostics_fn=consume,
+    )
+
+    assert len(received) == 1
+    diagnostics = received[0]
+    assert diagnostics.writer_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.capture_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.delivery_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.writer_attempted is False
+    assert diagnostics.capture_enabled is False
+    assert diagnostics.consumer_present is False
+
+
+def test_diagnostics_callback_writer_only_tracks_writer_success(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ShadowManifestCaptureDiagnostics] = []
+
+    def consume(diagnostics: ShadowManifestCaptureDiagnostics) -> None:
+        received.append(diagnostics)
+
+    pipeline._run_monitor_step(
+        context(),
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=output_path,
+        consume_shadow_manifest_capture_diagnostics_fn=consume,
+    )
+
+    assert len(received) == 1
+    diagnostics = received[0]
+    assert diagnostics.writer_status is ObservationStatus.SUCCEEDED
+    assert diagnostics.capture_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.delivery_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.writer_attempted is True
+    assert diagnostics.capture_enabled is False
+    assert diagnostics.snapshot_entries_count == 0
+
+
+def test_diagnostics_callback_capture_and_delivery_success(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+
+    received: list[ShadowManifestCaptureDiagnostics] = []
+
+    def consume(diagnostics: ShadowManifestCaptureDiagnostics) -> None:
+        received.append(diagnostics)
+
+    pipeline._run_monitor_step(
+        context(),
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=output_path,
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=lambda _manifest: None,
+        consume_shadow_manifest_capture_diagnostics_fn=consume,
+    )
+
+    assert len(received) == 1
+    diagnostics = received[0]
+    assert diagnostics.writer_status is ObservationStatus.SUCCEEDED
+    assert diagnostics.capture_status is ObservationStatus.SUCCEEDED
+    assert diagnostics.delivery_status is ObservationStatus.SUCCEEDED
+    assert diagnostics.capture_enabled is True
+    assert diagnostics.consumer_present is True
+    assert diagnostics.skipped_empty_snapshot is False
+    assert diagnostics.snapshot_entries_count == 1
+    assert diagnostics.evidence_build_attempted == 1
+    assert diagnostics.evidence_build_failed == 0
+    assert diagnostics.entry_capture_succeeded == 1
+    assert diagnostics.consumer_call_succeeded == 1
+
+
+def test_diagnostics_callback_skips_empty_snapshot(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+
+    received: list[ShadowManifestCaptureDiagnostics] = []
+
+    def consume(diagnostics: ShadowManifestCaptureDiagnostics) -> None:
+        received.append(diagnostics)
+
+    def fail(*_args, **_kwargs):
+        raise OSError("factory unavailable")
+
+    monkeypatch.setattr(shadow_telemetry, "build_manifest_evidence_entry", fail)
+
+    pipeline._run_monitor_step(
+        context(),
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=output_path,
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=lambda _manifest: None,
+        consume_shadow_manifest_capture_diagnostics_fn=consume,
+    )
+
+    assert len(received) == 1
+    diagnostics = received[0]
+    assert diagnostics.writer_status is ObservationStatus.SUCCEEDED
+    assert diagnostics.capture_status is ObservationStatus.FAILED
+    assert diagnostics.delivery_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.skipped_empty_snapshot is True
+    assert diagnostics.snapshot_entries_count == 0
+    assert diagnostics.evidence_build_attempted == 1
+    assert diagnostics.evidence_build_failed == 1
+    assert diagnostics.consumer_call_attempted == 0
+
+
+def test_diagnostics_callback_writer_failure_does_not_fake_capture(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+
+    received: list[ShadowManifestCaptureDiagnostics] = []
+
+    def consume(diagnostics: ShadowManifestCaptureDiagnostics) -> None:
+        received.append(diagnostics)
+
+    def fail(*_args, **_kwargs):
+        raise OSError("diagnostic storage unavailable")
+
+    monkeypatch.setattr(pipeline, "append_shadow_comparison", fail)
+
+    pipeline._run_monitor_step(
+        context(),
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=output_path,
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=lambda _manifest: None,
+        consume_shadow_manifest_capture_diagnostics_fn=consume,
+    )
+
+    assert len(received) == 1
+    diagnostics = received[0]
+    assert diagnostics.writer_status is ObservationStatus.FAILED
+    assert diagnostics.capture_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.delivery_status is ObservationStatus.NOT_ATTEMPTED
+    assert diagnostics.snapshot_entries_count == 0
+
+
+def _minimal_shadow_comparison() -> PublicationShadowComparison:
+    return PublicationShadowComparison(
+        run_id="run-x",
+        evaluated=True,
+        current_monitor_decision="Approved",
+        canonical_decision="Approved",
+        diverged=False,
+        divergence_type=ShadowDivergenceType.AGREEMENT,
+        canonical_severity=None,
+        canonical_reasons=(),
+        canonical_required_actions=(),
+        provenance_valid=True,
+        current_sources=(),
+        missing_sources=(),
+        foreign_run_sources=(),
+        unknown_sources=(),
+        unavailable_inputs=(),
+    )
+
+
+def test_event_recording_callback_failure_before_factory_does_not_break_writer(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    comparison = _minimal_shadow_comparison()
+    output_path = tmp_path / "shadow.jsonl"
+    captured: list[ManifestEvidenceEntry] = []
+
+    def capture(entry: ManifestEvidenceEntry) -> None:
+        captured.append(entry)
+
+    def fail(_event: str) -> None:
+        raise RuntimeError("event sink down")
+
+    with caplog.at_level("WARNING"):
+        shadow_telemetry.append_shadow_comparison(
+            comparison,
+            timestamp_utc=STARTED_AT,
+            output_path=output_path,
+            capture_manifest_entry_fn=capture,
+            record_manifest_capture_event_fn=fail,
+        )
+
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert len(captured) == 1
+    assert "Observational manifest capture event recording failed" in caplog.text
+
+
+def test_event_recording_callback_failure_after_capture_does_not_break_writer(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    comparison = _minimal_shadow_comparison()
+    output_path = tmp_path / "shadow.jsonl"
+    captured: list[ManifestEvidenceEntry] = []
+
+    def capture(entry: ManifestEvidenceEntry) -> None:
+        captured.append(entry)
+
+    def fail_on_success(event: str) -> None:
+        if event == "entry_capture_succeeded":
+            raise RuntimeError("event sink down")
+
+    with caplog.at_level("WARNING"):
+        shadow_telemetry.append_shadow_comparison(
+            comparison,
+            timestamp_utc=STARTED_AT,
+            output_path=output_path,
+            capture_manifest_entry_fn=capture,
+            record_manifest_capture_event_fn=fail_on_success,
+        )
+
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert len(captured) == 1
+    assert "Observational manifest capture event recording failed" in caplog.text
+
+
+def test_event_recording_callback_failure_during_factory_error_does_not_break_writer(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    comparison = _minimal_shadow_comparison()
+    output_path = tmp_path / "shadow.jsonl"
+    captured: list[ManifestEvidenceEntry] = []
+
+    def capture(entry: ManifestEvidenceEntry) -> None:
+        captured.append(entry)
+
+    def fail_factory(*_args, **_kwargs):
+        raise OSError("factory down")
+
+    def fail_on_build_failed(event: str) -> None:
+        if event == "evidence_build_failed":
+            raise RuntimeError("event sink down")
+
+    monkeypatch.setattr(shadow_telemetry, "build_manifest_evidence_entry", fail_factory)
+
+    with caplog.at_level("WARNING"):
+        shadow_telemetry.append_shadow_comparison(
+            comparison,
+            timestamp_utc=STARTED_AT,
+            output_path=output_path,
+            capture_manifest_entry_fn=capture,
+            record_manifest_capture_event_fn=fail_on_build_failed,
+        )
+
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert captured == []
+    assert "Observational manifest capture failed for shadow telemetry" in caplog.text
+    assert "Observational manifest capture event recording failed" in caplog.text
+
+
+@pytest.mark.parametrize("signature_exc", [ValueError, TypeError])
+def test_signature_inspection_failure_does_not_block_writer_and_is_conservative(
+    signature_exc: type[Exception],
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ShadowManifestCaptureDiagnostics] = []
+
+    def consume(diagnostics: ShadowManifestCaptureDiagnostics) -> None:
+        received.append(diagnostics)
+
+    def fail_signature(_callable):
+        raise signature_exc("no signature")
+
+    monkeypatch.setattr(pipeline.inspect, "signature", fail_signature)
+
+    pipeline._run_monitor_step(
+        context(),
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=output_path,
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=lambda _manifest: None,
+        consume_shadow_manifest_capture_diagnostics_fn=consume,
+    )
+
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert_historical_payload(payload)
+    assert len(received) == 1
+    diagnostics = received[0]
+    assert diagnostics.writer_status is ObservationStatus.SUCCEEDED
+    assert diagnostics.capture_enabled is True
+    assert diagnostics.capture_status is ObservationStatus.INDETERMINATE
+
+
+def test_diagnostics_callback_generation_failure_is_isolated(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ShadowManifestCaptureDiagnostics] = []
+
+    def consume(diagnostics: ShadowManifestCaptureDiagnostics) -> None:
+        received.append(diagnostics)
+
+    def fail_diagnostics(**_kwargs):
+        raise ValueError("invalid diagnostics")
+
+    monkeypatch.setattr(pipeline, "ShadowManifestCaptureDiagnostics", fail_diagnostics)
+
+    with caplog.at_level("WARNING"):
+        pipeline._run_monitor_step(
+            context(),
+            record_shadow_telemetry=True,
+            shadow_telemetry_path=output_path,
+            capture_shadow_manifest_entries=True,
+            consume_shadow_manifest_snapshot_fn=lambda _manifest: None,
+            consume_shadow_manifest_capture_diagnostics_fn=consume,
+        )
+
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert_historical_payload(payload)
+    assert received == []
+    assert "Observational manifest capture diagnostics generation failed" in caplog.text
+
+
+def test_diagnostics_contract_rejects_negative_counters() -> None:
+    with pytest.raises(ValueError):
+        ShadowManifestCaptureDiagnostics(
+            writer_status=ObservationStatus.NOT_ATTEMPTED,
+            capture_status=ObservationStatus.NOT_ATTEMPTED,
+            delivery_status=ObservationStatus.NOT_ATTEMPTED,
+            writer_attempted=False,
+            capture_enabled=False,
+            consumer_present=False,
+            skipped_empty_snapshot=False,
+            snapshot_entries_count=-1,
+            evidence_build_attempted=0,
+            evidence_build_succeeded=0,
+            evidence_build_failed=0,
+            entry_capture_attempted=0,
+            entry_capture_succeeded=0,
+            entry_capture_failed=0,
+            manifest_build_attempted=0,
+            manifest_build_succeeded=0,
+            manifest_build_failed=0,
+            consumer_call_attempted=0,
+            consumer_call_succeeded=0,
+            consumer_call_failed=0,
+        )
+
+
+def test_diagnostics_contract_rejects_impossible_attempt_relationships() -> None:
+    with pytest.raises(ValueError):
+        ShadowManifestCaptureDiagnostics(
+            writer_status=ObservationStatus.NOT_ATTEMPTED,
+            capture_status=ObservationStatus.NOT_ATTEMPTED,
+            delivery_status=ObservationStatus.NOT_ATTEMPTED,
+            writer_attempted=False,
+            capture_enabled=False,
+            consumer_present=False,
+            skipped_empty_snapshot=False,
+            snapshot_entries_count=0,
+            evidence_build_attempted=0,
+            evidence_build_succeeded=1,
+            evidence_build_failed=0,
+            entry_capture_attempted=0,
+            entry_capture_succeeded=0,
+            entry_capture_failed=0,
+            manifest_build_attempted=0,
+            manifest_build_succeeded=0,
+            manifest_build_failed=0,
+            consumer_call_attempted=0,
+            consumer_call_succeeded=0,
+            consumer_call_failed=0,
+        )

@@ -70,7 +70,19 @@ def append_shadow_comparison(
     timestamp_utc: datetime,
     output_path: Path,
     capture_manifest_entry_fn: Callable[[ManifestEvidenceEntry], None] | None = None,
+    record_manifest_capture_event_fn: Callable[[str], None] | None = None,
 ) -> Path:
+    def safe_record(event: str) -> None:
+        if record_manifest_capture_event_fn is None:
+            return
+        try:
+            record_manifest_capture_event_fn(event)
+        except Exception:
+            LOGGER.warning(
+                "Observational manifest capture event recording failed for shadow telemetry.",
+                exc_info=True,
+            )
+
     record = serialize_shadow_comparison(
         comparison, timestamp_utc=timestamp_utc
     )
@@ -79,6 +91,7 @@ def append_shadow_comparison(
         stream.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     if capture_manifest_entry_fn is not None:
+        safe_record("evidence_build_attempted")
         try:
             entry = build_manifest_evidence_entry(
                 evidence_type=SHADOW_COMPARISON_EVIDENCE_TYPE,
@@ -91,11 +104,24 @@ def append_shadow_comparison(
                 raise ValueError(
                     "IdentityStatus.PROVEN must not be produced for shadow telemetry"
                 )
-
-            capture_manifest_entry_fn(entry)
         except Exception:
+            safe_record("evidence_build_failed")
             LOGGER.warning(
                 "Observational manifest capture failed for shadow telemetry.",
                 exc_info=True,
             )
+        else:
+            safe_record("evidence_build_succeeded")
+
+            safe_record("entry_capture_attempted")
+            try:
+                capture_manifest_entry_fn(entry)
+            except Exception:
+                safe_record("entry_capture_failed")
+                LOGGER.warning(
+                    "Observational manifest capture failed for shadow telemetry.",
+                    exc_info=True,
+                )
+            else:
+                safe_record("entry_capture_succeeded")
     return output_path
