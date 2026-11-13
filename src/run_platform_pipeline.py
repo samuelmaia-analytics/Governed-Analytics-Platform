@@ -56,6 +56,9 @@ from src.publication_shadow import (
     compare_publication_shadow,
     evaluate_provenanced_publication_shadow,
 )
+from src.publication_shadow.in_memory_manifest_collector import (
+    InMemoryExecutionManifestCollector,
+)
 from src.publish_components.models import PrivacyCheck
 from src.publish_dashboard import run_publish_dashboard
 from src.published_monitoring import (
@@ -211,6 +214,7 @@ def _run_monitor_step(
     context: PipelineGovernanceContext | None = None,
     *,
     record_shadow_telemetry: bool = False,
+    capture_shadow_manifest_entries: bool = False,
     shadow_telemetry_path: Path = DEFAULT_SHADOW_TELEMETRY_PATH,
     record_dual_privacy_telemetry: bool = False,
     dual_privacy_telemetry_path: Path = DEFAULT_DUAL_PRIVACY_TELEMETRY_PATH,
@@ -271,11 +275,19 @@ def _run_monitor_step(
         timestamp_utc=datetime.now(UTC).isoformat(),
     )
 
+    collector: InMemoryExecutionManifestCollector | None = None
+
     if context is not None:
         envelope = context.build_provenanced_evidence()
         timestamp = context.started_at or datetime.now(UTC)
         if record_shadow_telemetry or _ACTIVE_SHADOW_ENABLED.get():
             try:
+                capture_manifest = capture_shadow_manifest_entries
+                if capture_manifest:
+                    collector = InMemoryExecutionManifestCollector(
+                        run_id=context.run_id,
+                        dataset_name=None,
+                    )
                 evaluation = evaluate_provenanced_publication_shadow(
                     envelope,
                     required_sources=SHADOW_REQUIRED_SOURCES,
@@ -285,11 +297,19 @@ def _run_monitor_step(
                     evaluation,
                     validate_evidence_provenance(envelope, SHADOW_REQUIRED_SOURCES),
                 )
-                append_shadow_comparison(
-                    comparison,
-                    timestamp_utc=timestamp,
-                    output_path=shadow_telemetry_path,
-                )
+                if collector is None:
+                    append_shadow_comparison(
+                        comparison,
+                        timestamp_utc=timestamp,
+                        output_path=shadow_telemetry_path,
+                    )
+                else:
+                    append_shadow_comparison(
+                        comparison,
+                        timestamp_utc=timestamp,
+                        output_path=shadow_telemetry_path,
+                        capture_manifest_entry_fn=collector.capture_manifest_entry_fn,
+                    )
             except Exception:
                 LOGGER.warning("Falha ao registrar telemetria shadow", exc_info=True)
         if record_dual_privacy_telemetry or _ACTIVE_DUAL_ENABLED.get():
@@ -388,7 +408,7 @@ def resolve_steps(selected_steps: list[str] | None) -> list[str]:
     return selected_steps
 
 
-def execute_step(step_name: str) -> None:
+def execute_step(step_name: str, *, capture_shadow_manifest_entries: bool = False) -> None:
     handler = STEP_HANDLERS.get(step_name)
     if handler is None:  # pragma: no cover
         raise ValueError(f"Etapa desconhecida: {step_name}")
@@ -417,7 +437,10 @@ def execute_step(step_name: str) -> None:
             )
         )
     else:
-        handler()
+        if step_name == "monitor" and capture_shadow_manifest_entries:
+            handler(capture_shadow_manifest_entries=True)
+        else:
+            handler()
 
 
 def resolve_git_commit() -> str:
@@ -493,7 +516,10 @@ def save_pipeline_execution_report(
 
 
 def run_selected_steps(
-    selected_steps: list[str], continue_on_error: bool = False
+    selected_steps: list[str],
+    continue_on_error: bool = False,
+    *,
+    capture_shadow_manifest_entries: bool = False,
 ) -> list[StepExecution]:
     executions: list[StepExecution] = []
     failures: list[StepExecution] = []
@@ -501,7 +527,10 @@ def run_selected_steps(
         started_at = perf_counter()
         LOGGER.info("Iniciando etapa: %s", step_name)
         try:
-            execute_step(step_name)
+            if capture_shadow_manifest_entries:
+                execute_step(step_name, capture_shadow_manifest_entries=True)
+            else:
+                execute_step(step_name)
         except Exception as exc:
             elapsed = perf_counter() - started_at
             failure = StepExecution(
