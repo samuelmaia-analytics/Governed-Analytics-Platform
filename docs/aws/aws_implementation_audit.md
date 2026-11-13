@@ -397,6 +397,15 @@ Reusable:
 Gaps:
 
 - No authentication/authorization around API endpoints.
+  Update (13 Nov 2026): This gap was addressed in Checkpoint 16B by enforcing Bearer authentication
+  for sensitive endpoints in `src/api.py` (commit `145a54f183fa3ac4502bbd1718e78b4a5869aad1`).
+
+  Current state:
+
+  - `/health` remains public
+  - governance and Snowflake endpoints require `Authorization: Bearer`
+
+  Residual limitation: shared-token authentication only (no RBAC/ABAC).
 - Snowflake credentials are environment-based; no AWS Secrets Manager or IAM integration exists.
 - Query endpoint validates write intent but should also restrict database/schema/table scope for production.
 

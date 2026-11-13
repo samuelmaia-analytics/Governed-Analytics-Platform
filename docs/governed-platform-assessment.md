@@ -1,4 +1,4 @@
-﻿# Governed Analytics Platform — Inventário, Diagnóstico Arquitetural e Validação (ETAPA 0)
+# Governed Analytics Platform — Inventário, Diagnóstico Arquitetural e Validação (ETAPA 0)
 
 Data: 2026-11-12
 
@@ -256,7 +256,21 @@ Nota sobre CI:
 
 ## 6) Testes e cobertura (execução real nesta máquina)
 
-Importante: os testes não foram reexecutados nesta consolidação.
+Atualização (Checkpoint 16C — 13/11/2026): a suíte global foi reexecutada nesta máquina usando o Python do ambiente virtual do repositório (sem depender do `python` do PATH) e com isolamento de artefatos fora do working tree.
+
+- Testes coletados: **1.353**
+- Testes aprovados: **1.353**
+- Falhas/erros/skips: **0/0/0**
+- Cobertura total: **92%** (escopo: `src` + `app`)
+
+Comando equivalente utilizado (PowerShell, na raiz do projeto):
+
+- `.\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --cov=src --cov=app --cov-report=term-missing`
+
+Nota: dados de cobertura foram direcionados para diretório temporário externo ao repositório (não gerando `.coverage`, `coverage.xml` ou `htmlcov/` no working tree).
+
+
+Importante (histórico): na consolidação original desta etapa, os testes não foram reexecutados; veja a atualização do Checkpoint 16C acima.
 
 Comando executado (histórico da validação do ambiente):
 

@@ -75,7 +75,27 @@ Fronteira chave: o app consome a camada publicada (`data/published/dashboard`), 
 - Base legal e retenção em linguagem de portfólio.
 - Controles corporativos avançados (IAM completo e trilha centralizada de auditoria).
 
+## Qualidade verificada (execução local)
+
+Resultados verificados no **Checkpoint 16C** em **13/11/2026** (execução local; não equivale automaticamente aos números do workflow do GitHub Actions ou do Codecov):
+
+- Testes coletados: **1.353**
+- Testes aprovados: **1.353**
+- Falhas/erros/skips: **0/0/0**
+- Cobertura total: **92%** (escopo: `src` + `app`)
+- Python: **3.11.18** · Pytest: **9.0.3**
+
+Comando equivalente utilizado (PowerShell, na raiz do projeto):
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --cov=src --cov=app --cov-report=term-missing
+```
+
+Nota: a coleta/armazenamento de dados de cobertura foi isolada em diretório temporário **fora do repositório**, para evitar criação de artefatos (`.coverage`, `htmlcov/`, `coverage.xml`) no working tree.
+
+
 ## Limites de Prontidão para Produção
+
 
 - Projeto de portfólio com inspiração de produção.
 - Uso de dados sintéticos, públicos ou de demonstração.
@@ -145,11 +165,36 @@ Governança e dados Snowflake disponíveis via REST API:
 
 | Método | Caminho | Descrição |
 | --- | --- | --- |
-| `GET` | `/health` | Health check |
-| `GET` | `/api/v1/governance/status` | Status do publication gate e scores de qualidade |
-| `GET` | `/api/v1/snowflake/health` | Status da conexão Snowflake |
-| `GET` | `/api/v1/snowflake/tables` | Lista tabelas do schema configurado |
-| `POST` | `/api/v1/snowflake/query` | Executa uma consulta SELECT somente leitura |
+| `GET` | `/health` | Health check (público) |
+| `GET` | `/api/v1/governance/status` | Status do publication gate e scores de qualidade (Bearer obrigatório) |
+| `GET` | `/api/v1/snowflake/health` | Status da conexão Snowflake (Bearer obrigatório) |
+| `GET` | `/api/v1/snowflake/tables` | Lista tabelas do schema configurado (Bearer obrigatório) |
+| `POST` | `/api/v1/snowflake/query` | Executa uma consulta SELECT somente leitura (Bearer obrigatório) |
+
+### Autenticação e segurança
+
+Os endpoints sensíveis exigem **autenticação Bearer**. Configure o token no servidor da API via `GAP_API_BEARER_TOKEN`. No cliente, envie o cabeçalho `Authorization: Bearer <token>` usando o mesmo valor. Evite registrar tokens em logs, prints ou histórico de terminal.
+
+- `/health` é público.
+- Sem `GAP_API_BEARER_TOKEN` configurado no servidor: endpoints sensíveis retornam **503** (fail-closed).
+- Sem cabeçalho `Authorization` ou com formato inválido: **401**.
+- Token inválido: **403**.
+
+Exemplo (bash):
+
+```bash
+export API_TOKEN="YOUR_TOKEN_HERE"
+curl -sS -H "Authorization: Bearer $API_TOKEN" http://localhost:8000/api/v1/governance/status
+```
+
+Exemplo (Windows PowerShell):
+
+```powershell
+$env:API_TOKEN = "YOUR_TOKEN_HERE"
+Invoke-RestMethod -Headers @{ Authorization = "Bearer $env:API_TOKEN" } -Uri "http://localhost:8000/api/v1/governance/status"
+```
+
+Limitações: o token é compartilhado e **não implementa RBAC/ABAC** (autorização granular). Em uma implantação corporativa, é necessário gerir secrets adequadamente e adotar autorização por escopo/identidade.
 
 Execução local:
 

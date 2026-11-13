@@ -80,7 +80,8 @@ No contexto deste projeto, os papéis estão acumulados pelo autor do projeto, m
 
 ## Limitações
 
-- este projeto não implementa autenticação, RBAC ou catálogo externo real
+- histórico: o projeto não implementava autenticação nem RBAC/ABAC ou catálogo externo real
+- atualização (13/11/2026): a API FastAPI exige autenticação Bearer para endpoints sensíveis (Checkpoint 16B, commit `145a54f183fa3ac4502bbd1718e78b4a5869aad1`; token compartilhado via `GAP_API_BEARER_TOKEN`), mas **não** há autorização granular (RBAC/ABAC)
 - os controles aqui documentados representam uma implementação local de governança por design adequada ao escopo do projeto
 
 

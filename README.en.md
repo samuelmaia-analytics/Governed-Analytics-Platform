@@ -22,6 +22,25 @@ A personal portfolio platform that turns public Olist e-commerce data into analy
 
 The documented governance review on **24 October 2026** passed **383 tests**, including invalid Gate evidence cases. This is a historical result, not a new test run or a guarantee that all execution paths use one promotion gate.
 
+### Latest verified run (local)
+
+Verified results from **Checkpoint 16C** on **13 Nov 2026** (local execution; it does not automatically match GitHub Actions or Codecov metrics):
+
+- Collected tests: **1,353**
+- Passed: **1,353**
+- Failures/errors/skips: **0/0/0**
+- Total coverage: **92%** (scope: `src` + `app`)
+- Python: **3.11.18** · Pytest: **9.0.3**
+
+Equivalent command (PowerShell, from the repository root):
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --cov=src --cov=app --cov-report=term-missing
+```
+
+Note: coverage data was stored in a temporary directory **outside the repository**, avoiding `.coverage`, `htmlcov/` or `coverage.xml` artifacts in the working tree.
+
+
 ## Architecture and publication boundary
 
 ![Azure reference architecture for the Governed Analytics Platform](docs/assets/architecture-overview.svg)
@@ -48,7 +67,32 @@ A separate RAG assistant answers questions grounded in approved technical contra
 - **Limits:** external context is limited to five chunks and 7,000 characters; questions and answers are not persisted as application history.
 - **Security and setup:** [RAG documentation](docs/governance_rag.md) covers sources, hashes, consent, secrets, limits, costs and the local walkthrough.
 
-The integration review recorded on **31 October 2026** passed **1,111 tests, zero skips and 92% coverage**. This is the result from that validation, not a test run performed during this README update.
+The integration review recorded on **31 October 2026** passed **1,111 tests, zero skips and 92% coverage**. This is a historical milestone; for the latest verified execution (13 Nov 2026), see **Latest verified run (local)**.
+
+## FastAPI authentication
+
+Sensitive endpoints require **Bearer authentication**. Set the server token via `GAP_API_BEARER_TOKEN`. On the client, send `Authorization: Bearer <token>` using the same value. Avoid logging tokens or leaking them in shell history.
+
+- `/health` is public.
+- If `GAP_API_BEARER_TOKEN` is not configured on the server: sensitive endpoints return **503** (fail-closed).
+- Missing/malformed `Authorization` header: **401**.
+- Invalid token: **403**.
+
+Example (bash):
+
+```bash
+export API_TOKEN="YOUR_TOKEN_HERE"
+curl -sS -H "Authorization: Bearer $API_TOKEN" http://localhost:8000/api/v1/governance/status
+```
+
+Example (Windows PowerShell):
+
+```powershell
+$env:API_TOKEN = "YOUR_TOKEN_HERE"
+Invoke-RestMethod -Headers @{ Authorization = "Bearer $env:API_TOKEN" } -Uri "http://localhost:8000/api/v1/governance/status"
+```
+
+Limitations: the token is shared and does **not** implement RBAC/ABAC (fine-grained authorization). Enterprise deployments should use proper secret management and identity-based authorization.
 
 ## Run locally
 

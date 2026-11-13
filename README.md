@@ -18,6 +18,24 @@
 ## Resultados e evidências
 
 A publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. Na revisão de governança de 24/10/2026, a suíte completa passou com **383 testes**, incluindo validações de entradas inválidas do Gate. Esse resultado corresponde à revisão documentada; execuções posteriores podem alterar a contagem.
+### Validação mais recente (execução local)
+
+Resultados verificados no **Checkpoint 16C** em **13/11/2026** (execução local; não equivale automaticamente aos números do workflow do GitHub Actions ou do Codecov):
+
+- Testes coletados: **1.353**
+- Testes aprovados: **1.353**
+- Falhas/erros/skips: **0/0/0**
+- Cobertura total: **92%** (escopo: `src` + `app`)
+- Python: **3.11.18** · Pytest: **9.0.3**
+
+Comando equivalente utilizado (PowerShell, na raiz do projeto):
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --cov=src --cov=app --cov-report=term-missing
+```
+
+Nota: a coleta/armazenamento de dados de cobertura foi isolada em diretório temporário **fora do repositório**, para evitar criação de artefatos (`.coverage`, `htmlcov/`, `coverage.xml`) no working tree.
+
 
 ---
 
@@ -108,7 +126,7 @@ Implementei um assistente RAG para consultar regras presentes nos contratos téc
 - **Limites:** contexto externo limitado a cinco trechos e 7.000 caracteres; sem histórico persistente de perguntas e respostas.
 - **Segurança e configuração:** [documentação do RAG](docs/governance_rag.md) descreve fontes, hashes, consentimento, secrets, limites, custos e o roteiro local.
 
-Na revisão da integração registrada em **31/10/2026**, a suíte passou com **1.111 testes, zero skips e 92% de cobertura**. É um resultado daquela validação, não uma execução realizada durante esta atualização.
+Na revisão da integração registrada em **31/10/2026**, a suíte passou com **1.111 testes, zero skips e 92% de cobertura**. É um resultado daquela validação histórica; para a execução mais recente verificada (13/11/2026), consulte **Validação mais recente (execução local)**.
 
 ## Implementado x simulado
 
@@ -122,6 +140,34 @@ Na revisão da integração registrada em **31/10/2026**, a suíte passou com **
 - Testes, linting, mypy e workflows de CI.
 - Endpoints FastAPI para governança e integração com Snowflake.
 - Integração Snowflake com graceful degradation quando não há credenciais.
+
+#### API FastAPI (autenticação)
+
+Endpoints disponíveis:
+
+- `GET /health` (público)
+- `GET /api/v1/governance/status` (Bearer obrigatório)
+- `GET /api/v1/snowflake/health` (Bearer obrigatório)
+- `GET /api/v1/snowflake/tables` (Bearer obrigatório)
+- `POST /api/v1/snowflake/query` (Bearer obrigatório)
+
+Configuração: defina `GAP_API_BEARER_TOKEN` no servidor da API. No cliente, envie `Authorization: Bearer <token>` usando o mesmo valor. Evite registrar tokens em logs, prints ou histórico de terminal.
+
+Comportamento seguro por padrão (fail-closed):
+
+- Sem `GAP_API_BEARER_TOKEN` configurado no servidor: **503**.
+- Sem `Authorization` (ou formato inválido): **401**.
+- Token inválido: **403**.
+
+Exemplo (bash):
+
+```bash
+export API_TOKEN="YOUR_TOKEN_HERE"
+curl -sS -H "Authorization: Bearer $API_TOKEN" http://localhost:8000/api/v1/governance/status
+```
+
+Limitação: o token é compartilhado e **não implementa RBAC/ABAC** (autorização granular).
+
 
 ### Simulado / demonstrativo
 
