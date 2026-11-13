@@ -13,6 +13,7 @@ from src.observability_components.models import ObservabilityCheck
 from src.publication_provenance import PipelineGovernanceContext
 from src.publication_shadow import ShadowDivergenceType
 from src.publication_shadow.execution_identity_manifest import (
+    ExecutionIdentityManifest,
     IdentityStatus,
     ManifestEvidenceEntry,
 )
@@ -306,6 +307,276 @@ def test_capture_enabled_wires_collector_callback_and_preserves_identity(
     assert_historical_payload(payload)
 
 
+def test_manifest_consumer_default_off_does_not_receive_snapshot(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ExecutionIdentityManifest] = []
+
+    def consume(manifest: ExecutionIdentityManifest) -> None:
+        received.append(manifest)
+
+    pipeline._run_monitor_step(
+        context(),
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=output_path,
+        consume_shadow_manifest_snapshot_fn=consume,
+    )
+
+    assert received == []
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert_historical_payload(payload)
+
+
+def test_manifest_consumer_receives_execution_identity_manifest_after_success(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ExecutionIdentityManifest] = []
+
+    def consume(manifest: ExecutionIdentityManifest) -> None:
+        received.append(manifest)
+
+    pipeline._run_monitor_step(
+        context(),
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=output_path,
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=consume,
+    )
+
+    assert len(received) == 1
+    manifest = received[0]
+    assert isinstance(manifest, ExecutionIdentityManifest)
+    assert manifest.run_id == "run-x"
+    assert manifest.dataset_name is None
+    assert manifest.authorizes_publication is False
+    assert len(manifest.entries) == 1
+
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert_historical_payload(payload)
+
+
+def test_manifest_consumer_snapshot_empty_does_not_deliver(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ExecutionIdentityManifest] = []
+
+    def append_stub(
+        _comparison,
+        *,
+        timestamp_utc,
+        output_path: Path,
+        capture_manifest_entry_fn=None,
+    ) -> Path:
+        # Simula escrita bem-sucedida, mas não registra evidence no coletor.
+        output_path.write_text("{}\n", encoding="utf-8")
+        return output_path
+
+    monkeypatch.setattr(pipeline, "append_shadow_comparison", append_stub)
+
+    def consume(manifest: ExecutionIdentityManifest) -> None:
+        received.append(manifest)
+
+    with caplog.at_level("WARNING"):
+        pipeline._run_monitor_step(
+            context(),
+            record_shadow_telemetry=True,
+            shadow_telemetry_path=output_path,
+            capture_shadow_manifest_entries=True,
+            consume_shadow_manifest_snapshot_fn=consume,
+        )
+
+    assert received == []
+    assert "Observational manifest snapshot consumption failed" not in caplog.text
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert_historical_payload(payload)
+
+
+def test_manifest_consumer_factory_failure_keeps_writer_behavior_and_skips_delivery(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ExecutionIdentityManifest] = []
+
+    def fail(*_args, **_kwargs):
+        raise OSError("factory unavailable")
+
+    monkeypatch.setattr(shadow_telemetry, "build_manifest_evidence_entry", fail)
+
+    def consume(manifest: ExecutionIdentityManifest) -> None:
+        received.append(manifest)
+
+    with caplog.at_level("WARNING"):
+        pipeline._run_monitor_step(
+            context(),
+            record_shadow_telemetry=True,
+            shadow_telemetry_path=output_path,
+            capture_shadow_manifest_entries=True,
+            consume_shadow_manifest_snapshot_fn=consume,
+        )
+
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert "Observational manifest capture failed" in caplog.text
+    assert "factory unavailable" in caplog.text
+    assert received == []
+    assert "Observational manifest snapshot consumption failed" not in caplog.text
+    assert_historical_payload(payload)
+
+
+def test_manifest_consumer_writer_failure_does_not_deliver_and_preserves_warning(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+    received: list[ExecutionIdentityManifest] = []
+
+    def fail(*_args, **_kwargs):
+        raise OSError("diagnostic storage unavailable")
+
+    monkeypatch.setattr(pipeline, "append_shadow_comparison", fail)
+
+    def consume(manifest: ExecutionIdentityManifest) -> None:
+        received.append(manifest)
+
+    with caplog.at_level("WARNING"):
+        pipeline._run_monitor_step(
+            context(),
+            record_shadow_telemetry=True,
+            shadow_telemetry_path=output_path,
+            capture_shadow_manifest_entries=True,
+            consume_shadow_manifest_snapshot_fn=consume,
+        )
+
+    assert "Falha ao registrar telemetria shadow" in caplog.text
+    assert "diagnostic storage unavailable" in caplog.text
+    assert received == []
+    assert "Observational manifest snapshot consumption failed" not in caplog.text
+    assert_historical_payload(payload)
+
+
+def test_manifest_consumer_isolated_between_invocations(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    isolate_monitor(monkeypatch)
+    received: list[ExecutionIdentityManifest] = []
+
+    def consume(manifest: ExecutionIdentityManifest) -> None:
+        received.append(manifest)
+
+    ctx_a = PipelineGovernanceContext("run-a", started_at=STARTED_AT)
+    ctx_b = PipelineGovernanceContext("run-b", started_at=STARTED_AT)
+    out_a = tmp_path / "a.jsonl"
+    out_b = tmp_path / "b.jsonl"
+
+    pipeline._run_monitor_step(
+        ctx_a,
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=out_a,
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=consume,
+    )
+    pipeline._run_monitor_step(
+        ctx_b,
+        record_shadow_telemetry=True,
+        shadow_telemetry_path=out_b,
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=consume,
+    )
+
+    assert len(received) == 2
+    manifest_a, manifest_b = received
+    assert manifest_a.run_id == "run-a"
+    assert manifest_b.run_id == "run-b"
+    assert manifest_a.entries[0].artifact_reference == str(out_a)
+    assert manifest_b.entries[0].artifact_reference == str(out_b)
+    assert out_a.read_text(encoding="utf-8").count("\n") == 1
+    assert out_b.read_text(encoding="utf-8").count("\n") == 1
+
+def test_manifest_consumer_failure_logs_warning_and_does_not_block_writer(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+
+    def consume(_manifest: ExecutionIdentityManifest) -> None:
+        raise RuntimeError("consumer failed")
+
+    with caplog.at_level("WARNING"):
+        pipeline._run_monitor_step(
+            context(),
+            record_shadow_telemetry=True,
+            shadow_telemetry_path=output_path,
+            capture_shadow_manifest_entries=True,
+            consume_shadow_manifest_snapshot_fn=consume,
+        )
+
+    assert "Observational manifest snapshot consumption failed" in caplog.text
+    assert "consumer failed" in caplog.text
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert_historical_payload(payload)
+
+
+def test_manifest_consumer_manifest_build_failure_logs_warning_and_is_observational(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    payload = isolate_monitor(monkeypatch)
+    output_path = tmp_path / "shadow.jsonl"
+
+    created: list[object] = []
+    original_collector = pipeline.InMemoryExecutionManifestCollector
+
+    class SpyCollector(original_collector):
+        def __init__(self, *, run_id: str | None, dataset_name: str | None = None) -> None:
+            super().__init__(run_id=run_id, dataset_name=dataset_name)
+            created.append(self)
+
+        def build_execution_identity_manifest_v1(self) -> ExecutionIdentityManifest:
+            raise RuntimeError("manifest build failed")
+
+    monkeypatch.setattr(pipeline, "InMemoryExecutionManifestCollector", SpyCollector)
+
+    def consume(_manifest: ExecutionIdentityManifest) -> None:
+        pytest.fail("consumer should not receive manifest when build fails")
+
+    with caplog.at_level("WARNING"):
+        pipeline._run_monitor_step(
+            context(),
+            record_shadow_telemetry=True,
+            shadow_telemetry_path=output_path,
+            capture_shadow_manifest_entries=True,
+            consume_shadow_manifest_snapshot_fn=consume,
+        )
+
+    assert len(created) == 1
+    collector = created[0]
+    assert collector.run_id == "run-x"
+    assert collector.dataset_name is None
+
+    assert "Observational manifest snapshot consumption failed" in caplog.text
+    assert "manifest build failed" in caplog.text
+    assert output_path.read_text(encoding="utf-8").count("\n") == 1
+    assert_historical_payload(payload)
+
+
 def test_capture_factory_failure_logs_warning_and_does_not_block_writer(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -515,6 +786,56 @@ def test_dispatch_wires_capture_callback_via_execute_step(
 
 
 
+def test_run_selected_steps_does_not_pass_consumer_when_capture_off(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    called: list[tuple[str, object]] = []
+
+    def execute_spy(step_name: str) -> None:
+        called.append((step_name, None))
+
+    monkeypatch.setattr(pipeline, "execute_step", execute_spy)
+
+    def consumer(_manifest: ExecutionIdentityManifest) -> None:
+        pass
+    pipeline.run_selected_steps(["inventory"], consume_shadow_manifest_snapshot_fn=consumer)
+
+    assert called == [("inventory", None)]
+
+
+def test_run_selected_steps_passes_consumer_when_capture_on(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    called: list[tuple[str, bool, bool]] = []
+
+    def consumer(_manifest: ExecutionIdentityManifest) -> None:
+        pass
+
+    def execute_spy(
+        step_name: str,
+        *,
+        capture_shadow_manifest_entries: bool = False,
+        consume_shadow_manifest_snapshot_fn=None,
+    ) -> None:
+        called.append(
+            (
+                step_name,
+                capture_shadow_manifest_entries,
+                consume_shadow_manifest_snapshot_fn is consumer,
+            )
+        )
+
+    monkeypatch.setattr(pipeline, "execute_step", execute_spy)
+
+    pipeline.run_selected_steps(
+        ["inventory"],
+        capture_shadow_manifest_entries=True,
+        consume_shadow_manifest_snapshot_fn=consumer,
+    )
+
+    assert called == [("inventory", True, True)]
+
+
 def test_run_selected_steps_accepts_positional_continue_on_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -536,6 +857,24 @@ def test_run_selected_steps_accepts_positional_continue_on_error(
         pipeline.run_selected_steps(["build", "publish"], True)
 
     assert called_steps == ["build", "publish"]
+
+
+def test_execute_step_monitor_consumer_default_off_does_not_pass_kwargs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    called: list[str] = []
+
+    def monitor_handler() -> None:
+        called.append("monitor")
+
+    monkeypatch.setitem(pipeline.STEP_HANDLERS, "monitor", monitor_handler)
+
+    pipeline.execute_step(
+        "monitor",
+        consume_shadow_manifest_snapshot_fn=lambda _manifest: None,
+    )
+
+    assert called == ["monitor"]
 
 
 def test_execute_step_monitor_handler_without_kwargs_is_compatible(

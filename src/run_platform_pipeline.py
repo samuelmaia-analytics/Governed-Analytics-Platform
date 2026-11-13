@@ -56,6 +56,7 @@ from src.publication_shadow import (
     compare_publication_shadow,
     evaluate_provenanced_publication_shadow,
 )
+from src.publication_shadow.execution_identity_manifest import ExecutionIdentityManifest
 from src.publication_shadow.in_memory_manifest_collector import (
     InMemoryExecutionManifestCollector,
 )
@@ -215,6 +216,7 @@ def _run_monitor_step(
     *,
     record_shadow_telemetry: bool = False,
     capture_shadow_manifest_entries: bool = False,
+    consume_shadow_manifest_snapshot_fn: Callable[[ExecutionIdentityManifest], None] | None = None,
     shadow_telemetry_path: Path = DEFAULT_SHADOW_TELEMETRY_PATH,
     record_dual_privacy_telemetry: bool = False,
     dual_privacy_telemetry_path: Path = DEFAULT_DUAL_PRIVACY_TELEMETRY_PATH,
@@ -310,6 +312,18 @@ def _run_monitor_step(
                         output_path=shadow_telemetry_path,
                         capture_manifest_entry_fn=collector.capture_manifest_entry_fn,
                     )
+
+                    if consume_shadow_manifest_snapshot_fn is not None:
+                        try:
+                            entries = collector.snapshot_entries()
+                            if entries:
+                                manifest = collector.build_execution_identity_manifest_v1()
+                                consume_shadow_manifest_snapshot_fn(manifest)
+                        except Exception:
+                            LOGGER.warning(
+                                "Observational manifest snapshot consumption failed",
+                                exc_info=True,
+                            )
             except Exception:
                 LOGGER.warning("Falha ao registrar telemetria shadow", exc_info=True)
         if record_dual_privacy_telemetry or _ACTIVE_DUAL_ENABLED.get():
@@ -408,7 +422,12 @@ def resolve_steps(selected_steps: list[str] | None) -> list[str]:
     return selected_steps
 
 
-def execute_step(step_name: str, *, capture_shadow_manifest_entries: bool = False) -> None:
+def execute_step(
+    step_name: str,
+    *,
+    capture_shadow_manifest_entries: bool = False,
+    consume_shadow_manifest_snapshot_fn: Callable[[ExecutionIdentityManifest], None] | None = None,
+) -> None:
     handler = STEP_HANDLERS.get(step_name)
     if handler is None:  # pragma: no cover
         raise ValueError(f"Etapa desconhecida: {step_name}")
@@ -438,7 +457,13 @@ def execute_step(step_name: str, *, capture_shadow_manifest_entries: bool = Fals
         )
     else:
         if step_name == "monitor" and capture_shadow_manifest_entries:
-            handler(capture_shadow_manifest_entries=True)
+            if consume_shadow_manifest_snapshot_fn is None:
+                handler(capture_shadow_manifest_entries=True)
+            else:
+                handler(
+                    capture_shadow_manifest_entries=True,
+                    consume_shadow_manifest_snapshot_fn=consume_shadow_manifest_snapshot_fn,
+                )
         else:
             handler()
 
@@ -520,6 +545,7 @@ def run_selected_steps(
     continue_on_error: bool = False,
     *,
     capture_shadow_manifest_entries: bool = False,
+    consume_shadow_manifest_snapshot_fn: Callable[[ExecutionIdentityManifest], None] | None = None,
 ) -> list[StepExecution]:
     executions: list[StepExecution] = []
     failures: list[StepExecution] = []
@@ -528,7 +554,14 @@ def run_selected_steps(
         LOGGER.info("Iniciando etapa: %s", step_name)
         try:
             if capture_shadow_manifest_entries:
-                execute_step(step_name, capture_shadow_manifest_entries=True)
+                if consume_shadow_manifest_snapshot_fn is None:
+                    execute_step(step_name, capture_shadow_manifest_entries=True)
+                else:
+                    execute_step(
+                        step_name,
+                        capture_shadow_manifest_entries=True,
+                        consume_shadow_manifest_snapshot_fn=consume_shadow_manifest_snapshot_fn,
+                    )
             else:
                 execute_step(step_name)
         except Exception as exc:
