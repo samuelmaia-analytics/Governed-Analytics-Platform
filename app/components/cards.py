@@ -5,7 +5,7 @@ import streamlit as st
 from app.components.ui import inject_base_styles
 
 
-def render_metric_cards(metrics: list[dict[str, str]], max_columns: int = 4) -> None:
+def render_metric_cards(metrics: list[dict[str, str | None]], max_columns: int = 4) -> None:
     if not metrics:
         return
     inject_base_styles()

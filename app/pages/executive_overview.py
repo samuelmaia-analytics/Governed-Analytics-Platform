@@ -248,6 +248,8 @@ def render_executive_overview(
             cols = st.columns(len(row))
             for idx, (label, page, icon) in enumerate(row):
                 with cols[idx]:
+                    if page is None:
+                        continue
                     st.page_link(page, label=label, icon=icon, use_container_width=True)
 
     prev = _load_previous_snapshot()
