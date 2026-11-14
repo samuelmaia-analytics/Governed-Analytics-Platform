@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import socket
+import struct
 import subprocess
 import sys
 import time
@@ -8,77 +10,30 @@ from pathlib import Path
 from urllib.error import URLError
 from urllib.request import urlopen
 
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Page, expect, sync_playwright
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = ROOT_DIR / "assets" / "screenshots"
-APP_URL = "http://127.0.0.1:8501"
+with socket.socket() as capture_socket:
+    capture_socket.bind(("127.0.0.1", 0))
+    APP_PORT = capture_socket.getsockname()[1]
+APP_URL = f"http://127.0.0.1:{APP_PORT}"
 
 PAGE_TARGETS: list[tuple[str, list[str], str]] = [
-    ("", ["Executive Summary", "Resumo Executivo"], "executive_overview.png"),
+    ("", ["GOVERNED ANALYTICS PLATFORM"], "executive_overview.png"),
     (
         "lgpd-privacy-risk",
-        ["LGPD & Privacy Risk", "LGPD e Risco de Privacidade"],
+        ["Privacidade e Controles LGPD"],
         "lgpd_privacy_risk.png",
     ),
-    ("data-quality", ["Data Quality", "Qualidade de Dados"], "data_quality.png"),
+    ("data-quality", ["Qualidade dos Dados"], "data_quality.png"),
     (
         "governance-control-center",
-        ["Governance Control Center", "Central de Controles de Governança"],
+        ["Laboratório de Governança", "Governance Lab"],
         "governance_control_center.png",
     ),
 ]
-
-PRIVACY_PREVIEW_ANCHORS = [
-    "Privacy Transformation Preview",
-    "Prévia de Transformações de Privacidade",
-    "Prévia de Transformação de Privacidade",
-]
-
-
-def update_readme_screenshots_section() -> None:
-    generated_privacy = (OUTPUT_DIR / "privacy_transformation_preview.png").exists()
-    screenshots_lines = [
-        "## Screenshots",
-        "",
-        "### Executive Overview",
-        "![Executive Overview](assets/screenshots/executive_overview.png)",
-        "",
-        "### LGPD & Privacy Risk",
-        "![LGPD & Privacy Risk](assets/screenshots/lgpd_privacy_risk.png)",
-        "",
-        "### Data Quality",
-        "![Data Quality](assets/screenshots/data_quality.png)",
-        "",
-        "### Governance Control Center",
-        "![Governance Control Center](assets/screenshots/governance_control_center.png)",
-        "",
-    ]
-    if generated_privacy:
-        screenshots_lines.extend(
-            [
-                "### Privacy Transformation Preview",
-                "![Privacy Transformation Preview](assets/screenshots/privacy_transformation_preview.png)",
-                "",
-            ]
-        )
-    screenshots_block = "\n".join(screenshots_lines)
-
-    readme_targets = [
-        (ROOT_DIR / "README.md", "### Como atualizar screenshots localmente"),
-        (ROOT_DIR / "README.en.md", "### How to refresh screenshots locally"),
-    ]
-    for readme_path, marker in readme_targets:
-        content = readme_path.read_text(encoding="utf-8")
-        start = content.find("## Screenshots")
-        end = content.find(marker)
-        if start == -1 or end == -1 or end <= start:
-            print(f"[WARN] Could not update screenshots section in {readme_path}")
-            continue
-        updated = content[:start] + screenshots_block + "\n" + content[end:]
-        readme_path.write_text(updated, encoding="utf-8")
-        print(f"[OK] Updated screenshots section in {readme_path}")
 
 
 def wait_for_app_ready(timeout_seconds: int = 120) -> None:
@@ -98,56 +53,44 @@ def wait_for_app_ready(timeout_seconds: int = 120) -> None:
 
 def goto_page(page: Page, url_path: str) -> None:
     target_url = APP_URL if not url_path else f"{APP_URL}/{url_path}"
-    page.goto(target_url, wait_until="networkidle", timeout=45_000)
-    time.sleep(2)
-
-
-def dismiss_page_not_found_modal(page: Page) -> None:
-    try:
-        if page.get_by_text("Page not found").first.is_visible(timeout=1500):
-            close_button = page.get_by_role("button", name="x")
-            if close_button.first.is_visible(timeout=1500):
-                close_button.first.click()
-                time.sleep(1)
-    except PlaywrightTimeoutError:
-        pass
+    page.goto(target_url, wait_until="domcontentloaded", timeout=45_000)
 
 
 def ensure_any_text(
-    page: Page, candidates: list[str], timeout_ms: int = 12_000
+    page: Page, candidates: list[str], timeout_ms: int = 60_000
 ) -> bool:
     for text in candidates:
         try:
-            if page.get_by_text(text).first.is_visible(timeout=timeout_ms):
-                return True
-        except PlaywrightTimeoutError:
+            expect(page.get_by_text(text, exact=True).first).to_be_visible(
+                timeout=timeout_ms
+            )
+            return True
+        except AssertionError:
             continue
     return False
 
 
 def capture_current_page(page: Page, output_file: Path) -> None:
-    page.wait_for_load_state("networkidle", timeout=30_000)
-    time.sleep(2)
-    page.screenshot(path=str(output_file), full_page=True)
+    expect(page.locator('[data-testid="stAppViewContainer"]')).to_be_visible()
+    expect(page.locator('[data-testid="stStatusWidget"]')).to_have_count(
+        0, timeout=120_000
+    )
+    expect(page.locator('[data-testid="stException"]')).to_have_count(0)
+    expect(page.get_by_text("Page not found", exact=True)).to_have_count(0)
+    page.evaluate("document.fonts.ready")
+    page.wait_for_timeout(1000)
+    png = page.screenshot(full_page=False, animations="disabled")
+    if struct.unpack(">II", png[16:24]) != (1440, 900):
+        raise RuntimeError("Screenshot must be exactly 1440 x 900 pixels")
+    output_file.write_bytes(png)
     print(f"[OK] Saved: {output_file}")
 
 
 def try_capture_privacy_preview(page: Page) -> None:
-    for anchor in PRIVACY_PREVIEW_ANCHORS:
-        locator = page.get_by_text(anchor)
-        try:
-            if locator.first.is_visible(timeout=3000):
-                locator.first.scroll_into_view_if_needed()
-                time.sleep(2)
-                output_file = OUTPUT_DIR / "privacy_transformation_preview.png"
-                page.screenshot(path=str(output_file), full_page=True)
-                print(f"[OK] Saved: {output_file}")
-                return
-        except PlaywrightTimeoutError:
-            continue
-    print(
-        "[WARN] Privacy Transformation Preview section not found; skipping optional screenshot."
-    )
+    preview_tab = page.get_by_role("tab", name="Prévia de transformações", exact=True)
+    preview_tab.click()
+    expect(preview_tab).to_have_attribute("aria-selected", "true")
+    capture_current_page(page, OUTPUT_DIR / "privacy_transformation_preview.png")
 
 
 def main() -> int:
@@ -157,7 +100,7 @@ def main() -> int:
     try:
         streamlit_proc = subprocess.Popen(
             [
-                "python",
+                sys.executable,
                 "-m",
                 "streamlit",
                 "run",
@@ -165,7 +108,11 @@ def main() -> int:
                 "--server.headless",
                 "true",
                 "--server.port",
-                "8501",
+                str(APP_PORT),
+                "--server.address",
+                "127.0.0.1",
+                "--browser.gatherUsageStats",
+                "false",
             ],
             cwd=ROOT_DIR,
             env={**os.environ, "PYTHONPATH": str(ROOT_DIR)},
@@ -178,19 +125,18 @@ def main() -> int:
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
-            page = browser.new_page(viewport={"width": 1440, "height": 1100})
-            page.goto(APP_URL, wait_until="networkidle")
-            time.sleep(2)
+            page = browser.new_page(
+                viewport={"width": 1440, "height": 900}, device_scale_factor=1
+            )
 
             for url_path, expected_texts, file_name in PAGE_TARGETS:
                 try:
                     goto_page(page, url_path)
                 except PlaywrightTimeoutError:
                     print(f"[WARN] Could not open URL path: {url_path}")
-                    continue
-                dismiss_page_not_found_modal(page)
+                    raise
                 if not ensure_any_text(page, expected_texts):
-                    print(f"[WARN] Expected markers not found for: {file_name}")
+                    raise RuntimeError(f"Expected markers not found for: {file_name}")
                 capture_current_page(page, OUTPUT_DIR / file_name)
 
             goto_page(page, "lgpd-privacy-risk")
@@ -209,14 +155,13 @@ def main() -> int:
     if not after_pngs:
         print(f"[ERROR] No PNG files found in {OUTPUT_DIR}")
         return 1
-    print(f"[OK] Total PNG files in {OUTPUT_DIR}: {len(after_pngs)}")
+    print(f"[OK] Refreshed 5 screenshots at 1440 x 900 in {OUTPUT_DIR}")
     if generated_now:
         print(f"[OK] Newly generated in this run: {len(generated_now)}")
     else:
         print(
             "[WARN] No brand-new files were created; existing screenshots were refreshed."
         )
-    update_readme_screenshots_section()
     return 0
 
 

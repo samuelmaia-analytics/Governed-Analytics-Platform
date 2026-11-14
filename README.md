@@ -192,12 +192,12 @@ Limitação: o token é compartilhado e **não implementa RBAC/ABAC** (autoriza�
 
 ## Visão da aplicação
 
-As imagens abaixo são registros versionados da interface e podem representar uma versão anterior à modernização de 14/11/2026; para a aparência atual, consulte a [demonstração ao vivo](https://governed-analytics-platform.streamlit.app/). Não se trata de capturas novas do Checkpoint 18.
+Capturas reais do Streamlit local em **1440 × 900** (escala 1:1), sem redimensionamento. Os resultados refletem o cenário demonstrativo e podem variar entre execuções. [Processo de captura](docs/operations/streamlit_capture_runbook.md).
 
 
 | Executive Overview | Governance Control Center |
 |---|---|
-| ![Executive Overview](assets/screenshots/executive_overview_v3.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
+| ![Executive Overview](assets/screenshots/executive_overview.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
 
 | LGPD & Privacy Risk | Data Quality |
 |---|---|

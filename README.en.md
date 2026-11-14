@@ -12,7 +12,7 @@ A personal portfolio platform that turns public Olist e-commerce data into analy
 
 ## Executive interface update — 14 November 2026
 
-The Streamlit application now provides a refreshed Executive Overview, grouped sidebar navigation, reusable metric cards and clear historical evidence labels. Operational indicators come from available sources, with explicit missing-evidence states; the visual redesign does not change publication rules. See the [interface commit](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/8dc43e7a9c8bdc8714901c62810b9c0723d7c884) and [typing fix](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/1219c6a4d640b00d9c249eda8d9f3951ecd82ee4). CI, lint, security, policy and Streamlit deploy workflows passed on the latter commit. Historic screenshots may predate this change.
+The Streamlit application now provides a refreshed Executive Overview, grouped sidebar navigation, reusable metric cards and clear historical evidence labels. Operational indicators come from available sources, with explicit missing-evidence states; the visual redesign does not change publication rules. See the [interface commit](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/8dc43e7a9c8bdc8714901c62810b9c0723d7c884) and [typing fix](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/1219c6a4d640b00d9c249eda8d9f3951ecd82ee4). CI, lint, security, policy and Streamlit deploy workflows passed on the latter commit. Updated local interface captures are available in the application screenshots section.
 
 The **1,353 passing tests and 92% coverage** are from the separate **13 November 2026 local run**, not inferred from the CI badge. This is a personal demonstration project, not an enterprise deployment.
 
@@ -46,6 +46,18 @@ Equivalent command (PowerShell, from the repository root):
 
 Note: coverage data was stored in a temporary directory **outside the repository**, avoiding `.coverage`, `htmlcov/` or `coverage.xml` artifacts in the working tree.
 
+
+## Application screenshots
+
+Real local Streamlit captures at **1440 × 900**, pixel scale 1:1, without resizing. Results reflect the demonstration dataset and may vary between runs. [Capture runbook](docs/operations/streamlit_capture_runbook.md).
+
+| Executive Overview | Governance Control Center |
+|---|---|
+| ![Executive Overview](assets/screenshots/executive_overview.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
+
+| LGPD & Privacy Risk | Data Quality |
+|---|---|
+| ![LGPD Privacy Risk](assets/screenshots/lgpd_privacy_risk.png) | ![Data Quality](assets/screenshots/data_quality.png) |
 
 ## Architecture and publication boundary
 
