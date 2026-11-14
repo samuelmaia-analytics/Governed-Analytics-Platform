@@ -10,6 +10,12 @@ A personal portfolio platform that turns public Olist e-commerce data into analy
 
 [Open the demonstration](https://governed-analytics-platform.streamlit.app/)
 
+## Executive interface update — 14 November 2026
+
+The Streamlit application now provides a refreshed Executive Overview, grouped sidebar navigation, reusable metric cards and clear historical evidence labels. Operational indicators come from available sources, with explicit missing-evidence states; the visual redesign does not change publication rules. See the [interface commit](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/8dc43e7a9c8bdc8714901c62810b9c0723d7c884) and [typing fix](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/1219c6a4d640b00d9c249eda8d9f3951ecd82ee4). CI, lint, security, policy and Streamlit deploy workflows passed on the latter commit. Historic screenshots may predate this change.
+
+The **1,353 passing tests and 92% coverage** are from the separate **13 November 2026 local run**, not inferred from the CI badge. This is a personal demonstration project, not an enterprise deployment.
+
 ## Capabilities and evidence
 
 - Python and SQL ingestion, transformation and analytical modeling.
@@ -107,7 +113,7 @@ make test
 make app
 ```
 
-On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1` and copy the environment file with `copy .env.example .env`.
+On Windows PowerShell, use `uv sync --extra dev`, `Copy-Item .env.example .env`, then `uv run streamlit run app/main.py`. Run focused UI tests with `uv run python -m pytest -q tests/test_app_main.py tests/test_app_pages_rendering.py`. Never commit credentials.
 
 ## Documentation
 

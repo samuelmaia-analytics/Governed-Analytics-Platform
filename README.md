@@ -18,7 +18,7 @@
 ## Resultados e evidências
 
 A publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` —, com evidências de qualidade e governança antes do consumo. A validação local mais recente, em **13/11/2026**, registrou **1.353 testes aprovados**, **92% de cobertura** em `src` + `app` e **nenhuma falha**. São resultados da execução local, não métricas atribuídas ao GitHub Actions ou ao Codecov. Como histórico, a revisão de 24/10/2026 registrou **383 testes**, e a de 31/10/2026 registrou **1.111 testes**.
-### Validação mais recente (execução local)
+### Validação de qualidade (execução local)
 
 Resultados verificados no **Checkpoint 16C** em **13/11/2026** (execução local; não equivale automaticamente aos números do workflow do GitHub Actions ou do Codecov):
 
@@ -36,6 +36,16 @@ Comando equivalente utilizado (PowerShell, na raiz do projeto):
 
 Nota: a coleta/armazenamento de dados de cobertura foi isolada em diretório temporário **fora do repositório**, para evitar criação de artefatos (`.coverage`, `htmlcov/`, `coverage.xml`) no working tree.
 
+
+---
+
+## Interface executiva e observabilidade
+
+A aplicação Streamlit foi modernizada em **14/11/2026** com uma **Executive Overview** mais clara, cards de indicadores, navegação lateral por áreas, acesso às páginas existentes e apresentação explícita de evidências históricas. Os indicadores operacionais utilizam fontes disponíveis na execução; na ausência de dados, a interface informa a indisponibilidade em vez de inventar números. A modernização preserva o processamento e as regras de governança existentes.
+
+A mudança foi publicada no commit [`8dc43e7`](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/8dc43e7a9c8bdc8714901c62810b9c0723d7c884) e recebeu uma [correção de tipagem](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/commit/1219c6a4d640b00d9c249eda8d9f3951ecd82ee4). No commit de correção, os workflows **CI, Lint, Security, Policy Check e Deploy Streamlit** terminaram com sucesso. Esses checks não comprovam implantação corporativa nem substituem o escopo da validação local de 13/11/2026.
+
+[Executar demonstração](https://governed-analytics-platform.streamlit.app/) · [Conferir os workflows](https://github.com/samuelmaia-analytics/Governed-Analytics-Platform/actions)
 
 ---
 
@@ -182,6 +192,9 @@ Limitação: o token é compartilhado e **não implementa RBAC/ABAC** (autoriza�
 
 ## Visão da aplicação
 
+As imagens abaixo são registros versionados da interface e podem representar uma versão anterior à modernização de 14/11/2026; para a aparência atual, consulte a [demonstração ao vivo](https://governed-analytics-platform.streamlit.app/). Não se trata de capturas novas do Checkpoint 18.
+
+
 | Executive Overview | Governance Control Center |
 |---|---|
 | ![Executive Overview](assets/screenshots/executive_overview_v3.png) | ![Governance Control Center](assets/screenshots/governance_control_center.png) |
@@ -204,16 +217,18 @@ Limitação: o token é compartilhado e **não implementa RBAC/ABAC** (autoriza�
 
 ## Executar localmente
 
-### Windows PowerShell
+### Windows PowerShell (sem dependência de `make`)
+
+Com Python 3.11+ e [uv](https://docs.astral.sh/uv/) disponíveis:
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-make install
-copy .env.example .env
-make test
-make app
+uv sync --extra dev
+Copy-Item .env.example .env
+uv run python -m pytest -q tests/test_app_main.py tests/test_app_pages_rendering.py
+uv run streamlit run app/main.py
 ```
+
+A interface estará em `http://localhost:8501`. Configure valores de `.env` apenas quando uma funcionalidade opcional exigir credenciais; nunca versione tokens. Para executar a suíte completa: `uv run pytest`.
 
 ### Linux / macOS
 
