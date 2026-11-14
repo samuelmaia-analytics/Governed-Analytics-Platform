@@ -146,14 +146,20 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
 
         @staticmethod
         def navigation(*_args, **kwargs):  # type: ignore[no-untyped-def]
-            navigation_titles.extend(page.title for page in kwargs["pages"])
+            pages = kwargs["pages"]
+            if isinstance(pages, dict):
+                for section_pages in pages.values():
+                    navigation_titles.extend(page.title for page in section_pages)
+            else:
+                navigation_titles.extend(page.title for page in pages)
             return FakeNavigation()
 
     monkeypatch.setattr(main_module, "st", FakeStreamlit())
     monkeypatch.setattr(main_module, "build_locale_selector", lambda: "pt-BR")
+    monkeypatch.setattr(main_module, "inject_base_styles", lambda: None)
     monkeypatch.setattr(main_module, "build_context", lambda _locale: context)
     monkeypatch.setattr(
-        main_module, "_render_executive_page", lambda _context, _locale: None
+        main_module, "_render_executive_page", lambda *_args, **_kwargs: None
     )
     monkeypatch.setattr(
         main_module, "_render_catalog_page", lambda _context, _locale: None
@@ -203,21 +209,21 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
 
     assert calls.count("page") == 15
     expected_routes = {
-        "Portfolio Overview": "executive-overview",
-        "Business Insights": "revenue-analytics",
-        "Publication Governance": "publication-governance",
-        "Privacy & LGPD Controls": "lgpd-privacy-risk",
+        "Overview": "executive-overview",
+        "Indicadores anal\u00edticos": "revenue-analytics",
+        "Publication Gate": "publication-governance",
+        "LGPD e Privacidade": "lgpd-privacy-risk",
         "Data Quality": "data-quality",
         "Seller Performance": "seller-performance",
-        "Customer Retention": "cohort-retention",
-        "Data Catalog": "data-catalog",
-        "Technical Analysis": "technical-analysis",
-        "Governance Evidence": "governance-report",
-        "Governance Lab": "governance-control-center",
-        "Automation & Orchestration": "n8n-automation",
-        "GenAI Experiment": "genai-insights",
-        "Assistente de Governan\u00e7a": "governance-assistant",
-        "Snowflake Integration": "snowflake-explorer",
+        "Cohort Retention": "cohort-retention",
+        "Contratos e Cat\u00e1logo": "data-catalog",
+        "An\u00e1lise Explorat\u00f3ria": "technical-analysis",
+        "Evid\u00eancias e rastreabilidade": "governance-report",
+        "Central de Controles": "governance-control-center",
+        "n8n Automation": "n8n-automation",
+        "GenAI Insights": "genai-insights",
+        "Assistente RAG": "governance-assistant",
+        "Snowflake Explorer": "snowflake-explorer",
     }
     registered_routes = {page.title: page.url_path for page in registered_pages}
     assert len(registered_pages) == len(expected_routes)
@@ -227,26 +233,24 @@ def test_main_builds_navigation_and_runs_selected_page(monkeypatch) -> None:
     assert registered_routes == expected_routes
     assert "eda" not in url_paths
     assert navigation_titles == [
-        "Portfolio Overview",
-        "Business Insights",
-        "Publication Governance",
-        "Privacy & LGPD Controls",
+        "Overview",
         "Data Quality",
+        "Contratos e Cat\u00e1logo",
+        "LGPD e Privacidade",
+        "Central de Controles",
+        "Indicadores anal\u00edticos",
         "Seller Performance",
-        "Customer Retention",
-        "Data Catalog",
-        "Technical Analysis",
-        "Governance Evidence",
-        "Governance Lab",
-        "Automation & Orchestration",
-        "GenAI Experiment",
-        "Assistente de Governan\u00e7a",
-        "Snowflake Integration",
+        "Cohort Retention",
+        "An\u00e1lise Explorat\u00f3ria",
+        "n8n Automation",
+        "GenAI Insights",
+        "Assistente RAG",
+        "Snowflake Explorer",
+        "Publication Gate",
+        "Evid\u00eancias e rastreabilidade",
     ]
-    technical_page = next(
-        page for page in registered_pages if page.title == "Technical Analysis"
-    )
-    assert technical_page.title == "Technical Analysis"
+    technical_page = next(page for page in registered_pages if page.title == "An\u00e1lise Explorat\u00f3ria")
+    assert technical_page.title == "An\u00e1lise Explorat\u00f3ria"
     assert technical_page.icon == ":material/monitoring:"
     assert technical_page.url_path == "technical-analysis"
     assert callable(technical_page.fn)

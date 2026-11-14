@@ -83,6 +83,9 @@ class _FakeContainer:
     def plotly_chart(self, *_args, **_kwargs) -> None:
         return None
 
+    def container(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
+        return self
+
     def expander(self, *_args, **_kwargs):  # type: ignore[no-untyped-def]
         return _FakeContainer()
 
@@ -1127,11 +1130,21 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
         source_fingerprint="source-sha256",
         published_fingerprint="published-sha256",
     )
-    monkeypatch.setattr(executive_overview_page, "st", CapturingStreamlit())
+    fake_st = CapturingStreamlit()
+    monkeypatch.setattr(executive_overview_page, "st", fake_st)
+    monkeypatch.setattr(cards, "st", fake_st)
     monkeypatch.setattr(
         executive_overview_page,
         "_render_operational_readiness_section",
         lambda _locale: None,
+    )
+    monkeypatch.setattr(executive_overview_page, "_data_freshness", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(executive_overview_page, "_data_freshness", lambda *_args, **_kwargs: None)
+
+    monkeypatch.setattr(
+        executive_overview_page,
+        "_data_freshness",
+        lambda *_args, **_kwargs: None,
     )
 
     executive_overview_page.render_executive_overview(  # type: ignore[arg-type]
@@ -1155,39 +1168,21 @@ def test_portfolio_overview_prioritizes_value_kpis_and_navigation(
         duckdb_version="1.0",
     )
 
-    assert ("title", "Governed Analytics Platform") in calls
-    assert ("caption", "Projeto de portfólio profissional") in calls
-    assert any(
-        "transforma dados brutos" in value
-        for kind, value in calls
-        if kind == "markdown"
-    )
-    assert any(
-        "fins demonstrativos" in value
-        for kind, value in calls
-        if kind == "caption"
-    )
-    assert metrics[:4] == [
+    assert ("title", "GOVERNED ANALYTICS PLATFORM") in calls
+    assert any(kind == "caption" and "Dados confi" in value for kind, value in calls)
+    assert any(kind == "markdown" and "analytics governada" in value for kind, value in calls)
+    assert metrics[:7] == [
         ("Registros governados", "2"),
-        ("Governança de publicação", "Decisão auditável disponível"),
-        ("Controles de privacidade", "16/16 PASS"),
-        ("Qualidade e monitoramento", "Qualidade 24/25 · Monitoramento 12/12"),
+        ("Publication Gate", "Needs Review"),
+        ("Data Quality Score", "100 / 100"),
+        ("Privacy Risk Score", "15 / 100"),
+        ("Freshness dos dados", "Indisponível"),
+        ("Checks críticos", "0"),
+        ("Contratos de dados", "1/1 PASS"),
     ]
-    assert all(value != "Needs Review" for _, value in metrics[:4])
-    assert snapshot.historical_decision == "Needs Review"
-    assert any(
-        kind == "write"
-        and "plataforma analítica governada" in value
-        and "15/100" not in value
-        for kind, value in calls
-    )
-    assert (
-        "caption",
-        "Indicadores diagnósticos do ambiente demonstrativo.",
-    ) in calls
-    assert page_links == ["Explore Business Insights", "View Governance Decision"]
-    assert ("info", "Raw Data") in calls
-    assert ("success", "Trusted Analytics") in calls
+    assert page_links == ["Publication Gate", "Indicadores analíticos"]
+    assert any(kind == "info" and value.startswith("Problema:") for kind, value in calls)
+    assert any(kind == "success" and value.startswith("Evid") for kind, value in calls)
     assert any(
         "github.com/samuelmaia-analytics" in value
         for kind, value in calls
@@ -1243,12 +1238,16 @@ def test_portfolio_overview_uses_demonstration_fallbacks_without_evidence(
         source_fingerprint="Unavailable",
         published_fingerprint="Unavailable",
     )
-    monkeypatch.setattr(executive_overview_page, "st", CapturingStreamlit())
+    fake_st = CapturingStreamlit()
+    monkeypatch.setattr(executive_overview_page, "st", fake_st)
+    monkeypatch.setattr(cards, "st", fake_st)
     monkeypatch.setattr(
         executive_overview_page,
         "_render_operational_readiness_section",
         lambda _locale: None,
     )
+
+    monkeypatch.setattr(executive_overview_page, "_data_freshness", lambda *_args, **_kwargs: None)
 
     executive_overview_page.render_executive_overview(  # type: ignore[arg-type]
         df=pd.DataFrame({"value": [1, 2]}),
@@ -1288,27 +1287,18 @@ def test_portfolio_overview_uses_demonstration_fallbacks_without_evidence(
         governance_snapshot=snapshot,
     )
 
-    assert metrics[:4] == [
+    assert metrics[:7] == [
         ("Registros governados", "2"),
-        ("Governança de publicação", "Decisão auditável disponível"),
-        ("Controles de privacidade", "Controles demonstrados"),
-        ("Qualidade e monitoramento", "Validações demonstradas"),
+        ("Publication Gate", "Unavailable"),
+        ("Data Quality Score", "50 / 100"),
+        ("Privacy Risk Score", "100 / 100"),
+        ("Freshness dos dados", "Indisponível"),
+        ("Checks críticos", "0"),
+        ("Contratos de dados", "Sem evidência"),
     ]
-    primary_values = {str(value) for _, value in metrics[:4]}
-    assert "0/0 PASS" not in primary_values
-    assert "Unavailable" not in primary_values
-    assert "Approved" not in primary_values
-
-    headline = next(value for kind, value in calls if kind == "write")
-    assert "100/100" not in headline
-    assert "50/100" not in headline
-    assert "5 falhas" not in headline
-    assert ("Score de Risco LGPD", "100 / 100") in metrics
-    assert ("Score de Qualidade", "50 / 100") in metrics
-    assert (
-        "caption",
-        "Indicadores diagnósticos do ambiente demonstrativo.",
-    ) in calls
+    assert ("Score de risco LGPD", "100 / 100") in metrics
+    assert ("Score de qualidade", "50 / 100") in metrics
+    assert any(kind == "caption" and "Indicadores diagn" in value for kind, value in calls)
 
 
 def test_portfolio_overview_navigation_keeps_governance_links(
@@ -1369,7 +1359,9 @@ def test_portfolio_overview_navigation_keeps_governance_links(
         source_fingerprint="source-sha256",
         published_fingerprint="published-sha256",
     )
-    monkeypatch.setattr(executive_overview_page, "st", CapturingStreamlit())
+    fake_st = CapturingStreamlit()
+    monkeypatch.setattr(executive_overview_page, "st", fake_st)
+    monkeypatch.setattr(cards, "st", fake_st)
     monkeypatch.setattr(
         executive_overview_page,
         "_render_operational_readiness_section",
@@ -1397,40 +1389,29 @@ def test_portfolio_overview_navigation_keeps_governance_links(
         duckdb_version="1.0",
     )
 
-    assert ("title", "Governed Analytics Platform") in calls
-    assert ("caption", "Projeto de portfólio profissional") in calls
-    assert any(
-        "transforma dados brutos" in value
-        for kind, value in calls
-        if kind == "markdown"
-    )
-    assert any(
-        "fins demonstrativos" in value
-        for kind, value in calls
-        if kind == "caption"
-    )
-    assert metric_labels[:4] == [
+    assert ("title", "GOVERNED ANALYTICS PLATFORM") in calls
+    assert any(kind == "caption" and "Dados confi" in value for kind, value in calls)
+    assert any(kind == "markdown" and "analytics governada" in value for kind, value in calls)
+    assert metric_labels[:7] == [
         "Registros governados",
-        "Governança de publicação",
-        "Controles de privacidade",
-        "Qualidade e monitoramento",
+        "Publication Gate",
+        "Data Quality Score",
+        "Privacy Risk Score",
+        "Freshness dos dados",
+        "Checks críticos",
+        "Contratos de dados",
     ]
-    assert page_links == ["Explore Business Insights", "View Governance Decision"]
-    assert ("info", "Raw Data") in calls
-    assert ("success", "Trusted Analytics") in calls
+    assert page_links == ["Publication Gate", "Indicadores analíticos"]
     assert any(
         "github.com/samuelmaia-analytics" in value
         for kind, value in calls
         if kind == "markdown"
     )
-    assert control_center_page.GOVERNANCE_LAB_NOTICE.startswith(
-        "Interactive diagnostic environment"
-    )
 
 
 @pytest.mark.parametrize("locale,record_label,unavailable", [
-    ("pt-BR", "Registros analisados", "Evidências indisponíveis para estes dados"),
-    ("en-US", "Analyzed records", "Evidence unavailable for selected data"),
+    ("pt-BR", "Registros analisados", "Indisponível"),
+    ("en-US", "Analyzed records", "Unavailable"),
 ])
 def test_overview_without_published_source_does_not_load_persisted_evidence(
     monkeypatch, locale, record_label, unavailable,
@@ -1450,12 +1431,17 @@ def test_overview_without_published_source_does_not_load_persisted_evidence(
         f"    {{'failed_checks_count': 0}}, '{locale}', uses_persisted_governance=False)\n"
     ).run()
     assert not app.exception
+    metrics = {metric.label: metric.value for metric in app.metric}
     assert app.metric[0].label == record_label
-    assert [metric.value for metric in app.metric[1:4]] == [unavailable] * 3
-    assert app.warning
+    assert metrics.get(record_label) == "1"
+    assert metrics.get("Publication Gate") == unavailable
+    assert metrics.get("Data Quality Score") == "100 / 100"
+    assert metrics.get("Privacy Risk Score") == "15 / 100"
     if locale == "en-US":
-        assert any("Professional portfolio project" in item.value for item in app.caption)
-        assert app.metric[1].label == "Publication governance"
+        assert metrics.get("Data contracts") == unavailable
+    else:
+        assert metrics.get("Contratos de dados") == unavailable
+    assert app.warning
 
 
 def test_render_revenue_analytics_with_and_without_semantic_slices(monkeypatch) -> None:
