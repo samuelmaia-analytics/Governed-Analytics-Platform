@@ -17,7 +17,7 @@
 
 ## Resultados e evidências
 
-A publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` — e a arquitetura mantém evidências de qualidade e governança antes do consumo. Na revisão de governança de 24/10/2026, a suíte completa passou com **383 testes**, incluindo validações de entradas inválidas do Gate. Esse resultado corresponde à revisão documentada; execuções posteriores podem alterar a contagem.
+A publicação passa por três estados explícitos — `Approved`, `Needs Review` e `Blocked` —, com evidências de qualidade e governança antes do consumo. A validação local mais recente, em **13/11/2026**, registrou **1.353 testes aprovados**, **92% de cobertura** em `src` + `app` e **nenhuma falha**. São resultados da execução local, não métricas atribuídas ao GitHub Actions ou ao Codecov. Como histórico, a revisão de 24/10/2026 registrou **383 testes**, e a de 31/10/2026 registrou **1.111 testes**.
 ### Validação mais recente (execução local)
 
 Resultados verificados no **Checkpoint 16C** em **13/11/2026** (execução local; não equivale automaticamente aos números do workflow do GitHub Actions ou do Codecov):

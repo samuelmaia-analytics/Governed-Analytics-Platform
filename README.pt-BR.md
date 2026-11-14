@@ -13,6 +13,8 @@
 Plataforma analítica governada para portfólio.
 Foco em Analytics Engineering com controles de governança, qualidade e privacidade.
 
+**Evidência mais recente:** validação local em **13/11/2026** com **1.353 testes aprovados**, **92% de cobertura** em `src` + `app` e **nenhuma falha**. Os resultados não correspondem automaticamente aos indicadores do GitHub Actions ou do Codecov; o detalhamento e os limites estão na seção [Qualidade verificada](#qualidade-verificada-execução-local).
+
 ## Resumo Executivo
 
 Este repositório demonstra um fluxo completo:
